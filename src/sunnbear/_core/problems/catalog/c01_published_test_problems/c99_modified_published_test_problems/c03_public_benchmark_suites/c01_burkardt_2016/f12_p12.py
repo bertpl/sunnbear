@@ -5,7 +5,16 @@ A change of formula f1.3.1.12 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -39,10 +48,10 @@ class ModifiedBurkardt2016P12(Formula):
     number = (1, 99, 3, 1, 12)
     name = "p12"
     params = (
-        FormulaParam("factor"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("factor", latex_symbol=r"\mathit{factor}"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -72,6 +81,30 @@ class ModifiedBurkardt2016P12(Formula):
         ),
         location="Problem p12",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \param{c_scale} \c"),
+            (
+                r"\fn{g}(\x)",
+                (
+                    r"\begin{cases} -\exp\left(\ln \param{factor} + \ln|\x - 1| - \frac{1}{(\x - 1)^2}\right) "
+                    r"& \text{if } \x < 1 \\ 0 & \text{if } \x = 1 \\ \exp\left(\ln \param{factor} + \ln|\x - "
+                    r"1| - \frac{1}{(\x - 1)^2}\right) & \text{otherwise} \end{cases}"
+                ),
+            ),
+        ),
+        expression=r"\fn{g}(\tmp{u}) + 2^{-918} (\tmp{u} - 1)",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"The term $2^{-918} (\tmp{u} - 1)$ keeps the function from being exactly 0 within about "
+                r"0.04 of its root, where the published function, $\fn{g}(\tmp{u})$, underflows to 0 in "
+                "float64. This changes what the test problem tests: with the published function, a solver "
+                "may stop at any x-value within about 0.04 of the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, factor: float, a: float, b: float, c_scale: float) -> float:
@@ -101,6 +134,7 @@ class ModifiedBurkardt2016P12(Formula):
                     (1000.0, -4.0, 4.1, 8.1),
                     (1000.0, 0.5, 2.0, 1.5),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

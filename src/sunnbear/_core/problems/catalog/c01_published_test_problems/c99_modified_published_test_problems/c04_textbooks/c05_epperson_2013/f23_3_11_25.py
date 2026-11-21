@@ -3,7 +3,14 @@
 A change of formula f1.4.5.23 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson201331125(Formula):
@@ -38,6 +45,20 @@ class ModifiedEpperson201331125(Formula):
         ),
         location="Exercise 3.11-25",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.004 \c"),),
+        expression=r"\tmp{u}^{5}",
+        interval="[-0.002, 0.002]",
+        notes=(
+            (
+                r"The expression is the published function, $(\x - 1)^5$, at $\x + 1$, on the published "
+                "interval $[0.998, 1.002]$ shifted by $-1$, because the published interval's largest "
+                "bound is about 250 times its width, more than the benchmark suite inclusion conditions "
+                "allow."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

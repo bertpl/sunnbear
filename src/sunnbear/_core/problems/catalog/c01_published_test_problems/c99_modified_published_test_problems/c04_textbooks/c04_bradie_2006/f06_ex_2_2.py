@@ -5,7 +5,14 @@ A change of formula f1.4.4.6 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBradie2006Ex22(Formula):
@@ -45,6 +52,19 @@ class ModifiedBradie2006Ex22(Formula):
             "109); Exercises 2.1-13, 2.5-15, 2.6-3"
         ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.495 \c"),),
+        expression=r"\tan{\left(\pi \tmp{u} \right)} - \tmp{u} - 6",
+        interval="[0, 0.495]",
+        notes=(
+            (
+                r"The interval ends at 0.495, not at the published 0.5, the pole of $\tan \pi \tmp{u}$, "
+                r"where the function is about $1.6 \cdot 10^{16}$ in float64 and which a shift along x by "
+                r"any $\c < 0$ crosses."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

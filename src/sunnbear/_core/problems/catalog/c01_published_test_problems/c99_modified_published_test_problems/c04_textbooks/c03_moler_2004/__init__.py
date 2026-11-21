@@ -16,3 +16,7 @@ class ModifiedMoler2004(FormulaCategory):
 
     number = (1, 99, 4, 3)
     name = "Moler (2004)"
+    description = (
+        "The test problems are modified versions of those that come from the textbook Numerical Computing "
+        "with MATLAB: from chapter 4, on zeros and roots, and from 2 examples of chapter 1."
+    )

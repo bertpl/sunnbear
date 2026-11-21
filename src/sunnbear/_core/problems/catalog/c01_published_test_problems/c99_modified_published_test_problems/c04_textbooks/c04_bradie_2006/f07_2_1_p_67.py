@@ -5,7 +5,16 @@ A change of formula f1.4.4.7 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedBradie200621P67(Formula):
@@ -52,9 +61,9 @@ class ModifiedBradie200621P67(Formula):
     number = (1, 99, 4, 4, 7)
     name = "§2.1 (p. 67)"
     params = (
-        FormulaParam("initial_investment"),
-        FormulaParam("monthly_deposit"),
-        FormulaParam("goal"),
+        FormulaParam("initial_investment", latex_symbol=r"\mathit{investment}"),
+        FormulaParam("monthly_deposit", latex_symbol=r"\mathit{monthly\ deposit}"),
+        FormulaParam("goal", latex_symbol=r"\mathit{goal}"),
     )
     source = FormulaSource(
         reference=(
@@ -63,6 +72,31 @@ class ModifiedBradie200621P67(Formula):
         ),
         location="§2.1 (p. 67); Exercises 2.1-19, 2.5-20",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{r}", r"\x - 0.09 \c"),),
+        expression=(
+            r"\begin{cases} \param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & "
+            r"\text{if } \tmp{r} = 0 \\ \operatorname{expm1}\left(36 "
+            r"\operatorname{log1p}\left(\frac{\tmp{r}}{12}\right)\right) "
+            r"\left(\param{initial_investment} + \frac{12 \param{monthly_deposit}}{\tmp{r}}\right) - "
+            r"\left(\param{goal} - \param{initial_investment}\right) & \text{otherwise} \end{cases}"
+        ),
+        interval="[0.01, 0.1]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\param{initial_investment} \left(1 + "
+                r"\frac{\tmp{r}}{12}\right)^{36} + \param{monthly_deposit} \frac{\left(1 + "
+                r"\tmp{r}/12\right)^{36} - 1}{\tmp{r}/12} - \param{goal},$$ without rounding $1 + "
+                r"\tmp{r}/12$ to float64 and without subtracting 1, which makes the published function "
+                "exactly 0 at many x-values next to the root."
+            ),
+            (
+                r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without cancellation for a small $z$, "
+                r"and $\operatorname{log1p}(z)$ is $\ln(1 + z)$, computed without rounding $1 + z$."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, initial_investment: float, monthly_deposit: float, goal: float) -> float:
@@ -90,6 +124,7 @@ class ModifiedBradie200621P67(Formula):
             ParamTable(
                 names=("initial_investment", "monthly_deposit", "goal"),
                 rows=((13500.0, 250.0, 25000.0), (14000.0, 250.0, 25000.0), (12500.0, 300.0, 25000.0)),
+                summary="The published parameter values.",
             ),
         )
 

@@ -24,3 +24,7 @@ class ModifiedArticlesOfSolversThatSunnbearImplements(FormulaCategory):
 
     number = (1, 99, 1)
     name = "Articles of solvers that sunnbear implements"
+    description = (
+        "The test problems are modified versions of those that come from articles on root-finding methods "
+        "that sunnbear implements."
+    )

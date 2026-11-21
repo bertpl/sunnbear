@@ -5,7 +5,16 @@ A change of formula f1.4.6.2 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedChapraCanale2015Ex52(Formula):
@@ -35,9 +44,9 @@ class ModifiedChapraCanale2015Ex52(Formula):
     number = (1, 99, 4, 6, 2)
     name = "Ex. 5.2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -47,6 +56,25 @@ class ModifiedChapraCanale2015Ex52(Formula):
         ),
         location="Example 5.2; Fig. 5.4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\sin{\left(10 \tmp{u} \right)} + \cos{\left(3 \tmp{u} \right)}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                "The intervals are the published $[3, 5]$ and $[4.2, 4.3]$, narrowed to $[3.3, 5]$ and "
+                "$[4.2, 4.26]$ so that each holds an odd number of roots, 5 and 1: the published "
+                "intervals hold 6 and 2 roots, so that the function has the same sign at both bounds of "
+                "each."
+            ),
+            (
+                "This changes what the test problem tests on $[4.2, 4.26]$: the source plots the function "
+                "on $[4.2, 4.3]$ to show that what looks like a double root is 2 roots, and the modified "
+                "interval holds only the first."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -69,6 +97,9 @@ class ModifiedChapraCanale2015Ex52(Formula):
                 rows=(
                     (3.3, 5.0, 1.7),
                     (4.2, 4.26, 0.06),
+                ),
+                summary=(
+                    "The published intervals $[3, 5]$ and $[4.2, 4.3]$, each narrowed to hold an odd number of roots."
                 ),
             ),
         )

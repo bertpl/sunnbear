@@ -14,3 +14,7 @@ class ModifiedSabharwal2019(FormulaCategory):
 
     number = (1, 99, 2, 13)
     name = "Sabharwal (2019)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces a hybrid "
+        "of bisection and regula falsi."
+    )

@@ -5,7 +5,14 @@ A change of formula f1.3.6.3 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedRootsJl2026Func10(Formula):
@@ -51,6 +58,23 @@ class ModifiedRootsJl2026Func10(Formula):
         ),
         location="test_derivative_free.jl, func10",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
+        expression=r"\arcsin{\left(\tmp{u}^{2} - 1 \right)} - \frac{\tmp{u}}{2} + 1",
+        interval="[-0.2, 1]",
+        notes=(
+            (
+                "The interval starts at $-0.2$, not at the published $-0.5$, so that it holds 1 of the "
+                "published interval's 2 roots: with an even number of roots, the function has the same "
+                "sign at both published bounds."
+            ),
+            (
+                "This changes what the test problem tests: the source finds every root in $[-0.5, 1]$, "
+                "and a solver on the modified interval finds only 1."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

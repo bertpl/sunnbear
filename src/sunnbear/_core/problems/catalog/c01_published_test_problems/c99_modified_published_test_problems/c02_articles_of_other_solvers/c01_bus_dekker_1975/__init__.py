@@ -14,3 +14,7 @@ class ModifiedBusDekker1975(FormulaCategory):
 
     number = (1, 99, 2, 1)
     name = "Bus, Dekker (1975)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces "
+        "Algorithms M and R, 2 methods with guaranteed convergence."
+    )

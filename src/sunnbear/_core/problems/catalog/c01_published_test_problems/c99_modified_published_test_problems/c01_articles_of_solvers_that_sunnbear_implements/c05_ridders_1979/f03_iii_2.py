@@ -5,7 +5,14 @@ A change of formula f1.1.5.3 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedRidders1979Iii2(Formula):
@@ -36,6 +43,18 @@ class ModifiedRidders1979Iii2(Formula):
         ),
         location="Section III, function 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.48 \c"),),
+        expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",
+        interval="[0.02, 1.5]",
+        notes=(
+            (
+                "The interval starts at 0.02, not at the published 0, because a shift along x evaluates "
+                r"the function left of 0, where its base, $\tan \tmp{u}$, is negative."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

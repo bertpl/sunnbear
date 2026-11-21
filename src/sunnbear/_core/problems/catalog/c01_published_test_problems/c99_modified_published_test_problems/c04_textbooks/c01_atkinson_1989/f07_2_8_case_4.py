@@ -5,7 +5,14 @@ A change of formula f1.4.1.7 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -46,6 +53,29 @@ class ModifiedAtkinson198928Case4(Formula):
         ),
         location="§2.8 case (4); Problem 34(iv)",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - 3 \c"),
+            (
+                r"\fn{g}(\x)",
+                (
+                    r"\begin{cases} 0 & \text{if } \x = 1 \\ (\x - 1) e^{-1/(\x - 1)^2} & \text{otherwise} "
+                    r"\end{cases}"
+                ),
+            ),
+        ),
+        expression=r"\fn{g}(\tmp{u}) + 2^{-918} (\tmp{u} - 1)",
+        interval="[0, 3]",
+        notes=(
+            (
+                r"The term $2^{-918} (\tmp{u} - 1)$ keeps the function from being exactly 0 within about "
+                r"0.04 of its root, where the published function, $\fn{g}(\tmp{u})$, underflows to 0 in "
+                "float64. This changes what the test problem tests: with the published function, a solver "
+                "may stop at any x-value within about 0.04 of the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

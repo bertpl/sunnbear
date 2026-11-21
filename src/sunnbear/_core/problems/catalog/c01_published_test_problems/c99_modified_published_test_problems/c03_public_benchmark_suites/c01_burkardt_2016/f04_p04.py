@@ -5,7 +5,14 @@ A change of formula f1.3.1.4 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBurkardt2016P04(Formula):
@@ -61,6 +68,19 @@ class ModifiedBurkardt2016P04(Formula):
         ),
         location="Problem p04",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x e^{-\c \ln(20/10^{-5})}"),),
+        expression=r"e^{\tmp{u}} - \frac{1.0}{100.0 \tmp{u} \tmp{u}}",
+        interval="[10^{-5}, 20]",
+        notes=(
+            (
+                r"$\c$ scales x, so that the root moves by the factor $(20/10^{-5})^{\c}$ and never "
+                "reaches 0: the interval spans orders of magnitude next to the pole at 0, across which a "
+                "shift along x would take the lower bound."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SCALES_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -21,3 +21,7 @@ class ModifiedGanchovski2026(FormulaCategory):
 
     number = (1, 99, 3, 4)
     name = "Ganchovski (2026)"
+    description = (
+        "The test problems are modified versions of those that come from Root-finding Test Functions, the "
+        "collection of functions in the repository of the modified Anderson–Björck method."
+    )

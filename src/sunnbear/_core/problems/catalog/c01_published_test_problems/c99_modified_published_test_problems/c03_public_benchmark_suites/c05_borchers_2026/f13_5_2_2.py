@@ -5,7 +5,14 @@ A change of formula f1.3.5.13 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBorchers2026522(Formula):
@@ -40,6 +47,23 @@ class ModifiedBorchers2026522(Formula):
         ),
         location="§5.2.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        expression=r"\tmp{u} \sin{\left(\pi \tmp{u} \right)}",
+        interval="[-2.04, 1.96]",
+        notes=(
+            (
+                "The interval is the published $[-2, 2]$ moved left by 0.04, so that neither bound is a "
+                r"root: at the published bounds, the roots $-2$ and 2, float64's value of $\pi$ makes the "
+                "function slightly negative."
+            ),
+            (
+                "This changes what the test problem tests: the source finds every root in $[-2, 2]$, and "
+                "a solver on the modified interval finds only 1."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

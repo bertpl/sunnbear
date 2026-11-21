@@ -5,7 +5,14 @@ A change of formula f1.4.4.28 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBradie2006Ex210(Formula):
@@ -39,6 +46,19 @@ class ModifiedBradie2006Ex210(Formula):
         ),
         location="Example 2.10; Exercises 2.5-11(a), 2.6-4, 2.6-12, 2.6-13",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"2 \tmp{u} \sin^{2}{\left(\frac{\tmp{u}}{2} \right)}",
+        interval="[-2, 1]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\tmp{u} \left(1 - \cos{\left(\tmp{u} "
+                r"\right)}\right),$$ without the cancellation that makes the published function exactly 0 "
+                "at many x-values next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

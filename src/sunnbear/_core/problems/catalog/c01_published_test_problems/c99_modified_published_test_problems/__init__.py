@@ -31,7 +31,8 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     problem satisfies the conditions, or only the tuples that need the modification; a formula that holds only some
     tuples names them in its docstring.
 
-    A formula of this subcategory applies ``c`` in 1 of 3 ways, which its docstring states:
+    A formula of this subcategory applies ``c`` in 1 of 3 ways, which its `effect_of_c` declares and its docstring
+    states:
 
     - it shifts x by ``c_scale*c``, as the published formulas do, with ``c_scale`` the rounded width of the formula's
       own interval;
@@ -39,9 +40,12 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     - it keeps the published interval ``[a, b]`` and evaluates the function at ``x*exp(-c*ln(b/a))``: ``c`` scales x,
       so that the root moves by the factor ``(b/a)**c`` and never reaches 0.
 
+    A formula's presentation shows the expression that its code computes, on its own interval, and its notes tell a
+    reader what the modification changes and why.
+
     Where a modification changes what the published test problem tests, such as when it removes a feature that the
     source uses the test problem to show, the formula's docstring says so in a paragraph with the words "changes what
-    the test problem tests".
+    the test problem tests", and a note of its presentation says so for a reader.
 
     `REJECTED_PUBLISHED_TEST_PROBLEMS.md`, in this package, lists every published test problem that the benchmark
     suite pipeline rejects, and the decision for it: a modification in this subcategory, or the reason why it has none.
@@ -49,3 +53,10 @@ class ModifiedPublishedTestProblems(FormulaCategory):
 
     number = (1, 99)
     name = "Modified published test problems"
+    description = (
+        "The test problems are modified versions of published test problems that do not satisfy the benchmark "
+        "suite inclusion conditions, each as close to the published one as the conditions allow. A modified "
+        "test problem that shifts its function along the x-axis takes $s$ from its own interval; where a "
+        r"shift along x does not work, such as next to a pole or the end of the function's domain, $\c$ is "
+        "added to the function's value or scales x instead."
+    )

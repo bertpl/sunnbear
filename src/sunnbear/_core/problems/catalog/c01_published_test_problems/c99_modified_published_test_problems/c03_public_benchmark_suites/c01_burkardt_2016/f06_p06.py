@@ -5,7 +5,14 @@ A change of formula f1.3.1.6 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBurkardt2016P06(Formula):
@@ -58,6 +65,22 @@ class ModifiedBurkardt2016P06(Formula):
         ),
         location="Problem p06",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 19.9 \c"),),
+        expression=(
+            r"e^{\tmp{u}} - 2.0 - \frac{1.0}{\left(10.0 \tmp{u}\right)^{2}} + \frac{2.0}{\left(100.0 "
+            r"\tmp{u}\right)^{3}}"
+        ),
+        interval="[0.08, 20]",
+        notes=(
+            (
+                "The interval starts at 0.08, not at the published $10^{-5}$, so that it holds 1 of the "
+                "published interval's 2 roots: with an even number of roots, the function has the same "
+                "sign at both published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

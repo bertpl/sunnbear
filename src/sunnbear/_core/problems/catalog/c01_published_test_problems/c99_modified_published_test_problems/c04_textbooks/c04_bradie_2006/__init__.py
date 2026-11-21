@@ -14,3 +14,7 @@ class ModifiedBradie2006(FormulaCategory):
 
     number = (1, 99, 4, 4)
     name = "Bradie (2006)"
+    description = (
+        "The test problems are modified versions of those that come from chapter 2, on rootfinding, of the "
+        "textbook A Friendly Introduction to Numerical Analysis."
+    )

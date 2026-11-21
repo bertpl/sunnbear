@@ -5,7 +5,16 @@ A change of formula f1.1.7.7 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -37,9 +46,9 @@ class ModifiedChandrupatla19977(Formula):
     number = (1, 99, 1, 7, 7)
     name = "7"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -49,6 +58,29 @@ class ModifiedChandrupatla19977(Formula):
         ),
         location="Table 1, function 7",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \param{c_scale} \c"),
+            (
+                r"\fn{g}(\x)",
+                (
+                    r"\begin{cases} 0 & \text{if } |\x| < 3.8 \cdot 10^{-4} \\ \x e^{-\x^{-2}} & "
+                    r"\text{otherwise} \end{cases}"
+                ),
+            ),
+        ),
+        expression=r"\fn{g}(\tmp{u}) + 2^{-918} \, \tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"The term $2^{-918} \, \tmp{u}$ keeps the function from being exactly 0 within about 0.04 "
+                r"of its root, where the published function, $\fn{g}(\tmp{u})$, underflows to 0 in "
+                "float64. This changes what the test problem tests: with the published function, a solver "
+                "may stop at any x-value within about 0.04 of the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -79,6 +111,7 @@ class ModifiedChandrupatla19977(Formula):
                     (-5.0, 50.0, 55.0),
                     (-10.0, 100.0, 110.0),
                 ),
+                summary="The published intervals.",
             ),
         )
 

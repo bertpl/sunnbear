@@ -5,7 +5,14 @@ A change of formula f1.1.13.19 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import sign
 
 
@@ -41,6 +48,23 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F75(Formula):
         ),
         location="Table 2, f75",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\operatorname{sign}{\left(3 \tmp{u} - 1 \right)} \frac{\left(3 \tmp{u} - 1\right)^{2} / "
+            r"81}{1 + \sqrt{1 - \left(3 \tmp{u} - 1\right)^{2} / 81}}"
+        ),
+        interval="[-1, 1]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\operatorname{sign}{\left(3 \tmp{u} - 1 "
+                r"\right)} \left(1 - \sqrt{1 - \frac{\left(3 \tmp{u} - 1\right)^{2}}{81}}\right),$$ "
+                "without the cancellation that makes the published function exactly 0 at many x-values "
+                "next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

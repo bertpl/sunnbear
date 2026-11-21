@@ -5,7 +5,14 @@ A change of formula f1.4.5.20 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson2013398(Formula):
@@ -33,6 +40,19 @@ class ModifiedEpperson2013398(Formula):
         ),
         location="Exercise 3.9-8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
+        expression=r"2 \sin{\left(\pi \tmp{u} \right)} + \tmp{u}",
+        interval="[1.3, 2]",
+        notes=(
+            (
+                "The interval starts at 1.3, not at the published 1, so that it holds 1 of the published "
+                "interval's 2 roots: with an even number of roots, the function has the same sign at both "
+                "published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

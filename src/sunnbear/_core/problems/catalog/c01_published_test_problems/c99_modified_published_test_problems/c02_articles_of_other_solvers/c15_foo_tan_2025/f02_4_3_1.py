@@ -5,7 +5,16 @@ A change of formula f1.2.15.2 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedFooTan2025431(Formula):
@@ -33,8 +42,8 @@ class ModifiedFooTan2025431(Formula):
     number = (1, 99, 2, 15, 2)
     name = "4.3.1"
     params = (
-        FormulaParam("q"),
-        FormulaParam("y"),
+        FormulaParam("q", latex_symbol="q"),
+        FormulaParam("y", latex_symbol="y"),
     )
     source = FormulaSource(
         reference=(
@@ -44,6 +53,24 @@ class ModifiedFooTan2025431(Formula):
         ),
         location="Section 4.3.1",
     )
+    presentation = FormulaPresentation(
+        expression=(
+            r"\frac{\x \ln{\left(\param{q} - 1 \right)}}{\ln{\left(\param{q} \right)}} - "
+            r"\frac{\begin{cases} 0 & \text{for}\: \x = 0 \\\x \ln{\left(\x \right)} & "
+            r"\text{otherwise} \end{cases}}{\ln{\left(\param{q} \right)}} - \frac{\begin{cases} 0 & "
+            r"\text{for}\: \x = 1 \\\left(1 - \x\right) \ln{\left(1 - \x \right)} & \text{otherwise} "
+            r"\end{cases}}{\ln{\left(\param{q} \right)}} - \param{y} + \c"
+        ),
+        interval="[0, 1]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                "problems, because a shift along x in either direction evaluates a logarithm outside its "
+                r"domain, $\ln \x$ left of 0 or $\ln(1 - \x)$ right of 1."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, q: float, y: float) -> float:
@@ -76,6 +103,7 @@ class ModifiedFooTan2025431(Formula):
                     (1.7014118346046923e38, 0.8),
                     (1.7014118346046923e38, 0.9),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

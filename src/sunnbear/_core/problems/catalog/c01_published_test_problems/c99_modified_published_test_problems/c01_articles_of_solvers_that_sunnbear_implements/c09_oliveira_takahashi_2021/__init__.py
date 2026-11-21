@@ -15,3 +15,8 @@ class ModifiedOliveiraTakahashi2021(FormulaCategory):
 
     number = (1, 99, 1, 9)
     name = "Oliveira, Takahashi (2021)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces the ITP "
+        "method, which improves the average performance of bisection and keeps bisection's worst-case number "
+        "of iterations."
+    )

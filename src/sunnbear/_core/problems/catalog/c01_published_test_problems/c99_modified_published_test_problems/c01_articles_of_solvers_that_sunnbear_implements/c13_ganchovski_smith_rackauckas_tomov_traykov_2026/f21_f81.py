@@ -5,7 +5,14 @@ A change of formula f1.1.13.21 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
@@ -43,6 +50,22 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F81(Formula):
         ),
         location="Table 2, f81",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2.02 \c"),),
+        expression=(
+            r"\begin{cases} 1 + \sin{\left(\frac{1}{\tmp{u} + 1} \right)} & \text{for}\: \tmp{u} > -1 "
+            r"\\-1 & \text{otherwise} \end{cases}"
+        ),
+        interval="[-1.02, 1]",
+        notes=(
+            (
+                "The interval starts at $-1.02$, not at the published $-1$, where the function jumps to a "
+                r"branch that is never negative: for any $\c < 0$, the published interval holds no sign "
+                "change."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

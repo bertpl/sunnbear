@@ -3,7 +3,14 @@
 A change of formula f1.3.2.5 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedGsl2024Func6(Formula):
@@ -39,6 +46,20 @@ class ModifiedGsl2024Func6(Formula):
         ),
         location="test_funcs.c, func6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.0007 \c"),),
+        expression=r"\tmp{u}^{7}",
+        interval="[-0.0005, 0.0002]",
+        notes=(
+            (
+                r"The expression is the published function, $(\x - 1)^7$, at $\x + 1$, on the published "
+                "interval $[0.9995, 1.0002]$ shifted by $-1$, because the published interval's largest "
+                "bound is about 1429 times its width, more than the benchmark suite inclusion conditions "
+                "allow."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

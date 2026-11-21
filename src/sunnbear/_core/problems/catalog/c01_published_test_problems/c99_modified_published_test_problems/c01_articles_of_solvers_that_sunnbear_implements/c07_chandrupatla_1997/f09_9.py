@@ -5,7 +5,16 @@ A change of formula f1.1.7.9 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedChandrupatla19979(Formula):
@@ -30,8 +39,8 @@ class ModifiedChandrupatla19979(Formula):
     number = (1, 99, 1, 7, 9)
     name = "9"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
     )
     source = FormulaSource(
         reference=(
@@ -41,6 +50,19 @@ class ModifiedChandrupatla19979(Formula):
         ),
         location="Table 1, function 9",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x e^{-\c \ln(\param{b}/\param{a})}"),),
+        expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2.0 \cdot 10^{-6}}{\tmp{u}^{3}}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"$\c$ scales x, so that the root moves by the factor $(\param{b}/\param{a})^{\c}$ and "
+                "never reaches 0: the interval spans orders of magnitude next to the pole at 0, across "
+                "which a shift along x would take the lower bound."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SCALES_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
@@ -62,6 +84,7 @@ class ModifiedChandrupatla19979(Formula):
                     (0.0002, 27.0),
                     (0.0002, 81.0),
                 ),
+                summary="The published intervals from $[2 \\cdot 10^{-4}, 9]$ on.",
             ),
         )
 

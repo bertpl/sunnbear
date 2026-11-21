@@ -54,3 +54,7 @@ class ModifiedRootsFortran2025(FormulaCategory):
 
     number = (1, 99, 3, 3)
     name = "roots-fortran (2025)"
+    description = (
+        "The test problems are modified versions of those that come from the test program of roots-fortran, a "
+        "Fortran library of root finders."
+    )

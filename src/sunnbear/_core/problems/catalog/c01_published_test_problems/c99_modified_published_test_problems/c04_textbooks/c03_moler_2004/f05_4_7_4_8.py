@@ -3,7 +3,14 @@
 A change of formula f1.4.3.5 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import bessel_j0
 
 
@@ -40,6 +47,19 @@ class ModifiedMoler20044748(Formula):
         ),
         location="§4.7, §4.8; Exercises 4.7, 4.10(a)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 30 \c"),),
+        expression=r"J_{0}\left(\tmp{u}\right)",
+        interval="[0, 30]",
+        notes=(
+            (
+                r"The interval ends at 30, not at the published $10\pi$, so that it holds 9 of the "
+                "published interval's 10 roots: with an even number of roots, the function has the same "
+                "sign at both published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

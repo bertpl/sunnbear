@@ -5,7 +5,14 @@ A change of formula f1.1.2.4 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedDowellJarratt1972Problem3(Formula):
@@ -39,6 +46,19 @@ class ModifiedDowellJarratt1972Problem3(Formula):
         ),
         location="Problem 3",
     )
+    presentation = FormulaPresentation(
+        expression=r"\sum_{n=-\infty}^{\infty} (-1)^n \x^{(3n^2 + n)/2} - 1 + \c",
+        interval="[-0.9999, -0.0001]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                "problem, because the published bounds lie $10^{-4}$ from $-1$, where the series "
+                "diverges, and from a second root at 0: a shift along x by more than $10^{-4}$ would "
+                "evaluate the series where it diverges, or move that root into the interval."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

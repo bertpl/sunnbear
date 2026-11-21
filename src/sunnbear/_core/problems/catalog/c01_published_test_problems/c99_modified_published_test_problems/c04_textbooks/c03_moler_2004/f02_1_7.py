@@ -3,7 +3,14 @@
 A change of formula f1.4.3.2 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedMoler200417(Formula):
@@ -43,6 +50,24 @@ class ModifiedMoler200417(Formula):
         ),
         location="§1.7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.024 \c"),),
+        expression=r"\left(\tmp{u} - 1\right)^{7}",
+        interval="[0.988, 1.012]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\tmp{u}^{7} - 7 \tmp{u}^{6} + 21 "
+                r"\tmp{u}^{5} - 35 \tmp{u}^{4} + 35 \tmp{u}^{3} - 21 \tmp{u}^{2} + 7 \tmp{u} - 1,$$ "
+                "without the cancellation that makes the published function exactly 0 at many x-values "
+                "across the interval."
+            ),
+            (
+                "This changes what the test problem tests: the source plots the published function on the "
+                "interval to show its rounding error, which the expression does not have."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

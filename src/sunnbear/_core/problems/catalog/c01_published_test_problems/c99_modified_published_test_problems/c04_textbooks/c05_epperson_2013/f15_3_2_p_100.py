@@ -3,7 +3,14 @@
 A change of formula f1.4.5.15 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson201332P100(Formula):
@@ -35,6 +42,19 @@ class ModifiedEpperson201332P100(Formula):
         ),
         location="§3.2 (p. 100), Fig. 3.4, Table 3.3; Example 3.19, Table 3.16",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.19 \c"),),
+        expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
+        interval="[0.01, 0.2]",
+        notes=(
+            (
+                "The interval starts at 0.01, the lower bound of the source's other interval, not at the "
+                "published $-0.2$, so that it holds the root and not the pole at 0: the pole is a second "
+                "sign change, so that the function has the same sign at both published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

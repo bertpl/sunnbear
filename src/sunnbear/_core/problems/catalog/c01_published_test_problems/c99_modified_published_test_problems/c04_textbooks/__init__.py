@@ -21,3 +21,7 @@ class ModifiedTextbooks(FormulaCategory):
 
     number = (1, 99, 4)
     name = "Textbooks"
+    description = (
+        "The test problems are modified versions of those that come from the examples and exercises of "
+        "textbooks on numerical analysis."
+    )

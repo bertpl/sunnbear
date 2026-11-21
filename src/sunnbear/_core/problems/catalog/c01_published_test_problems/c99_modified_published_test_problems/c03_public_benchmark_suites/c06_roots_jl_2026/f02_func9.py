@@ -5,7 +5,14 @@ A change of formula f1.3.6.2 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedRootsJl2026Func9(Formula):
@@ -57,6 +64,23 @@ class ModifiedRootsJl2026Func9(Formula):
         ),
         location="test_derivative_free.jl, func9; runbenchmarks.jl, f7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2.7 \c"),),
+        expression=r"\tanh{\left(\tmp{u} \right)} - \tan{\left(\tmp{u} \right)}",
+        interval="[5, 7.7]",
+        notes=(
+            (
+                r"The interval ends at 7.7, not at the published 12, left of the pole of $\tan \tmp{u}$ at "
+                r"$5\pi/2$, so that it holds 1 root and no pole: the published interval holds 2 roots and "
+                "2 poles, so that the function has the same sign at both published bounds."
+            ),
+            (
+                "This changes what the test problem tests: the source finds every root in $[5, 12]$, and "
+                "a solver on the modified interval finds only 1."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

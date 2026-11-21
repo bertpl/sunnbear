@@ -29,3 +29,7 @@ class ModifiedBurkardt2016(FormulaCategory):
 
     number = (1, 99, 3, 1)
     name = "Burkardt (2016)"
+    description = (
+        "The test problems are modified versions of those that come from TEST_ZERO, John Burkardt's "
+        "collection of functions for testing root finders, in its Python version."
+    )

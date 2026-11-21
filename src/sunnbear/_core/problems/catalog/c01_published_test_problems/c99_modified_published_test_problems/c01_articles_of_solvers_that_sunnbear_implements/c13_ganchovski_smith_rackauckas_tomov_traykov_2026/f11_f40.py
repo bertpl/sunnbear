@@ -3,7 +3,14 @@
 A change of formula f1.1.13.11 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F40(Formula):
@@ -33,6 +40,21 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F40(Formula):
         ),
         location="Table 2, f40",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=(
+            r"\begin{cases} 0 & \text{if } \tmp{u} = 0 \text{ or } \tmp{u} = \frac{2}{3} \\ "
+            r"\frac{1}{\tmp{u} - \frac{2}{3}} & \text{otherwise} \end{cases}"
+        ),
+        interval="[-11, 9]",
+        notes=(
+            (
+                r"The expression is 0 at the pole, $\tmp{u} = 2/3$ in float64, where the published "
+                "function divides by 0."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

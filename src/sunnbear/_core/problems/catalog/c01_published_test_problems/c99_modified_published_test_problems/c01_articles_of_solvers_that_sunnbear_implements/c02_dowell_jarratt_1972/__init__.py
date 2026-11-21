@@ -14,3 +14,7 @@ class ModifiedDowellJarratt1972(FormulaCategory):
 
     number = (1, 99, 1, 2)
     name = "Dowell, Jarratt (1972)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces the "
+        "Pegasus method, a modified regula falsi method."
+    )

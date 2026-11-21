@@ -5,7 +5,14 @@ A change of formula f1.4.5.14 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson201332P99(Formula):
@@ -35,6 +42,17 @@ class ModifiedEpperson201332P99(Formula):
         ),
         location="§3.2 (p. 99), Fig. 3.3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 7.92 \c"),),
+        expression=(
+            r"\frac{4 e^{2 - \frac{\tmp{u}}{2}} \left(1 + \frac{\ln{\left(\tmp{u} " r"\right)}}{\tmp{u}}\right)}{3}"
+        ),
+        interval="[0.08, 8]",
+        notes=(
+            (r"The interval starts at 0.08, not at the published 0, where $\ln(\tmp{u})/\tmp{u}$ is not " "finite."),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

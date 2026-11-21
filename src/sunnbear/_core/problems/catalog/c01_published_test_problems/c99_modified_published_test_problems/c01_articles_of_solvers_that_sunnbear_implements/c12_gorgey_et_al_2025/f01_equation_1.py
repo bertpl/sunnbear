@@ -3,7 +3,14 @@
 A change of formula f1.1.12.1 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedGorgeyEtAl2025Equation1(Formula):
@@ -35,6 +42,18 @@ class ModifiedGorgeyEtAl2025Equation1(Formula):
         ),
         location="Equation 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5.56 \c"),),
+        expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",
+        interval="[-2.5, 3.06]",
+        notes=(
+            (
+                "The interval ends at 3.06, not at the published 3, which is the triple root, so that the "
+                "function is not 0 there; the interval still holds all 3 roots."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

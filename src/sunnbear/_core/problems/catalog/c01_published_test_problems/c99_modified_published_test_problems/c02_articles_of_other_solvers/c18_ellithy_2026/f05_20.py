@@ -5,7 +5,16 @@ A change of formula f1.2.18.5 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedEllithy202620(Formula):
@@ -29,7 +38,7 @@ class ModifiedEllithy202620(Formula):
 
     number = (1, 99, 2, 18, 5)
     name = "20"
-    params = (FormulaParam("k"),)
+    params = (FormulaParam("k", latex_symbol="k"),)
     source = FormulaSource(
         reference=(
             "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "
@@ -40,6 +49,18 @@ class ModifiedEllithy202620(Formula):
         ),
         location="dataset.json, problems 20 and 39",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
+        expression=r"e^{\tmp{u}^{2}} - e^{\param{k} \tmp{u}}",
+        interval="[0.02, 2]",
+        notes=(
+            (
+                "The interval starts at 0.02, not at the published 0, which is a root, so that the "
+                "function is not 0 there."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float) -> float:
@@ -53,7 +74,7 @@ class ModifiedEllithy202620(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the parameter value of the modified test problem."""
-        return (ParamTable(names=("k",), rows=((1.2,),)),)
+        return (ParamTable(names=("k",), rows=((1.2,),), summary="The published parameter value $\\param{k} = 1.2$."),)
 
     test_cases = (
         FormulaTestCase.value(params={"k": 1.2}, x=0.614, c=0.25, expected=-0.1392373368444251),

@@ -14,3 +14,7 @@ class ModifiedSuliMayers2003(FormulaCategory):
 
     number = (1, 99, 4, 2)
     name = "Süli, Mayers (2003)"
+    description = (
+        "The test problems are modified versions of those that come from chapter 1, on solving equations by "
+        "iteration, of the textbook An Introduction to Numerical Analysis."
+    )

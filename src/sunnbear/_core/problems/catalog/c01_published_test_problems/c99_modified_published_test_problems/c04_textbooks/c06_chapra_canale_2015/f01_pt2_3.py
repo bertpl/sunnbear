@@ -5,7 +5,16 @@ A change of formula f1.4.6.1 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedChapraCanale2015Pt23(Formula):
@@ -44,10 +53,10 @@ class ModifiedChapraCanale2015Pt23(Formula):
     number = (1, 99, 4, 6, 1)
     name = "(PT2.3)"
     params = (
-        FormulaParam("g"),
-        FormulaParam("m"),
-        FormulaParam("v"),
-        FormulaParam("t"),
+        FormulaParam("g", latex_symbol="g"),
+        FormulaParam("m", latex_symbol="m"),
+        FormulaParam("v", latex_symbol="v"),
+        FormulaParam("t", latex_symbol="t"),
     )
     source = FormulaSource(
         reference=(
@@ -60,6 +69,24 @@ class ModifiedChapraCanale2015Pt23(Formula):
             "5.23, 5.26, 7.20, 7.21"
         ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\frac{\param{g} \param{m}}{\tmp{u}} \left(-\operatorname{expm1}\left(- "
+            r"\frac{\tmp{u}}{\param{m}} \param{t}\right)\right) - \param{v}"
+        ),
+        interval="[3, 5]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\frac{\param{g} \param{m}}{\tmp{u}} "
+                r"\left(1 - e^{- \frac{\tmp{u}}{\param{m}} \param{t}}\right) - \param{v},$$ without the "
+                "cancellation that makes the published function exactly 0 at many x-values next to the "
+                "root."
+            ),
+            r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without cancellation for a small $z$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, g: float, m: float, v: float, t: float) -> float:
@@ -76,7 +103,13 @@ class ModifiedChapraCanale2015Pt23(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the parameter values of the modified test problem."""
-        return (ParamTable(names=("g", "m", "v", "t"), rows=((9.81, 82.0, 36.0, 4.0),)),)
+        return (
+            ParamTable(
+                names=("g", "m", "v", "t"),
+                rows=((9.81, 82.0, 36.0, 4.0),),
+                summary="The published parameter values on $[3, 5]$.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0}, expected=(3.0, 5.0)),

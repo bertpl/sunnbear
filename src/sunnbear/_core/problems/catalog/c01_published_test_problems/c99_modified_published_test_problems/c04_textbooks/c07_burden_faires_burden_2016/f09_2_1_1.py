@@ -5,7 +5,14 @@ A change of formula f1.4.7.9 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBurdenFairesBurden2016211(Formula):
@@ -33,6 +40,18 @@ class ModifiedBurdenFairesBurden2016211(Formula):
         ),
         location="Exercise 2.1-1",
     )
+    presentation = FormulaPresentation(
+        expression=r"\sqrt{\x} - \cos{\left(\x \right)} + \c",
+        interval="[0, 1]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                r"problem, because a shift along x by any $\c > 0$ evaluates $\sqrt{\x}$ left of 0, "
+                "outside its domain."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

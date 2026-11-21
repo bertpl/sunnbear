@@ -15,3 +15,7 @@ class ModifiedGsl2024(FormulaCategory):
 
     number = (1, 99, 3, 2)
     name = "GSL (2024)"
+    description = (
+        "The test problems are modified versions of those that come from the tests of the root finders of the "
+        "GNU Scientific Library, release 2.8."
+    )

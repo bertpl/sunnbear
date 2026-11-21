@@ -3,7 +3,14 @@
 A change of formula f1.4.6.18 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 # ROOT is the float64 nearest to the published polynomial's root near 5.61.
 ROOT = 5.609788960859374
@@ -56,6 +63,28 @@ class ModifiedChapraCanale2015Prob510(Formula):
         ),
         location="Prob. 5.10",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - 1.5 \c"),
+            (r"\tmp{t}", r"\tmp{u} - 5.609788960859374"),
+        ),
+        expression=(
+            r"4.692574564789708 \cdot 10^{-16} + \tmp{t} \left(8.195425149706974 + \tmp{t} "
+            r"\left(19.183458051653208 + \tmp{t} \left(14.439155843437497 + "
+            r"\tmp{t}\right)\right)\right)"
+        ),
+        interval="[4.5, 6]",
+        notes=(
+            (
+                r"The expression is the Taylor expansion of the published polynomial, $$\tmp{u}^{4} - 8 "
+                r"\tmp{u}^{3} - 35 \tmp{u}^{2} + 450 \tmp{u} - 1001,$$ at the float64 value nearest to its "
+                "root, with its coefficients rounded to float64. Unlike the published form, it has no "
+                "terms that cancel next to the root, where the published polynomial is exactly 0 at many "
+                "x-values."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

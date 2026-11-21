@@ -5,7 +5,14 @@ A change of formula f1.2.13.9 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedSabharwal2019T28(Formula):
@@ -33,6 +40,18 @@ class ModifiedSabharwal2019T28(Formula):
         ),
         location="Table 2, function 8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"\tmp{u} e^{\tmp{u}} - 7",
+        interval="[-1, 2]",
+        notes=(
+            (
+                "The interval ends at 2, not at the published 1, so that it holds the function's root, "
+                "near 1.52, which the published interval leaves out."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,7 +3,14 @@
 A change of formula f1.4.5.22 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson20133114(Formula):
@@ -42,6 +49,25 @@ class ModifiedEpperson20133114(Formula):
         ),
         location="§3.11.4, Fig. 3.12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
+        expression=r"\left(\tmp{u} - 0.5\right)^{5}",
+        interval="[0.45, 0.55]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\tmp{u}^{5} - \frac{5 \tmp{u}^{4}}{2} + "
+                r"\frac{5 \tmp{u}^{3}}{2} - \frac{5 \tmp{u}^{2}}{4} + \frac{5 \tmp{u}}{16} - "
+                r"\frac{1}{32},$$ without the cancellation that makes the published function exactly 0 at "
+                "many x-values next to the root."
+            ),
+            (
+                "This changes what the test problem tests: the source evaluates the published function at "
+                "8000 points to show that next to the multiple root its values form a band around 0, "
+                "inside which a method's iterations stop early, and the expression has no such band."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

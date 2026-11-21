@@ -3,7 +3,16 @@
 A change of formula f1.4.2.5 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedSuliMayers2003133(Formula):
@@ -29,10 +38,10 @@ class ModifiedSuliMayers2003133(Formula):
     number = (1, 99, 4, 2, 5)
     name = "(1.33)"
     params = (
-        FormulaParam("a_"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a_", latex_symbol="a"),
+        FormulaParam("a", latex_symbol=r"x_{\min}"),
+        FormulaParam("b", latex_symbol=r"x_{\max}"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -41,6 +50,18 @@ class ModifiedSuliMayers2003133(Formula):
         ),
         location="Eq. (1.33)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                "The interval starts at 0.01, not at the published 0, which is a root, so that the "
+                "function is not 0 there."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, a: float, b: float, c_scale: float) -> float:
@@ -62,6 +83,7 @@ class ModifiedSuliMayers2003133(Formula):
                     (3.5, 0.01, 1.0, 0.99),
                     (3.99, 0.01, 1.0, 0.99),
                 ),
+                summary="The published parameter values, on the interval $[0.01, 1]$.",
             ),
         )
 

@@ -24,3 +24,7 @@ class ModifiedRootsJl2026(FormulaCategory):
 
     number = (1, 99, 3, 6)
     name = "Roots.jl (2026)"
+    description = (
+        "The test problems are modified versions of those that come from the tests of Roots.jl, a Julia "
+        "package of root finders, version 3.0.11."
+    )

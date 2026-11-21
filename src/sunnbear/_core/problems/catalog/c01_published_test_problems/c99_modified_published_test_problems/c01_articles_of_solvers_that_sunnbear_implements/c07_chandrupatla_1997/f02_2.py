@@ -5,7 +5,16 @@ A change of formula f1.1.7.2 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedChandrupatla19972(Formula):
@@ -42,8 +51,8 @@ class ModifiedChandrupatla19972(Formula):
     number = (1, 99, 1, 7, 2)
     name = "2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
     )
     source = FormulaSource(
         reference=(
@@ -53,6 +62,25 @@ class ModifiedChandrupatla19972(Formula):
         ),
         location="Table 1, function 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x e^{-\c \ln(\param{b}/\param{a})}"),),
+        expression=r"1 - \frac{1}{\tmp{u}^{2}}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"$\c$ scales x, so that the root moves by the factor $(\param{b}/\param{a})^{\c}$ and "
+                "never reaches 0: the interval spans orders of magnitude next to the pole at 0, across "
+                "which a shift along x would take the lower bound."
+            ),
+            (
+                "The widest published interval, $[10^{-12}, 10^{12}]$, becomes $[10^{-12}, 10^{10}]$: the "
+                "benchmark's tolerance on x is a fixed fraction of the interval's width, about 2 on the "
+                r"published interval, so that the root, at 1 for the smallest values of $\c$, lies within "
+                "it of the lower bound."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SCALES_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float) -> float:
@@ -74,6 +102,9 @@ class ModifiedChandrupatla19972(Formula):
                     (1e-06, 1000000.0),
                     (1e-10, 10000000000.0),
                     (1e-12, 10000000000.0),
+                ),
+                summary=(
+                    "The published intervals from $[10^{-4}, 10^{4}]$ on, the widest narrowed to $[10^{-12}, 10^{10}]$."
                 ),
             ),
         )

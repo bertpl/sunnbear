@@ -16,3 +16,7 @@ class ModifiedBorchers2026(FormulaCategory):
 
     number = (1, 99, 3, 5)
     name = "Borchers (2026)"
+    description = (
+        "The test problems are modified versions of those that come from the chapter on root finding of the "
+        "pracma Handbook, which documents the R package pracma."
+    )

@@ -14,3 +14,7 @@ class ModifiedEpperson2013(FormulaCategory):
 
     number = (1, 99, 4, 5)
     name = "Epperson (2013)"
+    description = (
+        "The test problems are modified versions of those that come from chapter 3, on root-finding, of the "
+        "textbook An Introduction to Numerical Methods and Analysis."
+    )
