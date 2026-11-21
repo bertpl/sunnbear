@@ -31,3 +31,4 @@ class ArticlesOfOtherSolvers(FormulaCategory):
 
     number = (1, 2)
     name = "Articles of other solvers"
+    description = "The test problems come from articles on root-finding methods that sunnbear does not implement."

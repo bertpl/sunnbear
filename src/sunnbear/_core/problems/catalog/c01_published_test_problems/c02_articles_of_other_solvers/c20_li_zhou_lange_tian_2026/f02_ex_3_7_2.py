@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Ex. 3 (7.2)`` in the survey of pub
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class LiZhouLangeTian2026Ex372(Formula):
@@ -26,9 +35,9 @@ class LiZhouLangeTian2026Ex372(Formula):
     number = (1, 2, 20, 2)
     name = "Ex. 3 (7.2)"
     params = (
-        FormulaParam("p"),
-        FormulaParam("mu"),
-        FormulaParam("sigma"),
+        FormulaParam("p", latex_symbol="p"),
+        FormulaParam("mu", latex_symbol=r"\mu"),
+        FormulaParam("sigma", latex_symbol=r"\sigma"),
     )
     source = FormulaSource(
         reference=(
@@ -38,8 +47,21 @@ class LiZhouLangeTian2026Ex372(Formula):
             " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
             "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
-        location="Ex. 3 (7.2)",
+        location="Example 3; Section 7.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\param{p} - \frac{1}{2} "
+            r"\operatorname{erfc}\left(-\frac{\tmp{u} - \param{mu}}{\param{sigma} \sqrt{2}}\right)"
+        ),
+        interval="[-2.5, -0.5]",
+        notes=(
+            r"The expression equals $$\param{p} - \Phi\left(\frac{\tmp{u} - \param{mu}}{\param{sigma}}\right),$$ with "
+            r"$\Phi$ the cumulative distribution function of the standard normal distribution.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, mu: float, sigma: float) -> float:
@@ -63,6 +85,7 @@ class LiZhouLangeTian2026Ex372(Formula):
                         1.0,
                     ),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

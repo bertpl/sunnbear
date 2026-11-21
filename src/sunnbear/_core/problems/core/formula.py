@@ -309,6 +309,10 @@ class Formula(FormulaTaxonomyNode, ABC):
         (`ParamNotation.spell_value_in_latex`), and wrapped in ``\prm{…}``. The values are substituted, not simplified:
         ``1 - \param{m}`` at ``m = 0.5`` gives ``1 - \prm{0.5}``.
 
+        A value that follows a number gets ``\cdot`` before it, so that the value does not read as part of the number
+        before it; `LatexTemplate.substitute_values` states which texts count as a number. ``2 \param{n}`` at ``n = 4``
+        gives ``2 \cdot \prm{4}``.
+
         Args:
             text: A definition's side, the expression or the interval of the formula's presentation.
             param_values: The test problem's parameter values, in the order of `params`.
@@ -319,7 +323,7 @@ class Formula(FormulaTaxonomyNode, ABC):
                 or if `text` names a parameter that the formula does not declare.
         """
         values = dict(zip(self.param_names, param_values, strict=True))
-        return LatexTemplate(text).substitute(
+        return LatexTemplate(text).substitute_values(
             {name: ParamNotation.spell_value_in_latex(value) for name, value in values.items()}
         )
 

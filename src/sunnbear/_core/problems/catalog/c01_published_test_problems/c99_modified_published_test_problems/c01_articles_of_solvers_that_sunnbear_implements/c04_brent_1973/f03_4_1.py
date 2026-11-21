@@ -51,7 +51,7 @@ class ModifiedBrent197341(Formula):
             "Table Errata 520. Mathematics of Computation 29(132), 1166. "
             "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
-        location="(4.1)",
+        location="Section 4, Eq. (4.1)",
     )
 
     @staticmethod

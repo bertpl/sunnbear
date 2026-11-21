@@ -5,7 +5,14 @@ The formula comes from the row with the key ``(4.1)`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Brent197341(Formula):
@@ -34,8 +41,19 @@ class Brent197341(Formula):
             "Table Errata 520. Mathematics of Computation 29(132), 1166. "
             "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
-        location="(4.1)",
+        location="Section 4, Eq. (4.1)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } |\tmp{u}| < 3.8 \cdot 10^{-4} \\ "
+            r"\tmp{u} e^{-\tmp{u}^{-2}} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-1, 4]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

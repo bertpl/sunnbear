@@ -5,7 +5,16 @@ The formula comes from the row with the key ``T5.1-14`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi1993T5114(Formula):
@@ -22,15 +31,28 @@ class AlefeldPotraShi1993T5114(Formula):
 
     number = (1, 2, 4, 6)
     name = "T5.1-14"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-14",
+        location="Table 5.1, problem 14",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 10^{4} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"e - 1.859 & \text{if } \tmp{u} > \frac{2 \cdot 10^{-3}}{1 + \param{n}} \\ "
+            r"\exp\left(\frac{(\param{n} + 1) \tmp{u}}{2} \cdot 10^{3}\right) - 1.859 "
+            r"& \text{if } 0 \le \tmp{u} \le \frac{2 \cdot 10^{-3}}{1 + \param{n}} \\ "
+            r"-0.859 & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[-10^{4}, 10^{-4}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -85,6 +107,7 @@ class AlefeldPotraShi1993T5114(Formula):
                     (900.0,),
                     (1000.0,),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

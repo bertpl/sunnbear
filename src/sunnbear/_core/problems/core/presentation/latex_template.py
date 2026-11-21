@@ -46,6 +46,11 @@ class LatexTemplate:
     _COMMAND_WITH_ARGUMENT: ClassVar[re.Pattern[str]] = re.compile(
         r"\\(" + "|".join(_ARGUMENT_PATTERN_BY_COMMAND) + r")(?![A-Za-z])"
     )
+    # _NUMBER_OR_EXPONENT_AT_END matches a text that ends, before any trailing spaces, in 1 of 3 things: a digit that is
+    # not a subscript, a placeholder, or an exponent in braces.
+    _NUMBER_OR_EXPONENT_AT_END: ClassVar[re.Pattern[str]] = re.compile(
+        r"(?:(?<!_)\d|" + _PLACEHOLDER.pattern + r"|\^\{[^{}]*\})\s*$"
+    )
 
     def __post_init__(self) -> None:
         r"""Check that every ``\param``, ``\tmp`` and ``\fn`` in the text has a well-formed argument.
@@ -100,3 +105,36 @@ class LatexTemplate:
             raise ValueError(f"LatexTemplate: no LaTeX for the placeholders {missing} of {self.text!r}.")
         else:
             return self._PLACEHOLDER.sub(lambda match: rf"\prm{{{latex_by_name[match[1]]}}}", self.text)
+
+    def substitute_values(self, latex_by_name: Mapping[str, str]) -> str:
+        r"""Return the text as `substitute` returns it, with ``\cdot`` before each value that follows a number.
+
+        ``\cdot`` goes before each value that follows 1 of these, because the value would otherwise read as part of the
+        number before it:
+
+        - a digit outside a subscript;
+        - another value;
+        - an exponent in braces.
+
+        For example, ``1.54226 \param{w}`` at ``w = 0.2`` would render as 1.542260.2, and ``2 \param{n}`` at ``n = 4``
+        as 24.
+
+        A symbol needs no dot, because ``2 \param{n}`` with the symbol ``n`` reads as ``2n``.
+
+        Args:
+            latex_by_name: The LaTeX of each parameter's value, such as ``"0.2"``; it may hold names that the text does
+                not use.
+
+        Raises:
+            ValueError: If the text has a placeholder whose name `latex_by_name` does not hold.
+        """
+
+        def placeholder_with_dot_where_needed(match: re.Match[str]) -> str:
+            r"""Return the placeholder of `match`, with ``\cdot`` before it where a number precedes it."""
+            if self._NUMBER_OR_EXPONENT_AT_END.search(self.text, 0, match.start()):
+                return rf"\cdot {match[0]}"
+            else:
+                return match[0]
+
+        text_with_dots = self._PLACEHOLDER.sub(placeholder_with_dot_where_needed, self.text)
+        return LatexTemplate(text_with_dots).substitute(latex_by_name)

@@ -12,3 +12,4 @@ class UserDefinedFunctions(FormulaCategory):
 
     number = (USER_DEFINED_FORMULA_CATEGORY_NUMBER,)
     name = "User-defined functions"
+    description = "The category is reserved for test problems that users define; sunnbear itself ships none."

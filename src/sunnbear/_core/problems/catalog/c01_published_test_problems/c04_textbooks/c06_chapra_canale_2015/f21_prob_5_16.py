@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Prob. 5.16`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ChapraCanale2015Prob516(Formula):
@@ -29,6 +36,16 @@ class ChapraCanale2015Prob516(Formula):
         ),
         location="Prob. 5.16",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{y}", r"\x - 2 \c"),
+            (r"\tmp{B}", r"3 + \tmp{y}"),
+            (r"\tmp{A_c}", r"3 \tmp{y} + \frac{\tmp{y}^2}{2}"),
+        ),
+        expression=r"1 - \frac{20^2}{9.81 \tmp{A_c}^3} \tmp{B}",
+        interval="[0.5, 2.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -5,7 +5,14 @@ The formula comes from the row with the key ``§8.3, (8.19), (8.20), Fig. 8.4`` 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ChapraCanale201583(Formula):
@@ -30,8 +37,20 @@ class ChapraCanale201583(Formula):
             "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
             "2021."
         ),
-        location="§8.3, (8.19), (8.20), Fig. 8.4",
+        location="§8.3, Eqs. (8.19), (8.20), Fig. 8.4",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{R}", r"\x - 400 \c"),
+            (r"\tmp{L}", "5"),
+            (r"\tmp{C}", r"10^{-4}"),
+            (r"\tmp{t}", "0.05"),
+            (r"\tmp{\omega}", r"\sqrt{\frac{1}{\tmp{L} \tmp{C}} - \left(\frac{\tmp{R}}{2 \tmp{L}}\right)^2}"),
+        ),
+        expression=r"e^{-\tmp{R} \tmp{t} / (2 \tmp{L})} \cos(\tmp{\omega} \tmp{t}) - 0.01",
+        interval="[0, 400]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -6,7 +6,16 @@ problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale201584821(Formula):
@@ -30,15 +39,28 @@ class ChapraCanale201584821(Formula):
 
     number = (1, 4, 6, 8)
     name = "§8.4, (8.21)"
-    params = (FormulaParam("eps"),)
+    params = (FormulaParam("eps", latex_symbol=r"\varepsilon"),)
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
             "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
             "2021."
         ),
-        location="§8.4, (8.21), Fig. 8.5; Prob. 8.13",
+        location="§8.4, Eq. (8.21), Fig. 8.5; Prob. 8.13",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - 0.072 \c"),
+            (r"\tmp{\mathrm{Re}}", r"\frac{1.23 \cdot 40 \cdot 0.005}{1.79 \cdot 10^{-5}}"),
+        ),
+        expression=(
+            r"\frac{1}{\sqrt{\tmp{u}}} "
+            r"+ 2 \log_{10}\left(\frac{\param{eps}}{3.7 \cdot 0.005} "
+            r"+ \frac{2.51}{\tmp{\mathrm{Re}} \sqrt{\tmp{u}}}\right)"
+        ),
+        interval="[0.008, 0.08]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, eps: float) -> float:
@@ -55,7 +77,7 @@ class ChapraCanale201584821(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("eps",), rows=((1.5e-06,), (4.5e-05,))),)
+        return (ParamTable(names=("eps",), rows=((1.5e-06,), (4.5e-05,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.0, expected=-0.07179608309477187),

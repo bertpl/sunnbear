@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``§8.2, (8.14)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale201582(Formula):
@@ -25,15 +34,32 @@ class ChapraCanale201582(Formula):
 
     number = (1, 4, 6, 6)
     name = "§8.2"
-    params = (FormulaParam("pCO2"),)
+    params = (FormulaParam("pCO2", latex_symbol=r"p_{\mathrm{CO_2}}"),)
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
             "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
             "2021."
         ),
-        location="§8.2, (8.14)",
+        location="§8.2, Eq. (8.14)",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{\mathrm{pH}}", r"\x - 10 \c"),
+            (r"\tmp{H}", r"10^{-\tmp{\mathrm{pH}}}"),
+            (r"\tmp{K_H}", r"10^{-1.46}"),
+            (r"\tmp{K_1}", r"10^{-6.3}"),
+            (r"\tmp{K_2}", r"10^{-10.3}"),
+            (r"\tmp{K_w}", r"10^{-14}"),
+        ),
+        expression=(
+            r"\frac{\tmp{K_1}}{10^6 \tmp{H}} \tmp{K_H} \param{pCO2} "
+            r"+ \frac{2 \tmp{K_2} \tmp{K_1}}{10^6 \tmp{H}^2} \tmp{K_H} \param{pCO2} "
+            r"+ \frac{\tmp{K_w}}{\tmp{H}} - \tmp{H}"
+        ),
+        interval="[2, 12]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, pCO2: float) -> float:
@@ -50,7 +76,7 @@ class ChapraCanale201582(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("pCO2",), rows=((315.0,), (375.0,))),)
+        return (ParamTable(names=("pCO2",), rows=((315.0,), (375.0,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"pCO2": 315.0}, x=5.0, c=0.0, expected=-9.45158725187333e-06),

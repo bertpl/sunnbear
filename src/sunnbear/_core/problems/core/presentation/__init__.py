@@ -9,7 +9,7 @@ parameters, temporary variables and intermediate functions that the text names.
 
 - **with symbols** (`Formula.latex_with_symbols`): each placeholder becomes its parameter's `latex_symbol`;
 - **with values** (`Formula.latex_with_values`): each placeholder becomes a test problem's value, spelled as the test
-  problem's id spells it.
+  problem's id spells it, with ``\cdot`` before a value that follows a number.
 
 A text for a reader is always rendered with symbols. `Formula.latex_display` joins the definitions and
 ``f(\x, \c) = `` plus the expression into 1 aligned display, in either form.

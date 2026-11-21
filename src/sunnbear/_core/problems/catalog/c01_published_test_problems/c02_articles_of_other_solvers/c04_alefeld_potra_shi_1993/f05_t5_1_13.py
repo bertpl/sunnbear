@@ -5,7 +5,16 @@ The formula comes from the row with the key ``T5.1-13`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi1993T5113(Formula):
@@ -17,15 +26,26 @@ class AlefeldPotraShi1993T5113(Formula):
 
     number = (1, 2, 4, 5)
     name = "T5.1-13"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-13",
+        location="Table 5.1, problem 13",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 10^{4} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"\frac{\param{n}}{20} \left(\frac{\tmp{u}}{1.5} + \sin \tmp{u} - 1\right) & \text{if } \tmp{u} \ge 0 \\ "
+            r"-\frac{\param{n}}{20} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"\left[-10^{4}, \frac{\pi}{2}\right]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -87,6 +107,7 @@ class AlefeldPotraShi1993T5113(Formula):
                     (39.0,),
                     (40.0,),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

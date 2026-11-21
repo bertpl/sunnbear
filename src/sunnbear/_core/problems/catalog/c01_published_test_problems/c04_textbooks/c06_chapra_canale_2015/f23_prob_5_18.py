@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Prob. 5.18`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale2015Prob518(Formula):
@@ -26,7 +35,7 @@ class ChapraCanale2015Prob518(Formula):
 
     number = (1, 4, 6, 23)
     name = "Prob. 5.18"
-    params = (FormulaParam("osf"),)
+    params = (FormulaParam("osf", latex_symbol="o_{sf}"),)
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
@@ -35,6 +44,19 @@ class ChapraCanale2015Prob518(Formula):
         ),
         location="Prob. 5.18",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{T}", r"\x - 40 \c"),
+            (r"\tmp{T_a}", r"\tmp{T} + 273.15"),
+        ),
+        expression=(
+            r"\ln \param{osf} - \left(-139.34411 + \frac{1.575701 \cdot 10^{5}}{\tmp{T_a}} "
+            r"- \frac{6.642308 \cdot 10^{7}}{\tmp{T_a}^2} + \frac{1.243800 \cdot 10^{10}}{\tmp{T_a}^3} "
+            r"- \frac{8.621949 \cdot 10^{11}}{\tmp{T_a}^4}\right)"
+        ),
+        interval="[0, 40]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, osf: float) -> float:
@@ -52,7 +74,7 @@ class ChapraCanale2015Prob518(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("osf",), rows=((8.0,), (10.0,), (12.0,))),)
+        return (ParamTable(names=("osf",), rows=((8.0,), (10.0,), (12.0,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"osf": 8.0}, x=28.0, c=0.0, expected=0.021762506592685964),

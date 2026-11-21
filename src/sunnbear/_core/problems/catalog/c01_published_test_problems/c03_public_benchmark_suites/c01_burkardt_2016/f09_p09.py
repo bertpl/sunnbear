@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``p09`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P09(Formula):
@@ -19,9 +28,9 @@ class Burkardt2016P09(Formula):
     number = (1, 3, 1, 9)
     name = "p09"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -49,8 +58,20 @@ class Burkardt2016P09(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p09",
+        location="Problem p09",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0.75 (\tmp{u} - 6.25) - 0.3125 & \text{if } \tmp{u} < 6 \\ "
+            r"2 (\tmp{u} - 6.25) & \text{if } 6 \le \tmp{u} \le 6.5 \\ "
+            r"0.75 (\tmp{u} - 6.25) + 0.3125 & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -69,7 +90,13 @@ class Burkardt2016P09(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-5.0, 16.0, 21.0), (5.25, 11.25, 6.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-5.0, 16.0, 21.0), (5.25, 11.25, 6.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": -5.0, "b": 16.0, "c_scale": 21.0}, x=1.3, c=0.0, expected=-4.025),

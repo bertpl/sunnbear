@@ -5,7 +5,16 @@ The formula comes from the row with the key ``(8)`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class SteffenEtAl20258(Formula):
@@ -28,13 +37,13 @@ class SteffenEtAl20258(Formula):
     number = (1, 1, 11, 2)
     name = "(8)"
     params = (
-        FormulaParam("lambda_"),
-        FormulaParam("sigma"),
-        FormulaParam("Lambda"),
-        FormulaParam("Gamma"),
-        FormulaParam("omega"),
-        FormulaParam("Tr"),
-        FormulaParam("Pr"),
+        FormulaParam("lambda_", latex_symbol=r"\lambda"),
+        FormulaParam("sigma", latex_symbol=r"\sigma"),
+        FormulaParam("Lambda", latex_symbol=r"\Lambda"),
+        FormulaParam("Gamma", latex_symbol=r"\Gamma"),
+        FormulaParam("omega", latex_symbol=r"\omega"),
+        FormulaParam("Tr", latex_symbol="T_r"),
+        FormulaParam("Pr", latex_symbol="P_r"),
     )
     source = FormulaSource(
         reference=(
@@ -42,8 +51,28 @@ class SteffenEtAl20258(Formula):
             "interval guaranteed for Dekker and Brent root finding methods. Examples and "
             "Counterexamples 7, 100173. https://doi.org/10.1016/j.exco.2024.100173."
         ),
-        location="(8)",
+        location="Eq. (8)",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - 3 \c"),
+            (
+                r"\fn{\alpha}(\param{omega}, \param{Tr})",
+                r"\left(1 + (0.37464 + 1.54226 \param{omega} - 0.26992 \param{omega}^2)"
+                r"\left(1 - \sqrt{\param{Tr}}\right)\right)^2",
+            ),
+        ),
+        expression=(
+            r"\tmp{u}^3 - \left(1 - \param{lambda_} + \frac{\param{Tr}}{\param{Gamma} \param{Pr}}\right) \tmp{u}^2 "
+            r"+ \left(\param{sigma} - \param{lambda_} - \frac{\param{lambda_} \param{Tr}}{\param{Gamma} \param{Pr}} "
+            r"+ \frac{\param{Lambda} \fn{\alpha}(\param{omega}, \param{Tr})}{\param{Gamma}^2 \param{Pr}}\right) "
+            r"\tmp{u} "
+            r"- \left(\param{sigma} + \frac{\param{sigma} \param{Tr}}{\param{Gamma} \param{Pr}} "
+            r"+ \frac{\param{Lambda} \fn{\alpha}(\param{omega}, \param{Tr})}{\param{Gamma}^2 \param{Pr}}\right)"
+        ),
+        interval="[14, 17]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(
@@ -79,6 +108,7 @@ class SteffenEtAl20258(Formula):
             ParamTable(
                 names=("lambda_", "sigma", "Lambda", "Gamma", "omega", "Tr", "Pr"),
                 rows=((2.0, -1.0, 0.45724, 0.0778, 0.2, 0.85, 0.45),),
+                summary="The published parameter values.",
             ),
         )
 

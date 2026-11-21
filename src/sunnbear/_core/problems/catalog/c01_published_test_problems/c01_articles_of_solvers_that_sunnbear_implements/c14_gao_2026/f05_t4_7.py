@@ -5,7 +5,16 @@ The formula comes from the row with the key ``T4.7`` in the survey of published 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Gao2026T47(Formula):
@@ -18,17 +27,32 @@ class Gao2026T47(Formula):
     number = (1, 1, 14, 5)
     name = "T4.7"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
             "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
         ),
-        location="T4.7",
+        location="Table 4, function 7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } |\tmp{u}| < 10^{-100} \\ "
+            r"\tmp{u} e^{-1/\tmp{u}^2} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            r"The expression is 0 for $|\tmp{u}| < 10^{-100}$, where float64 rounds $\tmp{u} e^{-1/\tmp{u}^2}$ to 0 "
+            r"anyway; the published function is 0 only at $\tmp{u} = 0$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -56,6 +80,7 @@ class Gao2026T47(Formula):
                     (-5.0, 50.0, 55.0),
                     (-10.0, 100.0, 110.0),
                 ),
+                summary="The published intervals.",
             ),
         )
 

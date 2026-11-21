@@ -61,7 +61,7 @@ class ModifiedBradie200621P67(Formula):
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="§2.1 (p. 67); 2.1-19; 2.5-20",
+        location="§2.1 (p. 67); Exercises 2.1-19, 2.5-20",
     )
 
     @staticmethod

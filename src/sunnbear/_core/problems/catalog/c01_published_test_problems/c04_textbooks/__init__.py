@@ -18,3 +18,4 @@ class Textbooks(FormulaCategory):
 
     number = (1, 4)
     name = "Textbooks"
+    description = "The test problems come from the examples and exercises of textbooks on numerical analysis."

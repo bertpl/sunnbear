@@ -43,7 +43,7 @@ class ModifiedBusDekker1975Iv(Formula):
             "for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345."
             " https://doi.org/10.1145/355656.355659."
         ),
-        location="IV",
+        location="Group IV",
     )
 
     @staticmethod

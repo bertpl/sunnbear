@@ -5,7 +5,16 @@ The formula comes from the row with the key ``7`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Chandrupatla19977(Formula):
@@ -20,9 +29,9 @@ class Chandrupatla19977(Formula):
     number = (1, 1, 7, 7)
     name = "7"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -30,8 +39,19 @@ class Chandrupatla19977(Formula):
             "zero of a nonlinear function without using derivatives. Advances in Engineering Software "
             "28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8."
         ),
-        location="7",
+        location="Table 1, function 7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } |\tmp{u}| < 3.8 \cdot 10^{-4} \\ "
+            r"\tmp{u} e^{-\tmp{u}^{-2}} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -58,6 +78,7 @@ class Chandrupatla19977(Formula):
                     (-5.0, 50.0, 55.0),
                     (-10.0, 100.0, 110.0),
                 ),
+                summary="The published intervals.",
             ),
         )
 

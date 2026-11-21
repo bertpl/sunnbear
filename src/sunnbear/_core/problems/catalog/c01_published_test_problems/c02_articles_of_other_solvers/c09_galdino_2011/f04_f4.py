@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import sign
 
 
@@ -24,8 +31,17 @@ class Galdino2011F4(Formula):
             "978-1-61284-365-0. No DOI; the author's copy: "
             "http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
         ),
-        location="f4",
+        location="Table IV, f4",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \c"),
+            (r"\tmp{p}", r"\tmp{u} + 1.11111"),
+        ),
+        expression=r"(81 - \tmp{p}(108 - \tmp{p}(54 - \tmp{p}(12 - \tmp{p})))) \operatorname{sgn}(\tmp{p} - 3)",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -5,7 +5,16 @@ The formula comes from the row with the key ``A.2`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.math_functions import normal_noise
 
 
@@ -27,7 +36,7 @@ class KumarSrivastav2026A2(Formula):
 
     number = (1, 2, 19, 6)
     name = "A.2"
-    params = (FormulaParam("sigma"),)
+    params = (FormulaParam("sigma", latex_symbol=r"\sigma"),)
     source = FormulaSource(
         reference=(
             "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "
@@ -35,8 +44,19 @@ class KumarSrivastav2026A2(Formula):
             "https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement "
             "offers the authors' scripts from the corresponding author on request."
         ),
-        location="A.2",
+        location="Appendix A.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u} - e^{-\tmp{u}} + \param{sigma} Z(\tmp{u})",
+        interval="[0, 1]",
+        notes=(
+            r"$Z(\tmp{u})$ is a pseudo-random value that depends only on $\tmp{u}$ and is distributed as a standard "
+            r"normal: evaluations at the same $\tmp{u}$ give the same value, and evaluations at different values of "
+            r"$\tmp{u}$ give independent values.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, sigma: float) -> float:
@@ -50,7 +70,7 @@ class KumarSrivastav2026A2(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("sigma",), rows=((0.001,),)),)
+        return (ParamTable(names=("sigma",), rows=((0.001,),), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"sigma": 0.001}, x=0.3, c=0.0, expected=-0.44033624226830675),

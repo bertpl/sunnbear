@@ -5,7 +5,14 @@ The formula comes from the row with the key ``Problem 3`` in the survey of publi
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class DowellJarratt1972Problem3(Formula):
@@ -32,6 +39,12 @@ class DowellJarratt1972Problem3(Formula):
         ),
         location="Problem 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\sum_{n=-\infty}^{\infty} (-1)^n \tmp{u}^{(3n^2 + n)/2} - 1",
+        interval="[-0.9999, -0.0001]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

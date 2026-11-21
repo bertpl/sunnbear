@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``3.9`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Stage201339(Formula):
@@ -22,8 +29,19 @@ class Stage201339(Formula):
             "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
             "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
         ),
-        location="3.9",
+        location="§3.9",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"|\tmp{u} - 2/3|^{0.2} & \text{if } \tmp{u} \le 2/3 \\ "
+            r"-|\tmp{u} - 2/3|^{0.2} & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-10, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

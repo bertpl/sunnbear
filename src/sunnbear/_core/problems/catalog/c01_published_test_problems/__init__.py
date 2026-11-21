@@ -47,6 +47,11 @@ class PublishedTestProblems(FormulaCategory):
 
     number = (1,)
     name = "Published test problems"
+    description = (
+        "The test problems come from articles on root-finding methods, public benchmark suites and textbooks. A "
+        r"formula that shifts its function along the x-axis evaluates the function at $\x - s \c$, with $s$ the width "
+        "of each published interval, rounded to 3 significant digits."
+    )
     is_builtin_only = True
 
     @staticmethod
