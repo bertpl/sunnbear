@@ -31,7 +31,7 @@ class ModifiedBradie2006Ex210(Formula):
 
     number = (1, 99, 4, 4, 28)
     name = "Ex. 2.10"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

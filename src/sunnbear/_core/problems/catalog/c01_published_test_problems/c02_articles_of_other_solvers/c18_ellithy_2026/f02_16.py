@@ -5,7 +5,7 @@ The formula comes from the rows with the keys ``16`` and ``37`` in the survey of
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Ellithy202616(Formula):
@@ -20,7 +20,13 @@ class Ellithy202616(Formula):
 
     number = (1, 2, 18, 2)
     name = "16"
-    param_names = ("k", "m", "a", "b", "c_scale")
+    params = (
+        FormulaParam("k"),
+        FormulaParam("m"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "

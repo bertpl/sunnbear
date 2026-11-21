@@ -25,7 +25,7 @@ class ModifiedGorgeyEtAl2025Equation2(Formula):
 
     number = (1, 99, 1, 12, 2)
     name = "Equation 2"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method"

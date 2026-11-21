@@ -5,7 +5,7 @@ The formula comes from the row with the key ``2.3-6(e)`` in the survey of publis
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class BurdenFairesBurden2016236E(Formula):
@@ -18,7 +18,11 @@ class BurdenFairesBurden2016236E(Formula):
 
     number = (1, 4, 7, 37)
     name = "2.3-6(e)"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "

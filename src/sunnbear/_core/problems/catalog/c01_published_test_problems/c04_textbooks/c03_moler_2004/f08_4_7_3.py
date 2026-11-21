@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``§4.7#3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.math_functions import bessel_j0
 
 
@@ -20,7 +20,7 @@ class Moler2004473(Formula):
 
     number = (1, 4, 3, 8)
     name = "§4.7#3"
-    param_names = ("y",)
+    params = (FormulaParam("y"),)
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "

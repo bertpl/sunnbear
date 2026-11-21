@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``2.2-9; 2.4-10; 2.5-10`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Bradie2006229(Formula):
@@ -17,7 +17,11 @@ class Bradie2006229(Formula):
 
     number = (1, 4, 4, 24)
     name = "2.2-9"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

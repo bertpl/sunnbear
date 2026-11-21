@@ -5,7 +5,7 @@ The formula comes from the row with the key ``3.4`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Stage201334(Formula):
@@ -19,7 +19,11 @@ class Stage201334(Formula):
 
     number = (1, 2, 12, 1)
     name = "3.4"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "

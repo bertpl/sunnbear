@@ -16,7 +16,7 @@ class Suhadolnik20128(Formula):
 
     number = (1, 2, 11, 5)
     name = "8"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. "

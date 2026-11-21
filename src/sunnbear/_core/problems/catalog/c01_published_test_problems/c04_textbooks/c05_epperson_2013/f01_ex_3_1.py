@@ -6,7 +6,7 @@ The formula comes from the row with the key ``Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Epperson2013Ex31(Formula):
@@ -23,7 +23,11 @@ class Epperson2013Ex31(Formula):
 
     number = (1, 4, 5, 1)
     name = "Ex. 3.1"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "

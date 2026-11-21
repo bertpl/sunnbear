@@ -5,7 +5,7 @@ The formula comes from the row with the key ``5.3`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Romadani202553(Formula):
@@ -20,7 +20,11 @@ class Romadani202553(Formula):
 
     number = (1, 2, 17, 3)
     name = "5.3"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding "

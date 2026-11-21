@@ -309,3 +309,21 @@ def test_table_rejects_a_malformed_table(names, rows, message):
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=message):
         ParamTable(names=names, rows=rows)
+
+
+# ==================================================================================================
+#  Summaries
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "recipe, expected",
+    [
+        (ParamGrid.decimal("b", 0.0, 1.0, 0.5, summary=r"The sweep of $\param{b}$."), r"The sweep of $\param{b}$."),
+        (ParamGrid.pow2("b", 0.0, 1.0, 0.5, summary="A sweep in powers of 2."), "A sweep in powers of 2."),
+        (ParamGrid.pow10("b", 0.0, 1.0, 0.5), None),
+        (ParamTable(names=("n",), rows=((1.0,),), summary="The published values."), "The published values."),
+        (ParamTable(names=("n",), rows=((1.0,),)), None),
+    ],
+)
+def test_recipe_holds_its_summary(recipe, expected):
+    """A grid or a table holds the summary that it is given, and None by default."""
+    assert recipe.summary == expected

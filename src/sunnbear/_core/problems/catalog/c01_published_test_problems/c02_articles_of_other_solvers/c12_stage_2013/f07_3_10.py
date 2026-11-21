@@ -17,7 +17,7 @@ class Stage2013310(Formula):
 
     number = (1, 2, 12, 7)
     name = "3.10"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "

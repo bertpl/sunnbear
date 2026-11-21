@@ -17,7 +17,7 @@ class Moler2004Ex410C(Formula):
 
     number = (1, 4, 3, 15)
     name = "Ex. 4.10(c)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "

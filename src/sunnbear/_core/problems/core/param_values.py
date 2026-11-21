@@ -161,6 +161,40 @@ class ParamNotation(StrEnum):
         return min(spellings, key=len)
 
     @classmethod
+    def spell_value_in_latex(cls, value: float) -> str:
+        r"""Return the canonical spelling of `value`, written in LaTeX, as a test problem's expression shows it.
+
+        The LaTeX differs from the canonical spelling in these ways:
+
+        - a whole number drops its ``.0``: ``3.0`` gives ``3``;
+        - a power puts its exponent in braces: ``10^0.3`` gives ``10^{0.3}``;
+        - an exponent in e-notation becomes a power of 10, and a mantissa of 1 is left out: ``2.5e-05`` gives
+          ``2.5 \cdot 10^{-5}``, and ``1e-05`` gives ``10^{-5}``;
+        - a negative value goes in parentheses, as in ``(-0.125)``, so that no 2 minus signs stand side by side.
+
+        Raises:
+            ValueError: If `value` is not a valid parameter value (`spell_value_canonically`).
+        """
+        spelling = cls.spell_value_canonically(value)
+        sign, unsigned = ("-", spelling[1:]) if spelling.startswith("-") else ("", spelling)
+        if "^" in unsigned:
+            base, exponent = unsigned.split("^")
+            latex = f"{base}^{{{exponent.removesuffix('.0')}}}"
+        elif "e" in unsigned:
+            mantissa, exponent = unsigned.split("e")
+            power = f"10^{{{int(exponent)}}}"
+            if float(mantissa) == 1.0:
+                latex = power
+            else:
+                latex = rf"{mantissa.removesuffix('.0')} \cdot {power}"
+        else:
+            latex = unsigned.removesuffix(".0")
+        if sign:
+            return f"({sign}{latex})"
+        else:
+            return latex
+
+    @classmethod
     def is_valid_value(cls, value: float) -> bool:
         """Return whether `value` is a valid parameter value.
 

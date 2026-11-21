@@ -17,7 +17,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F35(Formula):
 
     number = (1, 1, 13, 7)
     name = "f35"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "

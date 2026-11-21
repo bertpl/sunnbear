@@ -5,7 +5,7 @@ A change of formula f1.4.6.2 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedChapraCanale2015Ex52(Formula):
@@ -34,7 +34,11 @@ class ModifiedChapraCanale2015Ex52(Formula):
 
     number = (1, 99, 4, 6, 2)
     name = "Ex. 5.2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

@@ -19,7 +19,7 @@ class ScimlbenchmarksJl2026G(Formula):
 
     number = (1, 3, 7, 1)
     name = "g"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             'SciMLBenchmarks.jl, "Interval Rootfinding Test Suite" by Fabian Gittins (the front matter '

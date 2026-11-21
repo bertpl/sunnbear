@@ -5,7 +5,7 @@ The formula comes from the rows with the keys ``2.1-5(c)`` and ``2.3-6(c)`` in t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class BurdenFairesBurden2016215C(Formula):
@@ -24,7 +24,12 @@ class BurdenFairesBurden2016215C(Formula):
 
     number = (1, 4, 7, 13)
     name = "2.1-5(c)"
-    param_names = ("k", "a", "b", "c_scale")
+    params = (
+        FormulaParam("k"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "

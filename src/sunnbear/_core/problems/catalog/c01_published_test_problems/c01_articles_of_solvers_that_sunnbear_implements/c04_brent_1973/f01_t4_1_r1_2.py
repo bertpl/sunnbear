@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``T4.1 r1-2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Brent1973T41R12(Formula):
@@ -18,7 +18,11 @@ class Brent1973T41R12(Formula):
 
     number = (1, 1, 4, 1)
     name = "T4.1 r1-2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, "

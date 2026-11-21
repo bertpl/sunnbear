@@ -5,7 +5,7 @@ The formula comes from the rows with the keys ``func9`` and ``f7`` in the survey
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class RootsJl2026Func9(Formula):
@@ -23,7 +23,11 @@ class RootsJl2026Func9(Formula):
 
     number = (1, 3, 6, 2)
     name = "func9"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test,"

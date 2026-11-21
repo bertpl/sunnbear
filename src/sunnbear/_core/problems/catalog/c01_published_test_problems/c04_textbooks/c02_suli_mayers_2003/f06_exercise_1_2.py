@@ -22,7 +22,7 @@ class SuliMayers2003Exercise12(Formula):
 
     number = (1, 4, 2, 6)
     name = "Exercise 1.2"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "

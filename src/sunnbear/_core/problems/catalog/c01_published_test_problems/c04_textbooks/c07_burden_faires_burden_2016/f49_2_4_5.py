@@ -21,7 +21,7 @@ class BurdenFairesBurden2016245(Formula):
 
     number = (1, 4, 7, 49)
     name = "2.4-5"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "

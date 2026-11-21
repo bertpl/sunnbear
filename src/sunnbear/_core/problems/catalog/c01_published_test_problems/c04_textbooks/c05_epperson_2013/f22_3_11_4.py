@@ -18,7 +18,7 @@ class Epperson20133114(Formula):
 
     number = (1, 4, 5, 22)
     name = "§3.11.4"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "

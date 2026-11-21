@@ -17,7 +17,7 @@ class ChapraCanale2015Prob54(Formula):
 
     number = (1, 4, 6, 13)
     name = "Prob. 5.4"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

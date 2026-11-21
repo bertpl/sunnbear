@@ -5,7 +5,7 @@ The formula comes from the row with the key ``4.2`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class FooTan202542(Formula):
@@ -23,7 +23,7 @@ class FooTan202542(Formula):
 
     number = (1, 2, 15, 1)
     name = "4.2"
-    param_names = ("y",)
+    params = (FormulaParam("y"),)
     source = FormulaSource(
         reference=(
             "Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. "

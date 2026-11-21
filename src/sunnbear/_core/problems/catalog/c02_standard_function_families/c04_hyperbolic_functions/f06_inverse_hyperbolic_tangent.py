@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamNotation, ParamRecipe
+from sunnbear._core.problems.core import (
+    Formula,
+    FormulaParam,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamNotation,
+    ParamRecipe,
+)
 
 
 class InverseHyperbolicTangent(Formula):
@@ -25,7 +33,7 @@ class InverseHyperbolicTangent(Formula):
 
     number = (2, 4, 6)
     name = "Inverse hyperbolic tangent"
-    param_names = ("d",)
+    params = (FormulaParam("d"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, d: float) -> float:

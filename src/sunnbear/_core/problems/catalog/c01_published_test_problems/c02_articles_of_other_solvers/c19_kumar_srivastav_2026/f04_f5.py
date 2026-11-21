@@ -18,7 +18,7 @@ class KumarSrivastav2026F5(Formula):
 
     number = (1, 2, 19, 4)
     name = "f5"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "

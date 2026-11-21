@@ -5,7 +5,7 @@ The formula comes from the row with the key ``aps15_f`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Scipy2026Aps15F(Formula):
@@ -22,7 +22,7 @@ class Scipy2026Aps15F(Formula):
 
     number = (1, 3, 8, 8)
     name = "aps15_f"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, "

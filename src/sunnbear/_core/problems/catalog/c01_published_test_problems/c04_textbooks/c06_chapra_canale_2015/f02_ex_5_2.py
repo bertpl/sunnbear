@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Ex. 5.2; Fig. 5.4`` in the survey 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ChapraCanale2015Ex52(Formula):
@@ -20,7 +20,11 @@ class ChapraCanale2015Ex52(Formula):
 
     number = (1, 4, 6, 2)
     name = "Ex. 5.2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

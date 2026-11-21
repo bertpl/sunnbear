@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamNotation, ParamRecipe
+from sunnbear._core.problems.core import (
+    Formula,
+    FormulaParam,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamNotation,
+    ParamRecipe,
+)
 
 # Up to this ``d``, `HyperbolicTangent.parametrized_fun` computes ``1 + tanh(x - c)`` from ``exp(2*(x - c))``
 # for ``x < c``, where the root lies in the lower tail of ``tanh``. Above it, ``tanh(x - c) + (1 - d)`` is accurate
@@ -33,7 +41,10 @@ class HyperbolicTangent(Formula):
 
     number = (2, 4, 3)
     name = "Hyperbolic tangent"
-    param_names = ("b", "d")
+    params = (
+        FormulaParam("b"),
+        FormulaParam("d"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float, d: float) -> float:

@@ -15,7 +15,7 @@ class Ellithy202633(Formula):
 
     number = (1, 2, 18, 16)
     name = "33"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "

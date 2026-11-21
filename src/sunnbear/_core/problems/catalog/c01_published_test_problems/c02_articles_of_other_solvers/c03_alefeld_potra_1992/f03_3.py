@@ -14,7 +14,7 @@ class AlefeldPotra19923(Formula):
 
     number = (1, 2, 3, 3)
     name = "3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "

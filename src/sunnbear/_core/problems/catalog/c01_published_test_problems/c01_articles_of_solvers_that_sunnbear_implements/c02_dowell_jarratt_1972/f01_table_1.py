@@ -18,7 +18,7 @@ class DowellJarratt1972Table1(Formula):
 
     number = (1, 1, 2, 1)
     name = "Table 1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an '

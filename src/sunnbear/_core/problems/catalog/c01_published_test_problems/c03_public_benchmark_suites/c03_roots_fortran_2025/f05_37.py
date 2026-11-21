@@ -15,7 +15,7 @@ class RootsFortran202537(Formula):
 
     number = (1, 3, 3, 5)
     name = "37"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "

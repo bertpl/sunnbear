@@ -18,7 +18,7 @@ class Zhang20113(Formula):
 
     number = (1, 2, 10, 1)
     name = "3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Zhang, Z. (2011). An Improvement to the Brent's Method. International Journal of "

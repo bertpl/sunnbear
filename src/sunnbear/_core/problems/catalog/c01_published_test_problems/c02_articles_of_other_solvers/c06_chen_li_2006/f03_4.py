@@ -18,7 +18,7 @@ class ChenLi20064(Formula):
 
     number = (1, 2, 6, 3)
     name = "4"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Chen, J., Li, W. (2007). An improved exponential regula falsi methods with quadratic "

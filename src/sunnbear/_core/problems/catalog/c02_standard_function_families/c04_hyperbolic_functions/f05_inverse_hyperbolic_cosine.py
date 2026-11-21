@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamNotation, ParamRecipe
+from sunnbear._core.problems.core import (
+    Formula,
+    FormulaParam,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamNotation,
+    ParamRecipe,
+)
 
 
 class InverseHyperbolicCosine(Formula):
@@ -25,7 +33,7 @@ class InverseHyperbolicCosine(Formula):
 
     number = (2, 4, 5)
     name = "Inverse hyperbolic cosine"
-    param_names = ("b",)
+    params = (FormulaParam("b"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:

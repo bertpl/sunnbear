@@ -5,7 +5,7 @@ The formula comes from the row with the key ``f29`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
@@ -19,7 +19,11 @@ class GanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
 
     number = (1, 1, 13, 5)
     name = "f29"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "

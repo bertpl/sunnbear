@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Ex. 3 (7.2)`` in the survey of pub
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class LiZhouLangeTian2026Ex372(Formula):
@@ -25,7 +25,11 @@ class LiZhouLangeTian2026Ex372(Formula):
 
     number = (1, 2, 20, 2)
     name = "Ex. 3 (7.2)"
-    param_names = ("p", "mu", "sigma")
+    params = (
+        FormulaParam("p"),
+        FormulaParam("mu"),
+        FormulaParam("sigma"),
+    )
     source = FormulaSource(
         reference=(
             "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "

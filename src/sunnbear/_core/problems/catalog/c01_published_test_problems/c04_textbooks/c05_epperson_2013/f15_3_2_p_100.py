@@ -4,7 +4,7 @@ The formula comes from the row with the key ``§3.2 (p. 100), Fig. 3.4, Table 3.
 of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Epperson201332P100(Formula):
@@ -19,7 +19,11 @@ class Epperson201332P100(Formula):
 
     number = (1, 4, 5, 15)
     name = "§3.2 (p. 100)"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "

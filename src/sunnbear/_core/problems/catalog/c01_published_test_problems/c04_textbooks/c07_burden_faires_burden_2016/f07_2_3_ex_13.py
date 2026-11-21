@@ -6,7 +6,7 @@ published test problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class BurdenFairesBurden201623Ex13(Formula):
@@ -24,7 +24,11 @@ class BurdenFairesBurden201623Ex13(Formula):
 
     number = (1, 4, 7, 7)
     name = "§2.3 Ex. 1–3"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "

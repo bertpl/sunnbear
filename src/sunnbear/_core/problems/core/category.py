@@ -32,12 +32,16 @@ class FormulaCategory(FormulaTaxonomyNode):
     Class attributes:
         number: The category's place in the taxonomy; its parent category is ``number[:-1]``.
         name: Display name.
+        description: A text for a reader on what the category holds, in sunnbear's LaTeX notation (`presentation`),
+            with its math as ``$…$`` inline and ``$$…$$`` for display. None by default; the catalog's tests require it
+            of every shipped category.
         is_builtin_only: Whether this category and every node below it are reserved for classes
             defined inside the sunnbear package. Declared on top-level categories only; the
             registry applies a top-level category's flag to every node below it, and a
             subcategory's own `is_builtin_only` stays at its default `False`.
     """
 
+    description: ClassVar[str | None] = None
     is_builtin_only: ClassVar[bool] = False
 
     def __init_subclass__(cls, **kwargs: object) -> None:

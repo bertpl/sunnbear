@@ -2,7 +2,7 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 from .helpers import power_axis
@@ -43,7 +43,7 @@ class SignedPower1(Formula):
 
     number = (2, 3, 1)
     name = "Signed power 1"
-    param_names = ("p",)
+    params = (FormulaParam("p"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:

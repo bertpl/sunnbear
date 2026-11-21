@@ -2,7 +2,7 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
 
 from .helpers import power_axis
 
@@ -34,7 +34,7 @@ class SignedReciprocalPower(Formula):
 
     number = (2, 3, 5)
     name = "Signed reciprocal power"
-    param_names = ("p",)
+    params = (FormulaParam("p"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:

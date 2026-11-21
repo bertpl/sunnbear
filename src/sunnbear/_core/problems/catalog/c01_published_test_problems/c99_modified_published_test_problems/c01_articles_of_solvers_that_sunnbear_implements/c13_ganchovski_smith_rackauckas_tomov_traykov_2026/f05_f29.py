@@ -5,7 +5,7 @@ A change of formula f1.1.13.5 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
@@ -30,7 +30,11 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
 
     number = (1, 99, 1, 13, 5)
     name = "f29"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "

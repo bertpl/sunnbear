@@ -23,7 +23,7 @@ A `ParamRecipe` materializes parameter tuples, and comes in 2 kinds:
 A formula holds a *tuple* of recipes and its candidates are their concatenation,
 so recipes are additive: anything the small grammar above cannot express is
 written as one more recipe, not as a richer axis. Every recipe's parameter
-names must match the formula's declared `param_names`, which is what fixes the
+names must match the names of the formula's declared `params`, which is what fixes the
 meaning of tuple position (`Formula._validate_recipes`).
 
 When an axis's notation builds each grid value (`ParamNotation.build_value_from_argument`),
@@ -131,8 +131,18 @@ class ParamAxis:
 # ==================================================================================================
 #  ParamRecipe
 # ==================================================================================================
+@dataclass(frozen=True, kw_only=True)
 class ParamRecipe(ABC):
-    """`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table."""
+    r"""`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table.
+
+    Attributes:
+        summary: One sentence for a reader on what the recipe covers, such as "The sweep of $\param{b}$ at
+            $\param{d} = 1$.". The sentence is a text for a reader in sunnbear's LaTeX notation (`presentation`),
+            with its math as ``$…$`` inline and ``$$…$$`` for display. None by default; the catalog's tests require it
+            of every recipe of a shipped formula.
+    """
+
+    summary: str | None = None
 
     @abstractmethod
     def param_names(self) -> tuple[str, ...]:
@@ -235,19 +245,19 @@ class ParamGrid(ParamRecipe):
     #  Single-axis conveniences
     # --------------------------------------------------------------------------
     @classmethod
-    def decimal(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+    def decimal(cls, name: str, start: float, stop: float, step: float, *, summary: str | None = None) -> "ParamGrid":
         """Build a single-axis grid whose values are the grid arguments themselves (DECIMAL notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.DECIMAL),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.DECIMAL),), summary=summary)
 
     @classmethod
-    def pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+    def pow2(cls, name: str, start: float, stop: float, step: float, *, summary: str | None = None) -> "ParamGrid":
         """Build a single-axis grid in base-2 exponent space (POW2 notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW2),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW2),), summary=summary)
 
     @classmethod
-    def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+    def pow10(cls, name: str, start: float, stop: float, step: float, *, summary: str | None = None) -> "ParamGrid":
         """Build a single-axis grid in base-10 exponent space (POW10 notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),), summary=summary)
 
 
 # ==================================================================================================

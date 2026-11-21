@@ -19,7 +19,7 @@ class SteffenEtAl20256(Formula):
 
     number = (1, 1, 11, 1)
     name = "(6)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Steffen, V., Della Pasqua, C. C., de Oliveira, M. S., da Silva, E. A. (2025). Halving "

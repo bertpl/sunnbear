@@ -18,7 +18,7 @@ class Borchers2026F7(Formula):
 
     number = (1, 3, 5, 7)
     name = "f7"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". '

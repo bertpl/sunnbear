@@ -6,7 +6,7 @@ The formula comes from the row with the key ``(PT2.3), (PT2.4); Ex. 5.1, 5.3–5
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ChapraCanale2015Pt23(Formula):
@@ -26,7 +26,15 @@ class ChapraCanale2015Pt23(Formula):
 
     number = (1, 4, 6, 1)
     name = "(PT2.3)"
-    param_names = ("g", "m", "v", "t", "a", "b", "c_scale")
+    params = (
+        FormulaParam("g"),
+        FormulaParam("m"),
+        FormulaParam("v"),
+        FormulaParam("t"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

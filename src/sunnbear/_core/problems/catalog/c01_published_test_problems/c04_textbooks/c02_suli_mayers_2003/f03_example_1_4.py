@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Example 1.4`` in the survey of pub
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class SuliMayers2003Example14(Formula):
@@ -23,7 +23,7 @@ class SuliMayers2003Example14(Formula):
 
     number = (1, 4, 2, 3)
     name = "Example 1.4"
-    param_names = ("alpha",)
+    params = (FormulaParam("alpha"),)
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "

@@ -1,6 +1,6 @@
 """This formula is a line plus the mean ``O_n(x)`` of ``n`` odd powers from 3, ``m*x + (1 - m)*O_n(x) + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_term_count, slope_recipes, term_count_axis
 
@@ -22,7 +22,10 @@ class LinearPlusSumOfOddPowers(Formula):
 
     number = (2, 1, 5)
     name = "Linear plus sum of odd powers"
-    param_names = ("n", "m")
+    params = (
+        FormulaParam("n"),
+        FormulaParam("m"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, m: float) -> float:

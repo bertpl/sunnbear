@@ -5,7 +5,7 @@ The formula comes from the row with the key ``(8)`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class SteffenEtAl20258(Formula):
@@ -27,7 +27,15 @@ class SteffenEtAl20258(Formula):
 
     number = (1, 1, 11, 2)
     name = "(8)"
-    param_names = ("lambda_", "sigma", "Lambda", "Gamma", "omega", "Tr", "Pr")
+    params = (
+        FormulaParam("lambda_"),
+        FormulaParam("sigma"),
+        FormulaParam("Lambda"),
+        FormulaParam("Gamma"),
+        FormulaParam("omega"),
+        FormulaParam("Tr"),
+        FormulaParam("Pr"),
+    )
     source = FormulaSource(
         reference=(
             "Steffen, V., Della Pasqua, C. C., de Oliveira, M. S., da Silva, E. A. (2025). Halving "

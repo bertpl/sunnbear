@@ -3,7 +3,7 @@
 The formula comes from the rows with the keys ``3.11`` and ``3.12`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Stage2013311(Formula):
@@ -22,7 +22,7 @@ class Stage2013311(Formula):
 
     number = (1, 2, 12, 8)
     name = "3.11"
-    param_names = ("d",)
+    params = (FormulaParam("d"),)
     source = FormulaSource(
         reference=(
             "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "

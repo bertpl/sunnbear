@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Prob. 5.17, 5.19, 6.19, 8.9`` in t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ChapraCanale2015Prob517(Formula):
@@ -25,7 +25,10 @@ class ChapraCanale2015Prob517(Formula):
 
     number = (1, 4, 6, 22)
     name = "Prob. 5.17"
-    param_names = ("R", "V")
+    params = (
+        FormulaParam("R"),
+        FormulaParam("V"),
+    )
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

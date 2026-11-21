@@ -5,6 +5,7 @@ from counted_float import FlopCountingContext
 
 from sunnbear._core.problems.core import (
     Formula,
+    FormulaParam,
     FormulaRegistry,
     ParamAxis,
     ParamGrid,
@@ -63,7 +64,7 @@ def test_candidates_deduplicates_across_recipes():
     class DupTest(Formula):
         number = (99, 999)
         name = "Dup test"
-        param_names = ("p1",)
+        params = (FormulaParam("p1"),)
         jit = False
 
         @staticmethod
@@ -154,7 +155,7 @@ def test_candidates_deduplicates_across_notations():
     class CrossNotation(Formula):
         number = (99, 995)
         name = "Cross notation"
-        param_names = ("p1",)
+        params = (FormulaParam("p1"),)
         jit = False
 
         @staticmethod
@@ -183,7 +184,7 @@ def _formula_cls(number_last_element: int, declared: tuple[str, ...], recipes: t
     namespace = {
         "number": (99, number_last_element),
         "name": f"Varying {number_last_element}",
-        "param_names": declared,
+        "params": tuple(FormulaParam(name) for name in declared),
         "jit": False,
         "parametrized_fun": staticmethod(fun or (lambda x, c, p1: x - c)),
         "interval_bounds": interval_bounds or (lambda self, p1: (-1.0, 1.0)),

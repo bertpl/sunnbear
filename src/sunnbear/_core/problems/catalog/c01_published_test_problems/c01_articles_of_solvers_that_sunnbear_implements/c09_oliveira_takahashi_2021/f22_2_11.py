@@ -17,7 +17,7 @@ class OliveiraTakahashi2021211(Formula):
 
     number = (1, 1, 9, 22)
     name = "2.11"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method "

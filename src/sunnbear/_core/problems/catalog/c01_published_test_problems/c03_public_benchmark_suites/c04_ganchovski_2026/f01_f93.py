@@ -4,7 +4,7 @@ The formula comes from the rows with the keys ``f93``, ``f94``, ``f95``, ``f96``
 survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Ganchovski2026F93(Formula):
@@ -24,7 +24,7 @@ class Ganchovski2026F93(Formula):
 
     number = (1, 3, 4, 1)
     name = "f93"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the "

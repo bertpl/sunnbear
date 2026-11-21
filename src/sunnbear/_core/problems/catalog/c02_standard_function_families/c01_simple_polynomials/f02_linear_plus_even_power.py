@@ -1,6 +1,6 @@
 """This formula is a line plus an even power, ``x + w*(x^p - 1) + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_power, power_axis, weight_recipes
 
@@ -25,7 +25,10 @@ class LinearPlusEvenPower(Formula):
 
     number = (2, 1, 2)
     name = "Linear plus even power"
-    param_names = ("p", "w")
+    params = (
+        FormulaParam("p"),
+        FormulaParam("w"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, w: float) -> float:

@@ -20,7 +20,7 @@ class Ridders1979Iii3(Formula):
 
     number = (1, 1, 5, 4)
     name = "III.3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous"

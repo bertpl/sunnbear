@@ -5,7 +5,7 @@ A change of formula f1.4.4.7 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedBradie200621P67(Formula):
@@ -51,7 +51,11 @@ class ModifiedBradie200621P67(Formula):
 
     number = (1, 99, 4, 4, 7)
     name = "§2.1 (p. 67)"
-    param_names = ("initial_investment", "monthly_deposit", "goal")
+    params = (
+        FormulaParam("initial_investment"),
+        FormulaParam("monthly_deposit"),
+        FormulaParam("goal"),
+    )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

@@ -5,7 +5,7 @@ The formula comes from the row with the key ``§4.3, §4.4; Ex. 4.1, 4.8`` in th
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.math_functions import sign
 
 
@@ -24,7 +24,12 @@ class Moler200443(Formula):
 
     number = (1, 4, 3, 4)
     name = "§4.3"
-    param_names = ("a_", "a", "b", "c_scale")
+    params = (
+        FormulaParam("a_"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "

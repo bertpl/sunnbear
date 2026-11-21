@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``Fig. 3.2, 3.6, 3.7`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Epperson2013Fig32(Formula):
@@ -18,7 +18,11 @@ class Epperson2013Fig32(Formula):
 
     number = (1, 4, 5, 12)
     name = "Fig. 3.2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "

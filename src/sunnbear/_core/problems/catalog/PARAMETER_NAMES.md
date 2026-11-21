@@ -36,4 +36,4 @@ The first rule that applies gives the names:
 - **Where no name of the table fits, use a short word** that says what the parameter is, such as `steepness`. A numbered placeholder such as `p1` for "the first parameter" says nothing.
 - **A coefficient is `w`, never `c1` or `c2`.** Beside `c` and `c_scale`, such a name reads as a value of `c`.
 - **A power is `p`, never `e`.** In a formula's text, `e` reads as Euler's number.
-- **Counts and powers come first in `param_names`**, then the other parameters, so that an id starts with the parameter that changes the formula's structure.
+- **Counts and powers come first in `params`**, then the other parameters, so that an id starts with the parameter that changes the formula's structure.

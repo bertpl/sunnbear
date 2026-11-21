@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Ex. 6`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class AndersonBjorck1973Ex6(Formula):
@@ -17,7 +17,7 @@ class AndersonBjorck1973Ex6(Formula):
 
     number = (1, 1, 3, 1)
     name = "Ex. 6"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Anderson, N., Björck, Å. (1973). A new high order method of regula falsi type for "

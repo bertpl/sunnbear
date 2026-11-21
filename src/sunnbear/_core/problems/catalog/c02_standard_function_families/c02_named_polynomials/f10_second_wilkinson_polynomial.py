@@ -1,6 +1,6 @@
 """This formula is Wilkinson's second polynomial of degree ``n``, with ``c`` moving its zeros by a common factor."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
 
 from .helpers import is_valid_degree
 
@@ -37,7 +37,7 @@ class SecondWilkinsonPolynomial(Formula):
 
     number = (2, 2, 10)
     name = "Second Wilkinson polynomial"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:

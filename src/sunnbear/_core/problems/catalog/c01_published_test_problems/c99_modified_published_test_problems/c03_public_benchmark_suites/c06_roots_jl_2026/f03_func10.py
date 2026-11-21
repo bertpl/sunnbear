@@ -29,7 +29,7 @@ class ModifiedRootsJl2026Func10(Formula):
 
     number = (1, 99, 3, 6, 3)
     name = "func10"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test,"

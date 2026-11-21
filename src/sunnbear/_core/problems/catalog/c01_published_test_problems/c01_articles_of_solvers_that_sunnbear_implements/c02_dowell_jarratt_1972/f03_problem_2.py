@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``Problem 2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.math_functions import bessel_j0, bessel_j1, bessel_y0, bessel_y1
 
 
@@ -20,7 +20,7 @@ class DowellJarratt1972Problem2(Formula):
 
     number = (1, 1, 2, 3)
     name = "Problem 2"
-    param_names = ("K",)
+    params = (FormulaParam("K"),)
     source = FormulaSource(
         reference=(
             'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an '

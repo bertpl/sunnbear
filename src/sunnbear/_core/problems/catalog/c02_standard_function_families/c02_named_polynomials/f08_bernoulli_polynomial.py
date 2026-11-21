@@ -3,7 +3,7 @@
 import math
 from fractions import Fraction
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
 
 from .helpers import is_valid_degree
 
@@ -49,7 +49,11 @@ class BernoulliPolynomial(Formula):
 
     number = (2, 2, 8)
     name = "Bernoulli polynomial"
-    param_names = ("n", "a", "b")
+    params = (
+        FormulaParam("n"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, a: float, b: float) -> float:

@@ -20,7 +20,7 @@ class Gsl2024Func2(Formula):
 
     number = (1, 3, 2, 2)
     name = "func2"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "GNU Scientific Library (GSL), release 2.8, files `roots/test_funcs.c` and `roots/test.c` "

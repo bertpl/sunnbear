@@ -16,7 +16,7 @@ class ChapraCanale2015Fig78(Formula):
 
     number = (1, 4, 6, 5)
     name = "Fig. 7.8"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

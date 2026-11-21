@@ -5,7 +5,7 @@ The formula comes from the row with the key ``A.2`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.math_functions import normal_noise
 
 
@@ -27,7 +27,7 @@ class KumarSrivastav2026A2(Formula):
 
     number = (1, 2, 19, 6)
     name = "A.2"
-    param_names = ("sigma",)
+    params = (FormulaParam("sigma"),)
     source = FormulaSource(
         reference=(
             "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "

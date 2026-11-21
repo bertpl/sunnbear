@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``§2.2 Ex. 2; Fig. 2.4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class BurdenFairesBurden201622Ex2(Formula):
@@ -17,7 +17,11 @@ class BurdenFairesBurden201622Ex2(Formula):
 
     number = (1, 4, 7, 5)
     name = "§2.2 Ex. 2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "

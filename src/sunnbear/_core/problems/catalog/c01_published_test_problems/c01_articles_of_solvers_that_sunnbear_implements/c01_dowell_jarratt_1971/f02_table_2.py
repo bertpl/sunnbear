@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Table 2`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class DowellJarratt1971Table2(Formula):
@@ -19,7 +19,7 @@ class DowellJarratt1971Table2(Formula):
 
     number = (1, 1, 1, 2)
     name = "Table 2"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of "

@@ -4,7 +4,7 @@ How the pieces tie together, from authored code to a solvable function::
 
     Formula (subclass, auto-registered on definition)
       │ build_all_candidates() ── ParamRecipe grids and tables ──▶ p-tuples,
-      │                          validated against param_names,
+      │                          validated against the names of params,
       │                          filtered by is_param_tuple_valid(),
       │                          then near-duplicates dropped (deduplicate_param_tuples)
       │ build_candidate(p) [framework: carries the formula + identity, so the
@@ -33,10 +33,11 @@ package imports those modules.
 
 Ownership summary:
 
-- a concrete `Formula` contributes only mathematics plus its declared parameter
-  interface: `param_names`, `parametrized_fun`, `interval_bounds`, `recipes`, optionally
+- a concrete `Formula` contributes its mathematics and its declared parameter
+  interface: `params`, `parametrized_fun`, `interval_bounds`, `recipes`, optionally
   `is_param_tuple_valid` — one class, one module, in `catalog`; defining the
-  class registers it.
+  class registers it. It also declares what a reader sees of it: its `presentation`
+  (`FormulaPresentation`, in the LaTeX notation that the `presentation` package describes) and its `effect_of_c`.
 - the framework owns everything mechanical: numba compilation — once per
   formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
   identity (`ProblemId` — the formula number and its named parameter tuple, stable, rendered in
@@ -47,14 +48,17 @@ Ownership summary:
 """
 
 from .category import USER_DEFINED_FORMULA_CATEGORY_NUMBER, FormulaCategory
+from .effect_of_c import EffectOfC
 from .formula import Formula
 from .identity import ProblemId
+from .param import FormulaParam
 from .param_values import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,
     ParamNotation,
     deduplicate_param_tuples,
 )
+from .presentation import PLAIN_MARKER_MACROS, FormulaPresentation, LatexTemplate
 from .recipes import ParamAxis, ParamGrid, ParamRecipe, ParamTable
 from .registry import FormulaRegistry
 from .source import FormulaSource

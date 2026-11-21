@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``I.3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class BusDekker1975I3(Formula):
@@ -18,7 +18,7 @@ class BusDekker1975I3(Formula):
 
     number = (1, 2, 1, 2)
     name = "I.3"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "

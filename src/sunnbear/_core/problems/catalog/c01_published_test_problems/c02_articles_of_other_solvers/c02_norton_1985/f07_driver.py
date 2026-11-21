@@ -16,7 +16,7 @@ class Norton1985Driver(Formula):
 
     number = (1, 2, 2, 7)
     name = "driver"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational "

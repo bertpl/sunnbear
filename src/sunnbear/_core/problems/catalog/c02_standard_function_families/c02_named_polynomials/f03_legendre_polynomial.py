@@ -2,7 +2,7 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe, ParamTable
 
 from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
@@ -30,7 +30,7 @@ class LegendrePolynomial(Formula):
 
     number = (2, 2, 3)
     name = "Legendre polynomial"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:

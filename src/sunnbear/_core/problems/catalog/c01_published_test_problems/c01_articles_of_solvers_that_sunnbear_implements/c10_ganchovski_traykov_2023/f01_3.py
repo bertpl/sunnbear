@@ -19,7 +19,7 @@ class GanchovskiTraykov20233(Formula):
 
     number = (1, 1, 10, 1)
     name = "§3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving "

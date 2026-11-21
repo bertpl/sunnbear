@@ -21,7 +21,7 @@ class Bradie20062116A(Formula):
 
     number = (1, 4, 4, 19)
     name = "2.1-16(a)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
