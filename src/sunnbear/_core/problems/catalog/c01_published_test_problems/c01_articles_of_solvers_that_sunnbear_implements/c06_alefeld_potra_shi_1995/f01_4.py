@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class AlefeldPotraShi19954(Formula):
@@ -20,7 +20,13 @@ class AlefeldPotraShi19954(Formula):
 
     number = (1, 1, 6, 1)
     name = "4"
-    param_names = ("a_", "n", "a", "b", "c_scale")
+    params = (
+        FormulaParam("a_"),
+        FormulaParam("n"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous"

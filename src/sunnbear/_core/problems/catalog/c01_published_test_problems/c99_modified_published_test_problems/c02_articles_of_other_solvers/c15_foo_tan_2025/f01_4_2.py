@@ -5,7 +5,7 @@ A change of formula f1.2.15.1 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedFooTan202542(Formula):
@@ -29,7 +29,7 @@ class ModifiedFooTan202542(Formula):
 
     number = (1, 99, 2, 15, 1)
     name = "4.2"
-    param_names = ("y",)
+    params = (FormulaParam("y"),)
     source = FormulaSource(
         reference=(
             "Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. "

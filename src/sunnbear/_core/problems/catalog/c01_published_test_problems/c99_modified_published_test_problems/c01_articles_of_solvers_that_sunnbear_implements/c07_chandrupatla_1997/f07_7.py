@@ -5,7 +5,7 @@ A change of formula f1.1.7.7 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -36,7 +36,11 @@ class ModifiedChandrupatla19977(Formula):
 
     number = (1, 99, 1, 7, 7)
     name = "7"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the "

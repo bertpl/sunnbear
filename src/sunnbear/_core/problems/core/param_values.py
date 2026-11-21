@@ -161,6 +161,33 @@ class ParamNotation(StrEnum):
         return min(spellings, key=len)
 
     @classmethod
+    def spell_value_in_latex(cls, value: float) -> str:
+        r"""Return the canonical spelling of `value`, written in LaTeX, as a test problem's expression shows it.
+
+        A whole number drops its ``.0``, a power puts its exponent in braces, and an exponent in e-notation becomes a
+        power of 10: ``3.0`` gives ``3``, ``10^0.3`` gives ``10^{0.3}``, and ``2.5e-05`` gives ``2.5 \cdot 10^{-5}``. A
+        negative value goes in parentheses, as in ``(-0.125)``, so that no 2 minus signs stand side by side.
+
+        Raises:
+            ValueError: If `value` is not a valid parameter value (`spell_value_canonically`).
+        """
+        spelling = cls.spell_value_canonically(value)
+        sign, unsigned = ("-", spelling[1:]) if spelling.startswith("-") else ("", spelling)
+        if "^" in unsigned:
+            base, exponent = unsigned.split("^")
+            latex = f"{base}^{{{cls._drop_trailing_zero(exponent)}}}"
+        elif "e" in unsigned:
+            mantissa, exponent = unsigned.split("e")
+            power = f"10^{{{int(exponent)}}}"
+            latex = power if float(mantissa) == 1.0 else rf"{cls._drop_trailing_zero(mantissa)} \cdot {power}"
+        else:
+            latex = cls._drop_trailing_zero(unsigned)
+        if sign:
+            return f"({sign}{latex})"
+        else:
+            return latex
+
+    @classmethod
     def is_valid_value(cls, value: float) -> bool:
         """Return whether `value` is a valid parameter value.
 
@@ -221,6 +248,11 @@ class ParamNotation(StrEnum):
             return f"{self._power_base}^{argument!r}"
         else:
             return f"-{self._power_base}^{argument!r}"
+
+    @staticmethod
+    def _drop_trailing_zero(number: str) -> str:
+        """Return a number's spelling without a trailing ``.0``, such as ``3`` for ``3.0``."""
+        return number.removesuffix(".0")
 
     @property
     def _power_base(self) -> int:

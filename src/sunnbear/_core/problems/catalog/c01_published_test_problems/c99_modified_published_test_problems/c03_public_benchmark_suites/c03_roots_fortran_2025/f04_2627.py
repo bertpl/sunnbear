@@ -6,7 +6,7 @@ A change of formula f1.3.3.4 may need a matching change of this module.
 import math
 import sys
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 # MAX_EXP_ARGUMENT is the largest argument for which float64 exp does not overflow.
@@ -41,7 +41,11 @@ class ModifiedRootsFortran20252627(Formula):
 
     number = (1, 99, 3, 3, 4)
     name = "26–27"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "

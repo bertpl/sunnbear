@@ -201,3 +201,31 @@ def test_deduplicate_keeps_distinct_tuples():
 
     # --- act / assert -----------------
     assert deduplicate_param_tuples(tuples) == tuple(tuples)
+
+
+# ==================================================================================================
+#  ParamNotation.spell_value_in_latex
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        (3.0, "3"),  # a whole number drops its .0
+        (0.5, "0.5"),
+        (10**0.3, "10^{0.3}"),  # a power puts its exponent in braces
+        (2**0.5, "2^{0.5}"),
+        (2.5e-5, r"2.5 \cdot 10^{-5}"),  # e-notation becomes a power of 10
+        (1e-5, "10^{-5}"),  # a mantissa of 1 is left out
+        (-0.125, "(-0.125)"),  # a negative value goes in parentheses
+        (-(10**0.3), "(-10^{0.3})"),
+        (-1.0, "(-1)"),
+    ],
+)
+def test_spell_value_in_latex(value, expected):
+    """A value is written as its canonical spelling, in LaTeX, as a test problem's expression shows it."""
+    assert ParamNotation.spell_value_in_latex(value) == expected
+
+
+def test_spell_value_in_latex_rejects_an_invalid_value():
+    """A value that no notation spells is rejected, as by the canonical spelling."""
+    with pytest.raises(ValueError, match="not a valid parameter value"):
+        ParamNotation.spell_value_in_latex(0.1 + 0.2)

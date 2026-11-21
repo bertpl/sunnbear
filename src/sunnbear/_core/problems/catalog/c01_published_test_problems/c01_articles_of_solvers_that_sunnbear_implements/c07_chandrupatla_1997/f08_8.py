@@ -5,7 +5,7 @@ The formula comes from the row with the key ``8`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Chandrupatla19978(Formula):
@@ -20,7 +20,12 @@ class Chandrupatla19978(Formula):
 
     number = (1, 1, 7, 8)
     name = "8"
-    param_names = ("xi", "a", "b", "c_scale")
+    params = (
+        FormulaParam("xi"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the "

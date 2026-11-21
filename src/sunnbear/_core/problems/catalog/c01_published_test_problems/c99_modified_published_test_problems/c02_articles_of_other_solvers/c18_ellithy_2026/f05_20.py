@@ -5,7 +5,7 @@ A change of formula f1.2.18.5 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedEllithy202620(Formula):
@@ -29,7 +29,7 @@ class ModifiedEllithy202620(Formula):
 
     number = (1, 99, 2, 18, 5)
     name = "20"
-    param_names = ("k",)
+    params = (FormulaParam("k"),)
     source = FormulaSource(
         reference=(
             "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "

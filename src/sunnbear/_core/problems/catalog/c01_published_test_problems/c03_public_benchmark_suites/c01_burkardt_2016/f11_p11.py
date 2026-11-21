@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``p11`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Burkardt2016P11(Formula):
@@ -17,7 +17,12 @@ class Burkardt2016P11(Formula):
 
     number = (1, 3, 1, 11)
     name = "p11"
-    param_names = ("epsilon", "a", "b", "c_scale")
+    params = (
+        FormulaParam("epsilon"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "

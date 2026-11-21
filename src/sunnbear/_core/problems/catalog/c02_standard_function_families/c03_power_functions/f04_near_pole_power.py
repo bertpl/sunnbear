@@ -1,6 +1,6 @@
 """This formula is a reciprocal power on an interval that starts near its pole, ``(d/x)^p - 0.5 + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
 
 from .helpers import distance_axis, power_axis
 
@@ -27,7 +27,10 @@ class NearPolePower(Formula):
 
     number = (2, 3, 4)
     name = "Near-pole power"
-    param_names = ("p", "d")
+    params = (
+        FormulaParam("p"),
+        FormulaParam("d"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, d: float) -> float:

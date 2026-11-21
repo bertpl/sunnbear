@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamNotation, ParamRecipe
+from sunnbear._core.problems.core import (
+    Formula,
+    FormulaParam,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamNotation,
+    ParamRecipe,
+)
 
 
 class Exponential(Formula):
@@ -22,7 +30,7 @@ class Exponential(Formula):
 
     number = (2, 5, 1)
     name = "Exponential"
-    param_names = ("b",)
+    params = (FormulaParam("b"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:

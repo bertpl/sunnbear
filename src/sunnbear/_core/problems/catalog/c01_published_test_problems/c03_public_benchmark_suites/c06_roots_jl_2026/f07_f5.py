@@ -5,7 +5,7 @@ The formula comes from the rows with the keys ``f5`` and ``f6`` in the survey of
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class RootsJl2026F5(Formula):
@@ -23,7 +23,11 @@ class RootsJl2026F5(Formula):
 
     number = (1, 3, 6, 7)
     name = "f5"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test,"

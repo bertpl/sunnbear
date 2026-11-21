@@ -16,7 +16,7 @@ class BadrAlmotairiElGhamry2021P14(Formula):
 
     number = (1, 2, 14, 5)
     name = "P14"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Badr, E., Almotairi, S., El Ghamry, A. (2021). A comparative study among new hybrid root "

@@ -5,7 +5,7 @@ The formula comes from the row with the key ``2`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Norton19852(Formula):
@@ -19,7 +19,7 @@ class Norton19852(Formula):
 
     number = (1, 2, 2, 1)
     name = "2"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational "

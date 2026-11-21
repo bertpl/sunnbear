@@ -18,7 +18,7 @@ class Atkinson1989P38A(Formula):
 
     number = (1, 4, 1, 8)
     name = "P38(a)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "

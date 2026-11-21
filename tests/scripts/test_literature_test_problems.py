@@ -12,7 +12,7 @@ import textwrap
 import pytest
 
 from sunnbear._core.problems.catalog.c01_published_test_problems import PublishedTestProblems
-from sunnbear._core.problems.core import FormulaRegistry, FormulaSource
+from sunnbear._core.problems.core import EffectOfC, FormulaRegistry, FormulaSource
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
 # _PUBLISHED_FORMULAS are the formulas of category 1 outside subcategory 1.99, and _MODIFIED_FORMULAS those inside it.
@@ -318,25 +318,31 @@ def test_modified_category_has_the_name_of_its_published_category(category):
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_published_formula_shifts_x_by_c(formula, c):
-    """A published formula applies ``c`` by category 1's rule: it shifts x by ``c_scale*c``."""
+    """A published formula shifts x by ``c_scale*c``, by category 1's rule, and declares no other way."""
     for candidate in formula.build_all_candidates():
         # --- act ----------------------
         ways = _c_ways_followed(candidate, c)
 
         # --- assert -------------------
         assert "shifts x" in ways, candidate.id
+    assert formula.effect_of_c in (None, EffectOfC.SHIFTS_X)
 
 
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
-    """A formula of subcategory 1.99 applies ``c`` in 1 of the 3 ways that `ModifiedPublishedTestProblems` states."""
+    """A formula of subcategory 1.99 applies ``c`` in 1 of the 3 ways that `ModifiedPublishedTestProblems` states.
+
+    A formula that declares its way, in `effect_of_c`, must follow that way.
+    """
     for candidate in formula.build_all_candidates():
         # --- act ----------------------
         ways = _c_ways_followed(candidate, c)
 
         # --- assert -------------------
         assert ways, candidate.id
+        if formula.effect_of_c is not None:
+            assert _C_WAY_OF_EFFECT[formula.effect_of_c] in ways, candidate.id
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
@@ -773,6 +779,10 @@ def _first_run_formulas_table(script_modules):
         _formula_decisions(script_modules, [("d:3", "d:1")]),
         formulas_table_cls(()),
     )
+
+
+# _C_WAY_OF_EFFECT maps each way of `EffectOfC` to its name in `_c_ways_followed`.
+_C_WAY_OF_EFFECT = {EffectOfC.SHIFTS_X: "shifts x", EffectOfC.SHIFTS_Y: "adds to f", EffectOfC.SCALES_X: "scales x"}
 
 
 def _c_ways_followed(candidate, c):

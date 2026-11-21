@@ -5,7 +5,7 @@ A change of formula f1.1.7.2 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedChandrupatla19972(Formula):
@@ -41,7 +41,10 @@ class ModifiedChandrupatla19972(Formula):
 
     number = (1, 99, 1, 7, 2)
     name = "2"
-    param_names = ("a", "b")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+    )
     source = FormulaSource(
         reference=(
             "Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the "

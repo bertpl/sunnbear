@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``7.1`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class LiZhouLangeTian202671(Formula):
@@ -20,7 +20,13 @@ class LiZhouLangeTian202671(Formula):
 
     number = (1, 2, 20, 3)
     name = "7.1"
-    param_names = ("a0", "a1", "a2", "a3", "m")
+    params = (
+        FormulaParam("a0"),
+        FormulaParam("a1"),
+        FormulaParam("a2"),
+        FormulaParam("a3"),
+        FormulaParam("m"),
+    )
     source = FormulaSource(
         reference=(
             "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "

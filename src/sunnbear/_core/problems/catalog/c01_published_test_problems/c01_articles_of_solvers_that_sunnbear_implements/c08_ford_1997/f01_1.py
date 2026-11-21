@@ -5,7 +5,7 @@ The formula comes from the row with the key ``1`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Ford19971(Formula):
@@ -19,7 +19,11 @@ class Ford19971(Formula):
 
     number = (1, 1, 8, 1)
     name = "1"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear "

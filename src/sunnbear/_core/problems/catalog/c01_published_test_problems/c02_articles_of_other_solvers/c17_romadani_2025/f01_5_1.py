@@ -16,7 +16,7 @@ class Romadani202551(Formula):
 
     number = (1, 2, 17, 1)
     name = "5.1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding "

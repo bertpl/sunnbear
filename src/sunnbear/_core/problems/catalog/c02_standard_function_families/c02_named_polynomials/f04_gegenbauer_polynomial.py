@@ -3,7 +3,7 @@
 import itertools
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
 
 from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
@@ -55,7 +55,10 @@ class GegenbauerPolynomial(Formula):
 
     number = (2, 2, 4)
     name = "Gegenbauer polynomial"
-    param_names = ("n", "alpha")
+    params = (
+        FormulaParam("n"),
+        FormulaParam("alpha"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, alpha: float) -> float:

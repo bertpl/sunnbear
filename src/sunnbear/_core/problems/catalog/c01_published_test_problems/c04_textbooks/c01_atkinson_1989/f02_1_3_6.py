@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``(1.3.6)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Atkinson1989136(Formula):
@@ -18,7 +18,11 @@ class Atkinson1989136(Formula):
 
     number = (1, 4, 1, 2)
     name = "(1.3.6)"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "

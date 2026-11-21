@@ -4,7 +4,7 @@ The formula comes from the row with the key ``§2 (p. 55); §2.2 (p. 78); 2.2-15
 problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Bradie20062P55(Formula):
@@ -22,7 +22,11 @@ class Bradie20062P55(Formula):
 
     number = (1, 4, 4, 1)
     name = "§2 (p. 55)"
-    param_names = ("R", "rho_o", "rho_f")
+    params = (
+        FormulaParam("R"),
+        FormulaParam("rho_o"),
+        FormulaParam("rho_f"),
+    )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

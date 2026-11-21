@@ -17,7 +17,7 @@ class ParidaGupta20051(Formula):
 
     number = (1, 2, 5, 1)
     name = "1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple "

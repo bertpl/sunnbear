@@ -3,7 +3,7 @@
 A change of formula f1.2.4.2 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedAlefeldPotraShi1993T512(Formula):
@@ -29,7 +29,11 @@ class ModifiedAlefeldPotraShi1993T512(Formula):
 
     number = (1, 99, 2, 4, 2)
     name = "T5.1-2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "

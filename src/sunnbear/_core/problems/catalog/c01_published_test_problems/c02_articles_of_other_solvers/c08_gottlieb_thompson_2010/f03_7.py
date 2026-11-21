@@ -16,7 +16,7 @@ class GottliebThompson20107(Formula):
 
     number = (1, 2, 8, 3)
     name = "7"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Gottlieb, R. G., Thompson, B. F. (2010). Bisected direct quadratic regula falsi. Applied "

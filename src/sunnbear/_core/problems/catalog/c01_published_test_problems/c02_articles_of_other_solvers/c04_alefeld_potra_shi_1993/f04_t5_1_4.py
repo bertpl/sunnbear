@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``T5.1-4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class AlefeldPotraShi1993T514(Formula):
@@ -21,7 +21,13 @@ class AlefeldPotraShi1993T514(Formula):
 
     number = (1, 2, 4, 4)
     name = "T5.1-4"
-    param_names = ("a_", "n", "a", "b", "c_scale")
+    params = (
+        FormulaParam("a_"),
+        FormulaParam("n"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "

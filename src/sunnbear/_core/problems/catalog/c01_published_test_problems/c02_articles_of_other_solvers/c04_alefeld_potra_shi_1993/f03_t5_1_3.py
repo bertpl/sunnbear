@@ -5,7 +5,7 @@ The formula comes from the row with the key ``T5.1-3`` in the survey of publishe
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class AlefeldPotraShi1993T513(Formula):
@@ -22,7 +22,10 @@ class AlefeldPotraShi1993T513(Formula):
 
     number = (1, 2, 4, 3)
     name = "T5.1-3"
-    param_names = ("a_", "b_")
+    params = (
+        FormulaParam("a_"),
+        FormulaParam("b_"),
+    )
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "

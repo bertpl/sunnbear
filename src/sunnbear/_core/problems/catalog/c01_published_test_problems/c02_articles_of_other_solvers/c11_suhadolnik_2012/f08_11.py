@@ -5,7 +5,7 @@ The formula comes from the row with the key ``11`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Suhadolnik201211(Formula):
@@ -19,7 +19,11 @@ class Suhadolnik201211(Formula):
 
     number = (1, 2, 11, 8)
     name = "11"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. "

@@ -5,7 +5,7 @@ A change of formula f1.1.6.3 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedAlefeldPotraShi199512(Formula):
@@ -34,7 +34,7 @@ class ModifiedAlefeldPotraShi199512(Formula):
 
     number = (1, 99, 1, 6, 3)
     name = "12"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous"

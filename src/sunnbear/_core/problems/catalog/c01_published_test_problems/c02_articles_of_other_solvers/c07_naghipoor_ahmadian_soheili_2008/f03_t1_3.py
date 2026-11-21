@@ -18,7 +18,7 @@ class NaghipoorAhmadianSoheili2008T13(Formula):
 
     number = (1, 2, 7, 3)
     name = "T1.3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Naghipoor, J., Ahmadian, S. A., Soheili, A. R. (2008). An Improved Regula Falsi Method for"

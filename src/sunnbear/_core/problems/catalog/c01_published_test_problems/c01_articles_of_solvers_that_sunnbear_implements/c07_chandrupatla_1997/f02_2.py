@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Chandrupatla19972(Formula):
@@ -17,7 +17,11 @@ class Chandrupatla19972(Formula):
 
     number = (1, 1, 7, 2)
     name = "2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the "

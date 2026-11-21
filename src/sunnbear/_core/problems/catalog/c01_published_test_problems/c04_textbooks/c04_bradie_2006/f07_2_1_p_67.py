@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``§2.1 (p. 67); 2.1-19; 2.5-20`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Bradie200621P67(Formula):
@@ -25,7 +25,11 @@ class Bradie200621P67(Formula):
 
     number = (1, 4, 4, 7)
     name = "§2.1 (p. 67)"
-    param_names = ("initial_investment", "monthly_deposit", "goal")
+    params = (
+        FormulaParam("initial_investment"),
+        FormulaParam("monthly_deposit"),
+        FormulaParam("goal"),
+    )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

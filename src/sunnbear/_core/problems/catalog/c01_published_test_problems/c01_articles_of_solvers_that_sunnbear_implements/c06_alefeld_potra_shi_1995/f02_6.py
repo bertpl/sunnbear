@@ -5,7 +5,7 @@ The formula comes from the row with the key ``6`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class AlefeldPotraShi19956(Formula):
@@ -19,7 +19,7 @@ class AlefeldPotraShi19956(Formula):
 
     number = (1, 1, 6, 2)
     name = "6"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous"

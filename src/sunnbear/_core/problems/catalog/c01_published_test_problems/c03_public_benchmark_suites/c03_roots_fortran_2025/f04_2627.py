@@ -6,7 +6,7 @@ The formula comes from the row with the key ``26–27`` in the survey of publish
 import math
 import sys
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 # MAX_EXP_ARGUMENT is the largest argument for which float64 exp does not overflow.
 MAX_EXP_ARGUMENT = math.log(sys.float_info.max)
@@ -23,7 +23,11 @@ class RootsFortran20252627(Formula):
 
     number = (1, 3, 3, 4)
     name = "26–27"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "

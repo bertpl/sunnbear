@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``(25)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class TomovGanchovski202625(Formula):
@@ -18,7 +18,11 @@ class TomovGanchovski202625(Formula):
 
     number = (1, 1, 15, 1)
     name = "(25)"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a "

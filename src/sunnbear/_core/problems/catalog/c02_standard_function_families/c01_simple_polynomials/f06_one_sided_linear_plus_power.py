@@ -1,6 +1,14 @@
 """This formula is a weighted mean of a line and a power on ``[0, 1]``, ``x/(1 + w) + (w/(1 + w))*x^p - 0.5 + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamNotation, ParamRecipe
+from sunnbear._core.problems.core import (
+    Formula,
+    FormulaParam,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamNotation,
+    ParamRecipe,
+)
 
 from .helpers import HIGHEST_POWER
 
@@ -29,7 +37,10 @@ class OneSidedLinearPlusPower(Formula):
 
     number = (2, 1, 6)
     name = "One-sided linear plus power"
-    param_names = ("p", "w")
+    params = (
+        FormulaParam("p"),
+        FormulaParam("w"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, w: float) -> float:

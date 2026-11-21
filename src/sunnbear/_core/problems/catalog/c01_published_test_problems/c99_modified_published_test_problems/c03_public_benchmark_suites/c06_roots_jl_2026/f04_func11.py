@@ -28,7 +28,7 @@ class ModifiedRootsJl2026Func11(Formula):
 
     number = (1, 99, 3, 6, 4)
     name = "func11"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test,"

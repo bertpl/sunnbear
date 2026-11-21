@@ -21,7 +21,7 @@ class Atkinson198928Case4(Formula):
 
     number = (1, 4, 1, 7)
     name = "§2.8 case (4)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "

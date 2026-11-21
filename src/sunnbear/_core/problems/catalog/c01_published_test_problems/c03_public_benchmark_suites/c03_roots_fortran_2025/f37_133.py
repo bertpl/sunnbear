@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``133`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class RootsFortran2025133(Formula):
@@ -18,7 +18,12 @@ class RootsFortran2025133(Formula):
 
     number = (1, 3, 3, 37)
     name = "133"
-    param_names = ("x1", "x2", "y1", "y2")
+    params = (
+        FormulaParam("x1"),
+        FormulaParam("x2"),
+        FormulaParam("y1"),
+        FormulaParam("y2"),
+    )
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "

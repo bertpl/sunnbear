@@ -1,6 +1,6 @@
 """This formula is a line plus the mean ``E_n(x)`` of ``n`` even powers from 2, ``x + w*(E_n(x) - 1) + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_term_count, term_count_axis, weight_recipes
 
@@ -22,7 +22,10 @@ class LinearPlusSumOfEvenPowers(Formula):
 
     number = (2, 1, 4)
     name = "Linear plus sum of even powers"
-    param_names = ("n", "w")
+    params = (
+        FormulaParam("n"),
+        FormulaParam("w"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, w: float) -> float:

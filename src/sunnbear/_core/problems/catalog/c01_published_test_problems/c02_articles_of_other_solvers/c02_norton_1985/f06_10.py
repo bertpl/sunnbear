@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``10`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Norton198510(Formula):
@@ -20,7 +20,11 @@ class Norton198510(Formula):
 
     number = (1, 2, 2, 6)
     name = "10"
-    param_names = ("a_", "b_", "n")
+    params = (
+        FormulaParam("a_"),
+        FormulaParam("b_"),
+        FormulaParam("n"),
+    )
     source = FormulaSource(
         reference=(
             "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational "

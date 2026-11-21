@@ -5,7 +5,7 @@ The formula comes from the row with the key ``T4.7`` in the survey of published 
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Gao2026T47(Formula):
@@ -17,7 +17,11 @@ class Gao2026T47(Formula):
 
     number = (1, 1, 14, 5)
     name = "T4.7"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "

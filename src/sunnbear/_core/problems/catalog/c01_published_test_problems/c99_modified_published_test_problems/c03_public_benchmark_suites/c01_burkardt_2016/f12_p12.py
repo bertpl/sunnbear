@@ -5,7 +5,7 @@ A change of formula f1.3.1.12 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -38,7 +38,12 @@ class ModifiedBurkardt2016P12(Formula):
 
     number = (1, 99, 3, 1, 12)
     name = "p12"
-    param_names = ("factor", "a", "b", "c_scale")
+    params = (
+        FormulaParam("factor"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "

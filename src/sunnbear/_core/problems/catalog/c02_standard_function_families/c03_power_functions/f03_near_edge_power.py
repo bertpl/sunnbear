@@ -1,6 +1,6 @@
 """This formula is a power on an interval that starts at or near the edge of the power's domain, ``x^p - 0.5 + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
 
 from .helpers import distance_axis, power_axis
 
@@ -26,7 +26,10 @@ class NearEdgePower(Formula):
 
     number = (2, 3, 3)
     name = "Near-edge power"
-    param_names = ("p", "d")
+    params = (
+        FormulaParam("p"),
+        FormulaParam("d"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, d: float) -> float:

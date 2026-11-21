@@ -18,7 +18,7 @@ class DowellJarratt1971Table1(Formula):
 
     number = (1, 1, 1, 1)
     name = "Table 1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of "

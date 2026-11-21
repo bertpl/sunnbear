@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``§8.2, (8.14)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ChapraCanale201582(Formula):
@@ -25,7 +25,7 @@ class ChapraCanale201582(Formula):
 
     number = (1, 4, 6, 6)
     name = "§8.2"
-    param_names = ("pCO2",)
+    params = (FormulaParam("pCO2"),)
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

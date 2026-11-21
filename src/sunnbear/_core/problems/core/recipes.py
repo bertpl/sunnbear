@@ -131,8 +131,17 @@ class ParamAxis:
 # ==================================================================================================
 #  ParamRecipe
 # ==================================================================================================
+@dataclass(frozen=True, kw_only=True)
 class ParamRecipe(ABC):
-    """`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table."""
+    r"""`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table.
+
+    Attributes:
+        summary: Optional here: 1 sentence for a reader on what the recipe covers, such as "the sweep of $\param{b}$ at
+            $\param{d} = 1$", in sunnbear's LaTeX notation (`LatexTemplate`). The catalog's tests require it of every
+            recipe of a shipped formula.
+    """
+
+    summary: str | None = None
 
     @abstractmethod
     def param_names(self) -> tuple[str, ...]:
@@ -235,19 +244,19 @@ class ParamGrid(ParamRecipe):
     #  Single-axis conveniences
     # --------------------------------------------------------------------------
     @classmethod
-    def decimal(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+    def decimal(cls, name: str, start: float, stop: float, step: float, *, summary: str | None = None) -> "ParamGrid":
         """Build a single-axis grid whose values are the grid arguments themselves (DECIMAL notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.DECIMAL),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.DECIMAL),), summary=summary)
 
     @classmethod
-    def pow2(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+    def pow2(cls, name: str, start: float, stop: float, step: float, *, summary: str | None = None) -> "ParamGrid":
         """Build a single-axis grid in base-2 exponent space (POW2 notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW2),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW2),), summary=summary)
 
     @classmethod
-    def pow10(cls, name: str, start: float, stop: float, step: float) -> "ParamGrid":
+    def pow10(cls, name: str, start: float, stop: float, step: float, *, summary: str | None = None) -> "ParamGrid":
         """Build a single-axis grid in base-10 exponent space (POW10 notation)."""
-        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),))
+        return cls(axes=(ParamAxis(name, start, stop, step, ParamNotation.POW10),), summary=summary)
 
 
 # ==================================================================================================

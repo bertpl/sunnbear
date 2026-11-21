@@ -5,7 +5,7 @@ The formula comes from the row with the key ``Equation 3`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class GorgeyEtAl2025Equation3(Formula):
@@ -21,7 +21,11 @@ class GorgeyEtAl2025Equation3(Formula):
 
     number = (1, 1, 12, 3)
     name = "Equation 3"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method"

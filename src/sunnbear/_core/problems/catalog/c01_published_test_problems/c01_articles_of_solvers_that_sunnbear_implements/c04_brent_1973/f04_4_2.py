@@ -21,7 +21,7 @@ class Brent197342(Formula):
 
     number = (1, 1, 4, 4)
     name = "(4.2)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, "

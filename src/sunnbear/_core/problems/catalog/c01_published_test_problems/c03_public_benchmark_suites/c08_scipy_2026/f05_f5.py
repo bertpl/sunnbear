@@ -17,7 +17,7 @@ class Scipy2026F5(Formula):
 
     number = (1, 3, 8, 5)
     name = "f5"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, "

@@ -1,6 +1,6 @@
 """This formula is Wilkinson's polynomial of degree ``n``, divided by ``n!``, with ``x`` shifted by ``c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
 
 from .helpers import is_valid_degree
 
@@ -36,7 +36,7 @@ class WilkinsonPolynomial(Formula):
 
     number = (2, 2, 9)
     name = "Wilkinson polynomial"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:

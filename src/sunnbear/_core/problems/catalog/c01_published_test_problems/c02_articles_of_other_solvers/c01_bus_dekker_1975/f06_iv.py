@@ -19,7 +19,7 @@ class BusDekker1975Iv(Formula):
 
     number = (1, 2, 1, 6)
     name = "IV"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "

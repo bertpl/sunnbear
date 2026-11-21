@@ -32,7 +32,7 @@ class ModifiedBurkardt2016P04(Formula):
 
     number = (1, 99, 3, 1, 4)
     name = "p04"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "

@@ -21,7 +21,7 @@ class LiZhouLangeTian202673(Formula):
 
     number = (1, 2, 20, 5)
     name = "7.3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "

@@ -25,7 +25,7 @@ class IsmuniyartoPinheiroSokhna20253(Formula):
 
     number = (1, 2, 16, 1)
     name = "§3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ismuniyarto, Pinheiro, D., Sokhna, E. H. L. (2025). A numerical study of bracketing "

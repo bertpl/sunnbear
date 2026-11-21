@@ -2,7 +2,7 @@
 
 import itertools
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
 
 from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
 
@@ -50,7 +50,11 @@ class JacobiPolynomial(Formula):
 
     number = (2, 2, 5)
     name = "Jacobi polynomial"
-    param_names = ("n", "alpha", "beta")
+    params = (
+        FormulaParam("n"),
+        FormulaParam("alpha"),
+        FormulaParam("beta"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, alpha: float, beta: float) -> float:

@@ -32,7 +32,7 @@ class ModifiedFord19971(Formula):
 
     number = (1, 99, 1, 8, 1)
     name = "1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear "

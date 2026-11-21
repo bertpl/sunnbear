@@ -16,7 +16,7 @@ class Ganchovski2026F101(Formula):
 
     number = (1, 3, 4, 3)
     name = "f101"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the "

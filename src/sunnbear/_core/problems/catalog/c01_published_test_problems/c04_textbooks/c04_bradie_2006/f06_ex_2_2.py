@@ -6,7 +6,7 @@ The formula comes from the row with the key ``Ex. 2.2; Fig. 2.3; Tables 2.2, 2.3
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Bradie2006Ex22(Formula):
@@ -25,7 +25,11 @@ class Bradie2006Ex22(Formula):
 
     number = (1, 4, 4, 6)
     name = "Ex. 2.2"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

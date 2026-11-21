@@ -6,7 +6,7 @@ test problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class SuliMayers2003Example17(Formula):
@@ -22,7 +22,11 @@ class SuliMayers2003Example17(Formula):
 
     number = (1, 4, 2, 4)
     name = "Example 1.7"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "

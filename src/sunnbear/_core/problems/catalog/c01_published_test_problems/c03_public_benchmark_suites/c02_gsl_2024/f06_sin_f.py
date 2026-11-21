@@ -5,7 +5,7 @@ The formula comes from the row with the key ``sin_f`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Gsl2024SinF(Formula):
@@ -21,7 +21,11 @@ class Gsl2024SinF(Formula):
 
     number = (1, 3, 2, 6)
     name = "sin_f"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "GNU Scientific Library (GSL), release 2.8, files `roots/test_funcs.c` and `roots/test.c` "

@@ -2,7 +2,7 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
 
 from .helpers import power_axis
 
@@ -27,7 +27,7 @@ class SignedPower2(Formula):
 
     number = (2, 3, 2)
     name = "Signed power 2"
-    param_names = ("p",)
+    params = (FormulaParam("p"),)
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:

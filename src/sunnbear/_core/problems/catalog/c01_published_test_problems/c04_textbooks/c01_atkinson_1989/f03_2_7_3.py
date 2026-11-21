@@ -19,7 +19,7 @@ class Atkinson1989273(Formula):
 
     number = (1, 4, 1, 3)
     name = "(2.7.3)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "

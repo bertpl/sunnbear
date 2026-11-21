@@ -1,6 +1,6 @@
 """This formula is a line plus an odd power, ``m*x + (1 - m)*x^p + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe
 
 from .helpers import is_valid_power, power_axis, slope_recipes
 
@@ -30,7 +30,10 @@ class LinearPlusOddPower(Formula):
 
     number = (2, 1, 3)
     name = "Linear plus odd power"
-    param_names = ("p", "m")
+    params = (
+        FormulaParam("p"),
+        FormulaParam("m"),
+    )
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, m: float) -> float:

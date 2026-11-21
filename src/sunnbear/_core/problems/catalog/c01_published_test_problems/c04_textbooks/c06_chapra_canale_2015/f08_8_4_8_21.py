@@ -6,7 +6,7 @@ problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ChapraCanale201584821(Formula):
@@ -30,7 +30,7 @@ class ChapraCanale201584821(Formula):
 
     number = (1, 4, 6, 8)
     name = "§8.4, (8.21)"
-    param_names = ("eps",)
+    params = (FormulaParam("eps"),)
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

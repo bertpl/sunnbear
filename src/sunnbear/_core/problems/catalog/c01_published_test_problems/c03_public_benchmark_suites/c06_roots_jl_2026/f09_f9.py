@@ -18,7 +18,7 @@ class RootsJl2026F9(Formula):
 
     number = (1, 3, 6, 9)
     name = "f9"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test,"

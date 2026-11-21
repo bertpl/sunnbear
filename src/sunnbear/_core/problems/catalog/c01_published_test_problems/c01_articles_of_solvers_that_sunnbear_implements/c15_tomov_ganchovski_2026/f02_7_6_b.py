@@ -17,7 +17,7 @@ class TomovGanchovski202676B(Formula):
 
     number = (1, 1, 15, 2)
     name = "7.6-b"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a "

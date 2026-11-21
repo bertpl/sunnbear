@@ -29,7 +29,7 @@ class ModifiedGaldino2011F4(Formula):
 
     number = (1, 99, 2, 9, 4)
     name = "f4"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Galdino, S. (2011). A family of regula falsi root-finding methods. Proceedings of the 2011"

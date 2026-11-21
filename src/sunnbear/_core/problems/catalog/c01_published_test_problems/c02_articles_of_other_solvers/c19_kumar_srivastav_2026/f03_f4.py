@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``f4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class KumarSrivastav2026F4(Formula):
@@ -17,7 +17,7 @@ class KumarSrivastav2026F4(Formula):
 
     number = (1, 2, 19, 3)
     name = "f4"
-    param_names = ("x_star",)
+    params = (FormulaParam("x_star"),)
     source = FormulaSource(
         reference=(
             "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "

@@ -8,7 +8,15 @@ a worker process of a benchmark or pipeline run imports it by its module name. T
 fixture leaves both formulas out of its copy of the registry.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
 
 # ==================================================================================================
@@ -19,7 +27,13 @@ class ExampleCubic(Formula):
 
     number = (99, 801)
     name = "Example cubic"
-    param_names = ("p1",)
+    params = (FormulaParam("p1", latex_symbol="p_1"),)
+    presentation = FormulaPresentation(
+        expression=r"\x^3 - \param{p1} \x - \c",
+        interval="[-2, 2]",
+        summary=r"An example cubic, with 1 root for $\param{p1} \le 0$ and up to 3 roots for a larger $\param{p1}$.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p1: float) -> float:
@@ -32,7 +46,7 @@ class ExampleCubic(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps ``p1`` from 0 to 1 in steps of 0.2."""
-        return (ParamGrid.decimal("p1", 0.0, 1.0, step=0.2),)
+        return (ParamGrid.decimal("p1", 0.0, 1.0, step=0.2, summary=r"The sweep of $\param{p1}$ from 0 to 1."),)
 
     test_cases = (
         FormulaTestCase.value(params={"p1": 0.0}, x=0.0, c=0.0, expected=0.0),  # root at the origin
@@ -49,7 +63,13 @@ class ExampleOddPower(Formula):
 
     number = (99, 802)
     name = "Example odd power"
-    param_names = ("p1",)
+    params = (FormulaParam("p1", latex_symbol="p_1"),)
+    presentation = FormulaPresentation(
+        expression=r"\x^{\param{p1}} - \c",
+        interval="[-2, 2]",
+        summary="An example odd power, with 1 root of multiplicity 1 or more.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p1: float) -> float:
@@ -62,7 +82,7 @@ class ExampleOddPower(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps ``p1`` over the odd integers from 1 to 7."""
-        return (ParamGrid.decimal("p1", 1.0, 7.0, step=2.0),)
+        return (ParamGrid.decimal("p1", 1.0, 7.0, step=2.0, summary=r"The odd powers $\param{p1}$ from 1 to 7."),)
 
     def is_param_tuple_valid(self, p1: float) -> bool:
         """Require ``p1`` to be an odd integer, because an even power has no sign change on the interval."""

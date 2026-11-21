@@ -5,7 +5,7 @@ The formula comes from the row with the key ``6`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ScimlbenchmarksJl20266(Formula):
@@ -19,7 +19,7 @@ class ScimlbenchmarksJl20266(Formula):
 
     number = (1, 3, 7, 2)
     name = "6"
-    param_names = ("p",)
+    params = (FormulaParam("p"),)
     source = FormulaSource(
         reference=(
             'SciMLBenchmarks.jl, "Interval Rootfinding Test Suite" by Fabian Gittins (the front matter '

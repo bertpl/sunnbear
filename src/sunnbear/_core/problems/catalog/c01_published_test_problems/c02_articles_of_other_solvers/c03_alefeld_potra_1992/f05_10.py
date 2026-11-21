@@ -5,7 +5,7 @@ The formula comes from the row with the key ``10`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class AlefeldPotra199210(Formula):
@@ -17,7 +17,7 @@ class AlefeldPotra199210(Formula):
 
     number = (1, 2, 3, 5)
     name = "10"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "

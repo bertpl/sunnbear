@@ -24,7 +24,7 @@ class Scipy2026F6(Formula):
 
     number = (1, 3, 8, 6)
     name = "f6"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, "

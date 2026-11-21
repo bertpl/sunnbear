@@ -25,7 +25,7 @@ class ModifiedSabharwal2019T28(Formula):
 
     number = (1, 99, 2, 13, 9)
     name = "T2.8"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "

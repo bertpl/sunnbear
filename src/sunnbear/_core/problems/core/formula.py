@@ -21,8 +21,12 @@ from typing import ClassVar
 
 import numba
 
+from .effect_of_c import EffectOfC
+from .formula_param import FormulaParam
 from .identity import ProblemId
-from .param_values import DEDUP_DIGITS, deduplicate_param_tuples
+from .latex_template import LatexTemplate
+from .param_values import DEDUP_DIGITS, ParamNotation, deduplicate_param_tuples
+from .presentation import FormulaPresentation
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
 from .source import FormulaSource
@@ -43,9 +47,9 @@ class Formula(FormulaTaxonomyNode, ABC):
             ``number[:-1]``, and every formula belongs to a category, so the number has at least
             2 elements.
         name: Display name, e.g. "Odd power".
-        param_names: The formula's declared parameter interface, in tuple-position
-            order — the authority every recipe is validated against, and the
-            labels reporting uses. Empty for a formula without parameters.
+        params: The formula's declared parameters (`FormulaParam`), in tuple-position order. Their names,
+            `param_names`, are the authority that every recipe and hook signature is validated against, and the
+            labels that ids and reporting use. Empty for a formula without parameters.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
         test_cases: The formula's own test cases (`FormulaTestCase`), which
@@ -53,12 +57,18 @@ class Formula(FormulaTaxonomyNode, ABC):
             declare at least 1.
         source: The formula's publication (`FormulaSource`), or None (default)
             for a formula that no publication gives.
+        presentation: What a reader sees of the formula (`FormulaPresentation`), or None (default). The catalog's
+            tests require it of every shipped formula.
+        effect_of_c: How the formula's code applies ``c`` (`EffectOfC`), or None (default). The catalog's tests
+            require it of every shipped formula, and check it by evaluating the formula.
     """
 
-    param_names: ClassVar[tuple[str, ...]] = ()
+    params: ClassVar[tuple[FormulaParam, ...]] = ()
     jit: ClassVar[bool] = True
     test_cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
     source: ClassVar[FormulaSource | None] = None
+    presentation: ClassVar[FormulaPresentation | None] = None
+    effect_of_c: ClassVar[EffectOfC | None] = None
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
     # so the `in cls.__dict__` cache check below is not satisfied by this declaration)
     _compiled_formula_cache: ClassVar["Callable[..., float]"]
@@ -68,14 +78,28 @@ class Formula(FormulaTaxonomyNode, ABC):
 
         `inspect.isabstract` cannot decide concreteness here, because this hook runs before the ABC
         machinery records the new class's abstract methods.
+
+        Raises:
+            TypeError: If the subclass declares ``param_names``, which `params` derives, and which a class attribute
+                would hide.
+            ValueError: If a concrete subclass's presentation names a parameter it does not declare, or leaves one out
+                (`_validate_presentation`).
         """
         super().__init_subclass__(**kwargs)
+        if "param_names" in cls.__dict__:
+            raise TypeError(f"{cls.__name__} declares param_names; declare its parameters in params instead.")
         is_concrete = not any(
             getattr(getattr(cls, name), "__isabstractmethod__", False) for name in Formula.__abstractmethods__
         )
         if is_concrete:
             cls._validate_number_and_name(min_number_length=2)
+            cls._validate_presentation()
             FormulaRegistry.register_formula(cls)
+
+    @property
+    def param_names(self) -> tuple[str, ...]:
+        """Return the names of `params`, in tuple-position order, as ids, recipes and hook signatures use them."""
+        return tuple(param.name for param in self.params)
 
     # --------------------------------------------------------------------------
     #  Hooks implemented per formula
@@ -254,6 +278,63 @@ class Formula(FormulaTaxonomyNode, ABC):
         return tuple(candidates)
 
     # --------------------------------------------------------------------------
+    #  LaTeX of the presentation
+    # --------------------------------------------------------------------------
+    def latex_with_symbols(self, text: str) -> str:
+        r"""Return `text`, in sunnbear's LaTeX notation, with each placeholder replaced by its parameter's symbol.
+
+        Each symbol is wrapped in ``\prm{…}`` (`LatexTemplate.substitute`). A formula's texts for a reader are always
+        rendered this way.
+
+        Raises:
+            ValueError: If `text` names a parameter that has no `latex_symbol`.
+        """
+        symbols = {param.name: param.latex_symbol for param in self.params if param.latex_symbol is not None}
+        return LatexTemplate(text).substitute(symbols)
+
+    def latex_with_values(self, text: str, param_values: tuple[float, ...]) -> str:
+        r"""Return `text`, in sunnbear's LaTeX notation, with each placeholder replaced by a test problem's value.
+
+        Each value is spelled as the test problem's id spells it, written in LaTeX
+        (`ParamNotation.spell_value_in_latex`), and wrapped in ``\prm{…}``. The values are substituted, not simplified:
+        ``1 - \param{m}`` at ``m = 0.5`` gives ``1 - \prm{0.5}``.
+
+        Args:
+            text: A definition's side, the expression or the interval of the formula's presentation.
+            param_values: The test problem's parameter values, in the order of `params`.
+        """
+        values = dict(zip(self.param_names, param_values, strict=True))
+        return LatexTemplate(text).substitute(
+            {name: ParamNotation.spell_value_in_latex(value) for name, value in values.items()}
+        )
+
+    def latex_display(self, param_values: tuple[float, ...] | None = None) -> str:
+        r"""Return the presentation's definitions and ``f(\x, \c) = `` plus its expression, as 1 display in LaTeX.
+
+        With definitions, the display is an ``aligned`` environment of 1 line per definition, then the line of
+        ``f(\x, \c)``, aligned at their ``=``; without, it is the 1 line ``f(\x, \c) = …``.
+
+        Args:
+            param_values: A test problem's parameter values, in the order of `params`, for the display with values;
+                None (default) for the display with the parameters' symbols.
+
+        Raises:
+            ValueError: If the formula declares no presentation.
+        """
+        if self.presentation is None:
+            raise ValueError(f"{self.label} declares no presentation.")
+        lines = [*self.presentation.definitions, (r"f(\x, \c)", self.presentation.expression)]
+        rendered = [
+            (self._latex_in_form(left, param_values), self._latex_in_form(right, param_values)) for left, right in lines
+        ]
+        if self.presentation.definitions:
+            body = r" \\ ".join(f"{left} &= {right}" for left, right in rendered)
+            return rf"\begin{{aligned}} {body} \end{{aligned}}"
+        else:
+            left, right = rendered[0]
+            return f"{left} = {right}"
+
+    # --------------------------------------------------------------------------
     #  Validation
     # --------------------------------------------------------------------------
     def _validate_recipes(self, recipes: "tuple[ParamRecipe, ...]") -> None:
@@ -309,6 +390,47 @@ class Formula(FormulaTaxonomyNode, ABC):
                     f"Formula {cls.__name__} declares param_names={self.param_names} but "
                     f"{hook} takes {signature_names}; the two must agree."
                 )
+
+    @classmethod
+    def _validate_presentation(cls) -> None:
+        """Check that the presentation and the parameters' meanings name only declared parameters, and name them all.
+
+        Every placeholder of the presentation and of the meanings must name a parameter in `params`, and every parameter
+        must appear in the presentation's definitions, expression or interval. A formula without a presentation is not
+        checked; the catalog's tests require one of every shipped formula.
+
+        Raises:
+            ValueError: If a placeholder names an undeclared parameter, or a parameter appears in neither the
+                definitions, the expression nor the interval.
+        """
+        if cls.presentation is not None:
+            param_names = [param.name for param in cls.params]
+            meanings = [LatexTemplate(param.meaning) for param in cls.params if param.meaning is not None]
+            named = {
+                name for template in (*cls.presentation.templates, *meanings) for name in template.placeholder_names
+            }
+            undeclared = sorted(named - set(param_names))
+            if undeclared:
+                raise ValueError(f"{cls.__name__}'s presentation names the undeclared parameters {undeclared}.")
+            math = [*(side for definition in cls.presentation.definitions for side in definition)]
+            math += [cls.presentation.expression, cls.presentation.interval]
+            in_math = {name for text in math for name in LatexTemplate(text).placeholder_names}
+            absent = [name for name in param_names if name not in in_math]
+            if absent:
+                raise ValueError(
+                    f"{cls.__name__}'s presentation leaves the parameters {absent} out of its definitions, expression "
+                    "and interval."
+                )
+
+    # --------------------------------------------------------------------------
+    #  Helpers
+    # --------------------------------------------------------------------------
+    def _latex_in_form(self, text: str, param_values: tuple[float, ...] | None) -> str:
+        """Return `text` with the parameters' symbols where `param_values` is None, and with those values otherwise."""
+        if param_values is None:
+            return self.latex_with_symbols(text)
+        else:
+            return self.latex_with_values(text, param_values)
 
 
 def _declared_hook_param_names(fun: "Callable[..., object]", owner: str, hook: str, n_leading: int) -> tuple[str, ...]:

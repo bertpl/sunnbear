@@ -16,7 +16,7 @@ class AlefeldPotraShi1993T511(Formula):
 
     number = (1, 2, 4, 1)
     name = "T5.1-1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "

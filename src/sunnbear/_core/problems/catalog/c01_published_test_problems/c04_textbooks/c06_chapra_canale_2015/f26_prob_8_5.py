@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``Prob. 8.5`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ChapraCanale2015Prob85(Formula):
@@ -18,7 +18,12 @@ class ChapraCanale2015Prob85(Formula):
 
     number = (1, 4, 6, 26)
     name = "Prob. 8.5"
-    param_names = ("K", "ca0", "cb0", "cc0")
+    params = (
+        FormulaParam("K"),
+        FormulaParam("ca0"),
+        FormulaParam("cb0"),
+        FormulaParam("cc0"),
+    )
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

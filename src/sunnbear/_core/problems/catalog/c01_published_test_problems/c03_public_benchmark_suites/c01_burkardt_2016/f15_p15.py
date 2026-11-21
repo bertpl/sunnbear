@@ -5,7 +5,7 @@ The formula comes from the row with the key ``p15`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Burkardt2016P15(Formula):
@@ -20,7 +20,11 @@ class Burkardt2016P15(Formula):
 
     number = (1, 3, 1, 15)
     name = "p15"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "

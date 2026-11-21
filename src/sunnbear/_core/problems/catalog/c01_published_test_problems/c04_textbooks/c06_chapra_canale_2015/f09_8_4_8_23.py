@@ -25,7 +25,7 @@ class ChapraCanale201584823(Formula):
 
     number = (1, 4, 6, 9)
     name = "§8.4, (8.23)"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "

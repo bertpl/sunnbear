@@ -19,7 +19,7 @@ class SuliMayers2003Examples1113(Formula):
 
     number = (1, 4, 2, 2)
     name = "Examples 1.1–1.3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "

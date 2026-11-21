@@ -3,7 +3,7 @@
 The formula comes from the row with the key ``(1.2)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class SuliMayers200312(Formula):
@@ -21,7 +21,12 @@ class SuliMayers200312(Formula):
 
     number = (1, 4, 2, 1)
     name = "(1.2)"
-    param_names = ("M", "a", "b", "c_scale")
+    params = (
+        FormulaParam("M"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "

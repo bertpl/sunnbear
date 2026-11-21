@@ -3,7 +3,7 @@
 A change of formula f1.2.1.5 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -34,7 +34,7 @@ class ModifiedBusDekker1975Iii(Formula):
 
     number = (1, 99, 2, 1, 5)
     name = "III"
-    param_names = ("n",)
+    params = (FormulaParam("n"),)
     source = FormulaSource(
         reference=(
             "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "

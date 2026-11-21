@@ -3,7 +3,7 @@
 A change of formula f1.4.2.1 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class ModifiedSuliMayers200312(Formula):
@@ -46,7 +46,12 @@ class ModifiedSuliMayers200312(Formula):
 
     number = (1, 99, 4, 2, 1)
     name = "(1.2)"
-    param_names = ("M", "a", "b", "c_scale")
+    params = (
+        FormulaParam("M"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "

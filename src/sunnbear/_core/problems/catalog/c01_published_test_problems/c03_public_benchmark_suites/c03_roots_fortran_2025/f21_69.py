@@ -3,7 +3,7 @@
 The formula comes from the rows with the keys ``69`` and ``105`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class RootsFortran202569(Formula):
@@ -20,7 +20,12 @@ class RootsFortran202569(Formula):
 
     number = (1, 3, 3, 21)
     name = "69"
-    param_names = ("k", "a", "b", "c_scale")
+    params = (
+        FormulaParam("k"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, "

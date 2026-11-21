@@ -6,7 +6,7 @@ The formula comes from the rows with the keys ``2.1-1(c); 2.2-1(c); 2.4-1(c); 2.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Bradie2006211C(Formula):
@@ -26,7 +26,11 @@ class Bradie2006211C(Formula):
 
     number = (1, 4, 4, 10)
     name = "2.1-1(c)"
-    param_names = ("a", "b", "c_scale")
+    params = (
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "

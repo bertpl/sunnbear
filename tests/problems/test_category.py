@@ -142,3 +142,17 @@ def test_registration_after_a_read_is_checked_on_the_next_read():
     # --- assert -----------------------
     with pytest.raises(FormulaTaxonomyError):
         FormulaRegistry.formulas()
+
+
+# ==================================================================================================
+#  description
+# ==================================================================================================
+@pytest.mark.usefixtures("isolated_formula_registry")
+def test_category_description_defaults_to_none():
+    """A category declares its description for a reader, and has none by default."""
+    # --- arrange / act ----------------
+    described = define_category_cls((99, 1), description="Example functions.")
+    undescribed = define_category_cls((99, 2))
+
+    # --- assert -----------------------
+    assert (described.description, undescribed.description) == ("Example functions.", None)

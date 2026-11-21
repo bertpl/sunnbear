@@ -3,7 +3,7 @@
 The formula comes from the rows with the keys ``T2.1``, ``T2.2`` and ``T2.3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class Sabharwal2019T21(Formula):
@@ -19,7 +19,12 @@ class Sabharwal2019T21(Formula):
 
     number = (1, 2, 13, 5)
     name = "T2.1"
-    param_names = ("k", "a", "b", "c_scale")
+    params = (
+        FormulaParam("k"),
+        FormulaParam("a"),
+        FormulaParam("b"),
+        FormulaParam("c_scale"),
+    )
     source = FormulaSource(
         reference=(
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "

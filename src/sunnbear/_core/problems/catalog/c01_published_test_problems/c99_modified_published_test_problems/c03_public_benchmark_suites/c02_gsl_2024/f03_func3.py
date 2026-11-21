@@ -29,7 +29,7 @@ class ModifiedGsl2024Func3(Formula):
 
     number = (1, 99, 3, 2, 3)
     name = "func3"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "GNU Scientific Library (GSL), release 2.8, files `roots/test_funcs.c` and `roots/test.c` "

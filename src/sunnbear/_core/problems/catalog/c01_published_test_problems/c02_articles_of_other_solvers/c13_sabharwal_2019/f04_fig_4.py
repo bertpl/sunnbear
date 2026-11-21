@@ -16,7 +16,7 @@ class Sabharwal2019Fig4(Formula):
 
     number = (1, 2, 13, 4)
     name = "Fig. 4"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "

@@ -19,7 +19,7 @@ class Burkardt2016P19(Formula):
 
     number = (1, 3, 1, 18)
     name = "p19"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "John Burkardt, TEST_ZERO, Python version, file `test_zero.py`, "

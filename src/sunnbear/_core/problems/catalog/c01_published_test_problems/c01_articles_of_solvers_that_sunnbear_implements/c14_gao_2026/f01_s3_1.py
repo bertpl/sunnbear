@@ -17,7 +17,7 @@ class Gao2026S31(Formula):
 
     number = (1, 1, 14, 1)
     name = "S3.1"
-    param_names = ()
+    params = ()
     source = FormulaSource(
         reference=(
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "

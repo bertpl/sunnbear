@@ -3,7 +3,7 @@
 The formula comes from the rows with the keys ``f38`` and ``f39`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
@@ -18,7 +18,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
 
     number = (1, 1, 13, 10)
     name = "f38"
-    param_names = ("d",)
+    params = (FormulaParam("d"),)
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
