@@ -81,7 +81,7 @@ Every text field is markdown, with code in backticks; a field that holds only co
 - `sign`, `cbrt`, and the Bessel functions `J0`, `J1`, `Y0` and `Y1`;
 - a power `base^(1/q)` with an odd integer `q`: the real root, negative for a negative base.
 
-The script that compares the rows parses only part of this syntax: it compares a row whose `f` it cannot parse by its text (§ Statuses).
+The scripts that find duplicate rows parse only plain expressions. A row whose `f` uses `if`, a comparison or `sum` is compared with earlier rows by its text, so its duplicate is found only when the 2 texts are the same (§ Statuses).
 
 ## Statuses
 
