@@ -1,7 +1,6 @@
 """This module holds a formula of Stage (2013).
 
-The formula comes from the rows with the keys ``3.11`` and ``3.12`` in the survey of published test problems. A change
-of the formula's rows in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the rows with the keys ``3.11`` and ``3.12`` in the survey of published test problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

@@ -1,8 +1,7 @@
 """This module holds a formula of Epperson (2013).
 
 The formula comes from the row with the key ``Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13,
-3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2`` in the survey of published test problems. A change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+3.11-14; Tables 4.13, 4.14; 4.4-1, 4.4-2`` in the survey of published test problems.
 """
 
 import math

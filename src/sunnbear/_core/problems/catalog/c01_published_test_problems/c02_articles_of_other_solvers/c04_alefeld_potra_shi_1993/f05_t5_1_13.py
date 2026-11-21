@@ -1,7 +1,6 @@
 """This module holds a formula of Alefeld, Potra, Shi (1993).
 
-The formula comes from the row with the key ``T5.1-13`` in the survey of published test problems. A change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``T5.1-13`` in the survey of published test problems.
 """
 
 import math

@@ -1,7 +1,6 @@
 """This module holds a formula of Burden, Faires, Burden (2016).
 
-The formula comes from the row with the key ``2.2-14(a); 2.5-12(a)`` in the survey of published test problems. A change
-of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``2.2-14(a); 2.5-12(a)`` in the survey of published test problems.
 """
 
 import math

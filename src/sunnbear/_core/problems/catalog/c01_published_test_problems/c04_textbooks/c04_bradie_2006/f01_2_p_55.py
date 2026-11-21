@@ -1,7 +1,7 @@
 """This module holds a formula of Bradie (2006).
 
 The formula comes from the row with the key ``§2 (p. 55); §2.2 (p. 78); 2.2-15`` in the survey of published test
-problems. A change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

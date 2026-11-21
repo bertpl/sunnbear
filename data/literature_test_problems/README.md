@@ -72,6 +72,15 @@ A row's id is `<source id>:<key>`, such as `2011_zhang:3`. No 2 rows of a source
 
 Every text field is markdown, with code in backticks; a field that holds only code, such as `interval = '[0, 1]'`, is written without them.
 
+**A row's `f`** may use, besides the operators, the constants `pi` and `e` and the functions of Python's `math`:
+
+- `if(condition; a; b)`: `a` where the condition holds and `b` elsewhere; a condition compares with `<`, `<=`, `>`, `>=`, or `=` for equality;
+- a comparison in parentheses, as in `(x > 1)`: 1 where it holds and 0 elsewhere;
+- `sum(term, i = m..n)` and `prod(term, i = m..n)`, over the integers `i` from `m` to `n`;
+- `Phi(z)` and `phi(z)`, the cumulative distribution function and the density of the standard normal distribution;
+- `sign`, `cbrt`, and the Bessel functions `J0`, `J1`, `Y0` and `Y1`;
+- a power `base^(1/q)` with an odd integer `q`: the real root, negative for a negative base.
+
 ## Statuses
 
 Each row has 1 of 3 final statuses, decided in this order; the paragraphs *The same function* and *Test problems and intervals* below the list define the list's terms:
@@ -232,13 +241,14 @@ A formula's `status` is `active` or `retired`; `variable_change`, `f` and `param
 
 Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, below `src/sunnbear/_core/problems/catalog/c01_published_test_problems/`: 1 package per subcategory, 1 package per source and 1 module per formula. A person writes each module, and a change of a formula's rows needs a change of its module. A formula module:
 
-- takes its function from the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`, or the row gives only an `f_description`;
+- takes its function from the `f` of the formula's first row, as the source prints it, unless the formula's line in `formulas.csv` gives an `f`; where a row of the formula gives only an `f_description`, the module's author writes the function from that description and the source;
+- takes x as the variable that the formula's `variable_change` names, where `formulas.csv` gives one, as in `f(10^-pH)` on `[2, 12]`;
 - evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
 - lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
 - names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
-- holds test cases whose expected values are computed from the function in high precision, such as with mpmath.
+- holds test cases whose expected values are computed from the function in high precision, such as with mpmath. A case whose expected value is near 0 sets `atol=0.0`, because the default `atol` would accept any value near 0; a case whose function cannot be evaluated in float64 to within the default tolerance, such as an ill-conditioned function or a polynomial in expanded form near its multiple root, sets a wider `atol`.
 
 **The published test problems:** a row's parameters give 1 or several sets of values:
 

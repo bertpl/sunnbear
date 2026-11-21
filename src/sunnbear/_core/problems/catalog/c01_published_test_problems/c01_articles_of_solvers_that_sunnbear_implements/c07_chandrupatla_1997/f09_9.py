@@ -1,7 +1,6 @@
 """This module holds a formula of Chandrupatla (1997).
 
-The formula comes from the row with the key ``9`` in the survey of published test problems. A change of the formula's
-row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``9`` in the survey of published test problems.
 """
 
 import math

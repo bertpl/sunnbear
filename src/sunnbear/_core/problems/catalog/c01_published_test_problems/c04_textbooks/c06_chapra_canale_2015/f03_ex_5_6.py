@@ -1,8 +1,7 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``Ex. 5.6, §5.3.2, Fig. 5.14; Ex. 6.5; Ex. 7.6; Prob. 5.22, 5.24, 5.25`` in
-the survey of published test problems. A change of the formula's row in `data/literature_test_problems/sources/` needs a
-change of this module.
+the survey of published test problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

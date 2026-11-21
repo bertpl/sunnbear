@@ -1,7 +1,7 @@
 """This module holds a formula of Süli, Mayers (2003).
 
 The formula comes from the row with the key ``Example 1.7; Table 1.3; Exercises 1.3, 1.4`` in the survey of published
-test problems. A change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+test problems.
 """
 
 import math

@@ -1,7 +1,7 @@
 """This module holds a formula of Bradie (2006).
 
 The formula comes from the row with the key ``2.1-1(d); 2.2-1(d); 2.4-1(d); 2.5-1(d)`` in the survey of published test
-problems. A change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+problems.
 """
 
 import math

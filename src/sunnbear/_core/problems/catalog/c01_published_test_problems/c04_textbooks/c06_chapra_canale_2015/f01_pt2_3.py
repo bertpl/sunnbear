@@ -1,8 +1,7 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``(PT2.3), (PT2.4); Ex. 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14,
-5.21, 5.23, 5.26, 7.20, 7.21`` in the survey of published test problems. A change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+5.21, 5.23, 5.26, 7.20, 7.21`` in the survey of published test problems.
 """
 
 import math

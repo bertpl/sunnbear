@@ -1,7 +1,6 @@
 """This module holds a formula of Chapra, Canale (2015).
 
 The formula comes from the row with the key ``§8.3, (8.19), (8.20), Fig. 8.4`` in the survey of published test problems.
-A change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 import math

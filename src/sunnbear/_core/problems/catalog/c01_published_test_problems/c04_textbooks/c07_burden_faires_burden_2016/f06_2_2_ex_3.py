@@ -1,8 +1,7 @@
 """This module holds a formula of Burden, Faires, Burden (2016).
 
 The formula comes from the rows with the keys ``§2.2 Ex. 3; Fig. 2.5; 2.5-1(c)``, ``2.1-5(a); 2.5-8`` and ``2.2-10`` in
-the survey of published test problems. A change of the formula's rows in `data/literature_test_problems/sources/` needs
-a change of this module.
+the survey of published test problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

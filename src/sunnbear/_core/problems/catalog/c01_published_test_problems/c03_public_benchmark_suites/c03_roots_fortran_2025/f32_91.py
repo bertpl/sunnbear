@@ -1,7 +1,6 @@
 """This module holds a formula of roots-fortran (2025).
 
-The formula comes from the rows with the keys ``91`` and ``92`` in the survey of published test problems. A change of
-the formula's rows in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the rows with the keys ``91`` and ``92`` in the survey of published test problems.
 """
 
 import math

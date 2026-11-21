@@ -1,7 +1,6 @@
 """This module holds a formula of Brent (1973).
 
-The formula comes from the row with the key ``T4.1 r3`` in the survey of published test problems. A change of the
-formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the row with the key ``T4.1 r3`` in the survey of published test problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe

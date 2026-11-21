@@ -1,8 +1,7 @@
 """This module holds a formula of Epperson (2013).
 
 The formula comes from the row with the key ``3.1-2(d), 3.1-3(d); 3.2-5(a); 3.3-3(f); Ex. 3.10, 3.12, 3.20; 4.4-3,
-4.4-4`` in the survey of published test problems. A change of the formula's row in
-`data/literature_test_problems/sources/` needs a change of this module.
+4.4-4`` in the survey of published test problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe

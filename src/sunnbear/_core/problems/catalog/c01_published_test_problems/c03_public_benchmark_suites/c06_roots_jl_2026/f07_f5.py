@@ -1,7 +1,6 @@
 """This module holds a formula of Roots.jl (2026).
 
-The formula comes from the rows with the keys ``f5`` and ``f6`` in the survey of published test problems. A change of
-the formula's rows in `data/literature_test_problems/sources/` needs a change of this module.
+The formula comes from the rows with the keys ``f5`` and ``f6`` in the survey of published test problems.
 """
 
 import math

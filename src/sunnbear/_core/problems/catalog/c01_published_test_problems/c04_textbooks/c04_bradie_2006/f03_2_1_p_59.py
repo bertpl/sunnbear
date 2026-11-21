@@ -2,7 +2,7 @@
 
 The formula comes from the row with the key ``§2.1 (p. 59); Ex. 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6;
 Fig. 2.1; §2.2 (p. 74); §2.4 (p. 98); 2.1-10; 2.2-10; 2.4-13; 2.5-12 to 2.5-14, 2.5-17`` in the survey of published test
-problems. A change of the formula's row in `data/literature_test_problems/sources/` needs a change of this module.
+problems.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

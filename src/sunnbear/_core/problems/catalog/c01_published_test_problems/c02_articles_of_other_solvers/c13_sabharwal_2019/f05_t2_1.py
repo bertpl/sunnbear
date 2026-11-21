@@ -1,7 +1,6 @@
 """This module holds a formula of Sabharwal (2019).
 
 The formula comes from the rows with the keys ``T2.1``, ``T2.2`` and ``T2.3`` in the survey of published test problems.
-A change of the formula's rows in `data/literature_test_problems/sources/` needs a change of this module.
 """
 
 from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable

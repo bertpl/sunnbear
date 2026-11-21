@@ -17,8 +17,6 @@ from .data_files import (
     FormulaDecision,
     FunctionDecision,
     RowsTableLine,
-    Source,
-    SourceRow,
     join_row_ids,
     source_id_of_row_id,
     split_row_ids,
@@ -375,24 +373,3 @@ class FormulasTableLine:
                 ),
                 is_retired=line["status"] == "retired",
             )
-
-
-# ==================================================================================================
-#  SurveyFormula
-# ==================================================================================================
-@dataclass(frozen=True)
-class SurveyFormula:
-    """A `SurveyFormula` holds 1 formula's line of `formulas.csv` together with the source that holds its rows."""
-
-    formulas_table_line: FormulasTableLine
-    source: Source
-
-    def __post_init__(self) -> None:
-        """Raise `DataFileError` if `source` is not the formula's source."""
-        if self.source.source_id != self.formulas_table_line.source_id:
-            raise DataFileError(f"{self.formulas_table_line.formula_id}: {self.source.source_id} is not its source")
-
-    @property
-    def rows(self) -> tuple[SourceRow, ...]:
-        """Return the formula's rows from its source, in the order of `row_ids`."""
-        return tuple(self.source.find_row(row_id) for row_id in self.formulas_table_line.row_ids)
