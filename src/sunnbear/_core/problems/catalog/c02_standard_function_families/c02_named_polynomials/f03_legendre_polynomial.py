@@ -2,9 +2,23 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
-from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+from .helpers import (
+    JACOBI_SWEPT_DEGREES,
+    JACOBI_SWEPT_DEGREES_TEXT,
+    interval_by_parity_latex,
+    is_valid_degree,
+    jacobi_interval_bounds,
+)
 
 
 class LegendrePolynomial(Formula):
@@ -30,7 +44,14 @@ class LegendrePolynomial(Formula):
 
     number = (2, 2, 3)
     name = "Legendre polynomial"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{y}", r"\x - \frac{\c}{\param{n}^2}"),),
+        expression=r"P_{\param{n}}(\tmp{y})",
+        interval=interval_by_parity_latex("[-1, 1]", r"\left[-\cos\frac{2.5 \pi}{2 \param{n} + 1}, 1\right]"),
+        summary="The Legendre polynomial, whose amplitude grows from the middle of its interval toward the bounds.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -54,7 +75,13 @@ class LegendrePolynomial(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps the degrees of `JACOBI_SWEPT_DEGREES`."""
-        return (ParamTable(names=self.param_names, rows=tuple((degree,) for degree in JACOBI_SWEPT_DEGREES)),)
+        return (
+            ParamTable(
+                names=self.param_names,
+                rows=tuple((degree,) for degree in JACOBI_SWEPT_DEGREES),
+                summary=JACOBI_SWEPT_DEGREES_TEXT + ".",
+            ),
+        )
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer of at least 1."""

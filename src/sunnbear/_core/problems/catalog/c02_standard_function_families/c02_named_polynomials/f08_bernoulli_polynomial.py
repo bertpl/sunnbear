@@ -3,7 +3,16 @@
 import math
 from fractions import Fraction
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamRecipe,
+)
 
 from .helpers import is_valid_degree
 
@@ -50,10 +59,16 @@ class BernoulliPolynomial(Formula):
     number = (2, 2, 8)
     name = "Bernoulli polynomial"
     params = (
-        FormulaParam("n"),
-        FormulaParam("a"),
-        FormulaParam("b"),
+        FormulaParam("n", latex_symbol="n"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
     )
+    presentation = FormulaPresentation(
+        expression=r"B_{\param{n}}(\x - \c)",
+        interval=r"[\param{a}, \param{b}]",
+        summary="The Bernoulli polynomial of an odd degree, close to a sine between its outermost real roots.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, a: float, b: float) -> float:
@@ -104,7 +119,11 @@ class BernoulliPolynomial(Formula):
                     ParamAxis("n", lowest_degree, highest_degree, 2.0),
                     ParamAxis("a", a, a, 1.0),
                     ParamAxis("b", b, b, 1.0),
-                )
+                ),
+                summary=(
+                    rf"The odd degrees $\param{{n}}$ from {lowest_degree:g} to {highest_degree:g}, at "
+                    rf"$\param{{a}} = {a:g}$ and $\param{{b}} = {b:g}$."
+                ),
             )
             for lowest_degree, highest_degree, a, b in DEGREE_RANGES_WITH_INTERVALS
         )

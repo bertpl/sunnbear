@@ -43,3 +43,8 @@ class NamedPolynomials(FormulaCategory):
 
     number = (2, 2)
     name = "Named polynomials"
+    description = (
+        "Polynomials with a standard name, such as the Legendre and the Chebyshev polynomials. For every polynomial "
+        "but the Bernoulli polynomial, the interval holds every root for an odd degree, and every root but the lowest "
+        "for an even degree."
+    )

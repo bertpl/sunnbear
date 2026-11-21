@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -28,7 +30,16 @@ class HyperbolicSine(Formula):
 
     number = (2, 4, 1)
     name = "Hyperbolic sine"
-    params = (FormulaParam("b"),)
+    params = (FormulaParam("b", latex_symbol="b"),)
+    presentation = FormulaPresentation(
+        expression=r"\sinh(\x - \c)",
+        interval=r"[-\param{b}, \param{b}]",
+        summary=(
+            "The hyperbolic sine, from nearly a line on a narrow interval to exponential growth toward both bounds on "
+            "a wide one."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:
@@ -45,7 +56,12 @@ class HyperbolicSine(Formula):
         At the low end the function is a line to within 0.2 %. At the high end its values at the bounds are about
         1.3e43.
         """
-        return (ParamGrid(axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{b}$ from $10^{-1}$ to $10^{2}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, b: float) -> bool:
         """Require ``b`` to be above 0."""

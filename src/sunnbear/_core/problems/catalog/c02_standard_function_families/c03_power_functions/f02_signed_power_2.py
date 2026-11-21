@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
 from .helpers import power_axis
 
@@ -27,7 +35,16 @@ class SignedPower2(Formula):
 
     number = (2, 3, 2)
     name = "Signed power 2"
-    params = (FormulaParam("p"),)
+    params = (FormulaParam("p", latex_symbol="p"),)
+    presentation = FormulaPresentation(
+        expression=r"\operatorname{sgn}(\x) \, |\x|^{\param{p}} + \c",
+        interval="[-1, 1]",
+        summary=(
+            r"A signed power, with an infinite slope at $\x = 0$ for $\param{p} < 1$ and a zero slope for "
+            r"$\param{p} > 1$, away from its root."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:
@@ -44,7 +61,9 @@ class SignedPower2(Formula):
         At the low end the function is close to the step ``sign(x) + c``, and its root lies next to 0. At the high end
         the function equals ``c`` on nearly all of the interval, and its root lies next to a bound.
         """
-        return (ParamGrid(axes=(power_axis(-6.0, 6.0),)),)
+        return (
+            ParamGrid(axes=(power_axis(-6.0, 6.0),), summary=r"The sweep of $\param{p}$ from $10^{-6}$ to $10^{6}$."),
+        )
 
     def is_param_tuple_valid(self, p: float) -> bool:
         """Require ``p`` to be above 0."""

@@ -1,6 +1,13 @@
 """This formula is a line plus an odd power, ``m*x + (1 - m)*x^p + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 from .helpers import is_valid_power, power_axis, slope_recipes
 
@@ -31,9 +38,15 @@ class LinearPlusOddPower(Formula):
     number = (2, 1, 3)
     name = "Linear plus odd power"
     params = (
-        FormulaParam("p"),
-        FormulaParam("m"),
+        FormulaParam("p", latex_symbol="p"),
+        FormulaParam("m", latex_symbol="m", meaning=r"The slope at $\x = 0$."),
     )
+    presentation = FormulaPresentation(
+        expression=r"\param{m} \x + (1 - \param{m}) \x^{\param{p}} + \c",
+        interval="[-1, 1]",
+        summary=r"A line combined with an odd power, with 1 root or, for a negative $\param{m}$, up to 3.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, m: float) -> float:

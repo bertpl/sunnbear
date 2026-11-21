@@ -1,6 +1,6 @@
 """This formula is the line ``x + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import EffectOfC, Formula, FormulaPresentation, FormulaTestCase, ParamRecipe
 
 
 class Linear(Formula):
@@ -8,6 +8,12 @@ class Linear(Formula):
 
     number = (2, 1, 1)
     name = "Linear"
+    presentation = FormulaPresentation(
+        expression=r"\x + \c",
+        interval="[-1, 1]",
+        summary="A line, the simplest function with 1 root.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -30,7 +32,16 @@ class Exponential(Formula):
 
     number = (2, 5, 1)
     name = "Exponential"
-    params = (FormulaParam("b"),)
+    params = (FormulaParam("b", latex_symbol="b"),)
+    presentation = FormulaPresentation(
+        expression=r"e^{\x - \c} - 1",
+        interval=r"[-\param{b}, \param{b}]",
+        summary=(
+            "The exponential function, nearly flat over the lower half of a wide interval and steep toward its upper "
+            "bound."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:
@@ -47,7 +58,12 @@ class Exponential(Formula):
         At the low end the function is close to a line. At the high end the function's value at the upper bound is about
         2.7e43.
         """
-        return (ParamGrid(axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{b}$ from $10^{-1}$ to $10^{2}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, b: float) -> bool:
         """Require ``b`` to be above 0."""

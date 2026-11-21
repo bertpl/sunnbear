@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -31,7 +33,13 @@ class InverseHyperbolicSine(Formula):
 
     number = (2, 4, 4)
     name = "Inverse hyperbolic sine"
-    params = (FormulaParam("b"),)
+    params = (FormulaParam("b", latex_symbol="b"),)
+    presentation = FormulaPresentation(
+        expression=r"\frac{\operatorname{arsinh} \x}{\operatorname{arsinh} \param{b}} + \c",
+        interval=r"[-\param{b}, \param{b}]",
+        summary="The inverse hyperbolic sine, close to a signed logarithm on a wide interval.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:
@@ -44,7 +52,12 @@ class InverseHyperbolicSine(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps ``b`` from 10^-1 to 10^15."""
-        return (ParamGrid(axes=(ParamAxis("b", -1.0, 15.0, 0.1, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("b", -1.0, 15.0, 0.1, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{b}$ from $10^{-1}$ to $10^{15}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, b: float) -> bool:
         """Require ``b`` to be above 0."""

@@ -33,8 +33,10 @@ from sunnbear._core.problems.core import CandidateTestProblem, EffectOfC
 _X_FRACTIONS = (0.13, 0.21, 0.29, 0.37, 0.43, 0.57, 0.63, 0.71, 0.79, 0.87)
 # _X_STEP_FRACTION is the step in x of a central difference, as a fraction of the interval's width.
 _X_STEP_FRACTION = 1e-6
-# _C_STEP is the step in c of a central difference.
-_C_STEP = 1e-6
+# _C_STEP is the step in c of a central difference. It is large enough that rounding in the function's evaluation stays
+# far below _RESIDUAL_RTOL also where c moves x only by c/n^2 at a degree n above 1000, and small enough that the
+# differences' truncation error does too.
+_C_STEP = 1e-4
 # _MIN_SIGNIFICANT_ULPS is the smallest difference, in float64 units of the larger function value, that a central
 # difference must reach to count: a smaller difference is mostly rounding error.
 _MIN_SIGNIFICANT_ULPS = 1e4

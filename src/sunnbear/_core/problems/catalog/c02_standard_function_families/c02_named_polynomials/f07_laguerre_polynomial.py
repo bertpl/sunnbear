@@ -2,9 +2,17 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
-from .helpers import is_valid_degree
+from .helpers import interval_by_parity_latex, is_valid_degree
 
 # Above this degree the value at the upper bound of the interval overflows.
 HIGHEST_VALID_DEGREE = 256
@@ -41,7 +49,18 @@ class LaguerrePolynomial(Formula):
 
     number = (2, 2, 7)
     name = "Laguerre polynomial"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
+    presentation = FormulaPresentation(
+        expression=r"L_{\param{n}}(\x - \c)",
+        interval=interval_by_parity_latex(
+            r"[0, 4 \param{n} + 2]", r"\left[\frac{(1.25 \pi)^2}{4 \param{n} + 2}, 4 \param{n} + 2\right]"
+        ),
+        summary=(
+            "The Laguerre polynomial, with roots close together next to the lower bound and far apart toward the "
+            "upper bound."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -84,7 +103,15 @@ class LaguerrePolynomial(Formula):
         The sweep ends where the range of values is about as wide as at the highest degree that the recipe of
         `HermitePolynomial` sweeps.
         """
-        return (ParamGrid.decimal("n", 1.0, float(HIGHEST_SWEPT_DEGREE), 1.0),)
+        return (
+            ParamGrid.decimal(
+                "n",
+                1.0,
+                float(HIGHEST_SWEPT_DEGREE),
+                1.0,
+                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}.",
+            ),
+        )
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer from 1 to `HIGHEST_VALID_DEGREE`."""

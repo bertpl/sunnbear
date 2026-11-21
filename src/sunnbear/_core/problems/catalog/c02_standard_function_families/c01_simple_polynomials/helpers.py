@@ -38,6 +38,20 @@ def term_count_axis(lowest_power: int) -> ParamAxis:
     return ParamAxis("n", 2.0, float(highest_term_count), 1.0)
 
 
+def decimal_axis_text(axis: ParamAxis) -> str:
+    r"""Return a decimal `axis`'s values as a recipe's summary names them, such as "$\param{p}$ from 2 to 10".
+
+    The text names the step only where it is not 1, as in "$\param{p}$ from 3 to 9 in steps of 2".
+
+    The axis must use the ``ParamNotation.DECIMAL`` notation: for a power notation, the text would name the exponents
+    as the values.
+    """
+    text = r"$\param{" + axis.param_name + "}$" + f" from {axis.start:g} to {axis.stop:g}"
+    if axis.step != 1.0:
+        text += f" in steps of {axis.step:g}"
+    return text
+
+
 def weight_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
     """Return the recipes of a formula whose parameters are that of `first_axis` and a weight ``w``.
 
@@ -45,7 +59,10 @@ def weight_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
     steps of 0.2.
     """
     weight_axis = ParamAxis("w", -3.0, 3.0, 0.2, ParamNotation.POW10)
-    return (ParamGrid(axes=(first_axis, weight_axis)),)
+    summary = (
+        "The sweep of " + decimal_axis_text(first_axis) + r", combined with $\param{w}$ from $10^{-3}$ to $10^{3}$."
+    )
+    return (ParamGrid(axes=(first_axis, weight_axis), summary=summary),)
 
 
 def slope_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
@@ -65,8 +82,18 @@ def slope_recipes(first_axis: ParamAxis) -> tuple[ParamRecipe, ...]:
     positive_slope_axis = ParamAxis("m", -3.0, 1.0, 0.2, ParamNotation.POW10)
     zero_slope_axis = ParamAxis("m", 0.0, 0.0, 1.0)
     negative_slope_axis = ParamAxis("m", -3.0, 1.0, 0.2, ParamNotation.NEG_POW10)
+    first_axis_text = decimal_axis_text(first_axis)
     return (
-        ParamGrid(axes=(first_axis, positive_slope_axis)),
-        ParamGrid(axes=(first_axis, zero_slope_axis)),
-        ParamGrid(axes=(first_axis, negative_slope_axis)),
+        ParamGrid(
+            axes=(first_axis, positive_slope_axis),
+            summary="The sweep of " + first_axis_text + r", combined with $\param{m}$ from $10^{-3}$ to 10.",
+        ),
+        ParamGrid(
+            axes=(first_axis, zero_slope_axis),
+            summary="The sweep of " + first_axis_text + r" at $\param{m} = 0$.",
+        ),
+        ParamGrid(
+            axes=(first_axis, negative_slope_axis),
+            summary="The sweep of " + first_axis_text + r", combined with $\param{m}$ from $-10^{-3}$ to $-10$.",
+        ),
     )

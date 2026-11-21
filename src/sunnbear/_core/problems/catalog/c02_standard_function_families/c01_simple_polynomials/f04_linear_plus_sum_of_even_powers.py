@@ -1,6 +1,13 @@
 """This formula is a line plus the mean ``E_n(x)`` of ``n`` even powers from 2, ``x + w*(E_n(x) - 1) + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 from .helpers import is_valid_term_count, term_count_axis, weight_recipes
 
@@ -23,9 +30,15 @@ class LinearPlusSumOfEvenPowers(Formula):
     number = (2, 1, 4)
     name = "Linear plus sum of even powers"
     params = (
-        FormulaParam("n"),
-        FormulaParam("w"),
+        FormulaParam("n", latex_symbol="n"),
+        FormulaParam("w", latex_symbol="w"),
     )
+    presentation = FormulaPresentation(
+        expression=r"\x + \param{w} \left(\frac{1}{\param{n}} \sum_{k=1}^{\param{n}} \x^{2k} - 1\right) + \c",
+        interval="[-1, 1]",
+        summary="A line bent by a sum of even powers, with 1 root.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, w: float) -> float:

@@ -27,3 +27,6 @@ class ExponentialAndLogarithm(FormulaCategory):
 
     number = (2, 5)
     name = "Exponential and logarithm"
+    description = (
+        "The exponential function and the logarithm, each steep in one part of its interval and flat in another."
+    )

@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -33,7 +35,13 @@ class InverseHyperbolicCosine(Formula):
 
     number = (2, 4, 5)
     name = "Inverse hyperbolic cosine"
-    params = (FormulaParam("b"),)
+    params = (FormulaParam("b", latex_symbol="b"),)
+    presentation = FormulaPresentation(
+        expression=r"\frac{\operatorname{arcosh} \x}{\operatorname{arcosh} \param{b}} - 0.5 + \c",
+        interval=r"[1, \param{b}]",
+        summary="The inverse hyperbolic cosine, with an infinite slope at the lower bound, the edge of its domain.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:
@@ -51,7 +59,12 @@ class InverseHyperbolicCosine(Formula):
         largest ``b``, the range of ``c`` lets the root come too close to the lower bound to satisfy the conditions,
         so no benchmark suite holds such a candidate.
         """
-        return (ParamGrid(axes=(ParamAxis("b", 0.1, 15.0, 0.1, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("b", 0.1, 15.0, 0.1, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{b}$ from $10^{0.1}$ to $10^{15}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, b: float) -> bool:
         """Require ``b`` to be above 1."""

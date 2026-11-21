@@ -2,9 +2,24 @@
 
 import itertools
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamAxis,
+    ParamRecipe,
+    ParamTable,
+)
 
-from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+from .helpers import (
+    JACOBI_SWEPT_DEGREES,
+    JACOBI_SWEPT_DEGREES_TEXT,
+    interval_by_parity_latex,
+    is_valid_degree,
+    jacobi_interval_bounds,
+)
 
 # ``alpha`` and ``beta`` have to be above this value: the Jacobi polynomials are orthogonal on ``[-1, 1]`` only above
 # it.
@@ -51,10 +66,27 @@ class JacobiPolynomial(Formula):
     number = (2, 2, 5)
     name = "Jacobi polynomial"
     params = (
-        FormulaParam("n"),
-        FormulaParam("alpha"),
-        FormulaParam("beta"),
+        FormulaParam("n", latex_symbol="n"),
+        FormulaParam("alpha", latex_symbol=r"\alpha"),
+        FormulaParam("beta", latex_symbol=r"\beta"),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{y}", r"\x - \frac{\c}{\param{n}^2}"),),
+        expression=(
+            r"\frac{P^{(\param{alpha}, \param{beta})}_{\param{n}}(\tmp{y})}"
+            r"{P^{(\param{alpha}, \param{beta})}_{\param{n}}(1)}"
+        ),
+        interval=interval_by_parity_latex(
+            "[-1, 1]",
+            r"\left[-\cos\frac{(1.25 + \param{beta}/2) \pi}{\param{n} + (\param{alpha} + \param{beta} + 1)/2}, "
+            r"1\right]",
+        ),
+        summary=(
+            r"The Jacobi polynomial, whose amplitude toward the upper bound depends on $\param{alpha}$, and toward the "
+            r"lower bound on $\param{beta}$."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, alpha: float, beta: float) -> float:
@@ -97,7 +129,12 @@ class JacobiPolynomial(Formula):
         """
         alpha_beta_values = (-0.75, *ParamAxis("alpha", -0.5, 1.5, 0.5).values())
         rows = tuple(itertools.product(JACOBI_SWEPT_DEGREES, alpha_beta_values, alpha_beta_values))
-        return (ParamTable(names=self.param_names, rows=rows),)
+        summary = (
+            JACOBI_SWEPT_DEGREES_TEXT
+            + r", combined with $\param{alpha}$ and $\param{beta}$, each $-0.75$ or a value from $-0.5$ to 1.5 in "
+            + "steps of 0.5."
+        )
+        return (ParamTable(names=self.param_names, rows=rows, summary=summary),)
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:
         """Require ``n`` to be an integer of at least 1, and ``alpha`` and ``beta`` to be in their valid range."""

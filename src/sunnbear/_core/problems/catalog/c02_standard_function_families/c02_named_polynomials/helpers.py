@@ -1,10 +1,7 @@
-"""This module holds the rule for a valid degree, and what the formulas of polynomials orthogonal on ``[-1, 1]`` share.
+"""This module holds the rule for a valid degree, LaTeX for intervals, and what the orthogonal polynomials share.
 
-`is_valid_degree` serves every formula of the category. `JACOBI_SWEPT_DEGREES` and `jacobi_interval_bounds` serve
-the formulas whose polynomials are orthogonal on ``[-1, 1]``.
-
-Each of those polynomials is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1 rule gives the
-interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
+Each polynomial orthogonal on ``[-1, 1]`` is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1
+rule gives the interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
 """
 
 import math
@@ -21,11 +18,36 @@ JACOBI_SWEPT_DEGREES = (
     *(float(degree) for degree in range(1, 33)),
     *(2.0**exponent + parity for exponent in range(6, 11) for parity in (0.0, 1.0)),
 )
+# A recipe that sweeps `JACOBI_SWEPT_DEGREES` starts its summary with this text, which has no final period, so that
+# the recipe can name its other parameters after it. The text names the degrees of `JACOBI_SWEPT_DEGREES`, so the 2
+# change together.
+JACOBI_SWEPT_DEGREES_TEXT = (
+    r"The degrees $\param{n}$ from 1 to 32, then each power of 2 from 64 to 1024 and that power plus 1"
+)
 
 
 def is_valid_degree(n: float) -> bool:
     """Return whether `n` is an integer of at least 1."""
     return n == int(n) and n >= 1
+
+
+def interval_by_parity_latex(odd_degree_interval: str, even_degree_interval: str) -> str:
+    r"""Return a ``cases`` environment with the LaTeX of the interval for an odd and for an even degree ``n``.
+
+    The conditions name the degree by the placeholder ``\param{n}``, so the formula's degree parameter must be named
+    ``n``.
+
+    Args:
+        odd_degree_interval: The interval's LaTeX for an odd ``n``, such as ``"[-1, 1]"``.
+        even_degree_interval: The interval's LaTeX for an even ``n``.
+    """
+    return (
+        r"\begin{cases} "
+        + odd_degree_interval
+        + r" & \text{if } \param{n} \text{ is odd} \\ "
+        + even_degree_interval
+        + r" & \text{if } \param{n} \text{ is even} \end{cases}"
+    )
 
 
 def jacobi_interval_bounds(n: float, alpha: float, beta: float) -> tuple[float, float]:
