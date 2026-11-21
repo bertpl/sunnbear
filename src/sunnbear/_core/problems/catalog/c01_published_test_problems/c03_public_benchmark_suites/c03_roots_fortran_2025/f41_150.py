@@ -87,7 +87,7 @@ class RootsFortran2025150(Formula):
         location="root_tests.f90, case 150",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\left(\tmp{u} - 3.0\right)^{5}} - 1.0",
         interval="[2.6, 3.6]",
     )

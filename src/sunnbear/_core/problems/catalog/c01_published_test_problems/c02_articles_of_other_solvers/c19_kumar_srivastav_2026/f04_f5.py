@@ -36,7 +36,7 @@ class KumarSrivastav2026F5(Formula):
         location="Table 3, f5",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(1 + \tmp{u} \right)} - 0.4",
         interval="[0, 1]",
     )

@@ -56,7 +56,7 @@ class Burkardt2016P19(Formula):
         location="Problem p19",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\cos{\left(100.0 \tmp{u} \right)} - 4.0 \operatorname{erf}{\left(30.0 \tmp{u} - 10.0 " r"\right)}"
         ),

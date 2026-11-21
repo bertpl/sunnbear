@@ -35,7 +35,7 @@ class BurdenFairesBurden2016236A(Formula):
         location="Exercise 2.3-6(a)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} + 2^{- \tmp{u}} + 2 \cos{\left(\tmp{u} \right)} - 6",
         interval="[1, 2]",
     )

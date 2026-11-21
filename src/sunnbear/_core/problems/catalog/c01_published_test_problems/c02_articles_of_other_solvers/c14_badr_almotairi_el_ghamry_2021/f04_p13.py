@@ -33,7 +33,7 @@ class BadrAlmotairiElGhamry2021P13(Formula):
         location="Table 1, P13",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} \sinh{\left(\tmp{u} \right)} + 1",
         interval="[3, 4]",
     )

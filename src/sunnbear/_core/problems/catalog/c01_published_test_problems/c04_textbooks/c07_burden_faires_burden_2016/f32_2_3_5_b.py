@@ -33,7 +33,7 @@ class BurdenFairesBurden2016235B(Formula):
         location="Exercises 2.3-5(b), 2.6-1(b)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + 3 \tmp{u}^{2} - 1",
         interval="[-3, -2]",
     )

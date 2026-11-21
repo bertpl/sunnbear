@@ -34,7 +34,7 @@ class Norton1985Driver(Formula):
         location="the driver of the author's code",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{7} + 28 \tmp{u}^{4} - 480",
         interval="[1, 2]",
     )

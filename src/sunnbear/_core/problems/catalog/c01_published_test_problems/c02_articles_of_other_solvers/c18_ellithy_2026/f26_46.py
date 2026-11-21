@@ -37,7 +37,7 @@ class Ellithy202646(Formula):
         location="dataset.json, problem 46",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{\frac{\tmp{u}}{2}} - 1.5",
         interval="[0, 1]",
     )

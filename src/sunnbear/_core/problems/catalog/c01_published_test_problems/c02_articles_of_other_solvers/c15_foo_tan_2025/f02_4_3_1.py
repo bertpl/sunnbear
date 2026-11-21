@@ -47,7 +47,7 @@ class FooTan2025431(Formula):
         location="Section 4.3.1",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\frac{\tmp{u} \ln{\left(\param{q} - 1 \right)}}{\ln{\left(\param{q} \right)}} - "
             r"\frac{\begin{cases} 0 & \text{for}\: \tmp{u} = 0 \\\tmp{u} \ln{\left(\tmp{u} \right)} & "

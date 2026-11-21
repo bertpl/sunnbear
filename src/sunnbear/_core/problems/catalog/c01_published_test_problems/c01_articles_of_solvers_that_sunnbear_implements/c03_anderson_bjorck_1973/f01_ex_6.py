@@ -35,7 +35,7 @@ class AndersonBjorck1973Ex6(Formula):
         location="Ex. 6",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{- \param{n} \tmp{u}} \left(\tmp{u} - 1\right) + \tmp{u}^{\param{n}}",
         interval="[0, 1]",
     )

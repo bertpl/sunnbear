@@ -37,7 +37,7 @@ class DowellJarratt1971Table6(Formula):
         location="Table 6",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{- \param{n} \tmp{u}} \left(\tmp{u} - 1\right) + \tmp{u}^{\param{n}}",
         interval="[0, 1]",
     )

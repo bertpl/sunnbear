@@ -35,7 +35,7 @@ class Bradie2006211D(Formula):
         location="Exercises 2.1-1(d), 2.2-1(d), 2.4-1(d), 2.5-1(d)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[0, 1]",
     )

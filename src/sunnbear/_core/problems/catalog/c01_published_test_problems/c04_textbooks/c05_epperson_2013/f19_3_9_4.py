@@ -35,7 +35,7 @@ class Epperson2013394(Formula):
         location="Exercises 3.9-4, 3.9-5(d), 3.11-1",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \left(1 + e^{- \tmp{u}}\right)",
         interval="[1, 2]",
     )

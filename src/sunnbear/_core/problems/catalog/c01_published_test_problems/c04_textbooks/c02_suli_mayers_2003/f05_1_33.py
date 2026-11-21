@@ -38,7 +38,7 @@ class SuliMayers2003133(Formula):
         location="Eq. (1.33)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
         interval="[0, 1]",
     )

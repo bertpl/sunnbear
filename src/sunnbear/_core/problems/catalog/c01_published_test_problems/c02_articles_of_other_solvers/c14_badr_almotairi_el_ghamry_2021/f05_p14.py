@@ -33,7 +33,7 @@ class BadrAlmotairiElGhamry2021P14(Formula):
         location="Table 1, P14",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} - 3 \tmp{u} - 2",
         interval="[2, 3]",
     )

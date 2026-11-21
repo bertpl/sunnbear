@@ -39,7 +39,7 @@ class AlefeldPotraShi19956(Formula):
         location="Table I, problem 6",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} e^{- \param{n}} - 2 e^{- \param{n} \tmp{u}} + 1",
         interval="[0, 1]",
     )

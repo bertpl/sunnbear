@@ -34,7 +34,7 @@ class Moler2004Ex413(Formula):
         location="Exercise 4.1, function 3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(\tmp{u} + \frac{2}{3} \right)}",
         interval="[0, 1]",
     )

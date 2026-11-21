@@ -34,7 +34,7 @@ class BurdenFairesBurden2016241C(Formula):
         location="Exercise 2.4-1(c)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\tmp{u}^{3} - 3 \tmp{u}^{2} \cdot 2^{- \tmp{u}} + 3 \tmp{u} \cdot 4^{- \tmp{u}} - 8^{- " r"\tmp{u}}"
         ),

@@ -36,7 +36,7 @@ class BurdenFairesBurden20162214A(Formula):
         location="Exercises 2.2-14(a), 2.5-12(a)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 + \sin{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[2, 3]",
     )

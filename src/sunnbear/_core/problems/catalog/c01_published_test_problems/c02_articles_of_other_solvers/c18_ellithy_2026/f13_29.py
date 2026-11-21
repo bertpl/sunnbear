@@ -35,7 +35,7 @@ class Ellithy202629(Formula):
         location="dataset.json, problem 29",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{- \tmp{u}} - \cos{\left(3 \tmp{u} \right)} - 0.5",
         interval="[0, 1]",
     )

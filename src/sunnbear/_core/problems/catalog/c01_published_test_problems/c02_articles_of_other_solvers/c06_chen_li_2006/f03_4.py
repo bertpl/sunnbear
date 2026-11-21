@@ -38,7 +38,7 @@ class ChenLi20064(Formula):
         location="Example 4",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{- \tmp{u}} - 0.1",
         interval="[0, 1]",
     )

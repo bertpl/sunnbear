@@ -34,7 +34,7 @@ class Bradie20062313(Formula):
         location="Exercise 2.3-13",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \frac{2 - e^{\tmp{u}} + \tmp{u}^{2}}{3}",
         interval="[0, 1]",
     )

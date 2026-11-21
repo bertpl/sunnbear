@@ -85,7 +85,7 @@ class RootsFortran2025118(Formula):
         location="root_tests.f90, case 118",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 2.0",
         interval="[1, 2]",
     )

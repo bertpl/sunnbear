@@ -36,7 +36,7 @@ class BurdenFairesBurden2016241B(Formula):
         location="Exercise 2.4-1(b)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\cos{\left(\tmp{u} + \sqrt{2} \right)} + \tmp{u} \left(\frac{\tmp{u}}{2} + \sqrt{2}\right)",
         interval="[-2, -1]",
     )

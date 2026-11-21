@@ -44,7 +44,7 @@ class BurdenFairesBurden201621Ex1(Formula):
         ),
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + 4 \tmp{u}^{2} - 10",
         interval="[1, 2]",
     )

@@ -34,7 +34,7 @@ class Galdino2011F7(Formula):
         location="Table IV, f7",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - e^{\tmp{u} - 1}",
         interval="[4, 5]",
     )

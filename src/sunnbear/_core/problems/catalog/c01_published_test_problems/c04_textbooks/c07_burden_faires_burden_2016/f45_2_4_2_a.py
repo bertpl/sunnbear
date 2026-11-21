@@ -36,7 +36,7 @@ class BurdenFairesBurden2016242A(Formula):
         location="Exercise 2.4-2(a)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"1 - 4 \tmp{u} \cos{\left(\tmp{u} \right)} + 2 \tmp{u}^{2} + \cos{\left(2 \tmp{u} \right)}",
         interval="[0, 1]",
     )

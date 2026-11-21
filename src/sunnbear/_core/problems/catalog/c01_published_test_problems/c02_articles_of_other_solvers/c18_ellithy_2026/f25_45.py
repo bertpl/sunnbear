@@ -36,7 +36,7 @@ class Ellithy202645(Formula):
         location="dataset.json, problem 45",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\left(10.0 + \frac{3.592}{\tmp{u}^{2}}\right) \left(\tmp{u} - 0.04267\right) - 0.08206 " r"\cdot 300"
         ),

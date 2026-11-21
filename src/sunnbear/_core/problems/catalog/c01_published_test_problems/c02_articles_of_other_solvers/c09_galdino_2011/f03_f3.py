@@ -34,7 +34,7 @@ class Galdino2011F3(Formula):
         location="Table IV, f3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{4}\right)^{3}",
         interval="[2, 3]",
     )

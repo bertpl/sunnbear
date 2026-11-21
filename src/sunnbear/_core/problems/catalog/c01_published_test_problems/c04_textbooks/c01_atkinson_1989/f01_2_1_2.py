@@ -34,7 +34,7 @@ class Atkinson1989212(Formula):
         location="Eq. (2.1.2)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{6} - \tmp{u} - 1",
         interval="[1, 2]",
     )

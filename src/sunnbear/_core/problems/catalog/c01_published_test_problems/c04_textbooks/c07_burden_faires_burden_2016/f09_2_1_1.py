@@ -35,7 +35,7 @@ class BurdenFairesBurden2016211(Formula):
         location="Exercise 2.1-1",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sqrt{\tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[0, 1]",
     )

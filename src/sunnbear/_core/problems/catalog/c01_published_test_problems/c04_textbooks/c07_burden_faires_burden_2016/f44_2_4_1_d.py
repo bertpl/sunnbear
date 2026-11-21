@@ -37,7 +37,7 @@ class BurdenFairesBurden2016241D(Formula):
         location="Exercises 2.4-1(d), 2.5-2",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"e^{6 \tmp{u}} + 3 \ln{\left(2 \right)}^{2} e^{2 \tmp{u}} - \ln{\left(8 \right)} e^{4 "
             r"\tmp{u}} - \ln{\left(2 \right)}^{3}"

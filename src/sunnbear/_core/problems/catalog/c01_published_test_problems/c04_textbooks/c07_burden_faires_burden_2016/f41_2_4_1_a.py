@@ -35,7 +35,7 @@ class BurdenFairesBurden2016241A(Formula):
         location="Exercise 2.4-1(a)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 2 \tmp{u} e^{- \tmp{u}} + e^{- 2 \tmp{u}}",
         interval="[0, 1]",
     )

@@ -40,7 +40,7 @@ class Moler200441(Formula):
         location="§4.1, §4.2, §4.4, §4.5",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \param{M}",
         interval="[1, 2]",
     )

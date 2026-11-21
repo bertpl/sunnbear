@@ -34,7 +34,7 @@ class Bradie20062116B(Formula):
         location="Exercises 2.1-16(b), 2.2-11(b), 2.3-15, 2.4-14(b), 2.5-18(b)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u}^{2} - 10 \tmp{u} + 7",
         interval="[0, 1]",
     )

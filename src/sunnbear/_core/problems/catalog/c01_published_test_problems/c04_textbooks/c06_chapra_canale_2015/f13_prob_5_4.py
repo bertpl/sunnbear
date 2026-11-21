@@ -34,7 +34,7 @@ class ChapraCanale2015Prob54(Formula):
         location="Prob. 5.4",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"-12 - 21 \tmp{u} + 18 \tmp{u}^{2} - 2.75 \tmp{u}^{3}",
         interval="[-1, 0]",
     )

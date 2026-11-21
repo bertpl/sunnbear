@@ -35,7 +35,7 @@ class GottliebThompson20101(Formula):
         location="Table 1, test 1",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"3 \sin{\left(\tmp{u} \right)} - 2",
         interval="[0, 1]",
     )

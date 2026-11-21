@@ -35,7 +35,7 @@ class DowellJarratt1971Table3(Formula):
         location="Table 3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\left(1 + \left(1 - \param{n}\right)^{2}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{2}"
         ),

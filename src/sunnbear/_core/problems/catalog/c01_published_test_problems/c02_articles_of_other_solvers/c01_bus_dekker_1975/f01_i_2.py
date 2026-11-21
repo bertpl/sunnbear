@@ -36,7 +36,7 @@ class BusDekker1975I2(Formula):
         location="Group I, function 2",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} e^{- \param{n}} + 1 - 2 e^{- \param{n} \tmp{u}}",
         interval="[0, 1]",
     )

@@ -33,7 +33,7 @@ class Ellithy202622(Formula):
         location="dataset.json, problem 22",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} - 4 \tmp{u} + 13",
         interval="[-3, -2]",
     )

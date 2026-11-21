@@ -36,7 +36,7 @@ class Galdino2011F2(Formula):
         location="Table IV, f2",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 4\right)^{5} \ln{\left(\tmp{u} \right)}",
         interval="[3.5, 4.5]",
     )

@@ -87,7 +87,7 @@ class RootsFortran2025149(Formula):
         location="root_tests.f90, case 149",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\left(\tmp{u} - 7.14\right)^{3} \right)}",
         interval="[7, 8]",
     )

@@ -37,7 +37,7 @@ class Norton19855(Formula):
         location="Section 4, function 5",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\left(1 + \left(1 - \param{n}\right)^{4}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{4}"
         ),

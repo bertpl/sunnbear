@@ -35,7 +35,7 @@ class Ellithy202634(Formula):
         location="dataset.json, problem 34",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"4 \sin{\left(\tmp{u} \right)} - \tmp{u} + 1",
         interval="[-1, 0]",
     )

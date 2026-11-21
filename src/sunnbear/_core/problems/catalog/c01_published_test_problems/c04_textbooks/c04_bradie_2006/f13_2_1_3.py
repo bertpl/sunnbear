@@ -35,7 +35,7 @@ class Bradie2006213(Formula):
         location="Exercises 2.1-3, 2.2-8, 2.4-9, 2.5-9",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)}",
         interval="[3, 4]",
     )

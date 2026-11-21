@@ -38,7 +38,7 @@ class BurdenFairesBurden2016245(Formula):
         location="Exercise 2.4-5",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{6 \tmp{u}} + 1.441 e^{2 \tmp{u}} - 2.079 e^{4 \tmp{u}} - 0.333",
         interval="[-1, 0]",
     )

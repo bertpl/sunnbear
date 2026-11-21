@@ -37,7 +37,7 @@ class BurdenFairesBurden2016232(Formula):
         location="Exercises 2.3-2, 2.3-4",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"- \tmp{u}^{3} - \cos{\left(\tmp{u} \right)}",
         interval="[-1, 0]",
     )

@@ -34,7 +34,7 @@ class Gsl2024Func3(Formula):
         location="test_funcs.c, func3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 1.0 \cdot 10^{-8}",
         interval="[0, 1]",
     )

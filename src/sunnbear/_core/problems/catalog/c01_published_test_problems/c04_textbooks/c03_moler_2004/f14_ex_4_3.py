@@ -37,7 +37,7 @@ class Moler2004Ex43(Formula):
         location="Exercise 4.3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"816 \tmp{u}^{3} - 3835 \tmp{u}^{2} + 6000 \tmp{u} - 3125",
         interval="[1, 2]",
     )

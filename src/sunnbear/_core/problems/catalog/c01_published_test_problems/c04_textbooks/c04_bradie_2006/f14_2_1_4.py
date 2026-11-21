@@ -34,7 +34,7 @@ class Bradie2006214(Formula):
         location="Exercise 2.1-4",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"1 - \ln{\left(\tmp{u} \right)}",
         interval="[2, 3]",
     )

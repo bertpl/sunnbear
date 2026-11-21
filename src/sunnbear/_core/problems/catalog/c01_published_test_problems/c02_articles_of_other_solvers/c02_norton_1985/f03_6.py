@@ -39,7 +39,7 @@ class Norton19856(Formula):
         location="Section 4, function 6",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 1\right) e^{- \param{n} \tmp{u}} + \tmp{u}^{\param{n}}",
         interval="[0, 1]",
     )

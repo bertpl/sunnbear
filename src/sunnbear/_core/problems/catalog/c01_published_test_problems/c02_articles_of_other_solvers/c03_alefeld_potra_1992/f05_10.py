@@ -35,7 +35,7 @@ class AlefeldPotra199210(Formula):
         location="Table 1, problem 10",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} + \sin{\left(\frac{\tmp{u}}{\param{n}} \right)} - \frac{1}{4}",
         interval="[0, 1]",
     )

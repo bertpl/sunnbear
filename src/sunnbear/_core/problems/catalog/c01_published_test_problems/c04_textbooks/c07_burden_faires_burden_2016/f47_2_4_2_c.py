@@ -39,7 +39,7 @@ class BurdenFairesBurden2016242C(Formula):
         location="Exercise 2.4-2(c)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\sin^{3}{\left(\tmp{u} \right)} + 3 e^{- 2 \tmp{u}} \sin{\left(\tmp{u} \right)} - 3 e^{- "
             r"\tmp{u}} \sin^{2}{\left(\tmp{u} \right)} - e^{- 3 \tmp{u}}"

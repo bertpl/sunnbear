@@ -36,7 +36,7 @@ class BusDekker1975I4(Formula):
         location="Group I, function 4",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \left(1 - \tmp{u}\right)^{\param{n}}",
         interval="[0, 1]",
     )

@@ -36,7 +36,7 @@ class BurdenFairesBurden2016218(Formula):
         location="Exercises 2.1-8, 2.2-16",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
         interval="[4, 5]",
     )

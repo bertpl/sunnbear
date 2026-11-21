@@ -34,7 +34,7 @@ class Epperson2013398(Formula):
         location="Exercise 3.9-8",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \sin{\left(\pi \tmp{u} \right)} + \tmp{u}",
         interval="[1, 2]",
     )

@@ -37,7 +37,7 @@ class Bradie20062116A(Formula):
         location="Exercises 2.1-16(a), 2.2-11(a), 2.3-14, 2.4-14(a), 2.5-18(a)",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} + \tmp{u}^{2} - \tmp{u} - 4",
         interval="[1, 2]",
     )

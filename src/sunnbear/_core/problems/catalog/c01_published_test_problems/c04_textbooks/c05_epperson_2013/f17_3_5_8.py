@@ -34,7 +34,7 @@ class Epperson2013358(Formula):
         location="Exercises 3.5-8, 3.5-9",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"7 \tmp{u} - \cos{\left(2 \pi \tmp{u} \right)}",
         interval="[0, 1]",
     )

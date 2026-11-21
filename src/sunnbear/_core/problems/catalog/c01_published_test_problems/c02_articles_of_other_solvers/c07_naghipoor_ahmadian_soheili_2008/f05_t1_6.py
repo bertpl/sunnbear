@@ -34,7 +34,7 @@ class NaghipoorAhmadianSoheili2008T16(Formula):
         location="Table 1, equation 6",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\frac{1}{\tmp{u}} - 1",
         interval="[0.5, 1.5]",
     )

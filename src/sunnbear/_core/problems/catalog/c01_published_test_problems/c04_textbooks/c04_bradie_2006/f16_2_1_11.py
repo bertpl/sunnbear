@@ -32,7 +32,7 @@ class Bradie20062111(Formula):
         location="Exercises 2.1-11, 2.2-6, 2.4-5, 2.5-7",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 13",
         interval="[2, 3]",
     )

@@ -33,7 +33,7 @@ class ChapraCanale2015Prob58(Formula):
         location="Prob. 5.8",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 18",
         interval="[4, 5]",
     )

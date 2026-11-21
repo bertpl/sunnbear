@@ -33,7 +33,7 @@ class Romadani202551(Formula):
         location="Section 5.1",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{7} - 2 \tmp{u}^{6} + 4 \tmp{u}^{5} - 1",
         interval="[0, 1]",
     )

@@ -34,7 +34,7 @@ class KumarSrivastav2026F2(Formula):
         location="Table 3, f2",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + \tmp{u} - 1",
         interval="[0, 1]",
     )

@@ -33,7 +33,7 @@ class BadrAlmotairiElGhamry2021P12(Formula):
         location="Table 1, P12",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} + e^{\frac{\tmp{u}}{2}} - 5",
         interval="[1, 2]",
     )

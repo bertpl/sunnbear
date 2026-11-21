@@ -35,7 +35,7 @@ class SuliMayers2003Examples1113(Formula):
         location="Examples 1.1–1.3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} - 2 \tmp{u} - 1",
         interval="[1, 2]",
     )

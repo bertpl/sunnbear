@@ -36,7 +36,7 @@ class KumarSrivastav2026F3(Formula):
         location="Table 3, f3",
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\arctan{\left(\tmp{u} \right)} - 0.3",
         interval="[0, 1]",
     )
