@@ -331,10 +331,7 @@ def test_published_formula_shifts_x_by_c(formula, c):
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
-    """A formula of subcategory 1.99 applies ``c`` in 1 of the 3 ways that `ModifiedPublishedTestProblems` states.
-
-    A formula that declares its way, in `effect_of_c`, must follow that way.
-    """
+    """A formula of subcategory 1.99 applies ``c`` in a way of `ModifiedPublishedTestProblems`, and as it declares."""
     for candidate in formula.build_all_candidates():
         # --- act ----------------------
         ways = _c_ways_followed(candidate, c)
@@ -342,12 +339,12 @@ def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
         # --- assert -------------------
         assert ways, candidate.id
         if formula.effect_of_c is not None:
-            assert _C_WAY_OF_EFFECT[formula.effect_of_c] in ways, candidate.id
+            assert _C_WAY_NAME_BY_EFFECT_OF_C[formula.effect_of_c] in ways, candidate.id
 
 
-def test_c_way_of_effect_covers_every_effect():
-    """`_C_WAY_OF_EFFECT` names a way of `_c_ways_followed` for each member of `EffectOfC`."""
-    assert set(_C_WAY_OF_EFFECT) == set(EffectOfC)
+def test_c_way_name_by_effect_of_c_covers_every_effect():
+    """`_C_WAY_NAME_BY_EFFECT_OF_C` names a way of `_c_ways_followed` for each member of `EffectOfC`."""
+    assert set(_C_WAY_NAME_BY_EFFECT_OF_C) == set(EffectOfC)
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
@@ -786,8 +783,12 @@ def _first_run_formulas_table(script_modules):
     )
 
 
-# _C_WAY_OF_EFFECT maps each way of `EffectOfC` to its name in `_c_ways_followed`.
-_C_WAY_OF_EFFECT = {EffectOfC.SHIFTS_X: "shifts x", EffectOfC.SHIFTS_Y: "adds to f", EffectOfC.SCALES_X: "scales x"}
+# _C_WAY_NAME_BY_EFFECT_OF_C maps each way of `EffectOfC` to its name in `_c_ways_followed`.
+_C_WAY_NAME_BY_EFFECT_OF_C = {
+    EffectOfC.SHIFTS_X: "shifts x",
+    EffectOfC.SHIFTS_Y: "adds to f",
+    EffectOfC.SCALES_X: "scales x",
+}
 
 
 def _c_ways_followed(candidate, c):

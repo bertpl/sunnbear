@@ -8,7 +8,7 @@ from . import catalog
 from .core import (
     CANONICAL_DIGITS,
     DEDUP_DIGITS,
-    DEFAULT_MARKER_MACROS,
+    PLAIN_MARKER_MACROS,
     USER_DEFINED_FORMULA_CATEGORY_NUMBER,
     CandidateTestProblem,
     EffectOfC,

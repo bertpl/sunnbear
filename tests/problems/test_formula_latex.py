@@ -25,12 +25,15 @@ def _define_formula(declared_params: tuple[FormulaParam, ...], declared_presenta
 
         @staticmethod
         def parametrized_fun(x: float, c: float, m: float, b: float) -> float:
+            """Return the line ``m*x - c``."""
             return m * x - c
 
         def interval_bounds(self, m: float, b: float) -> tuple[float, float]:
+            """Return the interval ``[-b, b]``."""
             return (-b, b)
 
         def recipes(self) -> tuple[ParamRecipe, ...]:
+            """Return 1 grid over ``m`` and ``b``."""
             return (ParamGrid(axes=(ParamAxis("m", -1.0, 1.0, 1.0), ParamAxis("b", 1.0, 2.0, 1.0))),)
 
     return LineOnInterval
@@ -52,19 +55,22 @@ def test_declaring_param_names_is_rejected():
     """A formula that declares ``param_names``, which `params` derives, is rejected at class definition."""
     with pytest.raises(TypeError, match="declares param_names"):
 
-        class OldStyle(Formula):
+        class LineDeclaringParamNames(Formula):
             number = (99, 991)
-            name = "Old style"
+            name = "Line declaring param names"
             param_names = ("p1",)
 
             @staticmethod
             def parametrized_fun(x: float, c: float, p1: float) -> float:
+                """Return ``x - c``."""
                 return x - c
 
             def interval_bounds(self, p1: float) -> tuple[float, float]:
+                """Return the interval ``[-1, 1]``."""
                 return (-1.0, 1.0)
 
             def recipes(self) -> tuple[ParamRecipe, ...]:
+                """Return 1 grid over ``p1``."""
                 return (ParamGrid.decimal("p1", 0.0, 1.0, 0.5),)
 
 
@@ -163,3 +169,14 @@ def test_latex_display_needs_a_presentation():
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="declares no presentation"):
         formula.latex_display()
+
+
+# ==================================================================================================
+#  Texts for a reader
+# ==================================================================================================
+def test_texts_for_a_reader_gather_every_text():
+    """A formula's texts for a reader are its meanings, its recipes' summaries and its presentation's texts."""
+    assert ExampleCubic().texts_for_a_reader() == (
+        r"The sweep of $\param{p1}$ from 0 to 1.",
+        r"An example cubic, with 1 root for $\param{p1} \le 0$ and up to 3 roots for a larger $\param{p1}$.",
+    )

@@ -37,7 +37,7 @@ Ownership summary:
   interface: `params`, `parametrized_fun`, `interval_bounds`, `recipes`, optionally
   `is_param_tuple_valid` — one class, one module, in `catalog`; defining the
   class registers it. It also declares what a reader sees of it: its `presentation`
-  (`FormulaPresentation`, in the LaTeX notation of `latex_template`) and its `effect_of_c`.
+  (`FormulaPresentation`, in the LaTeX notation of `presentation.latex_template`) and its `effect_of_c`.
 - the framework owns everything mechanical: numba compilation — once per
   formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
   identity (`ProblemId` — the formula number and its named parameter tuple, stable, rendered in
@@ -51,7 +51,6 @@ from .category import USER_DEFINED_FORMULA_CATEGORY_NUMBER, FormulaCategory
 from .effect_of_c import EffectOfC
 from .formula import Formula
 from .identity import ProblemId
-from .latex_template import DEFAULT_MARKER_MACROS, LatexTemplate
 from .param import FormulaParam
 from .param_values import (
     CANONICAL_DIGITS,
@@ -59,7 +58,7 @@ from .param_values import (
     ParamNotation,
     deduplicate_param_tuples,
 )
-from .presentation import FormulaPresentation
+from .presentation import PLAIN_MARKER_MACROS, FormulaPresentation, LatexTemplate
 from .recipes import ParamAxis, ParamGrid, ParamRecipe, ParamTable
 from .registry import FormulaRegistry
 from .source import FormulaSource

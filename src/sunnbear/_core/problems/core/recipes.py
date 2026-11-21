@@ -136,7 +136,7 @@ class ParamRecipe(ABC):
     r"""`ParamRecipe` is the base class of a recipe that materializes parameter tuples: a grid or a table.
 
     Attributes:
-        summary: 1 sentence for a reader on what the recipe covers, such as "The sweep of $\param{b}$ at
+        summary: One sentence for a reader on what the recipe covers, such as "The sweep of $\param{b}$ at
             $\param{d} = 1$.", in sunnbear's LaTeX notation (`LatexTemplate`). None by default; the catalog's tests
             require it of every recipe of a shipped formula.
     """

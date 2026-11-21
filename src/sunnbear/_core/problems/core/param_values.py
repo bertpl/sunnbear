@@ -164,11 +164,12 @@ class ParamNotation(StrEnum):
     def spell_value_in_latex(cls, value: float) -> str:
         r"""Return the canonical spelling of `value`, written in LaTeX, as a test problem's expression shows it.
 
-        The LaTeX differs from the canonical spelling in 4 ways:
+        The LaTeX differs from the canonical spelling in these ways:
 
         - a whole number drops its ``.0``: ``3.0`` gives ``3``;
         - a power puts its exponent in braces: ``10^0.3`` gives ``10^{0.3}``;
-        - an exponent in e-notation becomes a power of 10: ``2.5e-05`` gives ``2.5 \cdot 10^{-5}``;
+        - an exponent in e-notation becomes a power of 10, and a mantissa of 1 is left out: ``2.5e-05`` gives
+          ``2.5 \cdot 10^{-5}``, and ``1e-05`` gives ``10^{-5}``;
         - a negative value goes in parentheses, as in ``(-0.125)``, so that no 2 minus signs stand side by side.
 
         Raises:

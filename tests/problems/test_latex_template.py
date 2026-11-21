@@ -1,6 +1,6 @@
 import pytest
 
-from sunnbear._core.problems.core import DEFAULT_MARKER_MACROS, LatexTemplate
+from sunnbear._core.problems.core import PLAIN_MARKER_MACROS, LatexTemplate
 
 
 # ==================================================================================================
@@ -21,17 +21,16 @@ def test_marker_names_follow_their_first_use():
     template = LatexTemplate(r"\fn{g}(\tmp{u}) + \tmp{t_{1}} \tmp{u} / \fn{g}(\param{b})")
 
     # --- assert -----------------------
-    assert template.temporary_variable_names == ("u", "t_{1}")
-    assert template.intermediate_function_names == ("g",)
+    assert template.temporary_variables_and_functions == (("tmp", "u"), ("tmp", "t_{1}"), ("fn", "g"))
 
 
 @pytest.mark.parametrize(
     "text",
     [
-        r"\param{1m} \x",  # a name that is no identifier
-        r"\param m",  # no braces
+        r"\param{1m} \x",  # the name is no identifier
+        r"\param m",  # the name has no braces
         r"\tmp u",
-        r"\fn{} + \x",  # an empty argument
+        r"\fn{} + \x",  # the argument is empty
     ],
 )
 def test_malformed_command_is_rejected(text):
@@ -46,8 +45,7 @@ def test_longer_command_is_not_a_marker():
     template = LatexTemplate(r"\fnsymbol{1} + \tmpx")
 
     # --- assert -----------------------
-    assert template.intermediate_function_names == ()
-    assert template.temporary_variable_names == ()
+    assert template.temporary_variables_and_functions == ()
 
 
 # ==================================================================================================
@@ -71,6 +69,6 @@ def test_substitute_rejects_a_missing_name():
         LatexTemplate(r"\param{m} \x^{\param{p}}").substitute({"m": "m"})
 
 
-def test_default_marker_macros_define_every_marker():
-    """The default definitions cover the 5 markers, each as plain LaTeX."""
-    assert dict(DEFAULT_MARKER_MACROS) == {r"\x": "x", r"\c": "c", r"\tmp": "#1", r"\fn": "#1", r"\prm": "#1"}
+def test_plain_marker_macros_define_every_marker():
+    """The plain definitions cover the 5 markers, each as plain LaTeX."""
+    assert dict(PLAIN_MARKER_MACROS) == {r"\x": "x", r"\c": "c", r"\tmp": "#1", r"\fn": "#1", r"\prm": "#1"}

@@ -3,14 +3,14 @@
 The checks of a formula's own notation, placeholders and definitions run when its class is defined (`Formula`,
 `FormulaPresentation`); these tests add the requirements that apply only to the shipped formulas and categories.
 
-The tests of how category 1's formulas apply ``c`` live with the survey of published test problems, in
-`tests/scripts/`, because they use the rule of category 1 for the size of the shift.
+The tests of how category 1's formulas apply ``c`` live with the survey of published test problems, because they use
+the rule of category 1 for the size of the shift.
 """
 
 import pytest
 
 import sunnbear._core.problems.catalog as catalog
-from sunnbear._core.problems.core import Formula, FormulaCategory, FormulaRegistry
+from sunnbear._core.problems.core import FormulaCategory, FormulaRegistry
 from tests.problems.effect_of_c_check import follows_effect_of_c
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
@@ -23,16 +23,7 @@ _SHIPPED_CATEGORIES = [
 _FORMULAS_TO_CHECK_FOR_C = [
     formula for formula in _SHIPPED_FORMULAS if formula.effect_of_c is not None and formula.number[0] != 1
 ]
-_INCOMPLETE = "the presentations of the catalog's formulas and categories are not complete"
-
-
-def _texts_for_a_reader(formula: Formula) -> list[str]:
-    """Return the formula's texts for a reader: summary, notes, its parameters' meanings and its recipes' summaries."""
-    texts = [param.meaning for param in formula.params if param.meaning is not None]
-    texts += [recipe.summary for recipe in formula.recipes() if recipe.summary is not None]
-    if formula.presentation is not None:
-        texts += formula.presentation.texts_for_a_reader
-    return texts
+_SKIP_REASON = "the presentations of the catalog's formulas and categories are not complete"
 
 
 # ==================================================================================================
@@ -41,7 +32,7 @@ def _texts_for_a_reader(formula: Formula) -> list[str]:
 @pytest.mark.parametrize("formula", _SHIPPED_FORMULAS, ids=lambda formula: formula.label)
 def test_formula_texts_hold_no_code(formula):
     """A text for a reader names no class or constant of sunnbear's code, so it holds no code span in backticks."""
-    assert [text for text in _texts_for_a_reader(formula) if "`" in text] == []
+    assert [text for text in formula.texts_for_a_reader() if "`" in text] == []
 
 
 @pytest.mark.parametrize("category", _SHIPPED_CATEGORIES, ids=lambda category: category.label)
@@ -64,7 +55,7 @@ def test_recipe_summaries_name_only_parameters(formula):
 # ==================================================================================================
 #  Required declarations
 # ==================================================================================================
-@pytest.mark.skip(reason=_INCOMPLETE)
+@pytest.mark.skip(reason=_SKIP_REASON)
 @pytest.mark.parametrize("formula", _SHIPPED_FORMULAS, ids=lambda formula: formula.label)
 def test_formula_declares_what_a_reader_sees(formula):
     """A shipped formula declares its presentation, how it applies ``c``, its symbols and its recipes' summaries."""
@@ -74,7 +65,7 @@ def test_formula_declares_what_a_reader_sees(formula):
     assert [recipe for recipe in formula.recipes() if recipe.summary is None] == []
 
 
-@pytest.mark.skip(reason=_INCOMPLETE)
+@pytest.mark.skip(reason=_SKIP_REASON)
 @pytest.mark.parametrize("formula", _SHIPPED_FORMULAS, ids=lambda formula: formula.label)
 def test_formula_declares_its_summary(formula):
     """A shipped formula's presentation holds its summary."""
@@ -82,7 +73,7 @@ def test_formula_declares_its_summary(formula):
     assert formula.presentation.summary is not None
 
 
-@pytest.mark.skip(reason=_INCOMPLETE)
+@pytest.mark.skip(reason=_SKIP_REASON)
 @pytest.mark.parametrize("category", _SHIPPED_CATEGORIES, ids=lambda category: category.label)
 def test_category_declares_its_description(category: FormulaCategory):
     """A shipped category declares its description for a reader."""

@@ -24,10 +24,9 @@ import numba
 
 from .effect_of_c import EffectOfC
 from .identity import ProblemId
-from .latex_template import LatexTemplate
 from .param import FormulaParam
 from .param_values import DEDUP_DIGITS, ParamNotation, deduplicate_param_tuples
-from .presentation import FormulaPresentation
+from .presentation import FormulaPresentation, LatexTemplate
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
 from .source import FormulaSource
@@ -48,9 +47,9 @@ class Formula(FormulaTaxonomyNode, ABC):
             ``number[:-1]``, and every formula belongs to a category, so the number has at least
             2 elements.
         name: Display name, e.g. "Odd power".
-        params: The formula's declared parameters (`FormulaParam`), in tuple-position order. Every recipe and hook
-            signature is validated against their names, `param_names`, which also label ids and reports. Empty for a
-            formula without parameters.
+        params: The formula's declared parameters (`FormulaParam`), in tuple-position order. Every recipe and every
+            hook signature is validated against the parameters' names (`param_names`), which also label ids and reports.
+            Empty for a formula without parameters.
         jit: Whether `parametrized_fun` is numba-compiled (default) — set
             False for formulas numba cannot compile.
         test_cases: The formula's own test cases (`FormulaTestCase`), which
@@ -281,14 +280,24 @@ class Formula(FormulaTaxonomyNode, ABC):
     # --------------------------------------------------------------------------
     #  LaTeX of the presentation
     # --------------------------------------------------------------------------
+    def texts_for_a_reader(self) -> tuple[str, ...]:
+        """Return its texts for a reader: its parameters' meanings, its recipes' summaries, its presentation's texts."""
+        meanings = [param.meaning for param in self.params if param.meaning is not None]
+        summaries = [recipe.summary for recipe in self.recipes() if recipe.summary is not None]
+        if self.presentation is not None:
+            return (*meanings, *summaries, *self.presentation.texts_for_a_reader)
+        else:
+            return (*meanings, *summaries)
+
     def latex_with_symbols(self, text: str) -> str:
         r"""Return `text`, in sunnbear's LaTeX notation, with each placeholder replaced by its parameter's symbol.
 
         Each symbol is wrapped in ``\prm{…}`` (`LatexTemplate.substitute`). A formula's texts for a reader are always
-        rendered this way.
+        rendered with its parameters' symbols.
 
         Raises:
-            ValueError: If `text` names a parameter that has no `latex_symbol`.
+            ValueError: If `text` breaks sunnbear's LaTeX notation (`LatexTemplate`), or names a parameter that the
+                formula does not declare or that has no `latex_symbol`.
         """
         symbols = {param.name: param.latex_symbol for param in self.params if param.latex_symbol is not None}
         return LatexTemplate(text).substitute(symbols)
@@ -306,8 +315,8 @@ class Formula(FormulaTaxonomyNode, ABC):
 
         Raises:
             ValueError: If `param_values` does not hold 1 value per parameter, if a value has no spelling
-                (`ParamNotation.spell_value_in_latex`), or if `text` names a parameter that the formula does not
-                declare.
+                (`ParamNotation.spell_value_in_latex`), if `text` breaks sunnbear's LaTeX notation (`LatexTemplate`),
+                or if `text` names a parameter that the formula does not declare.
         """
         values = dict(zip(self.param_names, param_values, strict=True))
         return LatexTemplate(text).substitute(
@@ -362,12 +371,12 @@ class Formula(FormulaTaxonomyNode, ABC):
         for recipe in recipes:
             if recipe.param_names() != self.param_names:
                 raise ValueError(
-                    f"Formula {type(self).__name__} declares param_names={self.param_names} but a recipe gives "
+                    f"Formula {type(self).__name__} declares the parameters {self.param_names} but a recipe gives "
                     f"{recipe.param_names()}; recipe parameter names must match the declared parameters, in order."
                 )
         if not recipes and self.param_names:
             raise ValueError(
-                f"Formula {type(self).__name__} declares param_names={self.param_names} but defines no recipes."
+                f"Formula {type(self).__name__} declares the parameters {self.param_names} but defines no recipes."
             )
 
     def _validate_param_name_consistency(self) -> None:
@@ -395,7 +404,7 @@ class Formula(FormulaTaxonomyNode, ABC):
             signature_names = _declared_hook_param_names(fun, cls.__name__, hook, n_leading)
             if signature_names != self.param_names:
                 raise ValueError(
-                    f"Formula {cls.__name__} declares param_names={self.param_names} but "
+                    f"Formula {cls.__name__} declares the parameters {self.param_names} but "
                     f"{hook} takes {signature_names}; the two must agree."
                 )
 
@@ -403,25 +412,27 @@ class Formula(FormulaTaxonomyNode, ABC):
     def _validate_presentation(cls) -> None:
         """Check that the presentation and the meanings name only declared parameters, and that its math names each one.
 
-        Every placeholder of the presentation and of the meanings must name a parameter in `params`, and every parameter
-        must appear in the presentation's definitions, expression or interval. A formula without a presentation is not
-        checked; the catalog's tests require one of every shipped formula.
+        The meanings are those of the parameters, and the presentation's math is its definitions, expression and
+        interval.
+
+        A formula without a presentation is not checked; the catalog's tests require one of every shipped formula.
 
         Raises:
-            ValueError: If a placeholder names an undeclared parameter, or a parameter appears in neither the
-                definitions, the expression nor the interval.
+            ValueError: If a placeholder names an undeclared parameter, or a parameter appears in none of the
+                definitions, the expression and the interval.
         """
         if cls.presentation is not None:
             param_names = [param.name for param in cls.params]
-            meanings = [LatexTemplate(param.meaning) for param in cls.params if param.meaning is not None]
-            named = {
-                name for template in (*cls.presentation.templates, *meanings) for name in template.placeholder_names
+            meaning_names = {
+                name
+                for param in cls.params
+                if param.meaning is not None
+                for name in LatexTemplate(param.meaning).placeholder_names
             }
-            undeclared = sorted(named - set(param_names))
+            undeclared = sorted((cls.presentation.placeholder_names | meaning_names) - set(param_names))
             if undeclared:
                 raise ValueError(f"{cls.__name__}'s presentation names the undeclared parameters {undeclared}.")
-            in_math = {name for template in cls.presentation.math_templates for name in template.placeholder_names}
-            absent = [name for name in param_names if name not in in_math]
+            absent = [name for name in param_names if name not in cls.presentation.math_placeholder_names]
             if absent:
                 raise ValueError(
                     f"{cls.__name__}'s presentation leaves the parameters {absent} out of its definitions, expression "
@@ -434,7 +445,7 @@ def _declared_hook_param_names(fun: "Callable[..., object]", owner: str, hook: s
 
     The concrete-signature gate for formula hooks: every hook that receives the
     parameter tuple positionally must *name* its parameters, so that the
-    declaration (`Formula.param_names`), the implementation, and the recipes
+    declaration (`Formula.params`), the implementation, and the recipes
     can all be checked against one another. A ``*params`` signature would be
     unintrospectable and silently exempt that formula from the cross-checks.
 

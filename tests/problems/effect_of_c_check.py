@@ -7,19 +7,19 @@ For each way of `EffectOfC`, the derivative ``df/dc`` at ``c = 0`` takes a known
 - scaling x by a factor ``k(c)``: ``df/dc = k'(0)*x*df/dx``;
 - shifting the function's value by ``s*c``: ``df/dc = s``.
 
-A way that moves x may also multiply the function's values by a positive factor ``g(c)``, which moves no root; the
-factor adds a term ``g'(0)*f`` to ``df/dc``. The second Wilkinson polynomial, with its zeros at ``2^-(k + c)``, does so.
+A formula whose ``c`` moves x may also multiply the function's values by a positive factor ``g(c)``, which moves no
+root; the factor adds a term ``g'(0)*f`` to ``df/dc``.
 
-The check runs in 3 steps:
+The check runs in these steps:
 
 - it estimates the derivatives by central differences at ``c = 0``, at x-values across the interval;
-- it fits the coefficients of the way's form to them, weighing each x-value by the inverse of its difference in c, so
-  that each residual counts relative to that difference, because a function's values can span many orders of
-  magnitude across its interval, as an exponential's do;
-- it accepts the way when the fit leaves no residual beyond the differences' error.
+- it fits the coefficients of the way's form of ``df/dc`` to the differences, weighting each x-value by the inverse of
+  its difference in c: a function's values can span many orders of magnitude across its interval, as an exponential's
+  do, so each residual must count relative to the difference at its x-value;
+- it accepts the way when every residual, relative to its difference in c, stays within `_RESIDUAL_RTOL`.
 
-Where a function is flat, or so steep that a difference falls below float64 rounding error, the check cannot decide and
-returns None.
+Where too few x-values give a difference well above float64 rounding error, as for a flat function or one whose values
+are very large, the check cannot decide and returns None.
 """
 
 import math
@@ -41,7 +41,7 @@ _MIN_SIGNIFICANT_ULPS = 1e4
 # _RESIDUAL_RTOL is the largest residual of the fit at an x-value, relative to the difference in c there, that still
 # counts as a fit.
 _RESIDUAL_RTOL = 1e-4
-# _MIN_X_VALUES is the fewest x-values whose differences the check fits.
+# _MIN_X_VALUES is the smallest number of x-values with significant differences that the check needs to decide.
 _MIN_X_VALUES = 4
 
 
@@ -98,8 +98,8 @@ def _significant_difference(value_above: float, value_below: float) -> float | N
     coefficients.
     """
     difference = value_above - value_below
-    noise = _MIN_SIGNIFICANT_ULPS * math.ulp(max(abs(value_above), abs(value_below)))
-    if math.isfinite(difference) and abs(difference) > noise:
+    min_significant_difference = _MIN_SIGNIFICANT_ULPS * math.ulp(max(abs(value_above), abs(value_below)))
+    if math.isfinite(difference) and abs(difference) > min_significant_difference:
         return difference
     else:
         return None

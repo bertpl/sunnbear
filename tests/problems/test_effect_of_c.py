@@ -17,7 +17,7 @@ def test_every_member_has_a_sentence():
 @pytest.mark.parametrize("formula_cls", [ExampleCubic, ExampleOddPower])
 @pytest.mark.parametrize("effect_of_c", list(EffectOfC))
 def test_check_accepts_only_the_declared_way(formula_cls, effect_of_c):
-    """`follows_effect_of_c` accepts the way that the example formula follows, and rejects the other ways."""
+    """`follows_effect_of_c` accepts the example formula's way of applying ``c``, and rejects the other ways."""
     # --- arrange ----------------------
     candidate = formula_cls().build_all_candidates()[-1]
 

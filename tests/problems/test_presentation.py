@@ -17,27 +17,22 @@ def test_definitions_used_in_order_are_accepted():
     )
 
     # --- assert -----------------------
-    assert [template.text for template in presentation.templates] == [
-        r"\tmp{u}",
-        r"\x - \c",
-        r"\fn{g}(\x)",
-        r"\sinh \x",
-        r"\fn{g}(\tmp{u}) / \fn{g}(\param{b})",
-        r"[0, \param{b}]",
-        r"Hyperbolic sine, scaled to 1 at $\x = \param{b}$.",
-    ]
+    assert presentation.math_placeholder_names == {"b"}
+    assert presentation.placeholder_names == {"b"}
+    assert presentation.texts_for_a_reader == (r"Hyperbolic sine, scaled to 1 at $\x = \param{b}$.",)
+    assert presentation.display_lines[-1] == (r"f(\x, \c)", r"\fn{g}(\tmp{u}) / \fn{g}(\param{b})")
 
 
 @pytest.mark.parametrize(
     "definitions, expression, message",
     [
-        (((r"\x - \c", r"\x"),), r"\x", "exactly 1 name"),  # a left side that defines nothing
-        (((r"\tmp{u} \tmp{v}", r"\x"),), r"\tmp{u} \tmp{v}", "exactly 1 name"),  # a left side that defines 2 names
-        (((r"\tmp{v}", r"\tmp{u}"), (r"\tmp{u}", r"\x")), r"\tmp{v}", "no earlier definition"),  # used before defined
-        (((r"\tmp{u}", r"\x"), (r"\tmp{u}", r"\c")), r"\tmp{u}", "an earlier line defines"),  # defined twice
+        (((r"\x - \c", r"\x"),), r"\x", "exactly 1 name"),  # the left side defines nothing
+        (((r"\tmp{u} \tmp{v}", r"\x"),), r"\tmp{u} \tmp{v}", "exactly 1 name"),  # the left side defines 2 names
+        (((r"\tmp{v}", r"\tmp{u}"), (r"\tmp{u}", r"\x")), r"\tmp{v}", "no earlier definition"),  # v uses u too early
+        (((r"\tmp{u}", r"\x"), (r"\tmp{u}", r"\c")), r"\tmp{u}", "an earlier line defines"),  # u is defined twice
         (((r"\tmp{u}", r"\x"),), r"\x - \c", "never used"),
-        ((), r"\tmp{u} - \c", "no earlier definition"),  # used, never defined
-        (((r"\tmp{g}", r"\x"),), r"\fn{g}(\x)", "no earlier definition"),  # a function is not a temporary variable
+        ((), r"\tmp{u} - \c", "no earlier definition"),  # u is used and never defined
+        (((r"\tmp{g}", r"\x"),), r"\fn{g}(\x)", "no earlier definition"),  # g is a function, not a temporary variable
     ],
 )
 def test_invalid_definitions_are_rejected(definitions, expression, message):
@@ -49,8 +44,8 @@ def test_invalid_definitions_are_rejected(definitions, expression, message):
 @pytest.mark.parametrize(
     "texts, message",
     [
-        ({"notes": (r"Here $\tmp{u}$ is undefined.",)}, "no earlier definition"),  # a note names an undefined name
-        ({"summary": r"A function of $\param{}$."}, "no well-formed argument"),  # malformed notation in the summary
+        ({"notes": (r"Here $\tmp{u}$ is undefined.",)}, "no earlier definition"),  # the note names an undefined name
+        ({"summary": r"A function of $\param{}$."}, "no well-formed argument"),  # the summary breaks the notation
     ],
 )
 def test_invalid_text_is_rejected(texts, message):

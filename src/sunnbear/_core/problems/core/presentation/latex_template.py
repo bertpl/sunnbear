@@ -1,6 +1,7 @@
-r"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation, and owns that notation.
+r"""`LatexTemplate` holds 1 text in sunnbear's LaTeX notation, and defines that notation.
 
-A formula's presentation writes its LaTeX, and the math in its texts for a reader, in this notation:
+The LaTeX of a formula's presentation, and the math in the texts for a reader that the last paragraph lists, use this
+notation:
 
 - **a placeholder per parameter,** ``\param{name}``, which `LatexTemplate.substitute` replaces before sunnbear hands
   the LaTeX out;
@@ -11,14 +12,19 @@ A formula's presentation writes its LaTeX, and the math in its texts for a reade
   - ``\fn{…}``, an intermediate function, such as ``\fn{g}(\x)``;
   - ``\prm{…}``, which wraps the symbol or the value that replaced a placeholder.
 
-A consumer that renders the LaTeX defines each marker as a macro. `DEFAULT_MARKER_MACROS` holds plain definitions,
-in the form of the ``macros`` option of KaTeX, so that any consumer renders the LaTeX without styling it.
+A consumer that renders the LaTeX defines each marker as a macro. `PLAIN_MARKER_MACROS` holds plain definitions, in the
+form of the ``macros`` option of KaTeX, so that a consumer that does not style the markers can still render the LaTeX.
 
 ``\c`` already exists in LaTeX as the cedilla accent, so the consumer's definition replaces it. A consumer that defines
 no markers fails on ``\x``, which every formula's expression uses.
 
-A text for a reader (a presentation's summary and notes, a parameter's meaning, a recipe's summary or a category's
-description) marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does.
+A text for a reader marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does. The texts for a reader
+are:
+
+- a presentation's summary and notes;
+- a parameter's meaning;
+- a recipe's summary;
+- a category's description.
 """
 
 import re
@@ -28,7 +34,7 @@ from types import MappingProxyType
 from typing import ClassVar
 
 # ``#1`` stands for the marker's argument, as in KaTeX's `macros` option.
-DEFAULT_MARKER_MACROS = MappingProxyType(
+PLAIN_MARKER_MACROS = MappingProxyType(
     {
         r"\x": "x",
         r"\c": "c",
@@ -57,9 +63,16 @@ class LatexTemplate:
     _MARKER_ARGUMENT: ClassVar[str] = r"\{((?:[^{}]|\{[^{}]*\})+)\}"
     _TEMPORARY_VARIABLE: ClassVar[re.Pattern[str]] = re.compile(r"\\tmp" + _MARKER_ARGUMENT)
     _INTERMEDIATE_FUNCTION: ClassVar[re.Pattern[str]] = re.compile(r"\\fn" + _MARKER_ARGUMENT)
-    # _COMMAND matches ``\param``, ``\tmp`` and ``\fn`` whatever follows them, so that __post_init__ finds a
-    # malformed one.
-    _COMMAND: ClassVar[re.Pattern[str]] = re.compile(r"\\(param|tmp|fn)(?![A-Za-z])")
+    # _ARGUMENT_PATTERN_BY_COMMAND holds, for each command with an argument, the pattern of the command with a
+    # well-formed argument.
+    _ARGUMENT_PATTERN_BY_COMMAND: ClassVar[Mapping[str, re.Pattern[str]]] = MappingProxyType(
+        {"param": _PLACEHOLDER, "tmp": _TEMPORARY_VARIABLE, "fn": _INTERMEDIATE_FUNCTION}
+    )
+    # _COMMAND_WITH_ARGUMENT matches each command of _ARGUMENT_PATTERN_BY_COMMAND, whatever argument follows it, so that
+    # __post_init__ finds a malformed one; a longer command such as ``\fnsymbol`` does not match.
+    _COMMAND_WITH_ARGUMENT: ClassVar[re.Pattern[str]] = re.compile(
+        r"\\(" + "|".join(_ARGUMENT_PATTERN_BY_COMMAND) + r")(?![A-Za-z])"
+    )
 
     def __post_init__(self) -> None:
         r"""Check that every ``\param``, ``\tmp`` and ``\fn`` in the text has a well-formed argument.
@@ -67,13 +80,8 @@ class LatexTemplate:
         Raises:
             ValueError: If a ``\param`` names no Python identifier, or a ``\tmp`` or ``\fn`` has no argument in braces.
         """
-        argument_pattern_by_command = {
-            "param": self._PLACEHOLDER,
-            "tmp": self._TEMPORARY_VARIABLE,
-            "fn": self._INTERMEDIATE_FUNCTION,
-        }
-        for command in self._COMMAND.finditer(self.text):
-            if not argument_pattern_by_command[command[1]].match(self.text, command.start()):
+        for command in self._COMMAND_WITH_ARGUMENT.finditer(self.text):
+            if not self._ARGUMENT_PATTERN_BY_COMMAND[command[1]].match(self.text, command.start()):
                 raise ValueError(
                     f"LatexTemplate: \\{command[1]} at position {command.start()} has no well-formed argument in "
                     f"{self.text!r}."
@@ -88,24 +96,17 @@ class LatexTemplate:
         return tuple(dict.fromkeys(match[1] for match in self._PLACEHOLDER.finditer(self.text)))
 
     @property
-    def temporary_variable_names(self) -> tuple[str, ...]:
-        r"""Return the arguments of the text's ``\tmp{…}`` markers, in the order of their first use."""
-        return tuple(dict.fromkeys(match[1] for match in self._TEMPORARY_VARIABLE.finditer(self.text)))
-
-    @property
-    def intermediate_function_names(self) -> tuple[str, ...]:
-        r"""Return the arguments of the text's ``\fn{…}`` markers, in the order of their first use."""
-        return tuple(dict.fromkeys(match[1] for match in self._INTERMEDIATE_FUNCTION.finditer(self.text)))
-
-    @property
-    def markers_and_names(self) -> tuple[tuple[str, str], ...]:
+    def temporary_variables_and_functions(self) -> tuple[tuple[str, str], ...]:
         r"""Return the text's temporary variables and intermediate functions, as pairs of marker and name.
 
-        The marker keeps a temporary variable ``\tmp{g}`` apart from an intermediate function ``\fn{g}``.
+        Each pair appears once, in the order of its first use, temporary variables first. The marker keeps a temporary
+        variable ``\tmp{g}`` apart from an intermediate function ``\fn{g}``.
         """
-        return (
-            *(("tmp", name) for name in self.temporary_variable_names),
-            *(("fn", name) for name in self.intermediate_function_names),
+        return tuple(
+            dict.fromkeys(
+                [("tmp", match[1]) for match in self._TEMPORARY_VARIABLE.finditer(self.text)]
+                + [("fn", match[1]) for match in self._INTERMEDIATE_FUNCTION.finditer(self.text)]
+            )
         )
 
     # --------------------------------------------------------------------------
