@@ -5,7 +5,14 @@ The formula comes from the row with the key ``III.3`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Ridders1979Iii3(Formula):
@@ -27,8 +34,14 @@ class Ridders1979Iii3(Formula):
             " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
             "https://doi.org/10.1109/TCS.1979.1084580."
         ),
-        location="III.3",
+        location="Section III, function 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 270 \c"),),
+        expression=r"\sin{\left(\frac{\pi \tmp{u}}{180} \right)}",
+        interval="[10, 280]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

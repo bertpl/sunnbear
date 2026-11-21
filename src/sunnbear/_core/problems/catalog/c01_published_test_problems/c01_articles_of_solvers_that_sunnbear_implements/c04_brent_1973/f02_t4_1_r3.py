@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``T4.1 r3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Brent1973T41R3(Formula):
@@ -24,8 +31,14 @@ class Brent1973T41R3(Formula):
             "Table Errata 520. Mathematics of Computation 29(132), 1166. "
             "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
         ),
-        location="T4.1 r3",
+        location="Table 4.1, row 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        expression=r"\tmp{u}^{19}",
+        interval="[-1, 4]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

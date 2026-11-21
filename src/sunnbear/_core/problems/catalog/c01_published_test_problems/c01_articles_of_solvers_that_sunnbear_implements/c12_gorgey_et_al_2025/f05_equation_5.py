@@ -5,7 +5,14 @@ The formula comes from the row with the key ``Equation 5`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class GorgeyEtAl2025Equation5(Formula):
@@ -28,6 +35,15 @@ class GorgeyEtAl2025Equation5(Formula):
         ),
         location="Equation 5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\tmp{u} \sin{\left(\tmp{u} \right)} - \tmp{u}^{2} e^{\tmp{u}} + e^{- \tmp{u}} + "
+            r"\cos{\left(\tmp{u} \right)}"
+        ),
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

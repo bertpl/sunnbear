@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Prob. 5.10`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ChapraCanale2015Prob510(Formula):
@@ -27,6 +34,12 @@ class ChapraCanale2015Prob510(Formula):
         ),
         location="Prob. 5.10",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        expression=r"\tmp{u}^{4} - 8 \tmp{u}^{3} - 35 \tmp{u}^{2} + 450 \tmp{u} - 1001",
+        interval="[4.5, 6]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

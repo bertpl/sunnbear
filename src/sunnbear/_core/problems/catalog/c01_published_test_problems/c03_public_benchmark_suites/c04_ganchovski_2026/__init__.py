@@ -21,3 +21,7 @@ class Ganchovski2026(FormulaCategory):
 
     number = (1, 3, 4)
     name = "Ganchovski (2026)"
+    description = (
+        "Test problems from Root-finding Test Functions, the collection of functions in the "
+        "repository of the modified Anderson–Björck method."
+    )

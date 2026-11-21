@@ -59,7 +59,7 @@ class ModifiedBurkardt2016P04(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p04",
+        location="Problem p04",
     )
 
     @staticmethod

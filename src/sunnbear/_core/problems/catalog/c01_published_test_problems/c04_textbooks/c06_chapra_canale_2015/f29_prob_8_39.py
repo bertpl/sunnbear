@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Prob. 8.39`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale2015Prob839(Formula):
@@ -21,11 +30,11 @@ class ChapraCanale2015Prob839(Formula):
     number = (1, 4, 6, 29)
     name = "Prob. 8.39"
     params = (
-        FormulaParam("u"),
-        FormulaParam("m0"),
-        FormulaParam("q"),
-        FormulaParam("g"),
-        FormulaParam("v"),
+        FormulaParam("u", latex_symbol="u"),
+        FormulaParam("m0", latex_symbol="m_{0}"),
+        FormulaParam("q", latex_symbol="q"),
+        FormulaParam("g", latex_symbol="g"),
+        FormulaParam("v", latex_symbol="v"),
     )
     source = FormulaSource(
         reference=(
@@ -35,6 +44,15 @@ class ChapraCanale2015Prob839(Formula):
         ),
         location="Prob. 8.39",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{t}", r"\x - 40 \c"),),
+        expression=(
+            r"\param{v} - \left(\param{u} \ln{\left(\frac{\param{m0}}{\param{m0} - \param{q} \tmp{t}} "
+            r"\right)} - \param{g} \tmp{t}\right)"
+        ),
+        interval="[10, 50]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, u: float, m0: float, q: float, g: float, v: float) -> float:
@@ -48,7 +66,13 @@ class ChapraCanale2015Prob839(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("u", "m0", "q", "g", "v"), rows=((2200.0, 160000.0, 2680.0, 9.81, 1000.0),)),)
+        return (
+            ParamTable(
+                names=("u", "m0", "q", "g", "v"),
+                rows=((2200.0, 160000.0, 2680.0, 9.81, 1000.0),),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

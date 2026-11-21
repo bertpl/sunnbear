@@ -16,3 +16,4 @@ class LiZhouLangeTian2026(FormulaCategory):
 
     number = (1, 2, 20)
     name = "Li, Zhou, Lange, Tian (2026)"
+    description = "Test problems from the article that introduces the upper-crossing/solution algorithm."

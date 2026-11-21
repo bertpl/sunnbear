@@ -5,7 +5,14 @@ The formula comes from the row with the key ``3.5-8, 3.5-9`` in the survey of pu
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Epperson2013358(Formula):
@@ -24,8 +31,14 @@ class Epperson2013358(Formula):
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="3.5-8, 3.5-9",
+        location="Exercises 3.5-8, 3.5-9",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=r"7 \tmp{u} - \cos{\left(2 \pi \tmp{u} \right)}",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

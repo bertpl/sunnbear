@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``2.1-12; 2.2-7; 2.4-6; 2.5-8`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Bradie20062112(Formula):
@@ -23,8 +30,14 @@ class Bradie20062112(Formula):
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="2.1-12; 2.2-7; 2.4-6; 2.5-8",
+        location="Exercises 2.1-12, 2.2-7, 2.4-6, 2.5-8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.09 \c"),),
+        expression=r"\frac{1}{\tmp{u}} - 37",
+        interval="[0.01, 0.1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

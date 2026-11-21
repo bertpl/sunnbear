@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``Problem 1`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class DowellJarratt1972Problem1(Formula):
@@ -17,7 +26,7 @@ class DowellJarratt1972Problem1(Formula):
 
     number = (1, 1, 2, 2)
     name = "Problem 1"
-    params = (FormulaParam("N"),)
+    params = (FormulaParam("N", latex_symbol="N"),)
     source = FormulaSource(
         reference=(
             'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an '
@@ -25,6 +34,12 @@ class DowellJarratt1972Problem1(Formula):
         ),
         location="Problem 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
+        expression=r"\frac{\param{N} \tmp{u} - 1}{\left(\param{N} - 1\right) \tmp{u}}",
+        interval="[0.01, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, N: float) -> float:
@@ -38,7 +53,7 @@ class DowellJarratt1972Problem1(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("N",), rows=((2.0,), (10.0,), (20.0,))),)
+        return (ParamTable(names=("N",), rows=((2.0,), (10.0,), (20.0,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"N": 2.0}, x=0.307, c=0.0, expected=-1.2573289902280131),

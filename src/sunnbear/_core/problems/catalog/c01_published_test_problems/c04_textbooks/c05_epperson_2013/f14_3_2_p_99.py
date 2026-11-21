@@ -5,7 +5,14 @@ The formula comes from the row with the key ``§3.2 (p. 99), Fig. 3.3`` in the s
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Epperson201332P99(Formula):
@@ -28,6 +35,14 @@ class Epperson201332P99(Formula):
         ),
         location="§3.2 (p. 99), Fig. 3.3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        expression=(
+            r"\frac{4 e^{2 - \frac{\tmp{u}}{2}} \left(1 + \frac{\ln{\left(\tmp{u} " r"\right)}}{\tmp{u}}\right)}{3}"
+        ),
+        interval="[0, 8]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

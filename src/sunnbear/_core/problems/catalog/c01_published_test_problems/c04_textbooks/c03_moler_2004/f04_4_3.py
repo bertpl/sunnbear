@@ -5,7 +5,16 @@ The formula comes from the row with the key ``§4.3, §4.4; Ex. 4.1, 4.8`` in th
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.math_functions import sign
 
 
@@ -25,10 +34,14 @@ class Moler200443(Formula):
     number = (1, 4, 3, 4)
     name = "§4.3"
     params = (
-        FormulaParam("a_"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a_", latex_symbol="a"),
+        FormulaParam("a", latex_symbol=r"x_{\min}"),
+        FormulaParam("b", latex_symbol=r"x_{\max}"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -37,8 +50,16 @@ class Moler200443(Formula):
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
-        location="§4.3, §4.4; Ex. 4.1, 4.8",
+        location="§4.3, §4.4; Exercises 4.1, 4.8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\operatorname{sign}{\left(\tmp{u} - \param{a_} \right)} \sqrt{\left|{\tmp{u} - " r"\param{a_}}\right|}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, a: float, b: float, c_scale: float) -> float:
@@ -52,7 +73,13 @@ class Moler200443(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a_", "a", "b", "c_scale"), rows=((2.0, 0.0, 4.0, 4.0), (2.0, 1.0, 4.0, 3.0))),)
+        return (
+            ParamTable(
+                names=("a_", "a", "b", "c_scale"),
+                rows=((2.0, 0.0, 4.0, 4.0), (2.0, 1.0, 4.0, 3.0)),
+                summary="The published parameter values and intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

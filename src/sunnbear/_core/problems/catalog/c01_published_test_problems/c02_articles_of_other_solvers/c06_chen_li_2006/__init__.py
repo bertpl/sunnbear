@@ -17,3 +17,4 @@ class ChenLi2006(FormulaCategory):
 
     number = (1, 2, 6)
     name = "Chen, Li (2006)"
+    description = "Test problems from the article that introduces an improved exponential regula falsi method."

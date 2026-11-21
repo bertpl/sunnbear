@@ -38,7 +38,7 @@ class ModifiedEllithy202620(Formula):
             "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
             "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
         ),
-        location="20, 39",
+        location="dataset.json, problems 20 and 39",
     )
 
     @staticmethod

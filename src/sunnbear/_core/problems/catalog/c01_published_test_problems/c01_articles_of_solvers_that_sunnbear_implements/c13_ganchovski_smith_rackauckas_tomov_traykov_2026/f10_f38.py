@@ -3,7 +3,16 @@
 The formula comes from the rows with the keys ``f38`` and ``f39`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
@@ -18,7 +27,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
 
     number = (1, 1, 13, 10)
     name = "f38"
-    params = (FormulaParam("d"),)
+    params = (FormulaParam("d", latex_symbol="d"),)
     source = FormulaSource(
         reference=(
             "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
@@ -28,8 +37,17 @@ class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f38, f39",
+        location="Table 2, f38 and f39",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=(
+            r"\begin{cases} - \param{d} & \text{for}\: \tmp{u} \leq \frac{1}{3} \\1 - \param{d} & "
+            r"\text{otherwise} \end{cases}"
+        ),
+        interval="[-11, 9]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, d: float) -> float:
@@ -46,7 +64,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F38(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("d",), rows=((0.5,), (0.001,))),)
+        return (ParamTable(names=("d",), rows=((0.5,), (0.001,)), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"d": 0.5}, x=-5.0, c=0.0, expected=-0.5),

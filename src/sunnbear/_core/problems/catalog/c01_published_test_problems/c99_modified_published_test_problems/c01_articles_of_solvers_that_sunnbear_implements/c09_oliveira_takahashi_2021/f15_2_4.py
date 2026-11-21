@@ -37,7 +37,7 @@ class ModifiedOliveiraTakahashi202124(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="2.4",
+        location="Table 1, ill-behaved function 4",
     )
 
     @staticmethod

@@ -5,7 +5,16 @@ The formula comes from the rows with the keys ``16`` and ``37`` in the survey of
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ellithy202616(Formula):
@@ -21,11 +30,15 @@ class Ellithy202616(Formula):
     number = (1, 2, 18, 2)
     name = "16"
     params = (
-        FormulaParam("k"),
-        FormulaParam("m"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("k", latex_symbol="k"),
+        FormulaParam("m", latex_symbol="m"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -35,8 +48,14 @@ class Ellithy202616(Formula):
             "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
             "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
         ),
-        location="16, 37",
+        location="dataset.json, problems 16 and 37",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\sin{\left(\param{k} \tmp{u} \right)} - \param{m} \tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float, m: float, a: float, b: float, c_scale: float) -> float:
@@ -52,7 +71,9 @@ class Ellithy202616(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("k", "m", "a", "b", "c_scale"), rows=((10.0, 0.5, 0.1, 0.4, 0.3), (20.0, 0.3, 0.05, 0.25, 0.2))
+                names=("k", "m", "a", "b", "c_scale"),
+                rows=((10.0, 0.5, 0.1, 0.4, 0.3), (20.0, 0.3, 0.05, 0.25, 0.2)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

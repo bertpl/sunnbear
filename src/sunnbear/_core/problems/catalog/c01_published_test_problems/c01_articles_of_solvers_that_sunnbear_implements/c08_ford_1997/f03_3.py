@@ -5,7 +5,16 @@ The formula comes from the row with the key ``3`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ford19973(Formula):
@@ -20,9 +29,13 @@ class Ford19973(Formula):
     number = (1, 1, 8, 3)
     name = "3"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -32,8 +45,14 @@ class Ford19973(Formula):
             "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
             "University of Essex technical report CSM-257 (1995)."
         ),
-        location="3",
+        location="Section “Numerical Tests”, function 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\frac{e^{\frac{21000}{\tmp{u}}}}{1.11 \cdot 10^{11} \tmp{u}^{2}} - 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -49,7 +68,9 @@ class Ford19973(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((550.0, 560.0, 10.0), (400.0, 600.0, 200.0), (350.0, 850.0, 500.0))
+                names=("a", "b", "c_scale"),
+                rows=((550.0, 560.0, 10.0), (400.0, 600.0, 200.0), (350.0, 850.0, 500.0)),
+                summary="The published intervals.",
             ),
         )
 

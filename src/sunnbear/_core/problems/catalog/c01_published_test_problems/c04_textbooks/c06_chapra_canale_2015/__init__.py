@@ -44,3 +44,4 @@ class ChapraCanale2015(FormulaCategory):
 
     number = (1, 4, 6)
     name = "Chapra, Canale (2015)"
+    description = "Test problems from Part Two, on roots of equations, of the textbook Numerical Methods for Engineers."

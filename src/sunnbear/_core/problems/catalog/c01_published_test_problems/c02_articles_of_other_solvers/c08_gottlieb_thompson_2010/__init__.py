@@ -15,3 +15,4 @@ class GottliebThompson2010(FormulaCategory):
 
     number = (1, 2, 8)
     name = "Gottlieb, Thompson (2010)"
+    description = "Test problems from the article that introduces bisected direct quadratic regula falsi."

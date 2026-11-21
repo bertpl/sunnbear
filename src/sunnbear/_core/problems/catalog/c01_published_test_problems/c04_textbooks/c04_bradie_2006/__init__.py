@@ -43,3 +43,6 @@ class Bradie2006(FormulaCategory):
 
     number = (1, 4, 4)
     name = "Bradie (2006)"
+    description = (
+        "Test problems from chapter 2, on rootfinding, of the textbook A Friendly Introduction to Numerical Analysis."
+    )

@@ -5,7 +5,16 @@ The formula comes from the rows with the keys ``func9`` and ``f7`` in the survey
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class RootsJl2026Func9(Formula):
@@ -24,9 +33,13 @@ class RootsJl2026Func9(Formula):
     number = (1, 3, 6, 2)
     name = "func9"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -47,8 +60,14 @@ class RootsJl2026Func9(Formula):
             "Algorithms 57(3), 389–398, published online in 2010. "
             "https://doi.org/10.1007/s11075-010-9434-5. Its rows are in `2010_li_multiple_roots`."
         ),
-        location="func9, f7",
+        location="test_derivative_free.jl, func9; runbenchmarks.jl, f7",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tanh{\left(\tmp{u} \right)} - \tan{\left(\tmp{u} \right)}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -62,7 +81,13 @@ class RootsJl2026Func9(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((5.0, 12.0, 7.0), (4.0, 8.0, 4.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((5.0, 12.0, 7.0), (4.0, 8.0, 4.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

@@ -32,3 +32,7 @@ class Moler2004(FormulaCategory):
 
     number = (1, 4, 3)
     name = "Moler (2004)"
+    description = (
+        "Test problems from chapter 4, on zeros and roots, and from chapter 1 of the textbook "
+        "Numerical Computing with MATLAB."
+    )

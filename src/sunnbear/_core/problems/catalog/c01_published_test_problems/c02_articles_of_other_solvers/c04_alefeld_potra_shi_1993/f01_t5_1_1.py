@@ -5,7 +5,14 @@ The formula comes from the row with the key ``T5.1-1`` in the survey of publishe
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class AlefeldPotraShi1993T511(Formula):
@@ -23,8 +30,14 @@ class AlefeldPotraShi1993T511(Formula):
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-1",
+        location="Table 5.1, problem 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.57 \c"),),
+        expression=r"\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{2}",
+        interval=r"\left[\frac{\pi}{2}, \pi\right]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

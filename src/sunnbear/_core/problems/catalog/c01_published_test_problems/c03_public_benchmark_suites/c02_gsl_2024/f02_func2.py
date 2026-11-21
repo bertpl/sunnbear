@@ -5,7 +5,14 @@ The formula comes from the row with the key ``func2`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import sign
 
 
@@ -28,8 +35,14 @@ class Gsl2024Func2(Formula):
             "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite "
             "no source for their functions."
         ),
-        location="func2",
+        location="test_funcs.c, func2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.33 \c"),),
+        expression=r"\sqrt{\left|{\tmp{u}}\right|} \operatorname{sign}{\left(\tmp{u} \right)}",
+        interval=r"\left[- \frac{1}{3}, 1\right]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

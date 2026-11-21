@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``III`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BusDekker1975Iii(Formula):
@@ -17,15 +26,21 @@ class BusDekker1975Iii(Formula):
 
     number = (1, 2, 1, 5)
     name = "III"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "
             "for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345."
             " https://doi.org/10.1145/355656.355659."
         ),
-        location="III",
+        location="Group III",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 11 \c"),),
+        expression=r"\tmp{u}^{\param{n}}",
+        interval="[-1, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -39,7 +54,13 @@ class BusDekker1975Iii(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((3.0,), (5.0,), (7.0,), (9.0,), (19.0,), (25.0,))),)
+        return (
+            ParamTable(
+                names=("n",),
+                rows=((3.0,), (5.0,), (7.0,), (9.0,), (19.0,), (25.0,)),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"n": 3.0}, x=2.3, c=0.0, expected=12.166999999999998),

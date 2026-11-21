@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f84`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class GanchovskiSmithRackauckasTomovTraykov2026F84(Formula):
@@ -25,8 +32,17 @@ class GanchovskiSmithRackauckasTomovTraykov2026F84(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f84",
+        location="Table 2, f84",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        expression=(
+            r"\left(\tmp{u} - 1\right) \left(\tmp{u} - 2\right) \left(\tmp{u} - 3\right) \left(\tmp{u} -"
+            r" 4\right) \left(\tmp{u} - 5\right) - 0.05"
+        ),
+        interval="[0.5, 5.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

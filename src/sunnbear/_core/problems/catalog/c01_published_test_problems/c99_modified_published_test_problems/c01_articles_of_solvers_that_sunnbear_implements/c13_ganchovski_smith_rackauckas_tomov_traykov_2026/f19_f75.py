@@ -39,7 +39,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F75(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f75",
+        location="Table 2, f75",
     )
 
     @staticmethod

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``§2.8 case (2); P34(ii); P14`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Atkinson198928Case2(Formula):
@@ -22,8 +29,14 @@ class Atkinson198928Case2(Formula):
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
             "Sons, New York. ISBN 0-471-62489-6."
         ),
-        location="§2.8 case (2); P34(ii); P14",
+        location="§2.8 case (2); Problem 34(ii); Problem 14",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"\tmp{u}^{2} - 1",
+        interval="[0, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

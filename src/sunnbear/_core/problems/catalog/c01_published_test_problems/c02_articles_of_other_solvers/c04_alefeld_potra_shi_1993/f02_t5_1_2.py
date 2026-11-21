@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``T5.1-2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi1993T512(Formula):
@@ -18,9 +27,13 @@ class AlefeldPotraShi1993T512(Formula):
     number = (1, 2, 4, 2)
     name = "T5.1-2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -28,8 +41,14 @@ class AlefeldPotraShi1993T512(Formula):
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-2",
+        location="Table 5.1, problem 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"- 2 \sum_{i=1}^{20} \frac{\left(2 i - 5\right)^{2}}{\left(\tmp{u} - i^{2}\right)^{3}}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -88,6 +107,7 @@ class AlefeldPotraShi1993T512(Formula):
                     (324.000000001, 360.999999999, 37.0),
                     (361.000000001, 399.999999999, 39.0),
                 ),
+                summary="The published intervals.",
             ),
         )
 

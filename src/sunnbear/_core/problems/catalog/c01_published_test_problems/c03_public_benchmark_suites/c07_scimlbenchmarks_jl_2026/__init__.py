@@ -17,3 +17,4 @@ class ScimlbenchmarksJl2026(FormulaCategory):
 
     number = (1, 3, 7)
     name = "SciMLBenchmarks.jl (2026)"
+    description = "Test problems from the Interval Rootfinding Test Suite of SciMLBenchmarks.jl."

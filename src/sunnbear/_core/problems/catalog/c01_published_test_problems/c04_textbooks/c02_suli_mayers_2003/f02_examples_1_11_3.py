@@ -5,7 +5,14 @@ The formula comes from the row with the key ``Examples 1.1–1.3`` in the survey
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class SuliMayers2003Examples1113(Formula):
@@ -27,6 +34,12 @@ class SuliMayers2003Examples1113(Formula):
         ),
         location="Examples 1.1–1.3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=r"e^{\tmp{u}} - 2 \tmp{u} - 1",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

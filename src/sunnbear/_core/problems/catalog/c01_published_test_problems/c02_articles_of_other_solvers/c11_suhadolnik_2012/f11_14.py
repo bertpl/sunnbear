@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``14`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Suhadolnik201214(Formula):
@@ -20,8 +27,14 @@ class Suhadolnik201214(Formula):
             "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. "
             "Applied Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
         ),
-        location="14",
+        location="Table 1, function 14",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.4 \c"),),
+        expression=r"\tmp{u}^{3} - 1",
+        interval="[0.1, 1.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

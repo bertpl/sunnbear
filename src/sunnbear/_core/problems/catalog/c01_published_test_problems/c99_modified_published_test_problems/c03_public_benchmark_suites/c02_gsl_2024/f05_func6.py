@@ -37,7 +37,7 @@ class ModifiedGsl2024Func6(Formula):
             "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite "
             "no source for their functions."
         ),
-        location="func6",
+        location="test_funcs.c, func6",
     )
 
     @staticmethod

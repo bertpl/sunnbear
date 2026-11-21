@@ -48,7 +48,7 @@ class ModifiedRootsJl2026Func11(Formula):
             "Algorithms 57(3), 389–398, published online in 2010. "
             "https://doi.org/10.1007/s11075-010-9434-5. Its rows are in `2010_li_multiple_roots`."
         ),
-        location="func11",
+        location="test_derivative_free.jl, func11",
     )
 
     @staticmethod

@@ -6,7 +6,16 @@ problems.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Epperson2013Ex38(Formula):
@@ -23,17 +32,27 @@ class Epperson2013Ex38(Formula):
     number = (1, 4, 5, 18)
     name = "Ex. 3.8"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
-        location="Ex. 3.8, 3.9, 3.15, 3.16; Table 3.12",
+        location="Examples 3.8, 3.9, 3.15, 3.16; Table 3.12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} - \frac{e^{- \tmp{u}}}{2}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -47,7 +66,11 @@ class Epperson2013Ex38(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 0.5, 0.5), (0.0, 1.0, 1.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((0.0, 0.5, 0.5), (0.0, 1.0, 1.0)), summary="The published intervals."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

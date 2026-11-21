@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f101`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Ganchovski2026F101(Formula):
@@ -33,6 +40,14 @@ class Ganchovski2026F101(Formula):
         ),
         location="f101",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        expression=(
+            r"\begin{cases} - \tmp{u}^{2} & \text{for}\: \tmp{u} < 0 \\7 \tmp{u}^{2} & \text{otherwise} " r"\end{cases}"
+        ),
+        interval="[-3, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class AlefeldPotra19923(Formula):
@@ -20,8 +27,14 @@ class AlefeldPotra19923(Formula):
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
             "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
         ),
-        location="3",
+        location="Table 1, problem 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
+        expression=r"11 \tmp{u}^{11} - 1",
+        interval="[0.1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

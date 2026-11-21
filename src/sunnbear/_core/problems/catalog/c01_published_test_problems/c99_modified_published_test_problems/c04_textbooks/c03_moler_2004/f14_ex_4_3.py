@@ -39,7 +39,7 @@ class ModifiedMoler2004Ex43(Formula):
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
-        location="Ex. 4.3",
+        location="Exercise 4.3",
     )
 
     @staticmethod

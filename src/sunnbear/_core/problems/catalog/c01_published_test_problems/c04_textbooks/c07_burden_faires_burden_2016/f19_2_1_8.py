@@ -5,7 +5,14 @@ The formula comes from the row with the key ``2.1-8; 2.2-16`` in the survey of p
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class BurdenFairesBurden2016218(Formula):
@@ -26,8 +33,14 @@ class BurdenFairesBurden2016218(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-8; 2.2-16",
+        location="Exercises 2.1-8, 2.2-16",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
+        interval="[4, 5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

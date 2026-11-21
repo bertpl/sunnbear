@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f49`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import real_root
 
 
@@ -31,8 +38,17 @@ class GanchovskiSmithRackauckasTomovTraykov2026F49(Formula):
             "`MDPI-Algorithms-Data` of the authors' repository "
             "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
         ),
-        location="f49",
+        location="Table 2, f49",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\begin{cases} - \tmp{u}^{3} - \tmp{u} - 1 & \text{for}\: \tmp{u} \leq 0 "
+            r"\\\sqrt[3]{\tmp{u}} - \tmp{u} - 1 & \text{otherwise} \end{cases}"
+        ),
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -5,7 +5,14 @@ The formula comes from the row with the key ``7.3`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class LiZhouLangeTian202673(Formula):
@@ -30,8 +37,14 @@ class LiZhouLangeTian202673(Formula):
             " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
             "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
-        location="7.3",
+        location="Section 7.3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 7 \c"),),
+        expression=r"- 0.5 \tmp{u} - 2 \sin{\left(\tmp{u} \right)} + 1",
+        interval="[0, 7]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

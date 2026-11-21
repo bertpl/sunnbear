@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``2.1-2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden2016212(Formula):
@@ -18,9 +27,13 @@ class BurdenFairesBurden2016212(Formula):
     number = (1, 4, 7, 10)
     name = "2.1-2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -28,8 +41,14 @@ class BurdenFairesBurden2016212(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-2",
+        location="Exercise 2.1-2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"3 \left(\tmp{u} + 1\right) \left(\tmp{u} - \frac{1}{2}\right) \left(\tmp{u} - 1\right)",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -43,7 +62,13 @@ class BurdenFairesBurden2016212(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-2.0, 1.5, 3.5), (-1.25, 2.5, 3.75))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-2.0, 1.5, 3.5), (-1.25, 2.5, 3.75)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

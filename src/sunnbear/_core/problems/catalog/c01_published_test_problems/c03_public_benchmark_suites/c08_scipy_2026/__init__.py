@@ -19,3 +19,4 @@ class Scipy2026(FormulaCategory):
 
     number = (1, 3, 8)
     name = "SciPy (2026)"
+    description = "Test problems from the module of test problems for SciPy's root finders, release 1.18.1."

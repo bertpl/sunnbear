@@ -5,7 +5,16 @@ The formula comes from the row with the key ``5`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ford19975(Formula):
@@ -20,9 +29,13 @@ class Ford19975(Formula):
     number = (1, 1, 8, 5)
     name = "5"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -32,8 +45,14 @@ class Ford19975(Formula):
             "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
             "University of Essex technical report CSM-257 (1995)."
         ),
-        location="5",
+        location="Section “Numerical Tests”, function 5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"e^{\frac{1}{\tmp{u}} - 25} - 1",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -49,7 +68,9 @@ class Ford19975(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((0.035, 0.05, 0.015), (0.03, 0.09, 0.06), (0.025, 0.5, 0.475))
+                names=("a", "b", "c_scale"),
+                rows=((0.035, 0.05, 0.015), (0.03, 0.09, 0.06), (0.025, 0.5, 0.475)),
+                summary="The published intervals.",
             ),
         )
 

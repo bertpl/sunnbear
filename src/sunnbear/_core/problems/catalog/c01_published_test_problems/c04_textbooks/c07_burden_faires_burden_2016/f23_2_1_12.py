@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``2.1-12`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden20162112(Formula):
@@ -18,9 +27,13 @@ class BurdenFairesBurden20162112(Formula):
     number = (1, 4, 7, 23)
     name = "2.1-12"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -28,8 +41,17 @@ class BurdenFairesBurden20162112(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-12",
+        location="Exercise 2.1-12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=(
+            r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right)^{2} \tmp{u} \left(\tmp{u} - 1\right)^{3}"
+            r" \left(\tmp{u} - 2\right)"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -47,6 +69,7 @@ class BurdenFairesBurden20162112(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=((-1.5, 2.5, 4.0), (-0.5, 2.4, 2.9), (-0.5, 3.0, 3.5), (-3.0, -0.5, 2.5)),
+                summary="The published intervals.",
             ),
         )
 

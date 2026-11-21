@@ -248,7 +248,10 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
 - lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
-- names its source in a `FormulaSource`: the source's `reference`, and the keys of the formula's rows as the location;
+- names its source in a `FormulaSource`: the source's `reference`, and as the location the formula's whole place in the source, which its rows' keys and the source's `where_in_source` give, such as `Table I, problem 12` for the row keyed `12`;
+- declares each parameter as a `FormulaParam` with its LaTeX symbol, the source's own. The bounds of a formula with several intervals are `a` and `b`, or `x_{\min}` and `x_{\max}` where a source's parameter is `a` or `b`; `c_scale` is `s`, with a meaning that states the rule for it;
+- declares in its `presentation` the shifted variable `\tmp{u} = \x - c_scale \c`, with `c_scale` as its number or as its placeholder; the function in that variable, in the source's form, as the expression; and the interval. A function whose variable is not `x` or `c` keeps its variable's name for the shifted variable;
+- declares `effect_of_c = EffectOfC.SHIFTS_X`, and gives its `ParamTable` the summary "The published parameter values.", which ends "parameter values and intervals." or reads "The published intervals." where the table lists intervals;
 - takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
 - holds test cases whose expected values are computed from the function in high precision, such as with mpmath:
   - a case whose expected value is below `1000*DEFAULT_ATOL` in magnitude sets `atol=0.0`, because the default `atol` would let a wrong value of that size pass;
@@ -275,7 +278,7 @@ The class docstring of `ModifiedPublishedTestProblems` describes subcategory 1.9
 2. Regenerate. The script prints each row that needs a decision; `rows.csv` gives, in `match_kind` and `matches`, why it needs one and the earlier rows that the script found for it.
 3. Add a line to `decisions.csv` for each of those rows, and for any automatic status that is wrong, then regenerate until the script prints no problems.
 4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where each row gives its own values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
-5. Write the source's package and its formula modules (§ Formula modules), and import the package in its subcategory's `__init__.py`.
+5. Write the source's package and its formula modules (§ Formula modules), and import the package in its subcategory's `__init__.py`. The package's category gives a `description` for a reader, which says what the source is, such as "Test problems from the article that introduces Ridders' method."
 6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 
 ## Regenerating
@@ -301,7 +304,7 @@ CI does not regenerate `rows.csv`, because another sympy version could change a 
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
 - the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids;
-- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, its `source` holds the source's reference and its rows' keys as the location;
+- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, and its `source` holds the source's reference;
 - every active formula of a source that has a formula in the catalog is in the catalog too.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

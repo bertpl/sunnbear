@@ -3,7 +3,16 @@
 The formula comes from the rows with the keys ``T2.1``, ``T2.2`` and ``T2.3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Sabharwal2019T21(Formula):
@@ -20,18 +29,28 @@ class Sabharwal2019T21(Formula):
     number = (1, 2, 13, 5)
     name = "T2.1"
     params = (
-        FormulaParam("k"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("k", latex_symbol="k"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "
             "Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
         ),
-        location="T2.1, T2.2, T2.3",
+        location="Table 2, functions 1, 2 and 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{2} - \param{k}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float, a: float, b: float, c_scale: float) -> float:
@@ -49,6 +68,7 @@ class Sabharwal2019T21(Formula):
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
                 rows=((3.0, 1.0, 2.0, 1.0), (5.0, 2.0, 7.0, 5.0), (10.0, 3.0, 4.0, 1.0)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

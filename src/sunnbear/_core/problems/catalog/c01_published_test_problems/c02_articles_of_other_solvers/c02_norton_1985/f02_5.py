@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``5`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Norton19855(Formula):
@@ -17,7 +26,7 @@ class Norton19855(Formula):
 
     number = (1, 2, 2, 2)
     name = "5"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational "
@@ -25,8 +34,16 @@ class Norton19855(Formula):
             "https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the "
             "Collected Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
         ),
-        location="5",
+        location="Section 4, function 5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=(
+            r"\left(1 + \left(1 - \param{n}\right)^{4}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{4}"
+        ),
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -40,7 +57,11 @@ class Norton19855(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((2.0,), (5.0,), (10.0,), (20.0,))),)
+        return (
+            ParamTable(
+                names=("n",), rows=((2.0,), (5.0,), (10.0,), (20.0,)), summary="The published parameter values."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"n": 2.0}, x=0.3, c=0.0, expected=0.5744),

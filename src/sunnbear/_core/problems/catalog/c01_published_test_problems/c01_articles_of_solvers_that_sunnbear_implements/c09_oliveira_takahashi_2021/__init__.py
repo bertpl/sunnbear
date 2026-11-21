@@ -40,3 +40,7 @@ class OliveiraTakahashi2021(FormulaCategory):
 
     number = (1, 1, 9)
     name = "Oliveira, Takahashi (2021)"
+    description = (
+        "Test problems from the article that introduces the ITP method, which improves the average "
+        "performance of bisection and keeps its worst case."
+    )

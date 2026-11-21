@@ -14,3 +14,7 @@ class BadrAlmotairiElGhamry2021(FormulaCategory):
 
     number = (1, 2, 14)
     name = "Badr, Almotairi, El Ghamry (2021)"
+    description = (
+        "Test problems from the article that introduces hybrid methods, among them a blend of "
+        "trisection and false position."
+    )

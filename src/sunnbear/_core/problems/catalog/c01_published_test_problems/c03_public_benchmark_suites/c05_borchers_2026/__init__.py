@@ -30,3 +30,6 @@ class Borchers2026(FormulaCategory):
 
     number = (1, 3, 5)
     name = "Borchers (2026)"
+    description = (
+        "Test problems from the chapter on root finding of the pracma Handbook, which documents the R package pracma."
+    )

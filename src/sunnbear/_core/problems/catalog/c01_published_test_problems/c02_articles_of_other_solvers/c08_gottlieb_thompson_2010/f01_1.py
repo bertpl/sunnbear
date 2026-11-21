@@ -5,7 +5,14 @@ The formula comes from the row with the key ``1`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class GottliebThompson20101(Formula):
@@ -25,8 +32,14 @@ class GottliebThompson20101(Formula):
             "Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy: "
             "http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
         ),
-        location="1",
+        location="Table 1, test 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=r"3 \sin{\left(\tmp{u} \right)} - 2",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

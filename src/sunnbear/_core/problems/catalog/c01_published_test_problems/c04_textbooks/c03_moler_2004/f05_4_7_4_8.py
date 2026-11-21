@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``§4.7, §4.8; Ex. 4.7, 4.10(a)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.math_functions import bessel_j0
 
 
@@ -26,9 +35,13 @@ class Moler20044748(Formula):
     number = (1, 4, 3, 5)
     name = "§4.7, §4.8"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -37,8 +50,14 @@ class Moler20044748(Formula):
             "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
             "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
         ),
-        location="§4.7, §4.8; Ex. 4.7, 4.10(a)",
+        location="§4.7, §4.8; Exercises 4.7, 4.10(a)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"J_{0}\left(\tmp{u}\right)",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -69,6 +88,7 @@ class Moler20044748(Formula):
                     (0.0, 3.83, 3.83),
                     (0.0, 31.4159265359, 31.4),
                 ),
+                summary="The published intervals.",
             ),
         )
 

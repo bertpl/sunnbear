@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``7.6-b`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class TomovGanchovski202676B(Formula):
@@ -28,8 +35,14 @@ class TomovGanchovski202676B(Formula):
             "`9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section "
             "7.4 pins commit `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17])."
         ),
-        location="7.6-b",
+        location="Section 7.6, function b",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.75 \c"),),
+        expression=r"\tmp{u} - \frac{1}{4}",
+        interval="[0.25, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

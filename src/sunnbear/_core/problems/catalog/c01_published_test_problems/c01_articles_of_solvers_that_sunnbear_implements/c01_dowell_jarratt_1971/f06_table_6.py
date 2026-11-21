@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Table 6`` in the survey of publish
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class DowellJarratt1971Table6(Formula):
@@ -19,7 +28,7 @@ class DowellJarratt1971Table6(Formula):
 
     number = (1, 1, 1, 6)
     name = "Table 6"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of "
@@ -27,6 +36,12 @@ class DowellJarratt1971Table6(Formula):
         ),
         location="Table 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=r"e^{- \param{n} \tmp{u}} \left(\tmp{u} - 1\right) + \tmp{u}^{\param{n}}",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -40,7 +55,11 @@ class DowellJarratt1971Table6(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((1.0,), (5.0,), (10.0,), (15.0,))),)
+        return (
+            ParamTable(
+                names=("n",), rows=((1.0,), (5.0,), (10.0,), (15.0,)), summary="The published parameter values."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"n": 1.0}, x=0.3, c=0.0, expected=-0.21857275447720254),

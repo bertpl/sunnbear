@@ -5,7 +5,16 @@ The formula comes from the row with the key ``4.2`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class FooTan202542(Formula):
@@ -23,15 +32,25 @@ class FooTan202542(Formula):
 
     number = (1, 2, 15, 1)
     name = "4.2"
-    params = (FormulaParam("y"),)
+    params = (FormulaParam("y", latex_symbol="y"),)
     source = FormulaSource(
         reference=(
             "Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. "
             "arXiv preprint 2509.20897v1. https://doi.org/10.48550/arxiv.2509.20897 "
             "(https://arxiv.org/abs/2509.20897v1)."
         ),
-        location="4.2",
+        location="Section 4.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        expression=(
+            r"\begin{cases} 0 & \text{for}\: \tmp{u} = 0 \\- \tmp{u} \log_{2}{\left(\tmp{u} \right)} & "
+            r"\text{otherwise} \end{cases} - \left(1 - \tmp{u}\right) \log_{2}{\left(1 - \tmp{u} "
+            r"\right)} - \param{y}"
+        ),
+        interval="[0, 0.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, y: float) -> float:
@@ -46,7 +65,11 @@ class FooTan202542(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
         return (
-            ParamTable(names=("y",), rows=((0.1,), (0.2,), (0.3,), (0.4,), (0.5,), (0.6,), (0.7,), (0.8,), (0.9,))),
+            ParamTable(
+                names=("y",),
+                rows=((0.1,), (0.2,), (0.3,), (0.4,), (0.5,), (0.6,), (0.7,), (0.8,), (0.9,)),
+                summary="The published parameter values.",
+            ),
         )
 
     test_cases = (

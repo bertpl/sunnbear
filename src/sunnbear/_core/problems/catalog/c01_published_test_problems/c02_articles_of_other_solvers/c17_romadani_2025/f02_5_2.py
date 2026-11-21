@@ -5,7 +5,14 @@ The formula comes from the row with the key ``5.2`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Romadani202552(Formula):
@@ -28,8 +35,14 @@ class Romadani202552(Formula):
             "Methods into Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), "
             "154–189. https://doi.org/10.62762/jam.2025.840767."
         ),
-        location="5.2",
+        location="Section 5.2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        expression=r"\sin{\left(\tmp{u} \right)} - \cos^{3}{\left(2 \tmp{u} \right)}",
+        interval="[2.5, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

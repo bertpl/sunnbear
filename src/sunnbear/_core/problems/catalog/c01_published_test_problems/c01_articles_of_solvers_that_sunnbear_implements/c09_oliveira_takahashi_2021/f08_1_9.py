@@ -5,7 +5,14 @@ The formula comes from the row with the key ``1.9`` in the survey of published t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class OliveiraTakahashi202119(Formula):
@@ -28,8 +35,16 @@ class OliveiraTakahashi202119(Formula):
             "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
             "December 2020."
         ),
-        location="1.9",
+        location="Table 1, well-behaved function 9",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(
+            r"\frac{1}{10^{3}} + \sum_{i=1}^{10} \frac{\sin{\left(\frac{\pi i^{3} \tmp{u}}{2} " r"\right)}}{\pi i^{3}}"
+        ),
+        interval="[-1, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

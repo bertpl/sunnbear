@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``Fig. 3`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Sabharwal2019Fig3(Formula):
@@ -24,6 +31,12 @@ class Sabharwal2019Fig3(Formula):
         ),
         location="Fig. 3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        expression=r"\tmp{u}^{9} - 8",
+        interval="[0, 1.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

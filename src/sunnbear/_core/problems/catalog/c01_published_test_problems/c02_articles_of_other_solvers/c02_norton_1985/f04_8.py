@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``8`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Norton19858(Formula):
@@ -22,9 +31,9 @@ class Norton19858(Formula):
     number = (1, 2, 2, 4)
     name = "8"
     params = (
-        FormulaParam("a_"),
-        FormulaParam("b_"),
-        FormulaParam("n"),
+        FormulaParam("a_", latex_symbol="a"),
+        FormulaParam("b_", latex_symbol="b"),
+        FormulaParam("n", latex_symbol="n"),
     )
     source = FormulaSource(
         reference=(
@@ -33,8 +42,14 @@ class Norton19858(Formula):
             "https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the "
             "Collected Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
         ),
-        location="8",
+        location="Section 4, function 8",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.7 \c"),),
+        expression=r"\tmp{u}^{\param{n}} + \param{a_} \tmp{u} + \param{b_}",
+        interval="[-0.7, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, b_: float, n: float) -> float:
@@ -50,7 +65,9 @@ class Norton19858(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a_", "b_", "n"), rows=((1.0, 0.0, 3.0), (1.0, 0.0, 5.0), (1.0, 0.0, 9.0), (1.0, 0.0, 19.0))
+                names=("a_", "b_", "n"),
+                rows=((1.0, 0.0, 3.0), (1.0, 0.0, 5.0), (1.0, 0.0, 9.0), (1.0, 0.0, 19.0)),
+                summary="The published parameter values.",
             ),
         )
 

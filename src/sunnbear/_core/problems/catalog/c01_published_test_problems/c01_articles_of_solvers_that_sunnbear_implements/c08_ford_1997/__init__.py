@@ -16,3 +16,4 @@ class Ford1997(FormulaCategory):
 
     number = (1, 1, 8)
     name = "Ford (1997)"
+    description = "Test problems from the article that introduces improved Illinois-type methods."

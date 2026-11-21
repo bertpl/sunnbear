@@ -15,3 +15,4 @@ class GorgeyEtAl2025(FormulaCategory):
 
     number = (1, 1, 12)
     name = "Gorgey et al. (2025)"
+    description = "Test problems from an article on the efficiency of Ridders' method, programmed in Scilab."

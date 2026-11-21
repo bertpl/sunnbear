@@ -4,7 +4,16 @@ The formula comes from the row with the key ``§2 (p. 55); §2.2 (p. 78); 2.2-15
 problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Bradie20062P55(Formula):
@@ -23,17 +32,26 @@ class Bradie20062P55(Formula):
     number = (1, 4, 4, 1)
     name = "§2 (p. 55)"
     params = (
-        FormulaParam("R"),
-        FormulaParam("rho_o"),
-        FormulaParam("rho_f"),
+        FormulaParam("R", latex_symbol="R"),
+        FormulaParam("rho_o", latex_symbol=r"\rho_{o}"),
+        FormulaParam("rho_f", latex_symbol=r"\rho_{f}"),
     )
     source = FormulaSource(
         reference=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
             "Upper Saddle River, NJ. ISBN 0-13-013054-0."
         ),
-        location="§2 (p. 55); §2.2 (p. 78); 2.2-15",
+        location="§2 (p. 55); §2.2 (p. 78); Exercise 2.2-15",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{h}", r"\x - 10 \c"),),
+        expression=(
+            r"\frac{\param{rho_f}}{3} \tmp{h}^{3} - \param{R} \param{rho_f} \tmp{h}^{2} + \frac{4 "
+            r"\param{R}^{3} \param{rho_o}}{3}"
+        ),
+        interval="[0, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, R: float, rho_o: float, rho_f: float) -> float:
@@ -47,7 +65,11 @@ class Bradie20062P55(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("R", "rho_o", "rho_f"), rows=((5.0, 0.12, 0.89),)),)
+        return (
+            ParamTable(
+                names=("R", "rho_o", "rho_f"), rows=((5.0, 0.12, 0.89),), summary="The published parameter values."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"R": 5.0, "rho_o": 0.12, "rho_f": 0.89}, x=3.0, c=0.0, expected=-12.04),

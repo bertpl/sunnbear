@@ -45,7 +45,7 @@ class ModifiedChapraCanale2015Ex52(Formula):
             "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
             "2021."
         ),
-        location="Ex. 5.2; Fig. 5.4",
+        location="Example 5.2; Fig. 5.4",
     )
 
     @staticmethod

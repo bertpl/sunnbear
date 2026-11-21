@@ -5,7 +5,14 @@ The formula comes from the row with the key ``g`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ScimlbenchmarksJl2026G(Formula):
@@ -29,8 +36,14 @@ class ScimlbenchmarksJl2026G(Formula):
             ' MIT license. The file names no source for its functions; it calls them "a selection of '
             'challenging test functions from the literature".'
         ),
-        location="g",
+        location="Section “A different function”, g",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
+        expression=r"e^{\tmp{u}} - 1.0 \cdot 10^{-15}",
+        interval="[-100, 0]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

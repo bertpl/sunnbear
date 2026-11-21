@@ -5,7 +5,16 @@ The formula comes from the rows with the keys ``2.1-5(c)`` and ``2.3-6(c)`` in t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden2016215C(Formula):
@@ -25,10 +34,14 @@ class BurdenFairesBurden2016215C(Formula):
     number = (1, 4, 7, 13)
     name = "2.1-5(c)"
     params = (
-        FormulaParam("k"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("k", latex_symbol="k"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -36,8 +49,14 @@ class BurdenFairesBurden2016215C(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-5(c), 2.3-6(c)",
+        location="Exercises 2.1-5(c), 2.3-6(c)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"2 \tmp{u} \cos{\left(2 \tmp{u} \right)} - \left(\tmp{u} - \param{k}\right)^{2}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float, a: float, b: float, c_scale: float) -> float:
@@ -55,6 +74,7 @@ class BurdenFairesBurden2016215C(Formula):
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
                 rows=((-1.0, -3.0, -2.0, 1.0), (-1.0, -1.0, 0.0, 1.0), (2.0, 2.0, 3.0, 1.0), (2.0, 3.0, 4.0, 1.0)),
+                summary="The published parameter values and intervals.",
             ),
         )
 

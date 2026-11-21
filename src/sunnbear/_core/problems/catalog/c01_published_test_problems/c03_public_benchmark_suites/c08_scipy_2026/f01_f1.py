@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``f1`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class Scipy2026F1(Formula):
@@ -30,8 +37,14 @@ class Scipy2026F1(Formula):
             'zero of a nonlinear function without using derivatives", Advances in Engineering Software '
             "28.3 (1997): 145-149 (no DOI in the module)"
         ),
-        location="f1",
+        location="Collection “original”, f1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.23 \c"),),
+        expression=r"\tmp{u} \left(\tmp{u} - 1.0\right)",
+        interval=r"[0.5, \sqrt{3}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

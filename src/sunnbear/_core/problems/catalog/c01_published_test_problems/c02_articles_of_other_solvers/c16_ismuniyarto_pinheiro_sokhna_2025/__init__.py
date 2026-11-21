@@ -15,3 +15,4 @@ class IsmuniyartoPinheiroSokhna2025(FormulaCategory):
 
     number = (1, 2, 16)
     name = "Ismuniyarto, Pinheiro, Sokhna (2025)"
+    description = "Test problems from an article that applies bracketing methods to find a break-even point."

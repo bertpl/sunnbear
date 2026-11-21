@@ -40,7 +40,7 @@ class ModifiedAlefeldPotraShi1993T512(Formula):
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-2",
+        location="Table 5.1, problem 2",
     )
 
     @staticmethod

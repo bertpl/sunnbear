@@ -15,3 +15,4 @@ class KumarSrivastav2026(FormulaCategory):
 
     number = (1, 2, 19)
     name = "Kumar, Srivastav (2026)"
+    description = "Test problems from a preprint that introduces a randomized bracketing method."

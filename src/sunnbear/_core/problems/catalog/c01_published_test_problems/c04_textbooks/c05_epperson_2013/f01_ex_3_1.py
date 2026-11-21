@@ -6,7 +6,16 @@ The formula comes from the row with the key ``Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Epperson2013Ex31(Formula):
@@ -24,9 +33,13 @@ class Epperson2013Ex31(Formula):
     number = (1, 4, 5, 1)
     name = "Ex. 3.1"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -34,10 +47,16 @@ class Epperson2013Ex31(Formula):
             "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
         ),
         location=(
-            "Ex. 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; 3.5-5; 3.9-12; 3.11-13, 3.11-14; Tables 4.13, "
-            "4.14; 4.4-1, 4.4-2"
+            "Examples 3.1, 3.2, 3.7, 3.17; Tables 3.13, 3.17; Exercises 3.5-5, 3.9-12, 3.11-13, "
+            "3.11-14; Tables 4.13, 4.14; Exercises 4.4-1, 4.4-2"
         ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"2 - e^{\tmp{u}}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -51,7 +70,13 @@ class Epperson2013Ex31(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((0.0, 1.0, 1.0), (-5.0, 5.0, 10.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.0, 1.0, 1.0), (-5.0, 5.0, 10.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=0.6501411924239969),

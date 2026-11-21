@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Prob. 5.17, 5.19, 6.19, 8.9`` in t
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale2015Prob517(Formula):
@@ -26,8 +35,8 @@ class ChapraCanale2015Prob517(Formula):
     number = (1, 4, 6, 22)
     name = "Prob. 5.17"
     params = (
-        FormulaParam("R"),
-        FormulaParam("V"),
+        FormulaParam("R", latex_symbol="R"),
+        FormulaParam("V", latex_symbol="V"),
     )
     source = FormulaSource(
         reference=(
@@ -37,6 +46,12 @@ class ChapraCanale2015Prob517(Formula):
         ),
         location="Prob. 5.17, 5.19, 6.19, 8.9",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{h}", r"\x - 3 \c"),),
+        expression=r"\param{V} - \frac{\pi \tmp{h}^{2} \left(3 \param{R} - \tmp{h}\right)}{3}",
+        interval="[0, 3]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, R: float, V: float) -> float:
@@ -50,7 +65,7 @@ class ChapraCanale2015Prob517(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("R", "V"), rows=((3.0, 30.0),)),)
+        return (ParamTable(names=("R", "V"), rows=((3.0, 30.0),), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.0, expected=23.12933686659912),

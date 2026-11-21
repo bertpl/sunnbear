@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``2.1-4; 2.6-2(g)`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class BurdenFairesBurden2016214(Formula):
@@ -18,9 +27,13 @@ class BurdenFairesBurden2016214(Formula):
     number = (1, 4, 7, 12)
     name = "2.1-4"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -28,8 +41,14 @@ class BurdenFairesBurden2016214(Formula):
             "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
             "the print year 2014."
         ),
-        location="2.1-4; 2.6-2(g)",
+        location="Exercises 2.1-4, 2.6-2(g)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{4} - 2 \tmp{u}^{3} - 4 \tmp{u}^{2} + 4 \tmp{u} + 4",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -47,6 +66,7 @@ class BurdenFairesBurden2016214(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=((-2.0, -1.0, 1.0), (0.0, 2.0, 2.0), (2.0, 3.0, 1.0), (-1.0, 0.0, 1.0)),
+                summary="The published intervals.",
             ),
         )
 

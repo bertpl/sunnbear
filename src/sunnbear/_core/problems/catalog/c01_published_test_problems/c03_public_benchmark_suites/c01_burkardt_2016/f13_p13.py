@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``p13`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Burkardt2016P13(Formula):
@@ -20,10 +29,14 @@ class Burkardt2016P13(Formula):
     number = (1, 3, 1, 13)
     name = "p13"
     params = (
-        FormulaParam("slope"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("slope", latex_symbol=r"\mathit{slope}"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -51,8 +64,14 @@ class Burkardt2016P13(Formula):
             "\n"
             "The file's `brent` solver cites Brent's 1973 book for the algorithm, not for any function."
         ),
-        location="p13",
+        location="Problem p13",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\param{slope} \left(\tmp{u} - 100.0\right)",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, slope: float, a: float, b: float, c_scale: float) -> float:
@@ -73,6 +92,7 @@ class Burkardt2016P13(Formula):
                     (1e-11, -10000000000000.0, 10000000000000.0, 20000000000000.0),
                     (1e-11, -100000000000.0, 100000000.0, 100000000000.0),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

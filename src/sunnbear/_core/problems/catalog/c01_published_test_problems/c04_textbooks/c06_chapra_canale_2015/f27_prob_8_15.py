@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Prob. 8.15`` in the survey of publ
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ChapraCanale2015Prob815(Formula):
@@ -22,7 +31,7 @@ class ChapraCanale2015Prob815(Formula):
 
     number = (1, 4, 6, 27)
     name = "Prob. 8.15"
-    params = (FormulaParam("c_"),)
+    params = (FormulaParam("c_", latex_symbol="C"),)
     source = FormulaSource(
         reference=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
@@ -31,6 +40,12 @@ class ChapraCanale2015Prob815(Formula):
         ),
         location="Prob. 8.15",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"\param{c_} - \left(10 - 20 \left(e^{- 0.2 \tmp{u}} - e^{- 0.75 \tmp{u}}\right)\right)",
+        interval="[0, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, c_: float) -> float:
@@ -44,7 +59,7 @@ class ChapraCanale2015Prob815(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("c_",), rows=((5.0,),)),)
+        return (ParamTable(names=("c_",), rows=((5.0,),), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"c_": 5.0}, x=0.6, c=0.0, expected=-0.014154298092315686),

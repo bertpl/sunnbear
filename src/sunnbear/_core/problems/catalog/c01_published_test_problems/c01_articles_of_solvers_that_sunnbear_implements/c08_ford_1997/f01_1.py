@@ -5,7 +5,16 @@ The formula comes from the row with the key ``1`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ford19971(Formula):
@@ -20,9 +29,13 @@ class Ford19971(Formula):
     number = (1, 1, 8, 1)
     name = "1"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -32,8 +45,14 @@ class Ford19971(Formula):
             "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
             "University of Essex technical report CSM-257 (1995)."
         ),
-        location="1",
+        location="Section “Numerical Tests”, function 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\sin{\left(\frac{0.01}{\tmp{u}} \right)} - 0.01",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -48,7 +67,11 @@ class Ford19971(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
         return (
-            ParamTable(names=("a", "b", "c_scale"), rows=((0.5, 2.0, 1.5), (0.2, 6.0, 5.8), (0.004, 200.0, 200.0))),
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.5, 2.0, 1.5), (0.2, 6.0, 5.8), (0.004, 200.0, 200.0)),
+                summary="The published intervals.",
+            ),
         )
 
     test_cases = (

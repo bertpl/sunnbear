@@ -5,7 +5,16 @@ The formula comes from the row with the key ``6`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ScimlbenchmarksJl20266(Formula):
@@ -19,7 +28,7 @@ class ScimlbenchmarksJl20266(Formula):
 
     number = (1, 3, 7, 2)
     name = "6"
-    params = (FormulaParam("p"),)
+    params = (FormulaParam("p", latex_symbol="p"),)
     source = FormulaSource(
         reference=(
             'SciMLBenchmarks.jl, "Interval Rootfinding Test Suite" by Fabian Gittins (the front matter '
@@ -29,8 +38,14 @@ class ScimlbenchmarksJl20266(Formula):
             ' MIT license. The file names no source for its functions; it calls them "a selection of '
             'challenging test functions from the literature".'
         ),
-        location="6",
+        location="Section “Extended Test Suite with Challenging Functions”, Function 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
+        expression=r"\sin{\left(20 \tmp{u} \right)} + \sin{\left(\tmp{u} \right)} + \tmp{u} - \param{p}",
+        interval="[-5, 5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:
@@ -44,7 +59,7 @@ class ScimlbenchmarksJl20266(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("p",), rows=((2.0,),)),)
+        return (ParamTable(names=("p",), rows=((2.0,),), summary="The published parameter values."),)
 
     test_cases = (
         FormulaTestCase.value(params={"p": 2.0}, x=-2.0, c=0.0, expected=-5.654410587305031),

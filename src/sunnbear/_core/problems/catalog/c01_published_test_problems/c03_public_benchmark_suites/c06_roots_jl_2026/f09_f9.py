@@ -5,7 +5,14 @@ The formula comes from the row with the key ``f9`` in the survey of published te
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class RootsJl2026F9(Formula):
@@ -38,8 +45,14 @@ class RootsJl2026F9(Formula):
             "Algorithms 57(3), 389–398, published online in 2010. "
             "https://doi.org/10.1007/s11075-010-9434-5. Its rows are in `2010_li_multiple_roots`."
         ),
-        location="f9",
+        location="runbenchmarks.jl, f9",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"\ln{\left(\tmp{u} \right)} + \sqrt{\tmp{u}} - 5",
+        interval="[7, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

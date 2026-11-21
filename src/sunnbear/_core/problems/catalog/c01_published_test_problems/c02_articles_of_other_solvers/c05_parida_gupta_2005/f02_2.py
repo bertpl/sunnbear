@@ -3,7 +3,14 @@
 The formula comes from the row with the key ``2`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ParidaGupta20052(Formula):
@@ -26,8 +33,14 @@ class ParidaGupta20052(Formula):
             'the article\'s copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; '
             "the article prints no online date."
         ),
-        location="2",
+        location="Example 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 32 \c"),),
+        expression=r"3 \tmp{u}^{2} - 11.12 \tmp{u} + 9.1389",
+        interval="[-30, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

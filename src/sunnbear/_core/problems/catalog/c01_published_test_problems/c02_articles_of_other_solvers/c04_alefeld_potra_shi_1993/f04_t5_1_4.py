@@ -3,7 +3,16 @@
 The formula comes from the row with the key ``T5.1-4`` in the survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class AlefeldPotraShi1993T514(Formula):
@@ -22,11 +31,15 @@ class AlefeldPotraShi1993T514(Formula):
     number = (1, 2, 4, 4)
     name = "T5.1-4"
     params = (
-        FormulaParam("a_"),
-        FormulaParam("n"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a_", latex_symbol="a"),
+        FormulaParam("n", latex_symbol="n"),
+        FormulaParam("a", latex_symbol=r"x_{\min}"),
+        FormulaParam("b", latex_symbol=r"x_{\max}"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -34,8 +47,14 @@ class AlefeldPotraShi1993T514(Formula):
             "equations. Mathematics of Computation 61(204), 733–744. "
             "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
         ),
-        location="T5.1-4",
+        location="Table 5.1, problem 4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{\param{n}} - \param{a_}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a_: float, n: float, a: float, b: float, c_scale: float) -> float:
@@ -68,6 +87,7 @@ class AlefeldPotraShi1993T514(Formula):
                     (1.0, 12.0, 0.95, 4.05, 3.1),
                     (1.0, 14.0, 0.95, 4.05, 3.1),
                 ),
+                summary="The published parameter values and intervals.",
             ),
         )
 

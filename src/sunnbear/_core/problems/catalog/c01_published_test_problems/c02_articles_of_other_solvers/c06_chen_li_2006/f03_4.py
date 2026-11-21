@@ -5,7 +5,14 @@ The formula comes from the row with the key ``4`` in the survey of published tes
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ChenLi20064(Formula):
@@ -28,8 +35,14 @@ class ChenLi20064(Formula):
             "2007 but no issue number; the issue number is Crossref's. The year 2006 of the title "
             "follows the online date that the article prints; the issue is dated 2007."
         ),
-        location="4",
+        location="Example 4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1 \c"),),
+        expression=r"\tmp{u} e^{- \tmp{u}} - 0.1",
+        interval="[0, 1]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

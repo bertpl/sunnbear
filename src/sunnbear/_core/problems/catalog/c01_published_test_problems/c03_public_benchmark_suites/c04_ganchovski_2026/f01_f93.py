@@ -4,7 +4,16 @@ The formula comes from the rows with the keys ``f93``, ``f94``, ``f95``, ``f96``
 survey of published test problems.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class Ganchovski2026F93(Formula):
@@ -24,7 +33,7 @@ class Ganchovski2026F93(Formula):
 
     number = (1, 3, 4, 1)
     name = "f93"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the "
@@ -39,8 +48,14 @@ class Ganchovski2026F93(Formula):
             "https://www.researchgate.net/publication/373922895_Additional_test_functions; "
             "roots-fortran (`roots_fortran`) cites that version."
         ),
-        location="f93, f94, f95, f96, f97, f98, f99",
+        location="f93, f94, f95, f96, f97, f98 and f99",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        expression=r"\tmp{u}^{\param{n}} - 0.001",
+        interval="[-10, 10]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -54,7 +69,13 @@ class Ganchovski2026F93(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("n",), rows=((5.0,), (7.0,), (9.0,), (11.0,), (13.0,), (15.0,), (17.0,))),)
+        return (
+            ParamTable(
+                names=("n",),
+                rows=((5.0,), (7.0,), (9.0,), (11.0,), (13.0,), (15.0,), (17.0,)),
+                summary="The published parameter values.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"n": 5.0}, x=-4.0, c=0.0, expected=-1024.001),

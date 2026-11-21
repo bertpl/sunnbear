@@ -5,7 +5,16 @@ The formula comes from the row with the key ``Ex. 1`` in the survey of published
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class LiZhouLangeTian2026Ex1(Formula):
@@ -20,9 +29,13 @@ class LiZhouLangeTian2026Ex1(Formula):
     number = (1, 2, 20, 1)
     name = "Ex. 1"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "c_scale",
+            latex_symbol="s",
+            meaning=r"The width $\param{b} - \param{a}$ of the interval, rounded to 3 significant digits.",
+        ),
     )
     source = FormulaSource(
         reference=(
@@ -32,8 +45,14 @@ class LiZhouLangeTian2026Ex1(Formula):
             " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
             "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
         ),
-        location="Ex. 1",
+        location="Example 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\cos{\left(0.5 \pi \tmp{u} \right)} - \tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -47,7 +66,13 @@ class LiZhouLangeTian2026Ex1(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the published parameter values."""
-        return (ParamTable(names=("a", "b", "c_scale"), rows=((-2.0, 1.0, 3.0), (0.0, 4.0, 4.0))),)
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((-2.0, 1.0, 3.0), (0.0, 4.0, 4.0)),
+                summary="The published intervals.",
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(params={"a": -2.0, "b": 1.0, "c_scale": 3.0}, x=-1.1, c=0.0, expected=0.9435655349597691),
