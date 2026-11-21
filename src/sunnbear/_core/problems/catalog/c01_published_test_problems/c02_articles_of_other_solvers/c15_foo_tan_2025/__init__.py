@@ -15,6 +15,6 @@ class FooTan2025(FormulaCategory):
     number = (1, 2, 15)
     name = "Foo, Tan (2025)"
     description = (
-        "Test problems from a preprint that introduces a higher-order root-finding method and "
-        "applies it to entropy functions."
+        "The test problems come from a preprint that introduces a higher-order root-finding method "
+        "and applies it to entropy functions."
     )

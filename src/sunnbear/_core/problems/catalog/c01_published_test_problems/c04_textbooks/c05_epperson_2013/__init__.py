@@ -39,6 +39,6 @@ class Epperson2013(FormulaCategory):
     number = (1, 4, 5)
     name = "Epperson (2013)"
     description = (
-        "Test problems from chapter 3, on root-finding, of the textbook An Introduction to "
-        "Numerical Methods and Analysis."
+        "The test problems come from chapter 3, on root-finding, of the textbook An Introduction to"
+        " Numerical Methods and Analysis."
     )

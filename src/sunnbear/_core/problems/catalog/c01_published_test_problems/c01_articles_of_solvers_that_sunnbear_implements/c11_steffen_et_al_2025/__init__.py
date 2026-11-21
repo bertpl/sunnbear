@@ -15,5 +15,6 @@ class SteffenEtAl2025(FormulaCategory):
     number = (1, 1, 11)
     name = "Steffen et al. (2025)"
     description = (
-        "Test problems from an article that guarantees a halving of the interval in Dekker's and Brent's methods."
+        "The test problems come from an article that guarantees a halving of the interval in "
+        "Dekker's and Brent's methods."
     )

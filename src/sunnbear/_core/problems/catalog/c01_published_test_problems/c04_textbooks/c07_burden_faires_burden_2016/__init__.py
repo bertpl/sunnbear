@@ -65,4 +65,6 @@ class BurdenFairesBurden2016(FormulaCategory):
 
     number = (1, 4, 7)
     name = "Burden, Faires, Burden (2016)"
-    description = "Test problems from chapter 2, on equations in 1 variable, of the textbook Numerical Analysis."
+    description = (
+        "The test problems come from chapter 2, on equations in 1 variable, of the textbook Numerical Analysis."
+    )

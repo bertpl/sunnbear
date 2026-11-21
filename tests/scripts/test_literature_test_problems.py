@@ -244,8 +244,9 @@ def test_timeline_template_counts_every_status(script_modules):
 def test_published_formula_matches_the_survey(formula, sources, committed_formulas_table):
     """A published formula has an active line in `formulas.csv`, and its category and `source` match its source.
 
-    The category's name must be the source's short title, and `source` must hold the source's reference. The survey
-    holds no field for a formula's location, its whole place in the source, so the test does not check it.
+    The category's name must be the source's short title, and `source` must hold the source's reference. The module's
+    author writes a formula's location from its rows' keys and the source's `where_in_source`, which is prose, so the
+    test does not check the location.
     """
     # --- arrange / act ----------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]

@@ -14,4 +14,6 @@ class DowellJarratt1971(FormulaCategory):
 
     number = (1, 1, 1)
     name = "Dowell, Jarratt (1971)"
-    description = "Test problems from the article that introduces the Illinois method, a modified regula falsi method."
+    description = (
+        "The test problems come from the article that introduces the Illinois method, a modified regula falsi method."
+    )

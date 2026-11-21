@@ -16,6 +16,6 @@ class Chandrupatla1997(FormulaCategory):
     number = (1, 1, 7)
     name = "Chandrupatla (1997)"
     description = (
-        "Test problems from the article that introduces Chandrupatla's method, a hybrid of "
-        "quadratic interpolation and bisection."
+        "The test problems come from the article that introduces Chandrupatla's method, a hybrid of"
+        " quadratic interpolation and bisection."
     )

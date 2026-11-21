@@ -14,4 +14,4 @@ class Zhang2011(FormulaCategory):
 
     number = (1, 2, 10)
     name = "Zhang (2011)"
-    description = "Test problems from the article that introduces an improvement to Brent's method."
+    description = "The test problems come from the article that introduces an improvement to Brent's method."

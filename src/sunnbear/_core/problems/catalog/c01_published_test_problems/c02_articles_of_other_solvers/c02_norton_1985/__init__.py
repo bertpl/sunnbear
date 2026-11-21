@@ -16,6 +16,6 @@ class Norton1985(FormulaCategory):
     number = (1, 2, 2)
     name = "Norton (1985)"
     description = (
-        "Test problems from the article that introduces Algorithm 631, which finds a bracketed zero"
-        " by Larkin's method of rational interpolation."
+        "The test problems come from the article that introduces Algorithm 631, which finds a "
+        "bracketed zero by Larkin's method of rational interpolation."
     )

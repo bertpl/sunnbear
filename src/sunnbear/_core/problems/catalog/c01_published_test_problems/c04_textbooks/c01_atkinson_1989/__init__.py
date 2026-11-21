@@ -14,4 +14,6 @@ class Atkinson1989(FormulaCategory):
 
     number = (1, 4, 1)
     name = "Atkinson (1989)"
-    description = "Test problems from chapter 2, on rootfinding, of the textbook An Introduction to Numerical Analysis."
+    description = (
+        "The test problems come from chapter 2, on rootfinding, of the textbook An Introduction to Numerical Analysis."
+    )

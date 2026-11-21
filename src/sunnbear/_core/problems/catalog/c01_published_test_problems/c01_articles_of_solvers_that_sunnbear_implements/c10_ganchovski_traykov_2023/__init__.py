@@ -16,6 +16,6 @@ class GanchovskiTraykov2023(FormulaCategory):
     number = (1, 1, 10)
     name = "Ganchovski, Traykov (2023)"
     description = (
-        "Test problems from the article that introduces the modified Anderson–Björck method, for "
-        "nonlinear equations in structural mechanics."
+        "The test problems come from the article that introduces the modified Anderson–Björck "
+        "method, for nonlinear equations in structural mechanics."
     )

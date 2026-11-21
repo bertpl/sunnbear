@@ -16,6 +16,6 @@ class Brent1973(FormulaCategory):
     number = (1, 1, 4)
     name = "Brent (1973)"
     description = (
-        "Test problems from chapter 4 of the book Algorithms for Minimization without Derivatives, "
-        "which presents Brent's method."
+        "The test problems come from chapter 4 of the book Algorithms for Minimization without "
+        "Derivatives, which presents Brent's method."
     )
