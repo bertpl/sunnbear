@@ -1,8 +1,16 @@
 """This formula is Wilkinson's polynomial of degree ``n``, divided by ``n!``, with ``x`` shifted by ``c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
-from .helpers import is_valid_degree
+from .helpers import interval_by_parity_latex, is_valid_degree
 
 HIGHEST_SWEPT_DEGREE = 40
 
@@ -36,7 +44,16 @@ class WilkinsonPolynomial(Formula):
 
     number = (2, 2, 9)
     name = "Wilkinson polynomial"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
+    presentation = FormulaPresentation(
+        expression=r"\prod_{k=1}^{\param{n}} \frac{\x - \c - k}{k}",
+        interval=interval_by_parity_latex(r"[0, \param{n} + 1]", r"[1.5, \param{n} + 1]"),
+        summary=(
+            "Wilkinson's polynomial, with equally spaced roots and an amplitude far larger next to the bounds than in "
+            "the middle."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -64,7 +81,15 @@ class WilkinsonPolynomial(Formula):
         A higher degree mainly widens the range of values between the middle of the interval and its bounds, and a
         wide range of values is not the purpose of this formula.
         """
-        return (ParamGrid.decimal("n", 1.0, float(HIGHEST_SWEPT_DEGREE), 1.0),)
+        return (
+            ParamGrid.decimal(
+                "n",
+                1.0,
+                float(HIGHEST_SWEPT_DEGREE),
+                1.0,
+                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}.",
+            ),
+        )
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer of at least 1."""

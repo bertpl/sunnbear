@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -42,9 +44,31 @@ class HyperbolicTangent(Formula):
     number = (2, 4, 3)
     name = "Hyperbolic tangent"
     params = (
-        FormulaParam("b"),
-        FormulaParam("d"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam(
+            "d", latex_symbol="d", meaning=r"How far $\tanh$ lies above its lower asymptote, $-1$, at the root."
+        ),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=(
+            r"\begin{cases} "
+            r"\frac{2 e^{2 \tmp{u}}}{1 + e^{2 \tmp{u}}} - \param{d} "
+            r"& \text{if } \tmp{u} < 0 \text{ and } \param{d} \le 0.5 \\ "
+            r"\tanh \tmp{u} + (1 - \param{d}) & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval=r"[-\param{b}, \param{b}]",
+        summary=(
+            "The hyperbolic tangent, close to a step on a wide interval, with its root in the step or far out in its "
+            "lower tail."
+        ),
+        notes=(
+            r"Both cases equal $$1 + \tanh(\x - \c) - \param{d};$$ the first keeps full precision next to a root in "
+            r"the lower tail of $\tanh$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float, d: float) -> float:
@@ -73,8 +97,14 @@ class HyperbolicTangent(Formula):
           holds the root at every ``d`` of the sweep.
         """
         return (
-            ParamGrid(axes=(ParamAxis("b", -1.0, 15.0, 0.1, ParamNotation.POW10), ParamAxis("d", 1.0, 1.0, 1.0))),
-            ParamGrid(axes=(ParamAxis("b", 32.0, 32.0, 1.0), ParamAxis("d", -15.0, 0.0, 0.1, ParamNotation.POW10))),
+            ParamGrid(
+                axes=(ParamAxis("b", -1.0, 15.0, 0.1, ParamNotation.POW10), ParamAxis("d", 1.0, 1.0, 1.0)),
+                summary=r"The sweep of $\param{b}$ from $10^{-1}$ to $10^{15}$ at $\param{d} = 1$.",
+            ),
+            ParamGrid(
+                axes=(ParamAxis("b", 32.0, 32.0, 1.0), ParamAxis("d", -15.0, 0.0, 0.1, ParamNotation.POW10)),
+                summary=r"The sweep of $\param{d}$ from $10^{-15}$ to 1 at $\param{b} = 32$.",
+            ),
         )
 
     def is_param_tuple_valid(self, b: float, d: float) -> bool:

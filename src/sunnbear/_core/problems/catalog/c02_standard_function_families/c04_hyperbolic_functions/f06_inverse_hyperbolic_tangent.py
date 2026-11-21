@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -33,7 +35,22 @@ class InverseHyperbolicTangent(Formula):
 
     number = (2, 4, 6)
     name = "Inverse hyperbolic tangent"
-    params = (FormulaParam("d"),)
+    params = (
+        FormulaParam(
+            "d",
+            latex_symbol="d",
+            meaning=r"The distance from each pole of $\operatorname{artanh}$, at $-1$ and $1$, to the nearest bound.",
+        ),
+    )
+    presentation = FormulaPresentation(
+        expression=r"\frac{\operatorname{artanh} \x}{\operatorname{artanh}(1 - \param{d})} + \c",
+        interval=r"[-(1 - \param{d}), 1 - \param{d}]",
+        summary=(
+            r"The inverse hyperbolic tangent, steep next to both bounds for a small $\param{d}$, where they lie close "
+            "to its poles."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, d: float) -> float:
@@ -51,7 +68,12 @@ class InverseHyperbolicTangent(Formula):
         smallest ``d``, the range of ``c`` lets the root come too close to a bound to satisfy the conditions, so no
         benchmark suite holds such a candidate.
         """
-        return (ParamGrid(axes=(ParamAxis("d", -15.0, -1.0, 0.1, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("d", -15.0, -1.0, 0.1, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{d}$ from $10^{-15}$ to $10^{-1}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, d: float) -> bool:
         """Require ``d`` to be between 0 and 1."""

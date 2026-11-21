@@ -2,9 +2,17 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
-from .helpers import is_valid_degree
+from .helpers import interval_by_parity_latex, is_valid_degree
 
 # Above this degree the values at the bounds of the interval overflow.
 HIGHEST_VALID_DEGREE = 512
@@ -43,7 +51,21 @@ class HermitePolynomial(Formula):
 
     number = (2, 2, 6)
     name = "Hermite polynomial"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
+    presentation = FormulaPresentation(
+        expression=r"\frac{H_{\param{n}}(\x - \c)}{\sqrt{2^{\param{n}} \, \param{n}! \, \sqrt{\pi}}}",
+        interval=interval_by_parity_latex(
+            r"\left[-\sqrt{2 \param{n} + 1}, \sqrt{2 \param{n} + 1}\right]",
+            r"\left[-\left(\sqrt{2 \param{n} + 1} - 2.55 \, (2 \param{n} + 1)^{-1/6}\right), "
+            r"\sqrt{2 \param{n} + 1}\right]",
+        ),
+        summary=(
+            r"The Hermite polynomial, whose amplitude grows about as $e^{\x^2/2}$ from the middle of its interval to "
+            "its bounds."
+        ),
+        notes=(r"$H_{\param{n}}$ is the physicists' Hermite polynomial, orthogonal under the weight $e^{-\x^2}$.",),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -83,7 +105,15 @@ class HermitePolynomial(Formula):
         A higher degree mainly widens the range of values between the middle of the interval and its bounds, and a
         wide range of values is not the purpose of this formula.
         """
-        return (ParamGrid.decimal("n", 1.0, float(HIGHEST_SWEPT_DEGREE), 1.0),)
+        return (
+            ParamGrid.decimal(
+                "n",
+                1.0,
+                float(HIGHEST_SWEPT_DEGREE),
+                1.0,
+                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}.",
+            ),
+        )
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Require ``n`` to be an integer from 1 to `HIGHEST_VALID_DEGREE`."""

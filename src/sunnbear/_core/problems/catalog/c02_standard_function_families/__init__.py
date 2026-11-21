@@ -16,4 +16,8 @@ class StandardFunctionFamilies(FormulaCategory):
 
     number = (2,)
     name = "Standard function families"
+    description = (
+        "Families of standard functions, such as polynomials, powers and the hyperbolic functions. Their parameters "
+        "vary what a solver meets, such as roots close together, an infinite slope, a pole or exponential growth."
+    )
     is_builtin_only = True

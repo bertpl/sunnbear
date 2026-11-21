@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
 from .helpers import power_axis
 
@@ -34,7 +42,19 @@ class SignedReciprocalPower(Formula):
 
     number = (2, 3, 5)
     name = "Signed reciprocal power"
-    params = (FormulaParam("p"),)
+    params = (FormulaParam("p", latex_symbol="p"),)
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{z}", r"\x - \frac{\c}{1 + \param{p}}"),),
+        expression=(
+            r"\begin{cases} "
+            r"0 & \text{if } \tmp{z} = 0 \\ "
+            r"\operatorname{sgn}(\tmp{z}) \min\left(|\tmp{z}|^{-\param{p}}, 10^{100}\right) & \text{otherwise} "
+            r"\end{cases}"
+        ),
+        interval="[-1, 1]",
+        summary="A signed reciprocal power, whose sign change is a pole, not a root.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:
@@ -63,7 +83,9 @@ class SignedReciprocalPower(Formula):
         At the low end the function is close to the step ``sign(z)``. At the high end its absolute value is
         `MAX_ABS_VALUE` on most of the interval.
         """
-        return (ParamGrid(axes=(power_axis(-3.0, 3.0),)),)
+        return (
+            ParamGrid(axes=(power_axis(-3.0, 3.0),), summary=r"The sweep of $\param{p}$ from $10^{-3}$ to $10^{3}$."),
+        )
 
     def is_param_tuple_valid(self, p: float) -> bool:
         """Require ``p`` to be above 0."""

@@ -1,8 +1,10 @@
 """This formula is a weighted mean of a line and a power on ``[0, 1]``, ``x/(1 + w) + (w/(1 + w))*x^p - 0.5 + c``."""
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -10,7 +12,7 @@ from sunnbear._core.problems.core import (
     ParamRecipe,
 )
 
-from .helpers import HIGHEST_POWER
+from .helpers import HIGHEST_POWER, decimal_axis_text
 
 # ``LOWEST_POWER`` is the lowest power ``p`` of the formula. With ``p = 1`` the function is the line ``x - 0.5 + c``
 # for every ``w``, so ``p = 1`` is not a valid power.
@@ -31,16 +33,23 @@ class OneSidedLinearPlusPower(Formula):
     The recipe sweeps ``w`` over a wide range on purpose, wider than the other simple polynomial formulas sweep their
     weights and slopes. At the low end the function is close to a line without being one, and at the high end it is
     close to the power alone, which is very flat for low x.
-
-    ``c`` adds to the function value.
     """
 
     number = (2, 1, 6)
     name = "One-sided linear plus power"
     params = (
-        FormulaParam("p"),
-        FormulaParam("w"),
+        FormulaParam("p", latex_symbol="p"),
+        FormulaParam("w", latex_symbol="w"),
     )
+    presentation = FormulaPresentation(
+        expression=r"\frac{\x + \param{w} \x^{\param{p}}}{1 + \param{w}} - 0.5 + \c",
+        interval="[0, 1]",
+        summary=(
+            r"A weighted mean of a line and a power, with 1 root, that gets flat next to the lower bound as "
+            r"$\param{w}$ grows."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, w: float) -> float:
@@ -59,7 +68,10 @@ class OneSidedLinearPlusPower(Formula):
         """
         power_axis = ParamAxis("p", float(LOWEST_POWER), float(HIGHEST_POWER), 1.0)
         weight_axis = ParamAxis("w", -6.0, 6.0, 0.5, ParamNotation.POW10)
-        return (ParamGrid(axes=(power_axis, weight_axis)),)
+        summary = (
+            "The sweep of " + decimal_axis_text(power_axis) + r", combined with $\param{w}$ from $10^{-6}$ to $10^{6}$."
+        )
+        return (ParamGrid(axes=(power_axis, weight_axis), summary=summary),)
 
     def is_param_tuple_valid(self, p: float, w: float) -> bool:
         """Require ``p`` to be an integer of at least `LOWEST_POWER`, and ``w`` to be 0 or more."""

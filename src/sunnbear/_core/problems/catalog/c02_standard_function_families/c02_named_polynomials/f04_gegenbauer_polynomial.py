@@ -3,9 +3,24 @@
 import itertools
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamAxis,
+    ParamRecipe,
+    ParamTable,
+)
 
-from .helpers import JACOBI_SWEPT_DEGREES, is_valid_degree, jacobi_interval_bounds
+from .helpers import (
+    JACOBI_SWEPT_DEGREES,
+    JACOBI_SWEPT_DEGREES_TEXT,
+    interval_by_parity_latex,
+    is_valid_degree,
+    jacobi_interval_bounds,
+)
 
 # ``alpha`` has to be above this value: the Gegenbauer polynomials are orthogonal on ``[-1, 1]`` only above it, and at
 # this value their outermost zeros lie on the bounds -1 and 1.
@@ -56,9 +71,25 @@ class GegenbauerPolynomial(Formula):
     number = (2, 2, 4)
     name = "Gegenbauer polynomial"
     params = (
-        FormulaParam("n"),
-        FormulaParam("alpha"),
+        FormulaParam("n", latex_symbol="n"),
+        FormulaParam("alpha", latex_symbol=r"\alpha"),
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{y}", r"\x - \frac{\c}{\param{n}^2}"),),
+        expression=(r"\frac{C^{(\param{alpha})}_{\param{n}}(\tmp{y})}{C^{(\param{alpha})}_{\param{n}}(1)}"),
+        interval=interval_by_parity_latex(
+            "[-1, 1]", r"\left[-\cos\frac{(1 + \param{alpha}/2) \pi}{\param{n} + \param{alpha}}, 1\right]"
+        ),
+        summary=(
+            r"The Gegenbauer polynomial, whose amplitude shrinks, stays the same or grows toward the bounds, as "
+            r"$\param{alpha}$ is below, at or above 0."
+        ),
+        notes=(
+            r"At $\param{alpha} = 0$, where $C^{(0)}_{\param{n}}$ is 0 everywhere, the function is the limit of the "
+            r"quotient, the Chebyshev polynomial of the first kind $T_{\param{n}}(\tmp{y})$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, alpha: float) -> float:
@@ -91,7 +122,15 @@ class GegenbauerPolynomial(Formula):
           further and gives no other kind of function.
         """
         alpha_values = ParamAxis("alpha", -0.4, 2.0, 0.2).values()
-        return (ParamTable(names=self.param_names, rows=tuple(itertools.product(JACOBI_SWEPT_DEGREES, alpha_values))),)
+        return (
+            ParamTable(
+                names=self.param_names,
+                rows=tuple(itertools.product(JACOBI_SWEPT_DEGREES, alpha_values)),
+                summary=(
+                    JACOBI_SWEPT_DEGREES_TEXT + r", combined with $\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
+                ),
+            ),
+        )
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
         """Require ``n`` to be an integer of at least 1, and ``alpha`` to be in its valid range."""

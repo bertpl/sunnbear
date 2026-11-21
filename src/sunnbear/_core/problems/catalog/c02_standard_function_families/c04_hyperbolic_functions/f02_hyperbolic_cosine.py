@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -33,7 +35,24 @@ class HyperbolicCosine(Formula):
 
     number = (2, 4, 2)
     name = "Hyperbolic cosine"
-    params = (FormulaParam("b"),)
+    params = (FormulaParam("b", latex_symbol="b"),)
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \c"),
+            (r"\tmp{v}", r"\frac{\param{b}}{2}"),
+        ),
+        expression=r"2 \sinh\frac{\tmp{u} + \tmp{v}}{2} \, \sinh\frac{\tmp{u} - \tmp{v}}{2}",
+        interval=r"[0, \param{b}]",
+        summary=(
+            "The hyperbolic cosine, with its minimum next to the lower bound and its root in the middle of the "
+            "interval."
+        ),
+        notes=(
+            r"The expression equals $$\cosh(\x - \c) - \cosh\frac{\param{b}}{2},$$ in a form whose terms do not "
+            "cancel next to the root.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, b: float) -> float:
@@ -57,7 +76,12 @@ class HyperbolicCosine(Formula):
 
         At the high end the value at the upper bound is about 1.3e43.
         """
-        return (ParamGrid(axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("b", -1.0, 2.0, 0.02, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{b}$ from $10^{-1}$ to $10^{2}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, b: float) -> bool:
         """Require ``b`` to be above 0."""

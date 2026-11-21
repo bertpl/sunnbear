@@ -3,8 +3,10 @@
 import math
 
 from sunnbear._core.problems.core import (
+    EffectOfC,
     Formula,
     FormulaParam,
+    FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
@@ -34,7 +36,16 @@ class Logarithm(Formula):
 
     number = (2, 5, 2)
     name = "Logarithm"
-    params = (FormulaParam("d"),)
+    params = (FormulaParam("d", latex_symbol="d"),)
+    presentation = FormulaPresentation(
+        expression=r"\frac{2 \ln \x}{\ln(1 / \param{d})} + 1 + \c",
+        interval=r"[\param{d}, 1]",
+        summary=(
+            r"The logarithm, steep next to the lower bound and flat over most of the interval for a small "
+            r"$\param{d}$."
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, d: float) -> float:
@@ -52,7 +63,12 @@ class Logarithm(Formula):
         smallest values of ``d``, the range of ``c`` lets the root come too close to the lower bound to satisfy the
         conditions, so no benchmark suite holds a candidate with such a ``d``.
         """
-        return (ParamGrid(axes=(ParamAxis("d", -15.0, -0.1, 0.1, ParamNotation.POW10),)),)
+        return (
+            ParamGrid(
+                axes=(ParamAxis("d", -15.0, -0.1, 0.1, ParamNotation.POW10),),
+                summary=r"The sweep of $\param{d}$ from $10^{-15}$ to $10^{-0.1}$.",
+            ),
+        )
 
     def is_param_tuple_valid(self, d: float) -> bool:
         """Require ``d`` to be between 0 and 1."""

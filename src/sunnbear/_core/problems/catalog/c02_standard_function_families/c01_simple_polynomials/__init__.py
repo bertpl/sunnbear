@@ -25,3 +25,4 @@ class SimplePolynomials(FormulaCategory):
 
     number = (2, 1)
     name = "Simple polynomials"
+    description = r"A line, alone or combined with a power or a sum of powers of $\x$."

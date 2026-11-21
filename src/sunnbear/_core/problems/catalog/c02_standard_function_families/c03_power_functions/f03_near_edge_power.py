@@ -1,6 +1,15 @@
 """This formula is a power on an interval that starts at or near the edge of the power's domain, ``x^p - 0.5 + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamAxis, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamAxis,
+    ParamGrid,
+    ParamRecipe,
+)
 
 from .helpers import distance_axis, power_axis
 
@@ -27,9 +36,15 @@ class NearEdgePower(Formula):
     number = (2, 3, 3)
     name = "Near-edge power"
     params = (
-        FormulaParam("p"),
-        FormulaParam("d"),
+        FormulaParam("p", latex_symbol="p"),
+        FormulaParam("d", latex_symbol="d"),
     )
+    presentation = FormulaPresentation(
+        expression=r"\x^{\param{p}} - 0.5 + \c",
+        interval=r"[\param{d}, 1]",
+        summary=r"A power on an interval that starts at or near the edge of its domain, $\x = 0$.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, d: float) -> float:
@@ -53,8 +68,17 @@ class NearEdgePower(Formula):
         """
         zero_distance_axis = ParamAxis("d", 0.0, 0.0, 1.0)
         return (
-            ParamGrid(axes=(power_axis(LOWEST_LOG10_POWER, 6.0), zero_distance_axis)),
-            ParamGrid(axes=(power_axis(LOWEST_LOG10_POWER, 0.0), distance_axis())),
+            ParamGrid(
+                axes=(power_axis(LOWEST_LOG10_POWER, 6.0), zero_distance_axis),
+                summary=r"The sweep of $\param{p}$ from $10^{-2}$ to $10^{6}$ at $\param{d} = 0$.",
+            ),
+            ParamGrid(
+                axes=(power_axis(LOWEST_LOG10_POWER, 0.0), distance_axis()),
+                summary=(
+                    r"The sweep of $\param{p}$ from $10^{-2}$ to 1, combined with $\param{d}$ from $10^{-6}$ to "
+                    r"$10^{-1}$."
+                ),
+            ),
         )
 
     def is_param_tuple_valid(self, p: float, d: float) -> bool:

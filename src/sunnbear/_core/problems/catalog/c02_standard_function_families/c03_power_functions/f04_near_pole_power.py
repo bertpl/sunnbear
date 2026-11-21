@@ -1,6 +1,14 @@
 """This formula is a reciprocal power on an interval that starts near its pole, ``(d/x)^p - 0.5 + c``."""
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 
 from .helpers import distance_axis, power_axis
 
@@ -28,9 +36,15 @@ class NearPolePower(Formula):
     number = (2, 3, 4)
     name = "Near-pole power"
     params = (
-        FormulaParam("p"),
-        FormulaParam("d"),
+        FormulaParam("p", latex_symbol="p"),
+        FormulaParam("d", latex_symbol="d"),
     )
+    presentation = FormulaPresentation(
+        expression=r"\left(\frac{\param{d}}{\x}\right)^{\param{p}} - 0.5 + \c",
+        interval=r"[\param{d}, 1]",
+        summary=r"A reciprocal power on an interval that starts near its pole, $\x = 0$.",
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, d: float) -> float:
@@ -48,7 +62,15 @@ class NearPolePower(Formula):
         ``p`` at a small ``d``, the root lies too close to the lower bound to satisfy the conditions, so no benchmark
         suite holds such a candidate.
         """
-        return (ParamGrid(axes=(power_axis(-2.0, 6.0), distance_axis())),)
+        return (
+            ParamGrid(
+                axes=(power_axis(-2.0, 6.0), distance_axis()),
+                summary=(
+                    r"The sweep of $\param{p}$ from $10^{-2}$ to $10^{6}$, combined with $\param{d}$ from $10^{-6}$ to "
+                    r"$10^{-1}$."
+                ),
+            ),
+        )
 
     def is_param_tuple_valid(self, p: float, d: float) -> bool:
         """Require ``p`` and ``d`` above 0, and a root inside the interval."""

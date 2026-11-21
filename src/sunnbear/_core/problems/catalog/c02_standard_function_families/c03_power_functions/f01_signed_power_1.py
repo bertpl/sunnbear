@@ -2,7 +2,15 @@
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaTestCase, ParamGrid, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamGrid,
+    ParamRecipe,
+)
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 from .helpers import power_axis
@@ -43,7 +51,21 @@ class SignedPower1(Formula):
 
     number = (2, 3, 1)
     name = "Signed power 1"
-    params = (FormulaParam("p"),)
+    params = (FormulaParam("p", latex_symbol="p"),)
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{z}", r"\x - \frac{\c}{1 + \param{p}}"),),
+        expression=r"\operatorname{sgn}(\tmp{z}) \, |\tmp{z}|^{\param{p}} + 2^{-918} \, \tmp{z}",
+        interval="[-1, 1]",
+        summary=(
+            r"A signed power, with an infinite slope at its root for $\param{p} < 1$ and a zero slope for "
+            r"$\param{p} > 1$."
+        ),
+        notes=(
+            r"The term $2^{-918} \, \tmp{z}$ keeps the function from being exactly 0 next to its root, where "
+            r"$|\tmp{z}|^{\param{p}}$ underflows to 0 for a large $\param{p}$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float) -> float:
@@ -61,7 +83,9 @@ class SignedPower1(Formula):
         At the low end the function is close to the step ``sign(z)``. At the high end the power exceeds the linear
         term only in a narrow strip at each bound.
         """
-        return (ParamGrid(axes=(power_axis(-6.0, 6.0),)),)
+        return (
+            ParamGrid(axes=(power_axis(-6.0, 6.0),), summary=r"The sweep of $\param{p}$ from $10^{-6}$ to $10^{6}$."),
+        )
 
     def is_param_tuple_valid(self, p: float) -> bool:
         """Require ``p`` to be above 0."""
