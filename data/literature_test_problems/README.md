@@ -290,7 +290,7 @@ The class docstring of `ModifiedPublishedTestProblems` describes subcategory 1.9
 4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where each row gives its own values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
 5. Write the source's package and its formula modules (§ Formula modules), and import the package in its subcategory's `__init__.py`. The package's `FormulaCategory` subclass gives:
    - a `description` that says what the source is, such as "The test problems come from the article that introduces Ridders' method.";
-   - a `publication`, a `Publication` whose `citation` is the source's `reference`, and whose other fields hold the parts of that citation; the `Publication` docstring describes each field, the citation key included. Its `year` is the year in the category's name, which can differ from the source's `year`.
+   - a `publication`, a `Publication` whose `citation` is the source's `reference`, and whose other fields hold the parts of that citation, apart from its citation key and its year; the `Publication` docstring describes each field. The `Publication`'s `year` is the year at the end of the source's package name, which can differ from the source's `year`.
 6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 
 ## Regenerating

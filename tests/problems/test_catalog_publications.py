@@ -12,8 +12,6 @@ test item per formula or category would only add items.
 import re
 from collections import Counter
 
-import pytest
-
 import sunnbear._core.problems.catalog as catalog
 from sunnbear._core.problems.core import FormulaRegistry
 
@@ -74,7 +72,6 @@ def test_citation_keys_are_unique():
     assert [key for key, count in counts.items() if count > 1] == []
 
 
-@pytest.mark.skip(reason="the shipped publications declare only their citations")
 def test_publications_declare_their_parts():
     """A shipped publication declares its citation key, its title, a DOI or URL, and the year in its category's name.
 
