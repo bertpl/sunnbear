@@ -1,0 +1,55 @@
+"""This module holds a formula of Ganchovski, Traykov (2023).
+
+The formula comes from the row with the key ``§3`` in the survey of published test problems.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+)
+
+
+class GanchovskiTraykov2023Section3(Formula):
+    """This formula comes from Ganchovski, Traykov (2023).
+
+    The survey writes the source's function as ``4 - tan(x)``; the formula's interval is ``[0, 1.5]``.
+
+    Not in Table 2; used for the convergence charts of Figures 10 (§3) and 12 (§5). §3 prints the interval as `[0.
+    1.5]`.
+    """
+
+    number = (1, 1, 10, 1)
+    name = "Section 3"
+    params = ()
+    location_in_publication = "§3"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        expression=r"4 - \tan{\left(\tmp{u} \right)}",
+        interval="[0, 1.5]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.5 * c
+        return 4 - math.tan(x)
+
+    def interval_bounds(self) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (0.0, 1.5)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return no recipe, since the published function has no parameters."""
+        return ()
+
+    test_cases = (
+        FormulaTestCase.value(params={}, x=0.45, c=0.0, expected=3.516944934383422),
+        FormulaTestCase.value(params={}, x=0.45, c=0.25, expected=3.924859057871715),
+        FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5)),
+    )

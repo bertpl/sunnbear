@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f15_2_4
+from . import f15_ill_behaved_function_4
 
 
 class ModifiedOliveiraTakahashi2021(FormulaCategory):

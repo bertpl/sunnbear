@@ -1,0 +1,58 @@
+"""This module holds a formula of Moler (2004).
+
+The formula comes from the row with the key ``§4.1, §4.2, §4.4, §4.5`` in the survey of published test problems.
+"""
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
+
+
+class Moler2004Section45(Formula):
+    """This formula comes from Moler (2004).
+
+    The survey writes the source's function as ``x^2 - M``, with the parameters ``M = 2``; the formula's interval is
+    ``[1, 2]``.
+
+    §4.2 prints `f(x) = x^2 - M` for computing `sqrt(M)`; §4.1's bisection code tests `x^2 > M`, and §4.5 writes `x^2 -
+    2`. Bisection on `[1, 2]` takes 52 steps (§4.1); Newton from `x = 1` takes 6 iterations (§4.2); secant from `a = 1,
+    b = 2` takes 7 (§4.4). Inverse quadratic interpolation from `a = -2, b = 0, c = 2` is undefined at its first step,
+    because `f(a) = f(c)`, and from `a = -2.001, b = 0, c = 1.999` its next iterate is near `x = 500` (§4.5).
+    """
+
+    number = (1, 4, 3, 3)
+    name = "Section 4.5"
+    params = (FormulaParam("M", latex_symbol="M"),)
+    location_in_publication = "§4.1, §4.2, §4.4, §4.5"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\tmp{u}^{2} - \param{M}",
+        interval="[1, 2]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, M: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.0 * c
+        return x**2 - M
+
+    def interval_bounds(self, M: float) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (1.0, 2.0)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (ParamTable(names=("M",), rows=((2.0,),), summary="The published parameter values."),)
+
+    test_cases = (
+        FormulaTestCase.value(params={"M": 2.0}, x=1.3, c=0.0, expected=-0.3099999999999999),
+        FormulaTestCase.value(params={"M": 2.0}, x=1.3, c=0.25, expected=-0.8974999999999999),
+        FormulaTestCase.interval_bounds(params={"M": 2.0}, expected=(1.0, 2.0)),
+    )

@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_ex_6
+from . import f01_exercise_6
 
 
 class AndersonBjorck1973(FormulaCategory):

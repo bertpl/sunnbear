@@ -266,7 +266,7 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
   - "The published parameter values." where it lists only parameter values;
   - "The published parameter values and intervals." where it lists intervals too;
   - "The published intervals." where it lists only intervals;
-- takes its name, and its module and class names, from the key of the formula's first row. Where the key lists several locations, separated by `;` or `,`, the name ends after the first location; while the names of several formulas of the source would give module names that differ only in their `fNN` prefix, each of those names takes its key's next location too;
+- takes its name from its `location_in_publication`: the most specific part of the first place there, with abbreviations written out, such as `Problem 12` for `Table I, problem 12`. A part that lists several items gives its first item, such as `Row 1` for `Table 4.1, rows 1 and 2`. Where 2 formulas of the source would get the same name, each takes the part before too, such as `Section 3, function 1` and `Table 2, function 1`. The module and class names follow from the name;
 - holds test cases whose expected values are computed from the function in high precision, such as with mpmath:
   - a case whose expected value is below `1000*DEFAULT_ATOL` in magnitude sets `atol=0.0`, because the default `atol` would let a wrong value of that size pass;
   - a case whose function cannot be evaluated in float64 to within the default tolerance, such as an ill-conditioned function or a polynomial in expanded form near its multiple root, sets an `atol` of a few times the difference between its float64 value and its high-precision value.

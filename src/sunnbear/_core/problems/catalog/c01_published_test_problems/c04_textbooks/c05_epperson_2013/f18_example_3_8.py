@@ -1,0 +1,74 @@
+"""This module holds a formula of Epperson (2013).
+
+The formula comes from the row with the key ``Ex. 3.8, 3.9, 3.15, 3.16; Table 3.12`` in the survey of published test
+problems.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
+
+
+class Epperson2013Example38(Formula):
+    """This formula comes from Epperson (2013).
+
+    The survey writes the source's function as ``x = (1/2)*exp(-x)``; the formula's intervals are `[0, 1/2]` (Ex. 3.9);
+    `[0, 1]` (Fig. 3.9, 3.10).
+
+    Fixed point 0.35173371124920. Fixed-point iteration from `x0 = 0, 5, -5` (Table 3.6); both Aitken algorithms from
+    `x0 = 0` (Ex. 3.15, 3.16, Table 3.12); Newton on `x - (1/2)*exp(-x)` from `x0 = 0` (Table 3.12). Figure 3.9 draws
+    it.
+    """
+
+    number = (1, 4, 5, 18)
+    name = "Example 3.8"
+    params = (
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
+    )
+    location_in_publication = "Examples 3.8, 3.9, 3.15, 3.16; Table 3.12"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u} - \frac{e^{- \tmp{u}}}{2}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
+        return (x) - ((1 / 2) * math.exp(-x))
+
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"), rows=((0.0, 0.5, 0.5), (0.0, 1.0, 1.0)), summary="The published intervals."
+            ),
+        )
+
+    test_cases = (
+        FormulaTestCase.value(
+            params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.0, expected=-0.28035398821252894
+        ),
+        FormulaTestCase.value(
+            params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.25, expected=-0.46265495601416634
+        ),
+        FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=-0.07040911034085895),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, expected=(0.0, 0.5)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, expected=(0.0, 1.0)),
+    )

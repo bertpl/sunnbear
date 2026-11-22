@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f03_4_1
+from . import f03_equation_4_1
 
 
 class ModifiedBrent1973(FormulaCategory):

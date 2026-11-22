@@ -2,7 +2,15 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_func1, f02_func2, f03_func3, f04_func4, f05_func6, f06_sin_f, f07_cos_f
+from . import (
+    f01_function_func1,
+    f02_function_func2,
+    f03_function_func3,
+    f04_function_func4,
+    f05_function_func6,
+    f06_function_sin_f,
+    f07_function_cos_f,
+)
 
 
 class Gsl2024(FormulaCategory):

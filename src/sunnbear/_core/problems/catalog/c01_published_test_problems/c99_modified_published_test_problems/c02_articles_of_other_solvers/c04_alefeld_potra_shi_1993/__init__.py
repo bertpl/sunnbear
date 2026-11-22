@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f02_t5_1_2
+from . import f02_problem_2
 
 
 class ModifiedAlefeldPotraShi1993(FormulaCategory):

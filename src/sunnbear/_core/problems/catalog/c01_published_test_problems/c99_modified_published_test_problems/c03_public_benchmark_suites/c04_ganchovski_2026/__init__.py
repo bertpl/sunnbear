@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f02_f100
+from . import f02_function_f100
 
 
 class ModifiedGanchovski2026(FormulaCategory):

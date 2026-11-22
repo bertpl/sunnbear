@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_f2, f02_f3, f03_f4, f04_f5, f05_f6, f06_a_2
+from . import f01_function_f2, f02_function_f3, f03_function_f4, f04_function_f5, f05_function_f6, f06_appendix_a_2
 
 
 class KumarSrivastav2026(FormulaCategory):

@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f12_f12, f13_5_2_2
+from . import f12_function_f12, f13_section_5_2_2
 
 
 class ModifiedBorchers2026(FormulaCategory):

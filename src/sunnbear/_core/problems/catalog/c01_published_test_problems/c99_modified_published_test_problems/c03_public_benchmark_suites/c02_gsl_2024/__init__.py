@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f03_func3, f05_func6
+from . import f03_function_func3, f05_function_func6
 
 
 class ModifiedGsl2024(FormulaCategory):

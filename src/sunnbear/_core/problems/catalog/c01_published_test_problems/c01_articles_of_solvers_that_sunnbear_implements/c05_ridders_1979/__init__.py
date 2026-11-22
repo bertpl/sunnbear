@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_i, f02_iii_1, f03_iii_2, f04_iii_3
+from . import f01_section_i, f02_function_1, f03_function_2, f04_function_3
 
 
 class Ridders1979(FormulaCategory):

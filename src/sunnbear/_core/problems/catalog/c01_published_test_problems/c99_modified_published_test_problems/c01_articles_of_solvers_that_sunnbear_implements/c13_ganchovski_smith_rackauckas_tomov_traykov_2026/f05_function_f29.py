@@ -1,0 +1,96 @@
+"""This module holds formula f1.99.1.13.5, the modified version of the published formula f1.1.13.5.
+
+A change of formula f1.1.13.5 may need a matching change of this module.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
+
+
+class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF29(Formula):
+    """This formula is the modified version of formula f1.1.13.5, from Ganchovski et al. (2026).
+
+    The survey writes the source's function as ``exp((x - 3)^5) - 1``; the published intervals are `[2.6, 4.6]`;
+    `[2.6, 3.6]` (`Test Functions.pdf`).
+
+    `Test Functions.pdf` gives the interval `[2.6, 3.6]`.
+
+    The formula computes the published function in the equivalent form ``expm1((x - 3)**5)``, on the published
+    intervals, and ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published
+    interval.
+
+    The published test problems do not satisfy the benchmark suite inclusion conditions, because the conditions require
+    bisection to spend a fixed number of evaluations, and bisection stops early where a midpoint lands on an exact 0 of
+    f.
+
+    Near the root, ``exp((x - 3)**5)`` rounds to 1, and the subtraction of 1 cancels, so that f is exactly 0 at many
+    x-values within about 7e-4 of the root; ``expm1(u)`` computes ``exp(u) - 1`` without the subtraction.
+    """
+
+    number = (1, 99, 1, 13, 5)
+    name = "Function f29"
+    params = (
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
+    )
+    location_in_publication = "Table 2, f29"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3\right)^{5}\right)",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without the cancellation that makes the "
+                r"published function, $$e^{\left(\tmp{u} - 3\right)^{5}} - 1,$$ exactly 0 at many x-values "
+                "next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``y = x - c_scale*c``, as ``expm1((y - 3)**5)``.
+
+        Category 1 states the rule for ``c_scale``.
+        """
+        x = x - c_scale * c
+        return math.expm1((x - 3) ** 5)
+
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the parameter values of the modified test problems."""
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=(
+                    (2.6, 4.6, 2.0),
+                    (2.6, 3.6, 1.0),
+                ),
+                summary="The published intervals.",
+            ),
+        )
+
+    test_cases = (
+        FormulaTestCase.interval_bounds(params={"a": 2.6, "b": 4.6, "c_scale": 2.0}, expected=(2.6, 4.6)),
+        FormulaTestCase.value(
+            params={"a": 2.6, "b": 4.6, "c_scale": 2.0}, x=3.2, c=0.25, expected=-0.002427049940032372
+        ),
+        FormulaTestCase.interval_bounds(params={"a": 2.6, "b": 3.6, "c_scale": 1.0}, expected=(2.6, 3.6)),
+        FormulaTestCase.value(
+            params={"a": 2.6, "b": 3.6, "c_scale": 1.0}, x=2.9, c=0.25, expected=-0.005238418878905655
+        ),
+    )

@@ -2,7 +2,16 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_2_1_2, f02_1_3_6, f03_2_7_3, f04_2_8_case_1, f05_2_8_case_2, f06_2_8_case_3, f07_2_8_case_4, f08_p38_a
+from . import (
+    f01_equation_2_1_2,
+    f02_equation_1_3_6,
+    f03_equation_2_7_3,
+    f04_case_1,
+    f05_case_2,
+    f06_case_3,
+    f07_case_4,
+    f08_problem_38_a,
+)
 
 
 class Atkinson1989(FormulaCategory):

@@ -1,0 +1,93 @@
+"""This module holds a formula of Chandrupatla (1997).
+
+The formula comes from the row with the key ``9`` in the survey of published test problems.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
+
+
+class Chandrupatla1997Function9(Formula):
+    """This formula comes from Chandrupatla (1997).
+
+    The survey writes the source's function as ``exp(x) - 2 - 0.01/x^2 + 0.000002/x^3``; the formula's intervals are
+    `[2E-4, 1]`; `[2E-4, 3]`; `[2E-4, 9]`; `[2E-4, 27]`; `[2E-4, 81]`.
+
+    Printed zero: `x = 0.7032`.
+    """
+
+    number = (1, 1, 7, 9)
+    name = "Function 9"
+    params = (
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
+    )
+    location_in_publication = "Table 1, function 9"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2.0 \cdot 10^{-6}}{\tmp{u}^{3}}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
+        return math.exp(x) - 2 - 0.01 / x**2 + 0.000002 / x**3
+
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=(
+                    (0.0002, 1.0, 1.0),
+                    (0.0002, 3.0, 3.0),
+                    (0.0002, 9.0, 9.0),
+                    (0.0002, 27.0, 27.0),
+                    (0.0002, 81.0, 81.0),
+                ),
+                summary="The published intervals.",
+            ),
+        )
+
+    test_cases = (
+        FormulaTestCase.value(
+            params={"a": 0.0002, "b": 1.0, "c_scale": 1.0}, x=0.30014, c=0.0, expected=-0.7608857084494749
+        ),
+        FormulaTestCase.value(
+            params={"a": 0.0002, "b": 1.0, "c_scale": 1.0}, x=0.30014, c=0.25, expected=-4.9104090962183635
+        ),
+        FormulaTestCase.value(
+            params={"a": 0.0002, "b": 3.0, "c_scale": 3.0}, x=0.90014, c=0.0, expected=0.44760838287162796
+        ),
+        FormulaTestCase.value(
+            params={"a": 0.0002, "b": 9.0, "c_scale": 9.0}, x=2.70014, c=0.0, expected=12.880443534868409
+        ),
+        FormulaTestCase.value(
+            params={"a": 0.0002, "b": 27.0, "c_scale": 27.0}, x=8.10014, c=0.0, expected=3292.9291806949154
+        ),
+        FormulaTestCase.value(
+            params={"a": 0.0002, "b": 81.0, "c_scale": 81.0}, x=24.3001, c=0.0, expected=35760150646.19565
+        ),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 1.0, "c_scale": 1.0}, expected=(0.0002, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 3.0, "c_scale": 3.0}, expected=(0.0002, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 9.0, "c_scale": 9.0}, expected=(0.0002, 9.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 27.0, "c_scale": 27.0}, expected=(0.0002, 27.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0002, "b": 81.0, "c_scale": 81.0}, expected=(0.0002, 81.0)),
+    )

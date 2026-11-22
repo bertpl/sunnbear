@@ -1,0 +1,64 @@
+"""This module holds formula f1.99.4.7.9, the modified version of the published formula f1.4.7.9.
+
+A change of formula f1.4.7.9 may need a matching change of this module.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+)
+
+
+class ModifiedBurdenFairesBurden2016Exercise211(Formula):
+    """This formula is the modified version of formula f1.4.7.9, from Burden, Faires, Burden (2016).
+
+    The survey writes the source's function as ``sqrt(x) - cos(x)``; the published interval is ``[0, 1]``.
+
+    Bisection to `p3`.
+
+    The formula keeps the published interval, evaluates the published function at x without shifting x, and adds ``c``
+    to the function's value.
+
+    The published test problem does not satisfy the benchmark suite inclusion conditions, because a shift along x by
+    any ``c > 0`` evaluates ``sqrt(x)`` left of ``a = 0``, outside its domain.
+    """
+
+    number = (1, 99, 4, 7, 9)
+    name = "Exercise 2.1-1"
+    params = ()
+    location_in_publication = "Exercise 2.1-1"
+    presentation = FormulaPresentation(
+        expression=r"\sqrt{\x} - \cos{\left(\x \right)} + \c",
+        interval="[0, 1]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                r"problem, because a shift along x by any $\c > 0$ evaluates $\sqrt{\x}$ left of 0, "
+                "outside its domain."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float) -> float:
+        """Evaluate the published function at ``x``, and add ``c``."""
+        return math.sqrt(x) - math.cos(x) + c
+
+    def interval_bounds(self) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (0.0, 1.0)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return no recipe, since the modified function has no parameters."""
+        return ()
+
+    test_cases = (
+        FormulaTestCase.value(params={}, x=0.3, c=0.25, expected=-0.1576139316204399),
+        FormulaTestCase.value(params={}, x=0.0, c=0.25, expected=-0.75),
+    )

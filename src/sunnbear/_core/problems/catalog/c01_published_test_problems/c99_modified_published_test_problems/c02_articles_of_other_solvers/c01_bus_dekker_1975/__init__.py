@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f05_iii, f06_iv
+from . import f05_group_iii, f06_group_iv
 
 
 class ModifiedBusDekker1975(FormulaCategory):

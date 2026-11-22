@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f05_t4_7
+from . import f05_function_7
 
 
 class ModifiedGao2026(FormulaCategory):

@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f02_2, f07_7, f08_8, f09_9
+from . import f02_function_2, f07_function_7, f08_function_8, f09_function_9
 
 
 class ModifiedChandrupatla1997(FormulaCategory):

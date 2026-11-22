@@ -1,0 +1,71 @@
+"""This module holds a formula of Stage (2013).
+
+The formula comes from the row with the key ``3.4`` in the survey of published test problems.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
+
+
+class Stage2013Section34(Formula):
+    """This formula comes from Stage (2013).
+
+    The survey writes the source's function as ``cos(x) - x^3``; the formula's intervals are `[0, 4]` (Figure 1); `[-10,
+    10]` (Figure 2).
+
+    Stage says `(0,4)` corresponds to Zhang, and that the article's code reproduces Zhang's Table 1.
+    """
+
+    number = (1, 2, 12, 1)
+    name = "Section 3.4"
+    params = (
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
+    )
+    location_in_publication = "§3.4"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}^{3}",
+        interval=r"[\param{a}, \param{b}]",
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - c_scale * c
+        return math.cos(x) - x**3
+
+    def interval_bounds(self, a: float, b: float, c_scale: float) -> tuple[float, float]:
+        """Return the interval of the tuple, its parameters ``a`` and ``b``."""
+        return (a, b)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("a", "b", "c_scale"),
+                rows=((0.0, 4.0, 4.0), (-10.0, 10.0, 20.0)),
+                summary="The published intervals.",
+            ),
+        )
+
+    test_cases = (
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=-1.3656422455233261),
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.25, expected=0.9720665778412416),
+        FormulaTestCase.value(
+            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.0, expected=63.34635637913639
+        ),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, expected=(0.0, 4.0)),
+        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, expected=(-10.0, 10.0)),
+    )

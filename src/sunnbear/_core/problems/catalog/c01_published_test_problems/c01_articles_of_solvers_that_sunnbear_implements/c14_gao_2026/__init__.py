@@ -2,7 +2,13 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_s3_1, f02_s3_2, f03_t2_1, f04_t2_2, f05_t4_7
+from . import (
+    f01_section_3_function_1,
+    f02_section_3_function_2,
+    f03_table_2_function_1,
+    f04_table_2_function_2,
+    f05_function_7,
+)
 
 
 class Gao2026(FormulaCategory):

@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_5_1, f02_5_2, f03_5_3, f04_5_4
+from . import f01_section_5_1, f02_section_5_2, f03_section_5_3, f04_section_5_4
 
 
 class Romadani2025(FormulaCategory):

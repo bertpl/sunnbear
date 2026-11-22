@@ -2,7 +2,15 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_f1, f02_f2, f03_f3, f04_f4, f05_f5, f06_f6, f07_f7
+from . import (
+    f01_function_f1,
+    f02_function_f2,
+    f03_function_f3,
+    f04_function_f4,
+    f05_function_f5,
+    f06_function_f6,
+    f07_function_f7,
+)
 
 
 class Galdino2011(FormulaCategory):

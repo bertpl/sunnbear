@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f04_f4, f06_f6
+from . import f04_function_f4, f06_function_f6
 
 
 class ModifiedGaldino2011(FormulaCategory):
