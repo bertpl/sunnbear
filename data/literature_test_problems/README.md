@@ -266,11 +266,13 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
   - "The published parameter values." where it lists only parameter values;
   - "The published parameter values and intervals." where it lists intervals too;
   - "The published intervals." where it lists only intervals;
-- takes its name from its `location_in_publication`, which lists 1 or more places in the source, separated by `;`, each from its widest part to its narrowest, such as a table and a problem in it:
-  - the name is the narrowest part of the first place, with abbreviations written out, such as `Problem 12` for `Table I, problem 12` and `Equation (4.1)` for `Section 4, Eq. (4.1)`, and with a word before a bare label, such as `Function f4` for `Table 3, f4`;
+- takes its name from its `location_in_publication`, which lists 1 or more places in the source, separated by `;`. Each place names its parts from the widest to the narrowest, such as a table and then a problem in that table:
+  - the name is the narrowest part of the first place, such as `Problem 12` for `Table I, problem 12`:
+    - an abbreviation in it is written out, such as `Equation (4.1)` for `Section 4, Eq. (4.1)`;
+    - a word is added before a part that is only a label, such as `Function f4` for `Table 3, f4`;
   - a part that lists several items gives its first item, such as `Row 1` for `Table 4.1, rows 1 and 2`;
-  - where 2 formulas of the source would get the same name, each name also takes the next wider part of that place, such as `Section 3, function 1` and `Table 2, function 1`;
-  - the module is named `fNN_` followed by the name in lowercase with `_` between its words, such as `f01_row_1`, and the class takes its category's class name followed by the name in CamelCase, such as `Brent1973Row1`;
+  - where 2 formulas of the source would get the same name, each name also takes the next wider part of its formula's first place, such as `Section 3, function 1` and `Table 2, function 1`;
+  - the module is named `f`, then the formula's number within its source in 2 digits, then `_` and the name's `name_slug`, such as `f01_row_1` for `Row 1` and `f03_equation_4_1` for `Equation (4.1)`; the class is named after the source package's `FormulaCategory` subclass, followed by the name in CamelCase, such as `Brent1973Row1`;
 - holds test cases whose expected values are computed from the function in high precision, such as with mpmath:
   - a case whose expected value is below `1000*DEFAULT_ATOL` in magnitude sets `atol=0.0`, because the default `atol` would let a wrong value of that size pass;
   - a case whose function cannot be evaluated in float64 to within the default tolerance, such as an ill-conditioned function or a polynomial in expanded form near its multiple root, sets an `atol` of a few times the difference between its float64 value and its high-precision value.
