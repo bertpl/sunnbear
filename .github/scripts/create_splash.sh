@@ -13,6 +13,7 @@ echo "--------------------------------------------------------------------------
 DISPLAY_VERSION="$1"  # WITHOUT leading "v" (the annotation adds it), e.g. "0.1.10" or "0.1.11-dev"
 
 # --- create splash without version info ---
+# The full-size images, this one and the background images/splash/splash.webp, are lossy WebP at quality 80, below the 90 of the splash with version: that splash shrinks them to 1920 px wide, with about 6 times fewer pixels, which hides their compression artifacts.
 if [ ! -f ./images/_splash_without_version.webp ]; then
     magick -pointsize 100 -background transparent \
            -font "./images/splash/google_fonts_montserrat_bold.ttf" -fill "#efefef" label:"S" \
@@ -31,7 +32,7 @@ if [ ! -f ./images/_splash_without_version.webp ]; then
            -font "./images/splash/google_fonts_montserrat_regular.ttf" -fill "#9a9a9a" label:"...-......." \
            +append "./images/header.mpc"
     magick "./images/splash/splash.webp" "./images/header.mpc" -gravity North -geometry +0+28 -composite \
-           -quality 95 -define webp:lossless=false "./images/_splash_without_version.webp"
+           -quality 80 -define webp:lossless=false "./images/_splash_without_version.webp"
     rm ./images/header.mpc ./images/header.cache
 fi
 
