@@ -2,7 +2,17 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_1, f02_2, f03_3, f04_4, f05_5, f06_6, f07_7, f08_8, f09_9
+from . import (
+    f01_function_1,
+    f02_function_2,
+    f03_function_3,
+    f04_function_4,
+    f05_function_5,
+    f06_function_6,
+    f07_function_7,
+    f08_function_8,
+    f09_function_9,
+)
 
 
 class Chandrupatla1997(FormulaCategory):

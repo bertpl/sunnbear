@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_ex_1, f02_ex_3_7_2, f03_7_1, f04_app_d, f05_7_3
+from . import f01_example_1, f02_example_3, f03_section_7_1, f04_appendix_d, f05_section_7_3
 
 
 class LiZhouLangeTian2026(FormulaCategory):

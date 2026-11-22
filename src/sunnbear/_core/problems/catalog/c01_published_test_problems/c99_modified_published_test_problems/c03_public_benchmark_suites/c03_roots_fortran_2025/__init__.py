@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f04_2627, f30_8688, f33_9394, f41_150
+from . import f04_case_26, f30_case_86, f33_case_93, f41_case_150
 
 
 class ModifiedRootsFortran2025(FormulaCategory):

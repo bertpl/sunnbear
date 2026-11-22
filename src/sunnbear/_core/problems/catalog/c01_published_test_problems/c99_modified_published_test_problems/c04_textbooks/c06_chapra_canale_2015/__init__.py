@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f01_pt2_3, f02_ex_5_2, f18_prob_5_10, f20_prob_5_15
+from . import f01_equation_pt2_3, f02_example_5_2, f18_problem_5_10, f20_problem_5_15
 
 
 class ModifiedChapraCanale2015(FormulaCategory):

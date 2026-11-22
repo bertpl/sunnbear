@@ -10,7 +10,7 @@ test item per formula or category would only add items.
 """
 
 import re
-from collections import Counter
+from collections import Counter, defaultdict
 
 import sunnbear._core.problems.catalog as catalog
 from sunnbear._core.problems.core import FormulaRegistry
@@ -92,3 +92,25 @@ def test_publications_declare_their_parts():
 
     # --- assert -----------------------
     assert failing == []
+
+
+def test_formula_names_are_readable_and_unique_within_each_single_publication_category():
+    """Each single-publication category holds formulas, no 2 of them share a name, and each starts with a capital."""
+    # --- act --------------------------
+    names_by_category = defaultdict(list)
+    for formula in _SHIPPED_FORMULAS:
+        category = FormulaRegistry.category_of(formula)
+        if category in _SINGLE_PUBLICATION_CATEGORIES:
+            names_by_category[category.label].append(formula.name)
+    duplicates = [
+        f"{label}: {name}"
+        for label, names in names_by_category.items()
+        for name, count in Counter(names).items()
+        if count > 1
+    ]
+    not_readable = [name for names in names_by_category.values() for name in names if not re.match(r"[A-Z][a-z]", name)]
+
+    # --- assert -----------------------
+    assert len(names_by_category) == len(_SINGLE_PUBLICATION_CATEGORIES)
+    assert duplicates == []
+    assert not_readable == []

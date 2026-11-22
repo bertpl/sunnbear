@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_1_2, f02_examples_1_11_3, f03_example_1_4, f04_example_1_7, f05_1_33, f06_exercise_1_2
+from . import f01_equation_1_2, f02_example_1_1, f03_example_1_4, f04_example_1_7, f05_equation_1_33, f06_exercise_1_2
 
 
 class SuliMayers2003(FormulaCategory):

@@ -2,7 +2,16 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f08_3_1_3_h, f11_3_1_14_b, f14_3_2_p_99, f15_3_2_p_100, f20_3_9_8, f21_ex_3_10, f22_3_11_4, f23_3_11_25
+from . import (
+    f08_exercise_3_1_3_h,
+    f11_exercise_3_1_14_b,
+    f14_figure_3_3,
+    f15_table_3_3,
+    f20_exercise_3_9_8,
+    f21_example_3_10,
+    f22_figure_3_12,
+    f23_exercise_3_11_25,
+)
 
 
 class ModifiedEpperson2013(FormulaCategory):

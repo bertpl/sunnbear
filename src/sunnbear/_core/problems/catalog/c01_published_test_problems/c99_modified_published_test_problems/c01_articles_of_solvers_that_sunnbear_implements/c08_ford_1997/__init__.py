@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f01_1
+from . import f01_function_1
 
 
 class ModifiedFord1997(FormulaCategory):

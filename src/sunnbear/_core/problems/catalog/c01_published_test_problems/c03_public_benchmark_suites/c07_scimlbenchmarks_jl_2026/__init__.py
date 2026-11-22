@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_g, f02_6
+from . import f01_function_g, f02_function_6
 
 
 class ScimlbenchmarksJl2026(FormulaCategory):

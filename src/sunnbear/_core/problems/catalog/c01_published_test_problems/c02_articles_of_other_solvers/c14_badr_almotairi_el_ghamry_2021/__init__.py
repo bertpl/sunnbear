@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_p7, f02_p10, f03_p12, f04_p13, f05_p14
+from . import f01_problem_p7, f02_problem_p10, f03_problem_p12, f04_problem_p13, f05_problem_p14
 
 
 class BadrAlmotairiElGhamry2021(FormulaCategory):

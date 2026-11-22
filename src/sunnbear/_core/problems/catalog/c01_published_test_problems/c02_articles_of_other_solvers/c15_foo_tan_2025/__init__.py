@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_4_2, f02_4_3_1
+from . import f01_section_4_2, f02_section_4_3_1
 
 
 class FooTan2025(FormulaCategory):

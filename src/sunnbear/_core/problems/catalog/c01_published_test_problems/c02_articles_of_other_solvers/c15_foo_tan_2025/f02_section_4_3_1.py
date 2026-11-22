@@ -1,0 +1,120 @@
+"""This module holds a formula of Foo, Tan (2025).
+
+The formula comes from the row with the key ``4.3.1`` in the survey of published test problems.
+"""
+
+import math
+
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
+
+
+class FooTan2025Section431(Formula):
+    """This formula comes from Foo, Tan (2025).
+
+    The survey writes the source's function as ``x*log(q - 1)/log(q) - if(x = 0; 0; x*log(x))/log(q) - if(x = 1; 0; (1 -
+    x)*log(1 - x))/log(q) - y``, with the parameters `q = 2^127 - 1`; `y = 0.1, 0.2, ..., 0.9`; the formula's interval
+    is ``[0, (q - 1)/q]``.
+
+    The article writes `Hq(x) = x*logq(q - 1) - x*logq(x) - (1 - x)*logq(1 - x)` with base-q logarithms. Definition 1
+    defines `Hq` on `[0, 1]`, so that the terms `x*logq(x)` and `(1 - x)*logq(1 - x)` are `0` at `x = 0` and at `x = 1`.
+    The row writes these 2 values as conditionals, which float64 needs at both bounds, because the upper bound `(q -
+    1)/q` rounds to `1`; it keeps the rest of the function as printed. The starting value is `x0 = y`. Table 2's values
+    match `q = 2^156`, not the stated `q = 2^127 - 1`; the text and Prop. 10, whose bound `0.0157` is `2/127`, confirm
+    `2^127 - 1`, which the row keeps.
+    """
+
+    number = (1, 2, 15, 2)
+    name = "Section 4.3.1"
+    params = (
+        FormulaParam("q", latex_symbol="q"),
+        FormulaParam("y", latex_symbol="y"),
+    )
+    location_in_publication = "Section 4.3.1"
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=(
+            r"\frac{\tmp{u} \ln{\left(\param{q} - 1 \right)}}{\ln{\left(\param{q} \right)}} - "
+            r"\frac{\begin{cases} 0 & \text{for}\: \tmp{u} = 0 \\\tmp{u} \ln{\left(\tmp{u} \right)} & "
+            r"\text{otherwise} \end{cases}}{\ln{\left(\param{q} \right)}} - \frac{\begin{cases} 0 & "
+            r"\text{for}\: \tmp{u} = 1 \\\left(1 - \tmp{u}\right) \ln{\left(1 - \tmp{u} \right)} & "
+            r"\text{otherwise} \end{cases}}{\ln{\left(\param{q} \right)}} - \param{y}"
+        ),
+        interval=(
+            r"\left[0, "
+            r"\frac{170141183460469231731687303715884105726}{170141183460469231731687303715884105727}\right]"
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
+
+    @staticmethod
+    def parametrized_fun(x: float, c: float, q: float, y: float) -> float:
+        """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
+        x = x - 1.0 * c
+        return (
+            x * math.log(q - 1) / math.log(q)
+            - ((0) if (x) == (0) else (x * math.log(x))) / math.log(q)
+            - ((0) if (x) == (1) else ((1 - x) * math.log(1 - x))) / math.log(q)
+            - y
+        )
+
+    def interval_bounds(self, q: float, y: float) -> tuple[float, float]:
+        """Return the formula's interval."""
+        return (0.0, 1.0)
+
+    def recipes(self) -> tuple[ParamRecipe, ...]:
+        """Return the published parameter values."""
+        return (
+            ParamTable(
+                names=("q", "y"),
+                rows=(
+                    (1.7014118346046923e38, 0.1),
+                    (1.7014118346046923e38, 0.2),
+                    (1.7014118346046923e38, 0.3),
+                    (1.7014118346046923e38, 0.4),
+                    (1.7014118346046923e38, 0.5),
+                    (1.7014118346046923e38, 0.6),
+                    (1.7014118346046923e38, 0.7),
+                    (1.7014118346046923e38, 0.8),
+                    (1.7014118346046923e38, 0.9),
+                ),
+                summary="The published parameter values.",
+            ),
+        )
+
+    test_cases = (
+        FormulaTestCase.value(params={"q": 1.7014118346046923e38, "y": 0.1}, x=0.3, c=0.0, expected=0.2069392984191393),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.1}, x=0.3, c=0.25, expected=-0.04774490584948067
+        ),
+        FormulaTestCase.value(params={"q": 1.7014118346046923e38, "y": 0.2}, x=0.3, c=0.0, expected=0.1069392984191393),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.3}, x=0.3, c=0.0, expected=0.0069392984191393005
+        ),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.4}, x=0.3, c=0.0, expected=-0.0930607015808607
+        ),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.5}, x=0.3, c=0.0, expected=-0.1930607015808607
+        ),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.6}, x=0.3, c=0.0, expected=-0.29306070158086067
+        ),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.7}, x=0.3, c=0.0, expected=-0.3930607015808607
+        ),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.8}, x=0.3, c=0.0, expected=-0.4930607015808607
+        ),
+        FormulaTestCase.value(
+            params={"q": 1.7014118346046923e38, "y": 0.9}, x=0.3, c=0.0, expected=-0.5930607015808607
+        ),
+        FormulaTestCase.interval_bounds(params={"q": 1.7014118346046923e38, "y": 0.1}, expected=(0.0, 1.0)),
+    )

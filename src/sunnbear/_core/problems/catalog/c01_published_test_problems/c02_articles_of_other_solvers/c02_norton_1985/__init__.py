@@ -2,7 +2,15 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_2, f02_5, f03_6, f04_8, f05_9, f06_10, f07_driver
+from . import (
+    f01_function_2,
+    f02_function_5,
+    f03_function_6,
+    f04_function_8,
+    f05_function_9,
+    f06_function_10,
+    f07_the_driver_of_the_author_s_code,
+)
 
 
 class Norton1985(FormulaCategory):

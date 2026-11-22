@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f05_20, f06_21, f14_30, f20_38
+from . import f05_problem_20, f06_problem_21, f14_problem_30, f20_problem_38
 
 
 class ModifiedEllithy2026(FormulaCategory):

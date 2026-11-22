@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f02_func9, f03_func10, f04_func11
+from . import f02_function_func9, f03_function_func10, f04_function_func11
 
 
 class ModifiedRootsJl2026(FormulaCategory):

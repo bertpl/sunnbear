@@ -2,7 +2,17 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_3_4, f02_3_5, f03_3_6, f04_3_7, f05_3_8, f06_3_9, f07_3_10, f08_3_11, f09_3_13
+from . import (
+    f01_section_3_4,
+    f02_section_3_5,
+    f03_section_3_6,
+    f04_section_3_7,
+    f05_section_3_8,
+    f06_section_3_9,
+    f07_section_3_10,
+    f08_section_3_11,
+    f09_section_3_13,
+)
 
 
 class Stage2013(FormulaCategory):

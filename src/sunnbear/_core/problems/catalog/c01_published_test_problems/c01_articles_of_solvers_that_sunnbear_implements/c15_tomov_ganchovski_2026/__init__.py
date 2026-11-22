@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_25, f02_7_6_b, f03_7_6_c
+from . import f01_equation_25, f02_function_b, f03_function_c
 
 
 class TomovGanchovski2026(FormulaCategory):

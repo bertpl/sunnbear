@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f02_1_3_6, f06_2_8_case_3, f07_2_8_case_4, f08_p38_a
+from . import f02_equation_1_3_6, f06_case_3, f07_case_4, f08_problem_38_a
 
 
 class ModifiedAtkinson1989(FormulaCategory):

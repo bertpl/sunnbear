@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_t1_1, f02_t1_2, f03_t1_3, f04_t1_4, f05_t1_6
+from . import f01_equation_1, f02_equation_2, f03_equation_3, f04_equation_4, f05_equation_6
 
 
 class NaghipoorAhmadianSoheili2008(FormulaCategory):

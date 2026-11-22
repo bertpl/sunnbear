@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_6, f02_8
+from . import f01_equation_6, f02_equation_8
 
 
 class SteffenEtAl2025(FormulaCategory):

@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_3
+from . import f01_section_3
 
 
 class IsmuniyartoPinheiroSokhna2025(FormulaCategory):

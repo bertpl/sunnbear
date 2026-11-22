@@ -3,21 +3,21 @@
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
-    f01_1_1,
-    f02_1_7,
-    f03_4_1,
-    f04_4_3,
-    f05_4_7_4_8,
-    f06_4_7_4_10,
-    f07_4_7_ex_4_1,
-    f08_4_7_3,
-    f09_ex_4_1,
-    f10_ex_4_1_2,
-    f11_ex_4_1_3,
-    f12_ex_4_1_4,
-    f13_ex_4_1_5,
-    f14_ex_4_3,
-    f15_ex_4_10_c,
+    f01_section_1_1,
+    f02_section_1_7,
+    f03_section_4_5,
+    f04_section_4_4,
+    f05_section_4_8,
+    f06_section_4_10,
+    f07_section_4_7,
+    f08_section_4_7_function_3,
+    f09_exercise_4_1,
+    f10_function_2,
+    f11_exercise_4_1_function_3,
+    f12_function_4,
+    f13_function_5,
+    f14_exercise_4_3,
+    f15_exercise_4_10_c,
 )
 
 

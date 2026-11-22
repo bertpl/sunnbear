@@ -3,17 +3,17 @@
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
-    f01_fig_1,
-    f02_fig_2,
-    f03_fig_3,
-    f04_fig_4,
-    f05_t2_1,
-    f06_t2_4,
-    f07_t2_5,
-    f08_t2_6,
-    f09_t2_8,
-    f10_t2_10,
-    f11_t2_11,
+    f01_figure_1,
+    f02_figure_2,
+    f03_figure_3,
+    f04_figure_4,
+    f05_function_1,
+    f06_function_4,
+    f07_function_5,
+    f08_function_6,
+    f09_function_8,
+    f10_function_10,
+    f11_function_11,
 )
 
 

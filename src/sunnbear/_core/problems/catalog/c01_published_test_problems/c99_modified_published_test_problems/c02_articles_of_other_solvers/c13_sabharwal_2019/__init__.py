@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f08_t2_6, f09_t2_8
+from . import f08_function_6, f09_function_8
 
 
 class ModifiedSabharwal2019(FormulaCategory):

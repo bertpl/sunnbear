@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f04_p04, f06_p06, f12_p12, f17_p18
+from . import f04_problem_p04, f06_problem_p06, f12_problem_p12, f17_problem_p18
 
 
 class ModifiedBurkardt2016(FormulaCategory):

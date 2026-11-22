@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
-from . import f01_1, f02_2, f03_3, f04_4, f05_5
+from . import f01_function_1, f02_function_2, f03_function_3, f04_function_4, f05_function_5
 
 
 class Ford1997(FormulaCategory):

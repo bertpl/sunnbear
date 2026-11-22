@@ -2,7 +2,7 @@
 
 from sunnbear._core.problems.core import FormulaCategory
 
-from . import f03_iii_2
+from . import f03_function_2
 
 
 class ModifiedRidders1979(FormulaCategory):
