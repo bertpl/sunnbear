@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -37,15 +36,7 @@ class KumarSrivastav2026A2(Formula):
     number = (1, 2, 19, 6)
     name = "A.2"
     params = (FormulaParam("sigma", latex_symbol=r"\sigma"),)
-    source = FormulaSource(
-        reference=(
-            "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "
-            "root finding with uniform spacing contraction. Research Square preprint. "
-            "https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement "
-            "offers the authors' scripts from the corresponding author on request."
-        ),
-        location="Appendix A.2",
-    )
+    location_in_publication = "Appendix A.2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - e^{-\tmp{u}} + \param{sigma} Z(\tmp{u})",

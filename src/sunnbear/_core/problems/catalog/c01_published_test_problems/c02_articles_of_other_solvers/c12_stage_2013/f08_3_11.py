@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -32,14 +31,7 @@ class Stage2013311(Formula):
     number = (1, 2, 12, 8)
     name = "3.11"
     params = (FormulaParam("d", latex_symbol="d"),)
-    source = FormulaSource(
-        reference=(
-            "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "
-            "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
-            "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
-        ),
-        location="§3.11; §3.12",
-    )
+    location_in_publication = "§3.11; §3.12"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=(

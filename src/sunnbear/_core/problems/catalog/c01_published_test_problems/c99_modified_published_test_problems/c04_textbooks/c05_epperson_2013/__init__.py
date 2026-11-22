@@ -8,8 +8,7 @@ from . import f08_3_1_3_h, f11_3_1_14_b, f14_3_2_p_99, f15_3_2_p_100, f20_3_9_8,
 class ModifiedEpperson2013(FormulaCategory):
     """`ModifiedEpperson2013` holds the modified versions of the formulas of 1 publication.
 
-    Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley & Sons, Hoboken,
-    NJ. ISBN 978-1-118-36759-9.
+    Its formulas modify those of category 1.4.5, `Epperson2013`, and come from its publication.
     """
 
     number = (1, 99, 4, 5)

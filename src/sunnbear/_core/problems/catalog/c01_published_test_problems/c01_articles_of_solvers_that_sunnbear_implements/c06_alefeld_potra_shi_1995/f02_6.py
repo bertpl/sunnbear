@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -29,15 +28,7 @@ class AlefeldPotraShi19956(Formula):
     number = (1, 1, 6, 2)
     name = "6"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous"
-            " functions. ACM Transactions on Mathematical Software 21(3), 327–344. "
-            "https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748: "
-            "https://www.netlib.org/toms/748."
-        ),
-        location="Table I, problem 6",
-    )
+    location_in_publication = "Table I, problem 6"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} e^{- \param{n}} - 2 e^{- \param{n} \tmp{u}} + 1",

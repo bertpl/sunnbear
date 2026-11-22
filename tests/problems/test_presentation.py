@@ -46,9 +46,28 @@ def test_invalid_definitions_are_rejected(definitions, expression, message):
     [
         ({"notes": (r"Here $\tmp{u}$ is undefined.",)}, "no earlier definition"),  # the note names an undefined name
         ({"summary": r"A function of $\param{}$."}, "no well-formed argument"),  # the summary breaks the notation
+        ({"param_conditions": (r"$\tmp{u} > 0$",)}, "no earlier definition"),  # the condition names an undefined name
     ],
 )
 def test_invalid_text_is_rejected(texts, message):
     """A text for a reader that names an undefined name, or breaks sunnbear's LaTeX notation, is rejected."""
     with pytest.raises(ValueError, match=message):
         FormulaPresentation(expression=r"\x - \c", interval="[0, 1]", **texts)
+
+
+def test_texts_for_a_reader_hold_the_summary_notes_and_parameter_conditions():
+    """The texts for a reader are the summary, then the notes, then the parameter conditions."""
+    # --- arrange ----------------------
+    presentation = FormulaPresentation(
+        expression=r"\x^{\param{p}} - \c",
+        interval="[0, 1]",
+        summary="A power.",
+        notes=("A note.",),
+        param_conditions=(r"$\param{p}$ is an odd integer.", r"$\param{p} \ge 3$"),
+    )
+
+    # --- act --------------------------
+    texts = presentation.texts_for_a_reader
+
+    # --- assert -----------------------
+    assert texts == ("A power.", "A note.", r"$\param{p}$ is an odd integer.", r"$\param{p} \ge 3$")

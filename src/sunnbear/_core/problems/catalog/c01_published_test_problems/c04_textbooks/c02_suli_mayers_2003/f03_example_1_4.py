@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -33,13 +32,7 @@ class SuliMayers2003Example14(Formula):
     number = (1, 4, 2, 3)
     name = "Example 1.4"
     params = (FormulaParam("alpha", latex_symbol=r"\alpha"),)
-    source = FormulaSource(
-        reference=(
-            "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
-            "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
-        ),
-        location="Example 1.4",
-    )
+    location_in_publication = "Example 1.4"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{u}", r"\x - \c"),

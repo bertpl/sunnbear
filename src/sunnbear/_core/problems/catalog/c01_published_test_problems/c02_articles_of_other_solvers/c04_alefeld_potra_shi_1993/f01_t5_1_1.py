@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class AlefeldPotraShi1993T511(Formula):
     number = (1, 2, 4, 1)
     name = "T5.1-1"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
-            "equations. Mathematics of Computation 61(204), 733–744. "
-            "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
-        ),
-        location="Table 5.1, problem 1",
-    )
+    location_in_publication = "Table 5.1, problem 1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.57 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{2}",

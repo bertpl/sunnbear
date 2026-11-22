@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -35,15 +34,7 @@ class Borchers2026F12(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". '
-            "https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The "
-            "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
-            " the author of the R package pracma. The chapter cites no source for its test problems."
-        ),
-        location="§5.6, f12",
-    )
+    location_in_publication = "§5.6, f12"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(

@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,15 +23,7 @@ class NaghipoorAhmadianSoheili2008T16(Formula):
     number = (1, 2, 7, 5)
     name = "T1.6"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Naghipoor, J., Ahmadian, S. A., Soheili, A. R. (2008). An Improved Regula Falsi Method for"
-            " Finding Simple Zeros of Nonlinear Equations. Applied Mathematical Sciences 2(8), 381–386."
-            " No DOI; the publisher's copy: "
-            "https://www.m-hikari.com/ams/ams-password-2008/ams-password5-8-2008/soheiliAMS5-8-2008.pdf."
-        ),
-        location="Table 1, equation 6",
-    )
+    location_in_publication = "Table 1, equation 6"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\frac{1}{\tmp{u}} - 1",

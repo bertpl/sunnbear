@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -26,15 +25,7 @@ class KumarSrivastav2026F5(Formula):
     number = (1, 2, 19, 4)
     name = "f5"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Kumar, D., Srivastav, S. K. (2026). A randomized bracketing method for derivative-free "
-            "root finding with uniform spacing contraction. Research Square preprint. "
-            "https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement "
-            "offers the authors' scripts from the corresponding author on request."
-        ),
-        location="Table 3, f5",
-    )
+    location_in_publication = "Table 3, f5"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(1 + \tmp{u} \right)} - 0.4",

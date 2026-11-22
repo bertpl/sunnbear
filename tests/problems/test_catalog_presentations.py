@@ -10,7 +10,7 @@ the rule of category 1 for the size of the shift.
 import pytest
 
 import sunnbear._core.problems.catalog as catalog
-from sunnbear._core.problems.core import FormulaRegistry
+from sunnbear._core.problems.core import Formula, FormulaRegistry
 from tests.problems.effect_of_c_check import follows_effect_of_c
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
@@ -93,6 +93,24 @@ def test_formulas_declare_their_summaries():
         formula.label
         for formula in _SHIPPED_FORMULAS
         if formula.presentation is None or formula.presentation.summary is None
+    ]
+
+    # --- assert -----------------------
+    assert failing == []
+
+
+@pytest.mark.skip(reason="the formulas of category 2 declare no parameter conditions")
+def test_formulas_declare_parameter_conditions_exactly_where_they_check_parameters():
+    """A shipped formula's presentation declares parameter conditions exactly when it overrides `is_param_tuple_valid`.
+
+    Nothing compares a condition's text with the code that checks it.
+    """
+    # --- act --------------------------
+    failing = [
+        formula.label
+        for formula in _SHIPPED_FORMULAS
+        if (type(formula).is_param_tuple_valid is not Formula.is_param_tuple_valid)
+        != (formula.presentation is not None and len(formula.presentation.param_conditions) > 0)
     ]
 
     # --- assert -----------------------

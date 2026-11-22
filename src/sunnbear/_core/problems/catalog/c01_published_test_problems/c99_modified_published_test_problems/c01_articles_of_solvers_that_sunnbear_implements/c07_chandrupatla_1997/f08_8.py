@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -45,14 +44,7 @@ class ModifiedChandrupatla19978(Formula):
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
     )
-    source = FormulaSource(
-        reference=(
-            "Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the "
-            "zero of a nonlinear function without using derivatives. Advances in Engineering Software "
-            "28(3), 145–149. https://doi.org/10.1016/S0965-9978(96)00051-8."
-        ),
-        location="Table 1, function 8",
-    )
+    location_in_publication = "Table 1, function 8"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(\param{b}/\param{a})}"),),
         expression=(

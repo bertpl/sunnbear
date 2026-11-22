@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -27,14 +26,7 @@ class BurdenFairesBurden2016242D(Formula):
     number = (1, 4, 7, 48)
     name = "2.4-2(d)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
-            "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
-            "the print year 2014."
-        ),
-        location="Exercise 2.4-2(d)",
-    )
+    location_in_publication = "Exercise 2.4-2(d)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{3 \tmp{u}} - 27 \tmp{u}^{6} + 27 \tmp{u}^{4} e^{\tmp{u}} - 9 \tmp{u}^{2} e^{2 \tmp{u}}",

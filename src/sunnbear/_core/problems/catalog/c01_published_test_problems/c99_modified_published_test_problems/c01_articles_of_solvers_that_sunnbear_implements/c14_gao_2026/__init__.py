@@ -8,8 +8,7 @@ from . import f05_t4_7
 class ModifiedGao2026(FormulaCategory):
     """`ModifiedGao2026` holds the modified versions of the formulas of 1 publication.
 
-    Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics Letters 178,
-    109928. https://doi.org/10.1016/j.aml.2026.109928.
+    Its formulas modify those of category 1.1.14, `Gao2026`, and come from its publication.
     """
 
     number = (1, 99, 1, 14)

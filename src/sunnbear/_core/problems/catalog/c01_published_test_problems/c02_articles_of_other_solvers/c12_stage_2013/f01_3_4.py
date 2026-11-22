@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -33,14 +32,7 @@ class Stage201334(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "
-            "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
-            "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
-        ),
-        location="§3.4",
-    )
+    location_in_publication = "§3.4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}^{3}",

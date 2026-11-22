@@ -1,6 +1,6 @@
 """This category holds the formulas of Borchers (2026)."""
 
-from sunnbear._core.problems.core import FormulaCategory
+from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
     f01_f1,
@@ -20,17 +20,19 @@ from . import (
 
 
 class Borchers2026(FormulaCategory):
-    """`Borchers2026` is the category of the formulas of 1 publication.
-
-    Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". https://hwborchers.lima-
-    city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The page is unversioned and gives no author or date;
-    it is on the website of Hans W. Borchers, the author of the R package pracma. The chapter cites no source for its
-    test problems.
-    """
+    """`Borchers2026` is the category of the formulas of 1 publication."""
 
     number = (1, 3, 5)
     name = "Borchers (2026)"
     description = (
         "The test problems come from the chapter on root finding of the pracma Handbook, which "
         "documents the R package pracma."
+    )
+    publication = Publication(
+        citation=(
+            'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding".'
+            " https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The page is"
+            " unversioned and gives no author or date; it is on the website of Hans W. Borchers, the author of"
+            " the R package pracma. The chapter cites no source for its test problems."
+        )
     )

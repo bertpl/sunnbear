@@ -1,6 +1,6 @@
 """This category holds the formulas of Burden, Faires, Burden (2016)."""
 
-from sunnbear._core.problems.core import FormulaCategory
+from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
     f01_2_pp_4748,
@@ -57,14 +57,17 @@ from . import (
 
 
 class BurdenFairesBurden2016(FormulaCategory):
-    """`BurdenFairesBurden2016` is the category of the formulas of 1 publication.
-
-    Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. Cengage Learning, Boston, MA.
-    ISBN 978-1-305-25366-7. The copyright page gives © 2016 and the print year 2014.
-    """
+    """`BurdenFairesBurden2016` is the category of the formulas of 1 publication."""
 
     number = (1, 4, 7)
     name = "Burden, Faires, Burden (2016)"
     description = (
         "The test problems come from chapter 2, on equations in 1 variable, of the textbook Numerical Analysis."
+    )
+    publication = Publication(
+        citation=(
+            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. Cengage"
+            " Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and the print year"
+            " 2014."
+        )
     )

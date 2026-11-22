@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -33,15 +32,7 @@ class IsmuniyartoPinheiroSokhna20253(Formula):
     number = (1, 2, 16, 1)
     name = "§3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ismuniyarto, Pinheiro, D., Sokhna, E. H. L. (2025). A numerical study of bracketing "
-            "root-finding methods for nonlinear equations: applications to break-even point "
-            "determination. Interval: Indonesian Journal of Mathematical Education 3(2), 213–218. "
-            "https://doi.org/10.37251/ijome.v3i2.2782. The first author has a single name."
-        ),
-        location="§3",
-    )
+    location_in_publication = "§3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{n}", r"\x - 8 \c"),),
         expression=(

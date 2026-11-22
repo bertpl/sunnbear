@@ -8,8 +8,7 @@ from . import f01_pt2_3, f02_ex_5_2, f18_prob_5_10, f20_prob_5_15
 class ModifiedChapraCanale2015(FormulaCategory):
     """`ModifiedChapraCanale2015` holds the modified versions of the formulas of 1 publication.
 
-    Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill Education, New York,
-    NY. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021.
+    Its formulas modify those of category 1.4.6, `ChapraCanale2015`, and come from its publication.
     """
 
     number = (1, 99, 4, 6)

@@ -1,17 +1,19 @@
 """This category holds the formulas of Suhadolnik (2012)."""
 
-from sunnbear._core.problems.core import FormulaCategory
+from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import f01_2, f02_4, f03_5, f04_7, f05_8, f06_9, f07_10, f08_11, f09_12, f10_13, f11_14, f12_15, f13_17, f14_18
 
 
 class Suhadolnik2012(FormulaCategory):
-    """`Suhadolnik2012` is the category of the formulas of 1 publication.
-
-    Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. Applied Mathematics Letters
-    25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006.
-    """
+    """`Suhadolnik2012` is the category of the formulas of 1 publication."""
 
     number = (1, 2, 11)
     name = "Suhadolnik (2012)"
     description = "The test problems come from the article that introduces combined bracketing methods."
+    publication = Publication(
+        citation=(
+            "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. Applied"
+            " Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
+        )
+    )

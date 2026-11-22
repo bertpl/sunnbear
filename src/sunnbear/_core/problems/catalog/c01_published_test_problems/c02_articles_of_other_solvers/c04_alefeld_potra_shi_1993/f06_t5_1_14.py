@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -32,14 +31,7 @@ class AlefeldPotraShi1993T5114(Formula):
     number = (1, 2, 4, 6)
     name = "T5.1-14"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
-            "equations. Mathematics of Computation 61(204), 733–744. "
-            "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
-        ),
-        location="Table 5.1, problem 14",
-    )
+    location_in_publication = "Table 5.1, problem 14"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 10^{4} \c"),),
         expression=(

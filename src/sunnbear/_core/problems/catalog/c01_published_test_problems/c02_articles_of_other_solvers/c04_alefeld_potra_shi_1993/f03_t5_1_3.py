@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -35,14 +34,7 @@ class AlefeldPotraShi1993T513(Formula):
         FormulaParam("a_", latex_symbol="a"),
         FormulaParam("b_", latex_symbol="b"),
     )
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
-            "equations. Mathematics of Computation 61(204), 733–744. "
-            "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
-        ),
-        location="Table 5.1, problem 3",
-    )
+    location_in_publication = "Table 5.1, problem 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 40 \c"),),
         expression=r"\param{a_} \tmp{u} e^{\param{b_} \tmp{u}}",

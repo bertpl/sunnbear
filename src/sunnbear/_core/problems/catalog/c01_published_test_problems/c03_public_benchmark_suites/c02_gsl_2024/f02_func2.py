@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -28,15 +27,7 @@ class Gsl2024Func2(Formula):
     number = (1, 3, 2, 2)
     name = "func2"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "GNU Scientific Library (GSL), release 2.8, files `roots/test_funcs.c` and `roots/test.c` "
-            "(copyright Reid Priedhorsky, Brian Gough), "
-            "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite "
-            "no source for their functions."
-        ),
-        location="test_funcs.c, func2",
-    )
+    location_in_publication = "test_funcs.c, func2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.33 \c"),),
         expression=r"\sqrt{\left|{\tmp{u}}\right|} \operatorname{sign}{\left(\tmp{u} \right)}",

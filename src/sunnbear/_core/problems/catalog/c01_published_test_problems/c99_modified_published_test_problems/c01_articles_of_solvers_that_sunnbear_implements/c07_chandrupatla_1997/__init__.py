@@ -8,9 +8,7 @@ from . import f02_2, f07_7, f08_8, f09_9
 class ModifiedChandrupatla1997(FormulaCategory):
     """`ModifiedChandrupatla1997` holds the modified versions of the formulas of 1 publication.
 
-    Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function
-    without using derivatives. Advances in Engineering Software 28(3), 145–149.
-    https://doi.org/10.1016/S0965-9978(96)00051-8.
+    Its formulas modify those of category 1.1.7, `Chandrupatla1997`, and come from its publication.
     """
 
     number = (1, 99, 1, 7)

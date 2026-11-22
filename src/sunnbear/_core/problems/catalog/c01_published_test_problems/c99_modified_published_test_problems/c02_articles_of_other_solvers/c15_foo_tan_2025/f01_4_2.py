@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -39,14 +38,7 @@ class ModifiedFooTan202542(Formula):
     number = (1, 99, 2, 15, 1)
     name = "4.2"
     params = (FormulaParam("y", latex_symbol="y"),)
-    source = FormulaSource(
-        reference=(
-            "Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. "
-            "arXiv preprint 2509.20897v1. https://doi.org/10.48550/arxiv.2509.20897 "
-            "(https://arxiv.org/abs/2509.20897v1)."
-        ),
-        location="Section 4.2",
-    )
+    location_in_publication = "Section 4.2"
     presentation = FormulaPresentation(
         expression=(
             r"\begin{cases} 0 & \text{for}\: \x = 0 \\- \x \log_{2}{\left(\x \right)} & "

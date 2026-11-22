@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,15 +23,7 @@ class Galdino2011F7(Formula):
     number = (1, 2, 9, 7)
     name = "f7"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Galdino, S. (2011). A family of regula falsi root-finding methods. Proceedings of the 2011"
-            " World Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517. ISBN "
-            "978-1-61284-365-0. No DOI; the author's copy: "
-            "http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
-        ),
-        location="Table IV, f7",
-    )
+    location_in_publication = "Table IV, f7"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - e^{\tmp{u} - 1}",

@@ -11,11 +11,12 @@ from sunnbear._core.problems.core import (
     ParamGrid,
     ParamRecipe,
     ProblemId,
+    Publication,
 )
 from sunnbear._core.problems.core.exceptions import InvalidParamsError, UnknownFormulaError
 
 from .example_formulas import ExampleCubic, ExampleOddPower
-from .example_taxonomy_nodes import define_formula_cls
+from .example_taxonomy_nodes import define_category_cls, define_formula_cls
 
 
 # ==================================================================================================
@@ -454,6 +455,57 @@ def test_formula_from_number_unknown_formula():
     """A formula number that is not registered raises `UnknownFormulaError`."""
     with pytest.raises(UnknownFormulaError):
         FormulaRegistry.formula_from_number((9, 9))
+
+
+@pytest.mark.usefixtures("isolated_formula_registry")
+def test_category_of_returns_the_category_that_holds_the_formula():
+    """`category_of` returns the category whose number is the formula's number without its last element."""
+    # --- arrange ----------------------
+    category_cls = define_category_cls((99, 1))
+    formula = define_formula_cls((99, 1, 1))()
+
+    # --- act --------------------------
+    category = FormulaRegistry.category_of(formula)
+
+    # --- assert -----------------------
+    assert type(category) is category_cls
+
+
+@pytest.mark.usefixtures("isolated_formula_registry")
+def test_publication_of_finds_the_publication_of_the_category_or_of_the_modified_formula():
+    """A formula comes from its category's publication, a modifying formula from that of the formula it modifies.
+
+    Category 99.2 declares that its formulas modify those of category 99.1, so formula 99.2.1 modifies formula 99.1.1.
+    """
+    # --- arrange ----------------------
+    publication = Publication(citation="Author, A. (2000). A title.")
+    define_category_cls((99, 1), publication=publication)
+    define_category_cls((99, 2), modifies_category_number=(99, 1))
+    define_category_cls((99, 3))
+    published_formula = define_formula_cls((99, 1, 1))()
+    modifying_formula = define_formula_cls((99, 2, 1))()
+    other_formula = define_formula_cls((99, 3, 1))()
+
+    # --- act --------------------------
+    publications = [
+        FormulaRegistry.publication_of(formula) for formula in (published_formula, modifying_formula, other_formula)
+    ]
+
+    # --- assert -----------------------
+    assert publications == [publication, publication, None]
+
+
+@pytest.mark.usefixtures("isolated_formula_registry")
+def test_publication_of_a_formula_that_modifies_no_registered_formula_raises():
+    """A modifying formula whose modified formula is not registered raises `UnknownFormulaError`."""
+    # --- arrange ----------------------
+    define_category_cls((99, 1))
+    define_category_cls((99, 2), modifies_category_number=(99, 1))
+    modifying_formula = define_formula_cls((99, 2, 1))()
+
+    # --- act / assert -----------------
+    with pytest.raises(UnknownFormulaError):
+        FormulaRegistry.publication_of(modifying_formula)
 
 
 def test_candidate_from_id_unknown_formula():

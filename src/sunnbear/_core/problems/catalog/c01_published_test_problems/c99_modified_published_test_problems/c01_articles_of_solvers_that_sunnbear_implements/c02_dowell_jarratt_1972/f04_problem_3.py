@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -39,13 +38,7 @@ class ModifiedDowellJarratt1972Problem3(Formula):
     number = (1, 99, 1, 2, 4)
     name = "Problem 3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an '
-            "equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959."
-        ),
-        location="Problem 3",
-    )
+    location_in_publication = "Problem 3"
     presentation = FormulaPresentation(
         expression=r"\sum_{n=-\infty}^{\infty} (-1)^n \x^{(3n^2 + n)/2} - 1 + \c",
         interval="[-0.9999, -0.0001]",

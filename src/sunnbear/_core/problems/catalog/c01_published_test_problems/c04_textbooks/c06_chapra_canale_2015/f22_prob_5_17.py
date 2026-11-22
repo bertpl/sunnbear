@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -38,14 +37,7 @@ class ChapraCanale2015Prob517(Formula):
         FormulaParam("R", latex_symbol="R"),
         FormulaParam("V", latex_symbol="V"),
     )
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="Prob. 5.17, 5.19, 6.19, 8.9",
-    )
+    location_in_publication = "Prob. 5.17, 5.19, 6.19, 8.9"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{h}", r"\x - 3 \c"),),
         expression=r"\param{V} - \frac{\pi \tmp{h}^{2} \left(3 \param{R} - \tmp{h}\right)}{3}",

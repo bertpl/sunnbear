@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -27,14 +26,7 @@ class BusDekker1975I5(Formula):
     number = (1, 2, 1, 4)
     name = "I.5"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "
-            "for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345."
-            " https://doi.org/10.1145/355656.355659."
-        ),
-        location="Group I, function 5",
-    )
+    location_in_publication = "Group I, function 5"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(

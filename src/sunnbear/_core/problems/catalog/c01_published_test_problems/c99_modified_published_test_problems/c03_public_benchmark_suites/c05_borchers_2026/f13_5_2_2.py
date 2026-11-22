@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -38,15 +37,7 @@ class ModifiedBorchers2026522(Formula):
     number = (1, 99, 3, 5, 13)
     name = "5.2.2"
     params = ()
-    source = FormulaSource(
-        reference=(
-            'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". '
-            "https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The "
-            "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
-            " the author of the R package pracma. The chapter cites no source for its test problems."
-        ),
-        location="§5.2.2",
-    )
+    location_in_publication = "§5.2.2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u} \sin{\left(\pi \tmp{u} \right)}",

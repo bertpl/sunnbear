@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,15 +23,7 @@ class OliveiraTakahashi2021112(Formula):
     number = (1, 1, 9, 11)
     name = "1.12"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method "
-            "average performance preserving minmax optimality. ACM Transactions on Mathematical "
-            "Software 47(1), Article 5. https://doi.org/10.1145/3423597. The article itself is dated "
-            "December 2020."
-        ),
-        location="Table 1, well-behaved function 12",
-    )
+    location_in_publication = "Table 1, well-behaved function 12"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\phi{\left(\tmp{u} - 1 \right)} - \frac{\sqrt{2}}{4}",

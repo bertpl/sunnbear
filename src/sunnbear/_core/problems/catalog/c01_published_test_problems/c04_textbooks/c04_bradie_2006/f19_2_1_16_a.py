@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -29,13 +28,7 @@ class Bradie20062116A(Formula):
     number = (1, 4, 4, 19)
     name = "2.1-16(a)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location="Exercises 2.1-16(a), 2.2-11(a), 2.3-14, 2.4-14(a), 2.5-18(a)",
-    )
+    location_in_publication = "Exercises 2.1-16(a), 2.2-11(a), 2.3-14, 2.4-14(a), 2.5-18(a)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} + \tmp{u}^{2} - \tmp{u} - 4",

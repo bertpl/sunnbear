@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -44,14 +43,7 @@ class ModifiedBusDekker1975Iv(Formula):
     number = (1, 99, 2, 1, 6)
     name = "IV"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "
-            "for finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345."
-            " https://doi.org/10.1145/355656.355659."
-        ),
-        location="Group IV",
-    )
+    location_in_publication = "Group IV"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{u}", r"\x - 5 \c"),

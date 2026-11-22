@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -27,17 +26,7 @@ class ScimlbenchmarksJl2026G(Formula):
     number = (1, 3, 7, 1)
     name = "g"
     params = ()
-    source = FormulaSource(
-        reference=(
-            'SciMLBenchmarks.jl, "Interval Rootfinding Test Suite" by Fabian Gittins (the front matter '
-            "of the file), file `benchmarks/IntervalNonlinearProblem/suite.jmd` at commit "
-            "`8a67931f726eeb53604926a6dd6bfc750316b4c4`, "
-            "https://github.com/SciML/SciMLBenchmarks.jl/blob/8a67931f726eeb53604926a6dd6bfc750316b4c4/benchmarks/IntervalNonlinearProblem/suite.jmd,"
-            ' MIT license. The file names no source for its functions; it calls them "a selection of '
-            'challenging test functions from the literature".'
-        ),
-        location="Section “A different function”, g",
-    )
+    location_in_publication = "Section “A different function”, g"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=r"e^{\tmp{u}} - 1.0 \cdot 10^{-15}",

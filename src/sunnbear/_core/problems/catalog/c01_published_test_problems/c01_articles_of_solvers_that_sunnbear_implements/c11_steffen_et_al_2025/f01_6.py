@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -27,14 +26,7 @@ class SteffenEtAl20256(Formula):
     number = (1, 1, 11, 1)
     name = "(6)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Steffen, V., Della Pasqua, C. C., de Oliveira, M. S., da Silva, E. A. (2025). Halving "
-            "interval guaranteed for Dekker and Brent root finding methods. Examples and "
-            "Counterexamples 7, 100173. https://doi.org/10.1016/j.exco.2024.100173."
-        ),
-        location="Eq. (6)",
-    )
+    location_in_publication = "Eq. (6)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=(

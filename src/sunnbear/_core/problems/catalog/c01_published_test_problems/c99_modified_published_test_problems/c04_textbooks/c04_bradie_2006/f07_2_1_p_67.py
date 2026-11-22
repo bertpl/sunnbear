@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -65,13 +64,7 @@ class ModifiedBradie200621P67(Formula):
         FormulaParam("monthly_deposit", latex_symbol=r"\mathit{monthly\ deposit}"),
         FormulaParam("goal", latex_symbol=r"\mathit{goal}"),
     )
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location="§2.1 (p. 67); Exercises 2.1-19, 2.5-20",
-    )
+    location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{r}", r"\x - 0.09 \c"),),
         expression=(

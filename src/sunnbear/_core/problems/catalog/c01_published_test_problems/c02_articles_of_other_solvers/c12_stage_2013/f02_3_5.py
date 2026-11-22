@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class Stage201335(Formula):
     number = (1, 2, 12, 2)
     name = "3.5"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "
-            "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
-            "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
-        ),
-        location="§3.5",
-    )
+    location_in_publication = "§3.5"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",

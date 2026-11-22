@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -32,18 +31,7 @@ class TomovGanchovski202625(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a "
-            "safeguarded modified Anderson–Björck method. arXiv preprint 2610.14193. "
-            "https://doi.org/10.48550/arxiv.2610.14193 (https://arxiv.org/abs/2610.14193). The authors'"
-            " C# code and benchmark definitions are in "
-            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit "
-            "`9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section "
-            "7.4 pins commit `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17])."
-        ),
-        location="Section 3, Eq. (25)",
-    )
+    location_in_publication = "Section 3, Eq. (25)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(

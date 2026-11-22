@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -26,14 +25,7 @@ class Zhang20113(Formula):
     number = (1, 2, 10, 1)
     name = "3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Zhang, Z. (2011). An Improvement to the Brent's Method. International Journal of "
-            "Experimental Algorithms 2(1), 21–26. No DOI; the publisher's page: "
-            "https://www.cscjournals.org/library/manuscriptinfo.php?mc=IJEA-7."
-        ),
-        location="Section 3",
-    )
+    location_in_publication = "Section 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}^{3}",

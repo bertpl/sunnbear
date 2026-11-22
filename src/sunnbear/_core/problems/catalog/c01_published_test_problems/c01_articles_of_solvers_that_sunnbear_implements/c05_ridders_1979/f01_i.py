@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class Ridders1979I(Formula):
     number = (1, 1, 5, 1)
     name = "I"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous"
-            " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
-            "https://doi.org/10.1109/TCS.1979.1084580."
-        ),
-        location="Section I",
-    )
+    location_in_publication = "Section I"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 5",

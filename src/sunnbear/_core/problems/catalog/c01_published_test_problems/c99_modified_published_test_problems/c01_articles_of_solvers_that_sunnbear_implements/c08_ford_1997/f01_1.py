@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -40,16 +39,7 @@ class ModifiedFord19971(Formula):
     number = (1, 99, 1, 8, 1)
     name = "1"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear "
-            "equations. Scientia Iranica 4(1&2), 28–34. The article has no working DOI: the journal's "
-            "page, https://scientiairanica.sharif.edu/article_21758.html, lists "
-            "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
-            "University of Essex technical report CSM-257 (1995)."
-        ),
-        location="Section “Numerical Tests”, function 1",
-    )
+    location_in_publication = "Section “Numerical Tests”, function 1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(200/0.004)}"),),
         expression=r"\sin{\left(\frac{0.01}{\tmp{u}} \right)} - 0.01",

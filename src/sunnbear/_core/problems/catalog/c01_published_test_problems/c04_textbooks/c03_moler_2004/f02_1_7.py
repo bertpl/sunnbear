@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -28,15 +27,7 @@ class Moler200417(Formula):
     number = (1, 4, 3, 2)
     name = "§1.7"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
-            "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
-            "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
-        ),
-        location="§1.7",
-    )
+    location_in_publication = "§1.7"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.024 \c"),),
         expression=(

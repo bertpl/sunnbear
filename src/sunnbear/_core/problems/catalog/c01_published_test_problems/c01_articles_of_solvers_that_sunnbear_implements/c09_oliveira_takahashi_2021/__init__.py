@@ -1,6 +1,6 @@
 """This category holds the formulas of Oliveira, Takahashi (2021)."""
 
-from sunnbear._core.problems.core import FormulaCategory
+from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
     f01_1_2,
@@ -31,16 +31,18 @@ from . import (
 
 
 class OliveiraTakahashi2021(FormulaCategory):
-    """`OliveiraTakahashi2021` is the category of the formulas of 1 publication.
-
-    Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average performance
-    preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article 5.
-    https://doi.org/10.1145/3423597. The article itself is dated December 2020.
-    """
+    """`OliveiraTakahashi2021` is the category of the formulas of 1 publication."""
 
     number = (1, 1, 9)
     name = "Oliveira, Takahashi (2021)"
     description = (
         "The test problems come from the article that introduces the ITP method, which improves the"
         " average performance of bisection and keeps bisection's worst-case number of iterations."
+    )
+    publication = Publication(
+        citation=(
+            "Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average"
+            " performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article"
+            " 5. https://doi.org/10.1145/3423597. The article itself is dated December 2020."
+        )
     )

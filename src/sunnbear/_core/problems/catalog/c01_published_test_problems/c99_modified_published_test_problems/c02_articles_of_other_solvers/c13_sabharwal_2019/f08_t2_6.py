@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -31,13 +30,7 @@ class ModifiedSabharwal2019T26(Formula):
     number = (1, 99, 2, 13, 8)
     name = "T2.6"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "
-            "Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
-        ),
-        location="Table 2, function 6",
-    )
+    location_in_publication = "Table 2, function 6"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 5.1 \c"),),
         expression=r"\tmp{u}^{2} + 5 \tmp{u} + 2",

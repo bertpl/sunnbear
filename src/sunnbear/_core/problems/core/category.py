@@ -10,6 +10,7 @@ from typing import ClassVar
 
 from sunnbear._core.utils.class_origin import is_sunnbear_module
 
+from .publication import Publication
 from .registry import FormulaRegistry
 from .taxonomy import FormulaTaxonomyNode
 
@@ -39,10 +40,19 @@ class FormulaCategory(FormulaTaxonomyNode):
             defined inside the sunnbear package. Declared on top-level categories only; the
             registry applies a top-level category's flag to every node below it, and a
             subcategory's own `is_builtin_only` stays at its default `False`.
+        publication: The publication of the category's formulas (`Publication`), declared by a category that holds
+            exactly the formulas of 1 publication; None by default. `FormulaRegistry.publication_of` finds it for each
+            formula.
+        modifies_category_number: The number of the category whose formulas the formulas below this category modify,
+            or None (default). A formula below this category modifies the formula with the same trailing elements
+            below that category, and comes from its publication: below a category 1.99 that declares ``(1,)``,
+            formula 1.99.1.6.3 modifies formula 1.1.6.3.
     """
 
     description: ClassVar[str | None] = None
     is_builtin_only: ClassVar[bool] = False
+    publication: ClassVar[Publication | None] = None
+    modifies_category_number: ClassVar[tuple[int, ...] | None] = None
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         """Validate the subclass and register it with `FormulaRegistry`.

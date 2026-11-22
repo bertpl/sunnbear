@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -27,13 +26,7 @@ class DowellJarratt1972Problem1(Formula):
     number = (1, 1, 2, 2)
     name = "Problem 1"
     params = (FormulaParam("N", latex_symbol="N"),)
-    source = FormulaSource(
-        reference=(
-            'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an '
-            "equation. BIT 12(4), 503–508. https://doi.org/10.1007/BF01932959."
-        ),
-        location="Problem 1",
-    )
+    location_in_publication = "Problem 1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
         expression=r"\frac{\param{N} \tmp{u} - 1}{\left(\param{N} - 1\right) \tmp{u}}",

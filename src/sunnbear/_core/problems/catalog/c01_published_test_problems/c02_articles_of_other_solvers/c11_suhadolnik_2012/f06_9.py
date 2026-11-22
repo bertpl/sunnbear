@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -22,13 +21,7 @@ class Suhadolnik20129(Formula):
     number = (1, 2, 11, 6)
     name = "9"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. "
-            "Applied Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
-        ),
-        location="Table 1, function 9",
-    )
+    location_in_publication = "Table 1, function 9"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{3} - 1",

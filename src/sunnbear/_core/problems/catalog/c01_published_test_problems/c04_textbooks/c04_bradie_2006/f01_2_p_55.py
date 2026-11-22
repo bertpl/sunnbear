@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -36,13 +35,7 @@ class Bradie20062P55(Formula):
         FormulaParam("rho_o", latex_symbol=r"\rho_{o}"),
         FormulaParam("rho_f", latex_symbol=r"\rho_{f}"),
     )
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location="§2 (p. 55); §2.2 (p. 78); Exercise 2.2-15",
-    )
+    location_in_publication = "§2 (p. 55); §2.2 (p. 78); Exercise 2.2-15"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{h}", r"\x - 10 \c"),),
         expression=(

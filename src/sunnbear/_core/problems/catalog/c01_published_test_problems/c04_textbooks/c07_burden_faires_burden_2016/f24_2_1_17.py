@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -25,14 +24,7 @@ class BurdenFairesBurden20162117(Formula):
     number = (1, 4, 7, 24)
     name = "2.1-17"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
-            "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
-            "the print year 2014."
-        ),
-        location="Exercises 2.1-17, 2.2-8, 2.5-7, 2.6-1(c)",
-    )
+    location_in_publication = "Exercises 2.1-17, 2.2-8, 2.5-7, 2.6-1(c)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 1",

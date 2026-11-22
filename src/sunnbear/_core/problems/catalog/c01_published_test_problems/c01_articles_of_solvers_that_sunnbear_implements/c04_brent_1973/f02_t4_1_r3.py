@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -23,16 +22,7 @@ class Brent1973T41R3(Formula):
     number = (1, 1, 4, 2)
     name = "T4.1 r3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Brent, R. P. (1973). Algorithms for Minimization without Derivatives. Prentice-Hall, "
-            "Englewood Cliffs, NJ. ISBN 0-13-022335-2. Author's scan: "
-            "https://maths-people.anu.edu.au/~brent/pub/pub011.html. Erratum: Brent, R. P. (1975). "
-            "Table Errata 520. Mathematics of Computation 29(132), 1166. "
-            "https://doi.org/10.1090/s0025-5718-1975-0371062-9."
-        ),
-        location="Table 4.1, row 3",
-    )
+    location_in_publication = "Table 4.1, row 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\tmp{u}^{19}",

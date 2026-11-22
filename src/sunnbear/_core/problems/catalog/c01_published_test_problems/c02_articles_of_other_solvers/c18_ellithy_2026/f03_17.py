@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -39,16 +38,7 @@ class Ellithy202617(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "
-            "finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. "
-            "https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the author's repository "
-            "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
-            "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
-        ),
-        location="dataset.json, problems 17, 28 and 44",
-    )
+    location_in_publication = "dataset.json, problems 17, 28 and 44"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \param{e} \sin{\left(\tmp{u} \right)} - \param{M}",

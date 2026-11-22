@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -30,17 +29,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F47(Formula):
     number = (1, 1, 13, 17)
     name = "f47"
     params = (FormulaParam("k", latex_symbol="k"),)
-    source = FormulaSource(
-        reference=(
-            "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
-            "the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. "
-            "https://doi.org/10.3390/a19050332. Supplementary materials: "
-            "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
-            "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
-        ),
-        location="Table 2, f47 and f48",
-    )
+    location_in_publication = "Table 2, f47 and f48"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.499 \c"),),
         expression=(r"\frac{1}{\sqrt{\tmp{u}}} - 2 \ln{\left(5 \cdot 10^{\param{k}} \sqrt{\tmp{u}} \right)} + " r"0.8"),

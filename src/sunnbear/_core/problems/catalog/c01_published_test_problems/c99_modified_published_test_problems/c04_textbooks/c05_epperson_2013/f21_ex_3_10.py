@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -33,13 +32,7 @@ class ModifiedEpperson2013Ex310(Formula):
     number = (1, 99, 4, 5, 21)
     name = "Ex. 3.10"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
-            "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
-        ),
-        location="Examples 3.10, 3.11, 3.14",
-    )
+    location_in_publication = "Examples 3.10, 3.11, 3.14"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{4} - \tmp{u} - 1",
