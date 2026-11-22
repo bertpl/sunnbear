@@ -94,8 +94,8 @@ def test_publications_declare_their_parts():
     assert failing == []
 
 
-def test_formula_names_are_readable_and_unique_within_each_publication():
-    """No 2 formulas of a single-publication category share a name, and each name starts with a word, not a number."""
+def test_formula_names_are_readable_and_unique_within_each_single_publication_category():
+    """No 2 formulas of a single-publication category share a name, and each name starts with a capitalized word."""
     # --- act --------------------------
     names_by_category = defaultdict(list)
     for formula in _SHIPPED_FORMULAS:
