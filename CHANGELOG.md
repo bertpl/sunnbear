@@ -5,21 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.4.7 (2026-11-22)
 
 ### Added
 
 - Add parameter conditions and structured publications to the formula catalog, and give the published formulas readable names
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.4.6 (2026-11-22)
 
