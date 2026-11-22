@@ -142,7 +142,7 @@ class FormulaRegistry:
         """Return the publication of `formula`, or None for a formula that no publication gives.
 
         A formula comes from the publication of its category. A formula below a category that declares
-        `FormulaCategory.modified_category_number` modifies a formula of another category, and comes from that
+        `FormulaCategory.original_category_number` modifies a formula of another category, and comes from that
         formula's publication.
 
         Raises:
@@ -156,9 +156,9 @@ class FormulaRegistry:
             # find the closest category above the formula that declares which category its formulas modify
             for n_elements in range(len(formula.number) - 1, 0, -1):
                 ancestor = cls._categories_by_number[formula.number[:n_elements]]
-                modified_formula_number = ancestor.modified_formula_number(formula.number)
-                if modified_formula_number is not None:
-                    return cls.publication_of(cls.formula_from_number(modified_formula_number))
+                original_formula_number = ancestor.original_formula_number(formula.number)
+                if original_formula_number is not None:
+                    return cls.publication_of(cls.formula_from_number(original_formula_number))
             return None
 
     @classmethod

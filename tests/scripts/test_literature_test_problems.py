@@ -288,7 +288,7 @@ def test_modified_formula_has_its_published_formula(formula):
     published_formulas = {published_formula.number: published_formula for published_formula in _PUBLISHED_FORMULAS}
 
     # --- act --------------------------
-    published_formula = published_formulas.get(ModifiedPublishedTestProblems().modified_formula_number(formula.number))
+    published_formula = published_formulas.get(ModifiedPublishedTestProblems().original_formula_number(formula.number))
 
     # --- assert -----------------------
     assert published_formula is not None

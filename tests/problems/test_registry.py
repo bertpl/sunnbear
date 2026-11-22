@@ -473,14 +473,14 @@ def test_category_of_returns_the_category_that_holds_the_formula():
 
 @pytest.mark.usefixtures("isolated_formula_registry")
 def test_publication_of_finds_the_publication_of_the_category_or_of_the_modified_formula():
-    """A formula comes from its category's publication; a modifying formula, from its modified formula's publication.
+    """A formula comes from its category's publication; a modifying formula, from its original formula's publication.
 
     A formula whose category declares no publication, and that modifies no formula, has none.
     """
     # --- arrange ----------------------
     publication = Publication(citation="Author, A. (2000). A title.")
     define_category_cls((99, 1), publication=publication)
-    define_category_cls((99, 2), modified_category_number=(99, 1))
+    define_category_cls((99, 2), original_category_number=(99, 1))
     define_category_cls((99, 3))
     published_formula = define_formula_cls((99, 1, 1))()
     modifying_formula = define_formula_cls((99, 2, 1))()
@@ -500,7 +500,7 @@ def test_publication_of_a_formula_that_modifies_no_registered_formula_raises():
     """A modifying formula whose modified formula is not registered raises `UnknownFormulaError`."""
     # --- arrange ----------------------
     define_category_cls((99, 1))
-    define_category_cls((99, 2), modified_category_number=(99, 1))
+    define_category_cls((99, 2), original_category_number=(99, 1))
     modifying_formula = define_formula_cls((99, 2, 1))()
 
     # --- act / assert -----------------
