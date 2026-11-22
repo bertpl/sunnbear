@@ -13,8 +13,8 @@ class RootsJl2026(FormulaCategory):
     description = "The test problems come from the tests of Roots.jl, a Julia package of root finders, version 3.0.11."
     publication = Publication(
         citation=(
-            "Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test, MIT"
-            " license. The functions of the rows are in 2 files:\n- `test/test_derivative_free.jl`,"
+            "Roots.jl v3.0.11 (2026), the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test,"
+            " MIT license. The functions of the rows are in 2 files:\n- `test/test_derivative_free.jl`,"
             " https://github.com/JuliaMath/Roots.jl/blob/v3.0.11/test/test_derivative_free.jl\n-"
             " `test/runbenchmarks.jl`,"
             " https://github.com/JuliaMath/Roots.jl/blob/v3.0.11/test/runbenchmarks.jl\n\nThe files cite 1 source:"

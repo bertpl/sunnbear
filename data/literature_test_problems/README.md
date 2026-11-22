@@ -33,9 +33,9 @@ A source's id is its file name: `<year>_<author names>` for a publication, optio
 
 | field | content |
 |---|---|
-| `title` | `Authors (year): subject`; `timeline.html` shows the part before the colon |
+| `title` | `Authors (year): subject`, with the year by which `reference` cites the source; `timeline.html` shows the part before the colon |
 | `reference` | the full reference with its DOI, or its URL where it has none |
-| `year` | the year of the edition or version that `reference` cites (see **Year** below) |
+| `year` | the year that places the source on the timeline (see **Year** below) |
 | `subcategory` | the subcategory of category 1 where the source's formulas belong (see **Subcategory** below) |
 | `where_in_source` | the tables, sections or files of the source that hold the functions |
 | `transcribed_from` | what the rows were read from, and which one is followed where they differ |
@@ -44,7 +44,7 @@ A source's id is its file name: `<year>_<author names>` for a publication, optio
 | `[[relations]]` | optional, any number: `sources`, the ids of other sources, and `text`, how this source's rows relate to theirs |
 | `[[rows]]` | 1 table per row, below |
 
-**Year.** A textbook's year is that of the cited edition, and a code suite's that of the cited release or commit. An article that appeared online before its issue takes the online year, so the year can differ from the one in its id (`2021_oliveira_takahashi` appeared online in 2020).
+**Year.** The `year` field orders the sources in time, by when their functions became public; the title and `reference` give the year by which the source is cited. A textbook's `year` is that of the cited edition, and a code suite's that of the cited release or commit. An article that appeared online before its issue takes the online year, so its `year` can differ from the year of its title: `2021_oliveira_takahashi` appeared online in 2020, and `2005_parida_gupta` in 2005, for an issue of 2006.
 
 The generated files list the sources in time order: by year, then by id without its leading year.
 

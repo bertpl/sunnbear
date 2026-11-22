@@ -1,4 +1,4 @@
-"""This module holds a formula of Parida, Gupta (2005).
+"""This module holds a formula of Parida, Gupta (2006).
 
 The formula comes from the row with the key ``1`` in the survey of published test problems.
 """
@@ -12,8 +12,8 @@ from sunnbear._core.problems.core import (
 )
 
 
-class ParidaGupta20051(Formula):
-    """This formula comes from Parida, Gupta (2005).
+class ParidaGupta20061(Formula):
+    """This formula comes from Parida, Gupta (2006).
 
     The survey writes the source's function as ``x^5 - 300*x^2 - 126*x + 5005``; the formula's interval is ``[-20,
     20]``.

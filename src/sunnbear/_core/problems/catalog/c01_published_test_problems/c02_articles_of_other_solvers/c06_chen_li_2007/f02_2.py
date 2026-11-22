@@ -1,7 +1,9 @@
-"""This module holds a formula of Parida, Gupta (2005).
+"""This module holds a formula of Chen, Li (2007).
 
 The formula comes from the row with the key ``2`` in the survey of published test problems.
 """
+
+import math
 
 from sunnbear._core.problems.core import (
     EffectOfC,
@@ -12,41 +14,41 @@ from sunnbear._core.problems.core import (
 )
 
 
-class ParidaGupta20052(Formula):
-    """This formula comes from Parida, Gupta (2005).
+class ChenLi20072(Formula):
+    """This formula comes from Chen, Li (2007).
 
-    The survey writes the source's function as ``3*x^2 - 11.12*x + 9.1389``; the formula's interval is ``[-30, 2]``.
+    The survey writes the source's function as ``x - exp(sin(x)) + 1``; the formula's interval is ``[1, 4]``.
 
-    `x0 = -30`. Root 1.23; the other root, about 2.4767, lies outside the interval.
+    `x0 = 4`. Root 1.69681.
     """
 
-    number = (1, 2, 5, 2)
+    number = (1, 2, 6, 2)
     name = "2"
     params = ()
     location_in_publication = "Example 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 32 \c"),),
-        expression=r"3 \tmp{u}^{2} - 11.12 \tmp{u} + 9.1389",
-        interval="[-30, 2]",
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"\tmp{u} - e^{\sin{\left(\tmp{u} \right)}} + 1",
+        interval="[1, 4]",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 32.0 * c
-        return 3 * x**2 - 11.12 * x + 9.1389
+        x = x - 3.0 * c
+        return x - math.exp(math.sin(x)) + 1
 
     def interval_bounds(self) -> tuple[float, float]:
         """Return the formula's interval."""
-        return (-30.0, 2.0)
+        return (1.0, 4.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return no recipe, since the published function has no parameters."""
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-20.4, c=0.0, expected=1484.4669),
-        FormulaTestCase.value(params={}, x=-20.4, c=0.25, expected=2744.6268999999998),
-        FormulaTestCase.interval_bounds(params={}, expected=(-30.0, 2.0)),
+        FormulaTestCase.value(params={}, x=1.9, c=0.0, expected=0.3238395631529812),
+        FormulaTestCase.value(params={}, x=1.9, c=0.25, expected=-0.34119855052789855),
+        FormulaTestCase.interval_bounds(params={}, expected=(1.0, 4.0)),
     )

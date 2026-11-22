@@ -13,7 +13,7 @@ class Scipy2026(FormulaCategory):
     description = "The test problems come from the module of test problems for SciPy's root finders, release 1.18.1."
     publication = Publication(
         citation=(
-            "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`,"
+            "SciPy 1.18.1 (2026), module `scipy/optimize/_tstutils.py`,"
             " https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites 2"
             ' sources:\n- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of'
             ' Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344,'
