@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add to each formula of the test problems its expression and interval in LaTeX, its parameters' symbols, and texts for a reader
+
 ### Changed
 
 ### Deprecated
