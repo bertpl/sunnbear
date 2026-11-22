@@ -54,8 +54,9 @@ class Formula(FormulaTaxonomyNode, ABC):
         test_cases: The formula's own test cases (`FormulaTestCase`), which
             the generic formula test runs; every registered formula must
             declare at least 1.
-        location_in_publication: Where the formula appears in its publication, which `FormulaRegistry.publication_of`
-            returns, such as "Table I, problem 12", or None (default) for a formula that no publication gives.
+        location_in_publication: Where the formula appears in its publication, such as "Table I, problem 12", or None
+            (default) for a formula that no publication gives. `FormulaRegistry.publication_of` returns the publication
+            itself.
         presentation: What a reader sees of the formula (`FormulaPresentation`), or None (default). The catalog's
             tests require it of every shipped formula.
         effect_of_c: How the formula's code applies ``c`` (`EffectOfC`), or None (default). The catalog's tests

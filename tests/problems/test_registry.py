@@ -475,7 +475,7 @@ def test_category_of_returns_the_category_that_holds_the_formula():
 def test_publication_of_finds_the_publication_of_the_category_or_of_the_modified_formula():
     """A formula comes from its category's publication; a modifying formula, from its modified formula's publication.
 
-    Category 99.2 declares that its formulas modify those of category 99.1, so formula 99.2.1 modifies formula 99.1.1.
+    A formula whose category declares no publication, and that modifies no formula, has none.
     """
     # --- arrange ----------------------
     publication = Publication(citation="Author, A. (2000). A title.")

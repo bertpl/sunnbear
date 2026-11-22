@@ -2,8 +2,10 @@ r"""This package holds what a reader sees of a formula: its math in LaTeX, and t
 
 A formula declares a `FormulaPresentation`: its expression and its interval in LaTeX, the definitions of the temporary
 variables and intermediate functions that the expression uses, a summary, notes and the conditions on the formula's
-parameters. Every one of them is written in sunnbear's LaTeX notation, described below. `LatexTemplate` holds 1 text in
-that notation, checks it, and lists the parameters, temporary variables and intermediate functions that the text names.
+parameters. Every one of them is written in sunnbear's LaTeX notation, described below.
+
+`LatexTemplate` holds 1 text in that notation, checks it, and lists the parameters, temporary variables and intermediate
+functions that the text names.
 
 `Formula` renders a text for a consumer, such as the website, in 1 of 2 forms:
 

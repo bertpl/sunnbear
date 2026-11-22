@@ -12,6 +12,9 @@ import textwrap
 import pytest
 
 from sunnbear._core.problems.catalog.c01_published_test_problems import PublishedTestProblems
+from sunnbear._core.problems.catalog.c01_published_test_problems.c99_modified_published_test_problems import (
+    ModifiedPublishedTestProblems,
+)
 from sunnbear._core.problems.core import EffectOfC, FormulaRegistry
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
@@ -285,7 +288,7 @@ def test_modified_formula_has_its_published_formula(formula):
     published_formulas = {published_formula.number: published_formula for published_formula in _PUBLISHED_FORMULAS}
 
     # --- act --------------------------
-    published_formula = published_formulas.get((1, *formula.number[2:]))
+    published_formula = published_formulas.get(ModifiedPublishedTestProblems().modified_formula_number(formula.number))
 
     # --- assert -----------------------
     assert published_formula is not None

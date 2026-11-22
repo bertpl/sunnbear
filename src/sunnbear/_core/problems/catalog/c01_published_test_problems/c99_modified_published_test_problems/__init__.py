@@ -23,7 +23,7 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     Formula 1.99.x.y.z modifies formula 1.x.y.z, and has the same name and location in the publication; subcategories
     1.99.x and 1.99.x.y have the names of subcategories 1.x and 1.x.y.
 
-    A category of this subcategory declares no publication, because no publication gives its modified formulas;
+    A category of this subcategory declares no publication, because no publication gives the formulas that it holds;
     `modified_category_number` lets `FormulaRegistry.publication_of` find the publication of the formula that each
     formula modifies.
 

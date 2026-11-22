@@ -55,7 +55,7 @@ class FormulaRegistry:
     `register_category`, so the registry is complete as soon as the modules that define the formula and
     category subclasses are imported.
 
-    It also finds the publication that a formula comes from, with `publication_of`.
+    The registry also finds a formula's publication, with `publication_of`.
     """
 
     _formulas_by_number: ClassVar[dict[tuple[int, ...], "Formula"]] = {}

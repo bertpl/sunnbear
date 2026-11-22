@@ -1,4 +1,4 @@
-"""`Publication` holds the citation and the parts of the publication of a category's formulas."""
+"""`Publication` holds the citation of a category's publication, and its parts: authors, year, title, DOI and more."""
 
 import re
 from dataclasses import dataclass
@@ -52,9 +52,11 @@ class Publication:
         """Check that the citation holds every declared part but the year, and that the citation key fits the year.
 
         Raises:
-            ValueError: If the citation does not hold a declared author, the title, where the publication appeared,
-                the DOI or the URL; if the citation key is not a name, 2 digits and an optional letter; or if its 2
-                digits are not the last 2 digits of the year.
+            ValueError: If any of these holds:
+                - the citation does not hold a declared author, the title, where the publication appeared, the DOI or
+                  the URL;
+                - the citation key is not a name, 2 digits and an optional letter;
+                - the citation key's 2 digits are not the last 2 digits of the year.
         """
         if self.citation_key is not None:
             match = _CITATION_KEY_PATTERN.fullmatch(self.citation_key)

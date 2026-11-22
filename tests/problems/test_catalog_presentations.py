@@ -109,7 +109,10 @@ def test_formulas_declare_parameter_conditions_exactly_where_they_check_paramete
     failing = []
     for formula in _SHIPPED_FORMULAS:
         has_param_check = type(formula).is_param_tuple_valid is not Formula.is_param_tuple_valid
-        has_param_conditions = formula.presentation is not None and len(formula.presentation.param_conditions) > 0
+        if formula.presentation is not None:
+            has_param_conditions = len(formula.presentation.param_conditions) > 0
+        else:
+            has_param_conditions = False
         if has_param_check != has_param_conditions:
             failing.append(formula.label)
 

@@ -44,9 +44,9 @@ class FormulaCategory(FormulaTaxonomyNode):
             exactly the formulas of 1 publication; None by default. `FormulaRegistry.publication_of` finds it for each
             formula.
         modified_category_number: The number of another category, or None (default). Each formula below this
-            category modifies the formula of that other category whose number ends in the same elements, and comes
-            from the modified formula's publication: below a category 1.99 that declares ``(1,)``, formula 1.99.1.6.3
-            modifies formula 1.1.6.3.
+            category modifies the formula whose number is its own number with this category's number replaced by that
+            other category's number, and comes from the modified formula's publication: below a category 1.99 that
+            declares ``(1,)``, formula 1.99.1.6.3 modifies formula 1.1.6.3.
     """
 
     description: ClassVar[str | None] = None
