@@ -89,6 +89,10 @@ class GegenbauerPolynomial(Formula):
             r"expression as $\param{alpha} \to 0$: the Chebyshev polynomial of the first kind, "
             r"$T_{\param{n}}(\tmp{y})$.",
         ),
+        param_conditions=(
+            r"$\param{n}$ is an integer of at least 1",
+            r"$-0.5 < \param{alpha} \le 7$",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -134,7 +138,7 @@ class GegenbauerPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
-        """Require ``n`` to be an integer of at least 1, and ``alpha`` to be in its valid range."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if not is_valid_degree(n):
             return False
         else:

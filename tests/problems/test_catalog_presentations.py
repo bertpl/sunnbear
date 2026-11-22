@@ -99,7 +99,6 @@ def test_formulas_declare_their_summaries():
     assert failing == []
 
 
-@pytest.mark.skip(reason="the formulas of category 2 declare no parameter conditions")
 def test_formulas_declare_parameter_conditions_exactly_where_they_check_parameters():
     """A shipped formula's presentation declares parameter conditions exactly when it overrides `is_param_tuple_valid`.
 

@@ -40,6 +40,7 @@ class InverseHyperbolicCosine(Formula):
         expression=r"\frac{\operatorname{arcosh} \x}{\operatorname{arcosh} \param{b}} - 0.5 + \c",
         interval=r"[1, \param{b}]",
         summary="The inverse hyperbolic cosine, with an infinite slope at the lower bound, the edge of its domain.",
+        param_conditions=(r"$\param{b} > 1$",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -67,7 +68,7 @@ class InverseHyperbolicCosine(Formula):
         )
 
     def is_param_tuple_valid(self, b: float) -> bool:
-        """Require ``b`` to be above 1."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return b > 1.0
 
     test_cases = (

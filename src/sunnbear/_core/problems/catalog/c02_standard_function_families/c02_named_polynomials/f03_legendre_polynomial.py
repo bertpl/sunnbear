@@ -50,6 +50,7 @@ class LegendrePolynomial(Formula):
         expression=r"P_{\param{n}}(\tmp{y})",
         interval=interval_by_parity_latex("[-1, 1]", r"\left[-\cos\frac{2.5 \pi}{2 \param{n} + 1}, 1\right]"),
         summary="The Legendre polynomial, whose amplitude grows from the middle of its interval toward the bounds.",
+        param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -84,7 +85,7 @@ class LegendrePolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer of at least 1."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return is_valid_degree(n)
 
     test_cases = (

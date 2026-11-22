@@ -67,6 +67,11 @@ class HyperbolicTangent(Formula):
             r"Both cases equal $$1 + \tanh(\x - \c) - \param{d};$$ the first keeps full precision next to a root in "
             r"the lower tail of $\tanh$.",
         ),
+        param_conditions=(
+            r"$\param{b} > 0$",
+            r"$0 < \param{d} < 2$",
+            r"$|\param{d} - 1| < \tanh \param{b}$, so that the root lies inside the interval",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -108,7 +113,7 @@ class HyperbolicTangent(Formula):
         )
 
     def is_param_tuple_valid(self, b: float, d: float) -> bool:
-        """Require ``b`` above 0, ``d`` between 0 and 2, and a root inside the interval."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if b > 0.0 and 0.0 < d < 2.0:
             return abs(d - 1.0) < math.tanh(b)
         else:

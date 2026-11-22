@@ -37,6 +37,7 @@ class LinearPlusSumOfEvenPowers(Formula):
         expression=r"\x + \param{w} \left(\frac{1}{\param{n}} \sum_{k=1}^{\param{n}} \x^{2k} - 1\right) + \c",
         interval="[-1, 1]",
         summary="A line bent by a sum of even powers, with 1 root.",
+        param_conditions=(r"$\param{n}$ is an integer of at least 2",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -61,7 +62,7 @@ class LinearPlusSumOfEvenPowers(Formula):
         return weight_recipes(term_count_axis(LOWEST_POWER))
 
     def is_param_tuple_valid(self, n: float, w: float) -> bool:
-        """Require ``n`` to be an integer of at least 2."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return is_valid_term_count(n)
 
     test_cases = (

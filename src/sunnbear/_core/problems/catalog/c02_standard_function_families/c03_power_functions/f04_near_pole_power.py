@@ -43,6 +43,11 @@ class NearPolePower(Formula):
         expression=r"\left(\frac{\param{d}}{\x}\right)^{\param{p}} - 0.5 + \c",
         interval=r"[\param{d}, 1]",
         summary=r"A reciprocal power on an interval that starts near its pole, $\x = 0$.",
+        param_conditions=(
+            r"$\param{p} > 0$",
+            r"$\param{d} > 0$",
+            r"$\param{d}^{\param{p}} < 0.5$, so that the root lies inside the interval",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -73,7 +78,7 @@ class NearPolePower(Formula):
         )
 
     def is_param_tuple_valid(self, p: float, d: float) -> bool:
-        """Require ``p`` and ``d`` above 0, and a root inside the interval."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if p > 0.0 and d > 0.0:
             return d**p < 0.5
         else:

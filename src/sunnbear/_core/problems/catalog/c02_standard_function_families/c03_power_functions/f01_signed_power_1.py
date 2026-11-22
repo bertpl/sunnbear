@@ -64,6 +64,7 @@ class SignedPower1(Formula):
             r"The term $2^{-918} \, \tmp{z}$ keeps the function from being exactly 0 next to its root, where "
             r"$|\tmp{z}|^{\param{p}}$ underflows to 0 for a large $\param{p}$.",
         ),
+        param_conditions=(r"$\param{p} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -88,7 +89,7 @@ class SignedPower1(Formula):
         )
 
     def is_param_tuple_valid(self, p: float) -> bool:
-        """Require ``p`` to be above 0."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return p > 0.0
 
     test_cases = (

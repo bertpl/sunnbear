@@ -53,6 +53,7 @@ class ChebyshevSecondKindPolynomial(Formula):
             "The Chebyshev polynomial of the second kind, whose amplitude grows from the middle of its interval toward "
             "the bounds."
         ),
+        param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -96,7 +97,7 @@ class ChebyshevSecondKindPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer of at least 1."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return is_valid_degree(n)
 
     test_cases = (

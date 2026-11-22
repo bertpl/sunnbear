@@ -40,6 +40,7 @@ class Exponential(Formula):
             "The exponential function, nearly flat over the lower half of a wide interval and steep toward its upper "
             "bound."
         ),
+        param_conditions=(r"$\param{b} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -66,7 +67,7 @@ class Exponential(Formula):
         )
 
     def is_param_tuple_valid(self, b: float) -> bool:
-        """Require ``b`` to be above 0."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return b > 0.0
 
     test_cases = (

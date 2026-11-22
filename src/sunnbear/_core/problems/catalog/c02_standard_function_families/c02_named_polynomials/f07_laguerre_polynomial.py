@@ -59,6 +59,7 @@ class LaguerrePolynomial(Formula):
             "The Laguerre polynomial, with roots close together next to the lower bound and far apart toward the "
             "upper bound."
         ),
+        param_conditions=(r"$\param{n}$ is an integer from 1 to 256",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -114,7 +115,7 @@ class LaguerrePolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer from 1 to `HIGHEST_VALID_DEGREE`."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if not is_valid_degree(n):
             return False
         else:

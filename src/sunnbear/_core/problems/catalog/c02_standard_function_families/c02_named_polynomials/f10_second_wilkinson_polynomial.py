@@ -53,6 +53,7 @@ class SecondWilkinsonPolynomial(Formula):
             "Wilkinson's second polynomial, with roots that lie closer together toward the lower bound, each half as "
             "far from 0 as the one above it."
         ),
+        param_conditions=(r"$\param{n}$ is an integer from 1 to 40",),
     )
     effect_of_c = EffectOfC.SCALES_X
 
@@ -94,7 +95,7 @@ class SecondWilkinsonPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer from 1 to `HIGHEST_VALID_DEGREE`."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if not is_valid_degree(n):
             return False
         else:

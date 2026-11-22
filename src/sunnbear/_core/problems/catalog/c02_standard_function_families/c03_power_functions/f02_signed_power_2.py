@@ -43,6 +43,7 @@ class SignedPower2(Formula):
             r"A signed power, with an infinite slope at $\x = 0$ for $\param{p} < 1$ and a zero slope for "
             r"$\param{p} > 1$, away from its root."
         ),
+        param_conditions=(r"$\param{p} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -66,7 +67,7 @@ class SignedPower2(Formula):
         )
 
     def is_param_tuple_valid(self, p: float) -> bool:
-        """Require ``p`` to be above 0."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return p > 0.0
 
     test_cases = (

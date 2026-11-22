@@ -52,6 +52,7 @@ class WilkinsonPolynomial(Formula):
             "Wilkinson's polynomial, with equally spaced roots and an amplitude far larger next to the bounds than in "
             "the middle."
         ),
+        param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -92,7 +93,7 @@ class WilkinsonPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer of at least 1."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return is_valid_degree(n)
 
     test_cases = (

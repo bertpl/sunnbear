@@ -43,6 +43,11 @@ class NearEdgePower(Formula):
         expression=r"\x^{\param{p}} - 0.5 + \c",
         interval=r"[\param{d}, 1]",
         summary=r"A power on an interval that starts at or near the edge of its domain, $\x = 0$.",
+        param_conditions=(
+            r"$\param{p} > 0$",
+            r"$\param{d} \ge 0$",
+            r"$\param{d}^{\param{p}} < 0.5$, so that the root lies inside the interval",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -82,7 +87,7 @@ class NearEdgePower(Formula):
         )
 
     def is_param_tuple_valid(self, p: float, d: float) -> bool:
-        """Require ``p`` above 0, ``d`` of 0 or more, and a root inside the interval."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if p > 0.0 and d >= 0.0:
             return d**p < 0.5
         else:

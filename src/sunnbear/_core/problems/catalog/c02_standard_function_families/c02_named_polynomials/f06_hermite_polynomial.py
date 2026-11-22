@@ -64,6 +64,7 @@ class HermitePolynomial(Formula):
             "its bounds."
         ),
         notes=(r"$H_{\param{n}}$ is the physicists' Hermite polynomial, orthogonal under the weight $e^{-\x^2}$.",),
+        param_conditions=(r"$\param{n}$ is an integer from 1 to 512",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -116,7 +117,7 @@ class HermitePolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer from 1 to `HIGHEST_VALID_DEGREE`."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if not is_valid_degree(n):
             return False
         else:

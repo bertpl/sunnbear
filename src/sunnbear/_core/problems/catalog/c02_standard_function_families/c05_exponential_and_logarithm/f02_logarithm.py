@@ -44,6 +44,7 @@ class Logarithm(Formula):
             r"The logarithm, steep next to the lower bound and flat over most of the interval for a small "
             r"$\param{d}$."
         ),
+        param_conditions=(r"$0 < \param{d} < 1$",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -71,7 +72,7 @@ class Logarithm(Formula):
         )
 
     def is_param_tuple_valid(self, d: float) -> bool:
-        """Require ``d`` to be between 0 and 1."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return 0.0 < d < 1.0
 
     test_cases = (
