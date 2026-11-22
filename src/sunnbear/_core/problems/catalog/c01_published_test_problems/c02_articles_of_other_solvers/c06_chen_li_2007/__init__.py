@@ -16,8 +16,9 @@ class ChenLi2007(FormulaCategory):
             "Chen, J., Li, W. (2007). An improved exponential regula falsi methods with quadratic convergence of"
             " both diameter and point for solving nonlinear equations. Applied Numerical Mathematics 57(1),"
             " 80–88. Published online 14 February 2006. https://doi.org/10.1016/j.apnum.2006.01.001. The article"
-            " prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The"
-            " survey's year 2006 follows the online date that the article prints; the issue is dated 2007."
+            " prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The year"
+            " 2006 under which the survey lists the article follows the online date that the article prints; the"
+            " issue is dated 2007."
         ),
         citation_key="Chen07",
         authors=("Chen, J.", "Li, W."),

@@ -16,9 +16,9 @@ class ParidaGupta2006(FormulaCategory):
             "Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple zeros of"
             " nonlinear equations. Applied Mathematics and Computation 177(2), 769–776."
             " https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006 but no"
-            " issue number; the issue number is Crossref's. The survey's year 2005 follows the article's"
-            ' copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; the article prints no'
-            " online date."
+            " issue number; the issue number is Crossref's. The year 2005 under which the survey lists the"
+            ' article follows the article\'s copyright line, "© 2005 Elsevier Inc.", which is also the year in the'
+            " DOI; the article prints no online date."
         ),
         citation_key="Parida06",
         authors=("Parida, P. K.", "Gupta, D. K."),
