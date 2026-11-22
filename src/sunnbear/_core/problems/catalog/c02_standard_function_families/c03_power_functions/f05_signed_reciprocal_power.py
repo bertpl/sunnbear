@@ -53,6 +53,7 @@ class SignedReciprocalPower(Formula):
         ),
         interval="[-1, 1]",
         summary="A signed reciprocal power, whose sign change is a pole, not a root.",
+        param_conditions=(r"$\param{p} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -88,7 +89,7 @@ class SignedReciprocalPower(Formula):
         )
 
     def is_param_tuple_valid(self, p: float) -> bool:
-        """Require ``p`` to be above 0."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return p > 0.0
 
     test_cases = (

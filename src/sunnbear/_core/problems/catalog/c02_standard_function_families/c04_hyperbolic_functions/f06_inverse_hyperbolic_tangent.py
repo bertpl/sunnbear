@@ -49,6 +49,7 @@ class InverseHyperbolicTangent(Formula):
             r"The inverse hyperbolic tangent, steep next to both bounds for a small $\param{d}$, because both bounds "
             r"then lie close to the poles of $\operatorname{artanh}$."
         ),
+        param_conditions=(r"$0 < \param{d} < 1$",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -76,7 +77,7 @@ class InverseHyperbolicTangent(Formula):
         )
 
     def is_param_tuple_valid(self, d: float) -> bool:
-        """Require ``d`` to be between 0 and 1."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return 0.0 < d < 1.0
 
     test_cases = (

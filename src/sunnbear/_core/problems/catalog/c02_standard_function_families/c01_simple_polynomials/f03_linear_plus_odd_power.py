@@ -45,6 +45,7 @@ class LinearPlusOddPower(Formula):
         expression=r"\param{m} \x + (1 - \param{m}) \x^{\param{p}} + \c",
         interval="[-1, 1]",
         summary=r"A line combined with an odd power, with 1 root or, for a negative $\param{m}$, up to 3.",
+        param_conditions=(r"$\param{p}$ is an odd integer of at least 3",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -62,7 +63,7 @@ class LinearPlusOddPower(Formula):
         return slope_recipes(power_axis(LOWEST_POWER))
 
     def is_param_tuple_valid(self, p: float, m: float) -> bool:
-        """Require ``p`` to be an odd integer of at least `LOWEST_POWER`."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return is_valid_power(p, LOWEST_POWER)
 
     test_cases = (

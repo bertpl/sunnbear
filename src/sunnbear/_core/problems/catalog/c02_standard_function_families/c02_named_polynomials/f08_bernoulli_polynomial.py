@@ -67,6 +67,10 @@ class BernoulliPolynomial(Formula):
         expression=r"B_{\param{n}}(\x - \c)",
         interval=r"[\param{a}, \param{b}]",
         summary="The Bernoulli polynomial of an odd degree, close to a sine between its outermost real roots.",
+        param_conditions=(
+            r"$\param{n}$ is an odd integer from 1 to 49",
+            r"$\param{a} < 0.5 < \param{b}$ and $\param{a} + \param{b} = 1$",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -129,7 +133,7 @@ class BernoulliPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float, a: float, b: float) -> bool:
-        """Require an odd integer ``n`` of at most `HIGHEST_VALID_DEGREE`, and ``a < 0.5 < b`` with ``a + b = 1``."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         if not is_valid_degree(n) or n > HIGHEST_VALID_DEGREE or int(n) % 2 == 0:
             return False
         else:

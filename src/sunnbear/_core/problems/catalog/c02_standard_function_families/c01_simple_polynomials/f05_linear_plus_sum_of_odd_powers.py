@@ -37,6 +37,7 @@ class LinearPlusSumOfOddPowers(Formula):
         expression=r"\param{m} \x + (1 - \param{m}) \frac{1}{\param{n}} \sum_{k=1}^{\param{n}} \x^{2k+1} + \c",
         interval="[-1, 1]",
         summary=r"A line combined with a sum of odd powers, with 1 root or, for a negative $\param{m}$, up to 3.",
+        param_conditions=(r"$\param{n}$ is an integer of at least 2",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -61,7 +62,7 @@ class LinearPlusSumOfOddPowers(Formula):
         return slope_recipes(term_count_axis(LOWEST_POWER))
 
     def is_param_tuple_valid(self, n: float, m: float) -> bool:
-        """Require ``n`` to be an integer of at least 2."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return is_valid_term_count(n)
 
     test_cases = (

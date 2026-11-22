@@ -38,6 +38,7 @@ class InverseHyperbolicSine(Formula):
         expression=r"\frac{\operatorname{arsinh} \x}{\operatorname{arsinh} \param{b}} + \c",
         interval=r"[-\param{b}, \param{b}]",
         summary="The inverse hyperbolic sine, close to a signed logarithm on a wide interval.",
+        param_conditions=(r"$\param{b} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -60,7 +61,7 @@ class InverseHyperbolicSine(Formula):
         )
 
     def is_param_tuple_valid(self, b: float) -> bool:
-        """Require ``b`` to be above 0."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return b > 0.0
 
     test_cases = (

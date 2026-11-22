@@ -85,6 +85,11 @@ class JacobiPolynomial(Formula):
             r"The Jacobi polynomial, whose amplitude toward the upper bound depends on $\param{alpha}$, and toward the "
             r"lower bound on $\param{beta}$."
         ),
+        param_conditions=(
+            r"$\param{n}$ is an integer of at least 1",
+            r"$-1 < \param{alpha} \le 3$",
+            r"$-1 < \param{beta} \le 3$",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -137,7 +142,7 @@ class JacobiPolynomial(Formula):
         return (ParamTable(names=self.param_names, rows=rows, summary=summary),)
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:
-        """Require ``n`` to be an integer of at least 1, and ``alpha`` and ``beta`` to be in their valid range."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         if not is_valid_degree(n):
             return False
         else:

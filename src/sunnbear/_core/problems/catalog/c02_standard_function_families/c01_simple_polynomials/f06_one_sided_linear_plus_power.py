@@ -48,6 +48,10 @@ class OneSidedLinearPlusPower(Formula):
             r"A weighted mean of a line and a power, with 1 root and, for a large $\param{w}$, flat next to the lower "
             "bound."
         ),
+        param_conditions=(
+            r"$\param{p}$ is an integer of at least 2",
+            r"$\param{w} \ge 0$",
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -74,7 +78,7 @@ class OneSidedLinearPlusPower(Formula):
         return (ParamGrid(axes=(power_axis, weight_axis), summary=summary),)
 
     def is_param_tuple_valid(self, p: float, w: float) -> bool:
-        """Require ``p`` to be an integer of at least `LOWEST_POWER`, and ``w`` to be 0 or more."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         if p != int(p):
             return False
         else:

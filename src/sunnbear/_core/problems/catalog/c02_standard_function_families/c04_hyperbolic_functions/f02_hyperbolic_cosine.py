@@ -51,6 +51,7 @@ class HyperbolicCosine(Formula):
             r"The expression equals $$\cosh(\x - \c) - \cosh\frac{\param{b}}{2},$$ in a form that loses no "
             "precision to cancellation next to the root.",
         ),
+        param_conditions=(r"$\param{b} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -84,7 +85,7 @@ class HyperbolicCosine(Formula):
         )
 
     def is_param_tuple_valid(self, b: float) -> bool:
-        """Require ``b`` to be above 0."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return b > 0.0
 
     test_cases = (

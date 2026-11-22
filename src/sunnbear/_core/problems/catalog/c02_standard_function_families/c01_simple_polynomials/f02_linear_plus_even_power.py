@@ -40,6 +40,7 @@ class LinearPlusEvenPower(Formula):
         expression=r"\x + \param{w} (\x^{\param{p}} - 1) + \c",
         interval="[-1, 1]",
         summary="A line bent by an even power, with 1 root.",
+        param_conditions=(r"$\param{p}$ is an even integer of at least 2",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -57,7 +58,7 @@ class LinearPlusEvenPower(Formula):
         return weight_recipes(power_axis(LOWEST_POWER))
 
     def is_param_tuple_valid(self, p: float, w: float) -> bool:
-        """Require ``p`` to be an even integer of at least `LOWEST_POWER`."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return is_valid_power(p, LOWEST_POWER)
 
     test_cases = (

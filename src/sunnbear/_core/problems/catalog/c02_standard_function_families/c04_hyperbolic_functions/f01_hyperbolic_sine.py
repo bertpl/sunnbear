@@ -38,6 +38,7 @@ class HyperbolicSine(Formula):
             "The hyperbolic sine, from nearly a line on a narrow interval to exponential growth toward both bounds on "
             "a wide one."
         ),
+        param_conditions=(r"$\param{b} > 0$",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
@@ -64,7 +65,7 @@ class HyperbolicSine(Formula):
         )
 
     def is_param_tuple_valid(self, b: float) -> bool:
-        """Require ``b`` to be above 0."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return b > 0.0
 
     test_cases = (

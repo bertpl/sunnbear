@@ -55,6 +55,7 @@ class ChebyshevFirstKindPolynomial(Formula):
             r"On $[-1, 1]$, $\cos(\param{n} \arccos \x)$ is the Chebyshev polynomial of the first kind, "
             r"$T_{\param{n}}(\x)$.",
         ),
+        param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
     effect_of_c = EffectOfC.SHIFTS_Y
 
@@ -85,7 +86,7 @@ class ChebyshevFirstKindPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Require ``n`` to be an integer of at least 1."""
+        """Check the conditions that the presentation's `param_conditions` state for a reader."""
         return is_valid_degree(n)
 
     test_cases = (
