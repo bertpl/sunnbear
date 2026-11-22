@@ -1,6 +1,6 @@
 title = 'Parida, Gupta (2006): an improved regula-falsi method'
 reference = '''
-Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple zeros of nonlinear equations. Applied Mathematics and Computation 177(2), 769–776. https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006 but no issue number; the issue number is Crossref's. The year 2005 under which the survey lists the article follows the article's copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; the article prints no online date.
+Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple zeros of nonlinear equations. Applied Mathematics and Computation 177(2), 769–776. https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006 but no issue number; the issue number is Crossref's. The survey lists the article under 2005, the year of its copyright line ("© 2005 Elsevier Inc.") and of its DOI; the article prints no online date.
 '''
 year = 2005
 subcategory = '1.2'

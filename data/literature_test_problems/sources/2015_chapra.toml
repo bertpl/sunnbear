@@ -90,7 +90,7 @@ Differences from the 6th edition (2010):
 - **Problems that the rows leave out:** the 7th no longer has the 6th's Prob. 5.15 (the moment of a beam, read from a figure), and it adds Prob. 5.20.
 
 Other sources with the same function:
-- `log(x)` on `[0.5, 5]` (Ex. 6.7) is Suhadolnik (2012)'s example 1 (`2012_suhadolnik`), and is in Chen & Li (2006) (`2006_chen_li`), Ganchovski et al.'s f51 (`2026_ganchovski_et_al`) and roots-fortran's case 134 (`roots_fortran`).
+- `log(x)` on `[0.5, 5]` (Ex. 6.7) is Suhadolnik (2012)'s example 1 (`2012_suhadolnik`), and is in Chen & Li (2007) (`2006_chen_li`), Ganchovski et al.'s f51 (`2026_ganchovski_et_al`) and roots-fortran's case 134 (`roots_fortran`).
 - `exp(-x) - x` is Bradie's 2.1-1(c) (`2006_bradie`), on `(0, 1)`, and Alhseno's 22 (`2026_alhseno`); `x = exp(-x)` is in Bradie (Ex. 2.6) and Epperson (3.1-5) (`2013_epperson`).
 - `x - cos(x)` is Badr's `P8` (`2021_badr`), Sabharwal's `T2.9` (`2019_sabharwal`) and Ellithy's 4 (`2026_ellithy`), all on `[0, 1]`.
 - `(x - 3)*(x - 1)*(x - 1)` (6.11) is Alhseno's 19, `(x - 1)^2*(x - 3)`.

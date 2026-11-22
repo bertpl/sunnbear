@@ -33,7 +33,7 @@ A source's id is its file name: `<year>_<author names>` for a publication, optio
 
 | field | content |
 |---|---|
-| `title` | `Authors (citation year): subject`, where the citation year is the year of the citation in `reference`; `timeline.html` shows the part before the colon |
+| `title` | `Authors (citation year): subject`, where the citation year is the year by which `reference` cites the source: an article's issue year, a book's edition year, or a code suite's release or commit year; `timeline.html` shows the part before the colon |
 | `reference` | the full reference with its DOI, or its URL where it has none |
 | `year` | the year that places the source on the timeline (see **Year** below) |
 | `subcategory` | the subcategory of category 1 where the source's formulas belong (see **Subcategory** below) |
@@ -44,11 +44,11 @@ A source's id is its file name: `<year>_<author names>` for a publication, optio
 | `[[relations]]` | optional, any number: `sources`, the ids of other sources, and `text`, how this source's rows relate to theirs |
 | `[[rows]]` | 1 table per row, below |
 
-**Year.** The `year` field orders the sources in time, by when their functions became public; the title and `reference` give the source's citation year. The `year` field depends on the kind of source:
+**Year.** The `year` field orders the sources in time, by when the cited version of each source became public; the title and `reference` give the source's citation year. The `year` field depends on the kind of source:
 
 - **textbook:** the year of the cited edition;
 - **code suite:** the year of the cited release or commit;
-- **article:** the year that it appeared: the online year that it prints, or its copyright year where it prints no online date. Its `year` can then differ from its citation year: `2021_oliveira_takahashi` appeared online in 2020, and `2005_parida_gupta` carries the copyright year 2005, for an issue of 2006.
+- **article:** the year that it appeared, which is the year of the online date that it prints, or its copyright year where it prints no online date. Its `year` can then differ from its citation year, and its id keeps the year that it was first given: `2021_oliveira_takahashi` appeared online in 2020, while its issue is dated 2021, and `2005_parida_gupta` carries the copyright year 2005, while its issue is dated 2006.
 
 The generated files list the sources in time order: by year, then by id without its leading year.
 
