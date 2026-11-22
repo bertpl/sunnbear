@@ -19,5 +19,11 @@ class FooTan2025(FormulaCategory):
             "Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. arXiv"
             " preprint 2509.20897v1. https://doi.org/10.48550/arxiv.2509.20897"
             " (https://arxiv.org/abs/2509.20897v1)."
-        )
+        ),
+        citation_key="Foo25",
+        authors=("Foo, W. G.", "Tan, C. H."),
+        year=2025,
+        title="Higher-Order Root-Finding Algorithm and its Applications",
+        published_in="arXiv",
+        doi="10.48550/arxiv.2509.20897",
     )

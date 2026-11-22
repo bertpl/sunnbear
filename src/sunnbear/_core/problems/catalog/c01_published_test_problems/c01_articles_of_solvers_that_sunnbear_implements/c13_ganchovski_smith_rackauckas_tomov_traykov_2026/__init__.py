@@ -49,5 +49,11 @@ class GanchovskiSmithRackauckasTomovTraykov2026(FormulaCategory):
             " https://doi.org/10.3390/a19050332. Supplementary materials:"
             " https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-Data` of the"
             " authors' repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
-        )
+        ),
+        citation_key="Ganchovski26a",
+        authors=("Ganchovski, N.", "Smith, O.", "Rackauckas, C.", "Tomov, L.", "Traykov, A."),
+        year=2026,
+        title="Improvements to the modified Anderson–Björck (modAB) root-finding algorithm",
+        published_in="Algorithms",
+        doi="10.3390/a19050332",
     )

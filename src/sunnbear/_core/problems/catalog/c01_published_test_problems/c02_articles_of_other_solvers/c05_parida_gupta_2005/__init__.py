@@ -19,5 +19,11 @@ class ParidaGupta2005(FormulaCategory):
             " issue number; the issue number is Crossref's. The year 2005 of the title follows the article's"
             ' copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; the article prints no'
             " online date."
-        )
+        ),
+        citation_key="Parida05",
+        authors=("Parida, P. K.", "Gupta, D. K."),
+        year=2005,
+        title="An improved regula-falsi method for enclosing simple zeros of nonlinear equations",
+        published_in="Applied Mathematics and Computation",
+        doi="10.1016/j.amc.2005.11.034",
     )

@@ -20,5 +20,11 @@ class Norton1985(FormulaCategory):
             " interpolation. ACM Transactions on Mathematical Software 11(2), 120–134."
             " https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the Collected"
             " Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
-        )
+        ),
+        citation_key="Norton85",
+        authors=("Norton, V.",),
+        year=1985,
+        title="Algorithm 631: Finding a bracketed zero by Larkin's method of rational interpolation",
+        published_in="ACM Transactions on Mathematical Software",
+        doi="10.1145/214392.214396",
     )

@@ -19,5 +19,11 @@ class Stage2013(FormulaCategory):
             "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International Journal of"
             " Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF:"
             " https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
-        )
+        ),
+        citation_key="Stage13",
+        authors=("Stage, S. A.",),
+        year=2013,
+        title="Comments on An Improvement to the Brent's Method",
+        published_in="International Journal of Experimental Algorithms",
+        url="https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf",
     )

@@ -18,5 +18,11 @@ class GorgeyEtAl2025(FormulaCategory):
             "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method in"
             " solving nonlinear equations using Scilab programming. Data Analytics and Applied Mathematics 6(1),"
             " 23–35. https://doi.org/10.15282/daam.v6i1.11307."
-        )
+        ),
+        citation_key="Gorgey25",
+        authors=("Gorgey, A.", "Azim, F. A.", "Zulkifly, Z. H.", "Hassim, H."),
+        year=2025,
+        title="Efficiency of Ridders' method in solving nonlinear equations using Scilab programming",
+        published_in="Data Analytics and Applied Mathematics",
+        doi="10.15282/daam.v6i1.11307",
     )

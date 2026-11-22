@@ -18,5 +18,11 @@ class AlefeldPotraShi1993(FormulaCategory):
         citation=(
             "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear equations."
             " Mathematics of Computation 61(204), 733–744. https://doi.org/10.1090/s0025-5718-1993-1192965-2."
-        )
+        ),
+        citation_key="Alefeld93",
+        authors=("Alefeld, G.", "Potra, F. A.", "Shi, Y."),
+        year=1993,
+        title="On enclosing simple roots of nonlinear equations",
+        published_in="Mathematics of Computation",
+        doi="10.1090/s0025-5718-1993-1192965-2",
     )

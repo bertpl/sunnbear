@@ -17,5 +17,11 @@ class DowellJarratt1972(FormulaCategory):
         citation=(
             'Dowell, M., Jarratt, P. (1972). The "Pegasus" method for computing the root of an equation. BIT'
             " 12(4), 503–508. https://doi.org/10.1007/BF01932959."
-        )
+        ),
+        citation_key="Dowell72",
+        authors=("Dowell, M.", "Jarratt, P."),
+        year=1972,
+        title='The "Pegasus" method for computing the root of an equation',
+        published_in="BIT",
+        doi="10.1007/BF01932959",
     )

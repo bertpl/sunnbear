@@ -18,5 +18,14 @@ class LiZhouLangeTian2026(FormulaCategory):
             " Computing 36(4), 197. https://doi.org/10.1007/s11222-026-10902-z. Preprint: arXiv 2212.00797v2 (8"
             " November 2025), https://arxiv.org/abs/2212.00797v2. The authors' R code:"
             " https://github.com/Xunjian-Li/US-algorithm.git."
-        )
+        ),
+        citation_key="Li26",
+        authors=("Li, X.-J.", "Zhou, H.", "Lange, K.", "Tian, G.-L."),
+        year=2026,
+        title=(
+            "The upper–crossing/solution (US) algorithm with strongly stable convergence and an acceleration "
+            "technique for root–finding problems"
+        ),
+        published_in="Statistics and Computing",
+        doi="10.1007/s11222-026-10902-z",
     )

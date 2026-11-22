@@ -17,5 +17,11 @@ class DowellJarratt1971(FormulaCategory):
         citation=(
             "Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of an"
             " equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364."
-        )
+        ),
+        citation_key="Dowell71",
+        authors=("Dowell, M.", "Jarratt, P."),
+        year=1971,
+        title="A modified regula falsi method for computing the root of an equation",
+        published_in="BIT",
+        doi="10.1007/BF01934364",
     )

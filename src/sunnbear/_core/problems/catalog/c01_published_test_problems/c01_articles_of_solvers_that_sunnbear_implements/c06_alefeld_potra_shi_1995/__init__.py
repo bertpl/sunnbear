@@ -20,5 +20,11 @@ class AlefeldPotraShi1995(FormulaCategory):
             " functions. ACM Transactions on Mathematical Software 21(3), 327–344."
             " https://doi.org/10.1145/210089.210111. The authors' code is CALGO 748:"
             " https://www.netlib.org/toms/748."
-        )
+        ),
+        citation_key="Alefeld95",
+        authors=("Alefeld, G. E.", "Potra, F. A.", "Shi, Y."),
+        year=1995,
+        title="Algorithm 748: enclosing zeros of continuous functions",
+        published_in="ACM Transactions on Mathematical Software",
+        doi="10.1145/210089.210111",
     )

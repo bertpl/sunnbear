@@ -21,5 +21,9 @@ class Scipy2026(FormulaCategory):
             ' gives no issue or pages\n- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for'
             ' finding the zero of a nonlinear function without using derivatives", Advances in Engineering'
             " Software 28.3 (1997): 145-149 (no DOI in the module)"
-        )
+        ),
+        citation_key="SciPy26",
+        year=2026,
+        title="SciPy",
+        url="https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py",
     )

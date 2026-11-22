@@ -19,5 +19,11 @@ class SteffenEtAl2025(FormulaCategory):
             "Steffen, V., Della Pasqua, C. C., de Oliveira, M. S., da Silva, E. A. (2025). Halving interval"
             " guaranteed for Dekker and Brent root finding methods. Examples and Counterexamples 7, 100173."
             " https://doi.org/10.1016/j.exco.2024.100173."
-        )
+        ),
+        citation_key="Steffen25",
+        authors=("Steffen, V.", "Della Pasqua, C. C.", "de Oliveira, M. S.", "da Silva, E. A."),
+        year=2025,
+        title="Halving interval guaranteed for Dekker and Brent root finding methods",
+        published_in="Examples and Counterexamples",
+        doi="10.1016/j.exco.2024.100173",
     )

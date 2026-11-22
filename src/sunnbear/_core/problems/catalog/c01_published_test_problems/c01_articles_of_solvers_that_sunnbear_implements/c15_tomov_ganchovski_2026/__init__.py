@@ -22,5 +22,11 @@ class TomovGanchovski2026(FormulaCategory):
             " https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit"
             " `9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section 7.4 pins"
             " commit `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17])."
-        )
+        ),
+        citation_key="Tomov26",
+        authors=("Tomov, L.", "Ganchovski, N."),
+        year=2026,
+        title="Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method",
+        published_in="arXiv",
+        doi="10.48550/arxiv.2610.14193",
     )

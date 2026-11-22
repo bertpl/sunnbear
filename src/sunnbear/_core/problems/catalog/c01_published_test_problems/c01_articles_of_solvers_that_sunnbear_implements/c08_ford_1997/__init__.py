@@ -17,5 +17,11 @@ class Ford1997(FormulaCategory):
             " Iranica 4(1&2), 28–34. The article has no working DOI: the journal's page,"
             " https://scientiairanica.sharif.edu/article_21758.html, lists 10.24200/sci.2020.21758, which doi.org"
             " does not resolve. An earlier version is the University of Essex technical report CSM-257 (1995)."
-        )
+        ),
+        citation_key="Ford97",
+        authors=("Ford, J. A.",),
+        year=1997,
+        title="Improved Illinois-type methods for the solution of nonlinear equations",
+        published_in="Scientia Iranica",
+        url="https://scientiairanica.sharif.edu/article_21758.html",
     )

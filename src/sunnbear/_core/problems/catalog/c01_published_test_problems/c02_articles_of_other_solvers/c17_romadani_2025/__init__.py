@@ -16,5 +16,13 @@ class Romadani2025(FormulaCategory):
             "Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding Methods into"
             " Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), 154–189."
             " https://doi.org/10.62762/jam.2025.840767."
-        )
+        ),
+        citation_key="Romadani25",
+        authors=("Romadani, M. N. H.",),
+        year=2025,
+        title=(
+            "From Theory to Code: Transforming Classical Root-Finding Methods into Efficient Python Implementations"
+        ),
+        published_in="ICCK Journal of Applied Mathematics",
+        doi="10.62762/jam.2025.840767",
     )

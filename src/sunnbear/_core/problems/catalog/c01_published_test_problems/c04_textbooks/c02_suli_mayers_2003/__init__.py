@@ -18,5 +18,11 @@ class SuliMayers2003(FormulaCategory):
         citation=(
             "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge University Press,"
             " Cambridge. https://doi.org/10.1017/CBO9780511801181."
-        )
+        ),
+        citation_key="Suli03",
+        authors=("Süli, E.", "Mayers, D. F."),
+        year=2003,
+        title="An Introduction to Numerical Analysis",
+        published_in="Cambridge University Press",
+        doi="10.1017/CBO9780511801181",
     )

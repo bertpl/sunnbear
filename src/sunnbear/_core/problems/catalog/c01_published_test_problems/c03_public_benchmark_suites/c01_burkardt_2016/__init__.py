@@ -50,5 +50,10 @@ class Burkardt2016(FormulaCategory):
             " 978-0-898716-60-3, for `p18`.\n- `p17`'s comment says that Wallis used the function to illustrate"
             " Newton's method, with no reference.\n\nThe file's `brent` solver cites Brent's 1973 book for the"
             " algorithm, not for any function."
-        )
+        ),
+        citation_key="TestZero16",
+        authors=("John Burkardt",),
+        year=2016,
+        title="TEST_ZERO",
+        url="https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py",
     )

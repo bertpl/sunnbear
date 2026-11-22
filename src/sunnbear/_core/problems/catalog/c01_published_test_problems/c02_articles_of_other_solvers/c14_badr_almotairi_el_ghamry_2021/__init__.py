@@ -18,5 +18,11 @@ class BadrAlmotairiElGhamry2021(FormulaCategory):
         citation=(
             "Badr, E., Almotairi, S., El Ghamry, A. (2021). A comparative study among new hybrid root finding"
             " algorithms and traditional methods. Mathematics 9(11), 1306. https://doi.org/10.3390/math9111306."
-        )
+        ),
+        citation_key="Badr21",
+        authors=("Badr, E.", "Almotairi, S.", "El Ghamry, A."),
+        year=2021,
+        title="A comparative study among new hybrid root finding algorithms and traditional methods",
+        published_in="Mathematics",
+        doi="10.3390/math9111306",
     )

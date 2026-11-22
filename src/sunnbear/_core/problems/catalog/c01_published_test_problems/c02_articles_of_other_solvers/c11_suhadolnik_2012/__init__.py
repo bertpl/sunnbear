@@ -15,5 +15,11 @@ class Suhadolnik2012(FormulaCategory):
         citation=(
             "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. Applied"
             " Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
-        )
+        ),
+        citation_key="Suhadolnik12",
+        authors=("Suhadolnik, A.",),
+        year=2012,
+        title="Combined bracketing methods for solving nonlinear equations",
+        published_in="Applied Mathematics Letters",
+        doi="10.1016/j.aml.2012.02.006",
     )

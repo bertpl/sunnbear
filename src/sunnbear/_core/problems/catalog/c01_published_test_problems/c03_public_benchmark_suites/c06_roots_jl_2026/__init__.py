@@ -25,5 +25,9 @@ class RootsJl2026(FormulaCategory):
             " Fifth-order iterative method for finding multiple roots of nonlinear equations. Numerical"
             " Algorithms 57(3), 389–398, published online in 2010. https://doi.org/10.1007/s11075-010-9434-5. Its"
             " rows are in `2010_li_multiple_roots`."
-        )
+        ),
+        citation_key="RootsJl26",
+        year=2026,
+        title="Roots.jl",
+        url="https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test",
     )

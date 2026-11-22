@@ -34,5 +34,11 @@ class Borchers2026(FormulaCategory):
             " https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The page is"
             " unversioned and gives no author or date; it is on the website of Hans W. Borchers, the author of"
             " the R package pracma. The chapter cites no source for its test problems."
-        )
+        ),
+        citation_key="Borchers26",
+        authors=("Borchers, H. W.",),
+        year=2026,
+        title="Root Finding",
+        published_in="pracma Handbook",
+        url="https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html",
     )

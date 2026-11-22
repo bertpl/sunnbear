@@ -18,5 +18,14 @@ class ChenLi2006(FormulaCategory):
             " 80–88. Published online 14 February 2006. https://doi.org/10.1016/j.apnum.2006.01.001. The article"
             " prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The year"
             " 2006 of the title follows the online date that the article prints; the issue is dated 2007."
-        )
+        ),
+        citation_key="Chen06",
+        authors=("Chen, J.", "Li, W."),
+        year=2006,
+        title=(
+            "An improved exponential regula falsi methods with quadratic convergence of both diameter and "
+            "point for solving nonlinear equations"
+        ),
+        published_in="Applied Numerical Mathematics",
+        doi="10.1016/j.apnum.2006.01.001",
     )

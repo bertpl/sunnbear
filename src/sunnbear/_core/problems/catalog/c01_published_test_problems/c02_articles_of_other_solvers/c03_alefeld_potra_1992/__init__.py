@@ -15,5 +15,11 @@ class AlefeldPotra1992(FormulaCategory):
         citation=(
             "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of nonlinear"
             " equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
-        )
+        ),
+        citation_key="Alefeld92",
+        authors=("Alefeld, G. E.", "Potra, F. A."),
+        year=1992,
+        title="Some efficient methods for enclosing simple zeros of nonlinear equations",
+        published_in="BIT",
+        doi="10.1007/bf01994885",
     )

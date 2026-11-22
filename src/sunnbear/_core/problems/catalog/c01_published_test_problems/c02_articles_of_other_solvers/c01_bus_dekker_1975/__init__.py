@@ -19,5 +19,11 @@ class BusDekker1975(FormulaCategory):
             "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence for"
             " finding a zero of a function. ACM Transactions on Mathematical Software 1(4), 330–345."
             " https://doi.org/10.1145/355656.355659."
-        )
+        ),
+        citation_key="Bus75",
+        authors=("Bus, J. C. P.", "Dekker, T. J."),
+        year=1975,
+        title="Two efficient algorithms with guaranteed convergence for finding a zero of a function",
+        published_in="ACM Transactions on Mathematical Software",
+        doi="10.1145/355656.355659",
     )

@@ -17,5 +17,11 @@ class KumarSrivastav2026(FormulaCategory):
             " with uniform spacing contraction. Research Square preprint."
             " https://doi.org/10.21203/rs.3.rs-10070193/v1. The article's Data Availability statement offers the"
             " authors' scripts from the corresponding author on request."
-        )
+        ),
+        citation_key="Kumar26",
+        authors=("Kumar, D.", "Srivastav, S. K."),
+        year=2026,
+        title=("A randomized bracketing method for derivative-free root finding with uniform spacing contraction"),
+        published_in="Research Square",
+        doi="10.21203/rs.3.rs-10070193/v1",
     )

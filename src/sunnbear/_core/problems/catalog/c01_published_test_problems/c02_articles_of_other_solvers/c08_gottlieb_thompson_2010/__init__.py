@@ -18,5 +18,11 @@ class GottliebThompson2010(FormulaCategory):
             "Gottlieb, R. G., Thompson, B. F. (2010). Bisected direct quadratic regula falsi. Applied"
             " Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy:"
             " http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
-        )
+        ),
+        citation_key="Gottlieb10",
+        authors=("Gottlieb, R. G.", "Thompson, B. F."),
+        year=2010,
+        title="Bisected direct quadratic regula falsi",
+        published_in="Applied Mathematical Sciences",
+        url="http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf",
     )

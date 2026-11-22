@@ -44,5 +44,11 @@ class OliveiraTakahashi2021(FormulaCategory):
             "Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average"
             " performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article"
             " 5. https://doi.org/10.1145/3423597. The article itself is dated December 2020."
-        )
+        ),
+        citation_key="Oliveira21",
+        authors=("Oliveira, I. F. D.", "Takahashi, R. H. C."),
+        year=2021,
+        title="An enhancement of the bisection method average performance preserving minmax optimality",
+        published_in="ACM Transactions on Mathematical Software",
+        doi="10.1145/3423597",
     )

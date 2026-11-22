@@ -16,5 +16,11 @@ class Zhang2011(FormulaCategory):
             "Zhang, Z. (2011). An Improvement to the Brent's Method. International Journal of Experimental"
             " Algorithms 2(1), 21–26. No DOI; the publisher's page:"
             " https://www.cscjournals.org/library/manuscriptinfo.php?mc=IJEA-7."
-        )
+        ),
+        citation_key="Zhang11",
+        authors=("Zhang, Z.",),
+        year=2011,
+        title="An Improvement to the Brent's Method",
+        published_in="International Journal of Experimental Algorithms",
+        url="https://www.cscjournals.org/library/manuscriptinfo.php?mc=IJEA-7",
     )
