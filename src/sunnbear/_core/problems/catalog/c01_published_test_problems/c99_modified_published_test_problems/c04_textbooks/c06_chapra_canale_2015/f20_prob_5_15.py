@@ -5,7 +5,16 @@ A change of formula f1.4.6.20 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedChapraCanale2015Prob515(Formula):
@@ -27,10 +36,10 @@ class ModifiedChapraCanale2015Prob515(Formula):
     number = (1, 99, 4, 6, 20)
     name = "Prob. 5.15"
     params = (
-        FormulaParam("g"),
-        FormulaParam("L"),
-        FormulaParam("t"),
-        FormulaParam("v"),
+        FormulaParam("g", latex_symbol="g"),
+        FormulaParam("L", latex_symbol="L"),
+        FormulaParam("t", latex_symbol="t"),
+        FormulaParam("v", latex_symbol="v"),
     )
     source = FormulaSource(
         reference=(
@@ -40,6 +49,21 @@ class ModifiedChapraCanale2015Prob515(Formula):
         ),
         location="Prob. 5.15",
     )
+    presentation = FormulaPresentation(
+        expression=(
+            r"\param{v} - \sqrt{2 \param{g} \x} \tanh{\left(\frac{\sqrt{2 \param{g} \x}}{2 \param{L}} "
+            r"\param{t} \right)} + \c"
+        ),
+        interval="[0, 2]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                r"problem, because a shift along x by any $\c > 0$ evaluates $\sqrt{2 \param{g} \x}$ left "
+                "of 0, outside its domain."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, g: float, L: float, t: float, v: float) -> float:
@@ -52,7 +76,11 @@ class ModifiedChapraCanale2015Prob515(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the parameter values of the modified test problem."""
-        return (ParamTable(names=("g", "L", "t", "v"), rows=((9.81, 4.0, 2.5, 5.0),)),)
+        return (
+            ParamTable(
+                names=("g", "L", "t", "v"), rows=((9.81, 4.0, 2.5, 5.0),), summary="The published parameter values."
+            ),
+        )
 
     test_cases = (
         FormulaTestCase.value(

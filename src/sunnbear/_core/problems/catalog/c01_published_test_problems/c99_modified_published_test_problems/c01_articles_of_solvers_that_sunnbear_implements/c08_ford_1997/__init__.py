@@ -16,3 +16,7 @@ class ModifiedFord1997(FormulaCategory):
 
     number = (1, 99, 1, 8)
     name = "Ford (1997)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces improved "
+        "Illinois-type methods."
+    )

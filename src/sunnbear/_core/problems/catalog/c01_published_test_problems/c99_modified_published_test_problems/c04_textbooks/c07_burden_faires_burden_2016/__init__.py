@@ -14,3 +14,7 @@ class ModifiedBurdenFairesBurden2016(FormulaCategory):
 
     number = (1, 99, 4, 7)
     name = "Burden, Faires, Burden (2016)"
+    description = (
+        "The test problems are modified versions of those that come from chapter 2, on equations in 1 "
+        "variable, of the textbook Numerical Analysis."
+    )

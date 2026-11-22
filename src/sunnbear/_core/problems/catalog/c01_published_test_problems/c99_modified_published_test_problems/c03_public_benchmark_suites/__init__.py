@@ -20,3 +20,7 @@ class ModifiedPublicBenchmarkSuites(FormulaCategory):
 
     number = (1, 99, 3)
     name = "Public benchmark suites"
+    description = (
+        "The test problems are modified versions of those that come from public collections of test problems "
+        "for root finders, such as the test suites of numerical libraries."
+    )

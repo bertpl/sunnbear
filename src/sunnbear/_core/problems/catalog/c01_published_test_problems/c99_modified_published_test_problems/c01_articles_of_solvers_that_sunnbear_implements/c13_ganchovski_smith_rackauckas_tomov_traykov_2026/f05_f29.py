@@ -5,7 +5,16 @@ A change of formula f1.1.13.5 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
@@ -31,9 +40,9 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
     number = (1, 99, 1, 13, 5)
     name = "f29"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -46,6 +55,19 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
         ),
         location="Table 2, f29",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3\right)^{5}\right)",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without the cancellation that makes the "
+                r"published function, $$e^{\left(\tmp{u} - 3\right)^{5}} - 1,$$ exactly 0 at many x-values "
+                "next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -69,6 +91,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F29(Formula):
                     (2.6, 4.6, 2.0),
                     (2.6, 3.6, 1.0),
                 ),
+                summary="The published intervals.",
             ),
         )
 

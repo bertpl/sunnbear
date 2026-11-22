@@ -16,3 +16,7 @@ class ModifiedEllithy2026(FormulaCategory):
 
     number = (1, 99, 2, 18)
     name = "Ellithy (2026)"
+    description = (
+        "The test problems are modified versions of those that come from the data set of the article that "
+        "introduces 4 multi-phase hybrid bracketing methods."
+    )

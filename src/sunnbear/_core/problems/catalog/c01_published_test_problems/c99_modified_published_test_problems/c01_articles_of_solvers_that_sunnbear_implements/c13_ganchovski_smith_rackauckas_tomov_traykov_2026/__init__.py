@@ -16,3 +16,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026(FormulaCategory):
 
     number = (1, 99, 1, 13)
     name = "Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026)"
+    description = (
+        "The test problems are modified versions of those that come from the article that improves the "
+        "modified Anderson–Björck method."
+    )

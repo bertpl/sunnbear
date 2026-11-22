@@ -3,7 +3,14 @@
 A change of formula f1.4.7.11 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBurdenFairesBurden2016213(Formula):
@@ -42,6 +49,19 @@ class ModifiedBurdenFairesBurden2016213(Formula):
         ),
         location="Exercises 2.1-3, 2.6-2(h)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.8 \c"),),
+        expression=r"\left(\tmp{u} - 3\right) \left(\left(\tmp{u} - 2\right)^{2} - 2\right)",
+        interval="[3.2, 4]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\tmp{u}^{3} - 7 \tmp{u}^{2} + 14 \tmp{u} "
+                "- 6,$$ without the cancellation that makes the published function exactly 0 at many "
+                "x-values next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

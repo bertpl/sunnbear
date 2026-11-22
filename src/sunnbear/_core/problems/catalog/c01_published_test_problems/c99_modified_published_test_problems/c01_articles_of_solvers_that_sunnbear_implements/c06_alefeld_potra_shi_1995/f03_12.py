@@ -5,7 +5,16 @@ A change of formula f1.1.6.3 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedAlefeldPotraShi199512(Formula):
@@ -34,7 +43,7 @@ class ModifiedAlefeldPotraShi199512(Formula):
 
     number = (1, 99, 1, 6, 3)
     name = "12"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Alefeld, G. E., Potra, F. A., Shi, Y. (1995). Algorithm 748: enclosing zeros of continuous"
@@ -44,6 +53,22 @@ class ModifiedAlefeldPotraShi199512(Formula):
         ),
         location="Table I, problem 12",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 99 \c"),),
+        expression=(
+            r"\param{n}^{1/\param{n}} " r"\operatorname{expm1}\left(\frac{\ln(\tmp{u}/\param{n})}{\param{n}}\right)"
+        ),
+        interval="[1, 100]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\tmp{u}^{\frac{1}{\param{n}}} - "
+                r"\param{n}^{\frac{1}{\param{n}}},$$ without the cancellation that makes the published "
+                "function exactly 0 at many x-values next to the root."
+            ),
+            r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without cancellation for a small $z$.",
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -84,6 +109,7 @@ class ModifiedAlefeldPotraShi199512(Formula):
                     (31.0,),
                     (33.0,),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

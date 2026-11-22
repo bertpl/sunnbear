@@ -5,7 +5,14 @@ A change of formula f1.3.3.41 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedRootsFortran2025150(Formula):
@@ -89,6 +96,19 @@ class ModifiedRootsFortran2025150(Formula):
         ),
         location="root_tests.f90, case 150",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3.0\right)^{5}\right)",
+        interval="[2.6, 3.6]",
+        notes=(
+            (
+                r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without the cancellation that makes the "
+                r"published function, $$e^{\left(\tmp{u} - 3.0\right)^{5}} - 1.0,$$ exactly 0 at many "
+                "x-values next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

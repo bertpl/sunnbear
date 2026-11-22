@@ -5,7 +5,14 @@ A change of formula f1.4.7.19 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBurdenFairesBurden2016218(Formula):
@@ -36,6 +43,19 @@ class ModifiedBurdenFairesBurden2016218(Formula):
         ),
         location="Exercises 2.1-8, 2.2-16",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 0.6 \c"),),
+        expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
+        interval="[4, 4.6]",
+        notes=(
+            (
+                "The interval ends at 4.6, not at the published 5, so that it holds the root and no pole. "
+                r"The bound 4.6 lies left of the pole of $\tan \tmp{u}$ at $3\pi/2$, which is a second "
+                "sign change, so the function has the same sign at both published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

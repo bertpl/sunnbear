@@ -20,10 +20,7 @@ _SHIPPED_FORMULAS = [
 _SHIPPED_CATEGORIES = [
     category for category in FormulaRegistry.categories() if type(category).__module__.startswith(_CATALOG_PREFIX)
 ]
-_FORMULAS_TO_CHECK_FOR_C = [
-    formula for formula in _SHIPPED_FORMULAS if formula.effect_of_c is not None and formula.number[0] != 1
-]
-_SKIP_REASON = "the presentations of the catalog's formulas and categories are not complete"
+_FORMULAS_TO_CHECK_FOR_C = [formula for formula in _SHIPPED_FORMULAS if formula.number[0] != 1]
 
 
 # ==================================================================================================
@@ -74,7 +71,6 @@ def test_recipe_summaries_name_only_parameters():
 # ==================================================================================================
 #  Required declarations
 # ==================================================================================================
-@pytest.mark.skip(reason=_SKIP_REASON)
 def test_formulas_declare_what_a_reader_sees():
     """A shipped formula declares its presentation, how it applies ``c``, its symbols and its recipes' summaries."""
     # --- act --------------------------
@@ -89,7 +85,7 @@ def test_formulas_declare_what_a_reader_sees():
     assert failing == []
 
 
-@pytest.mark.skip(reason=_SKIP_REASON)
+@pytest.mark.skip(reason="the formulas of category 1 declare no summary")
 def test_formulas_declare_their_summaries():
     """A shipped formula's presentation holds its summary."""
     # --- act --------------------------
@@ -103,7 +99,6 @@ def test_formulas_declare_their_summaries():
     assert failing == []
 
 
-@pytest.mark.skip(reason=_SKIP_REASON)
 def test_categories_declare_their_descriptions():
     """A shipped category declares its description for a reader."""
     # --- act --------------------------

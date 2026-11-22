@@ -315,14 +315,14 @@ def test_modified_category_has_the_name_of_its_published_category(category):
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
 @pytest.mark.parametrize("c", [0.25, -0.25])
 def test_published_formula_shifts_x_by_c(formula, c):
-    """A published formula shifts x by ``c_scale*c``, by category 1's rule, and declares no other way."""
+    """A published formula shifts x by ``c_scale*c``, by category 1's rule, and declares `EffectOfC.SHIFTS_X`."""
     for candidate in formula.build_all_candidates():
         # --- act ----------------------
         ways = _c_ways_followed(candidate, c)
 
         # --- assert -------------------
         assert "shifts x" in ways, candidate.id
-    assert formula.effect_of_c in (None, EffectOfC.SHIFTS_X)
+    assert formula.effect_of_c is EffectOfC.SHIFTS_X
 
 
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
@@ -334,9 +334,7 @@ def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
         ways = _c_ways_followed(candidate, c)
 
         # --- assert -------------------
-        assert ways, candidate.id
-        if formula.effect_of_c is not None:
-            assert _C_WAY_NAME_BY_EFFECT_OF_C[formula.effect_of_c] in ways, candidate.id
+        assert _C_WAY_NAME_BY_EFFECT_OF_C[formula.effect_of_c] in ways, candidate.id
 
 
 def test_c_way_name_by_effect_of_c_covers_every_effect():

@@ -3,7 +3,14 @@
 A change of formula f1.4.3.14 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedMoler2004Ex43(Formula):
@@ -41,6 +48,19 @@ class ModifiedMoler2004Ex43(Formula):
         ),
         location="Exercise 4.3",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\left(17 \tmp{u} - 25\right) \left(16 \tmp{u} - 25\right) \left(3 \tmp{u} - 5\right)",
+        interval="[1, 2]",
+        notes=(
+            (
+                r"The expression equals the published function, $$816 \tmp{u}^{3} - 3835 \tmp{u}^{2} + "
+                r"6000 \tmp{u} - 3125,$$ without the cancellation that makes the published function "
+                "exactly 0 at many x-values next to each of its 3 roots."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

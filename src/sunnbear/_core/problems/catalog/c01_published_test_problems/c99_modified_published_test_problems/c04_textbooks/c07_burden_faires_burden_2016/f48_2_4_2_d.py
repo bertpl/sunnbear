@@ -5,7 +5,14 @@ A change of formula f1.4.7.48 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedBurdenFairesBurden2016242D(Formula):
@@ -40,6 +47,19 @@ class ModifiedBurdenFairesBurden2016242D(Formula):
         ),
         location="Exercise 2.4-2(d)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=r"\left(e^{\tmp{u}} - 3 \tmp{u}^{2}\right)^{3}",
+        interval="[3, 5]",
+        notes=(
+            (
+                r"The expression equals the published function, $$e^{3 \tmp{u}} - 27 \tmp{u}^{6} + 27 "
+                r"\tmp{u}^{4} e^{\tmp{u}} - 9 \tmp{u}^{2} e^{2 \tmp{u}},$$ without the cancellation that "
+                "makes the published function exactly 0 at many x-values next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

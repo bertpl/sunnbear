@@ -14,3 +14,7 @@ class ModifiedAlefeldPotraShi1993(FormulaCategory):
 
     number = (1, 99, 2, 4)
     name = "Alefeld, Potra, Shi (1993)"
+    description = (
+        "The test problems are modified versions of those that come from an article that presents methods for "
+        "enclosing simple roots of nonlinear equations."
+    )

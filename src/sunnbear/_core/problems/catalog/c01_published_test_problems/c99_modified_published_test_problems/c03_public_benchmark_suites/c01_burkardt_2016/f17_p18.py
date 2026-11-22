@@ -3,7 +3,16 @@
 A change of formula f1.3.1.17 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedBurkardt2016P18(Formula):
@@ -38,9 +47,9 @@ class ModifiedBurkardt2016P18(Formula):
     number = (1, 99, 3, 1, 17)
     name = "p18"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -70,6 +79,25 @@ class ModifiedBurkardt2016P18(Formula):
         ),
         location="Problem p18",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"{10.0}^{14} \left(\tmp{u} - 1\right)^{7}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"The expression equals the published function, $${10.0}^{14} \left(1.0 \tmp{u}^{7} - 7.0 "
+                r"\tmp{u}^{6} + 21.0 \tmp{u}^{5} - 35.0 \tmp{u}^{4} + 35.0 \tmp{u}^{3} - 21.0 \tmp{u}^{2} "
+                r"+ 7.0 \tmp{u} - 1.0\right),$$ without the cancellation that makes the published function "
+                "exactly 0 at many x-values up to about 0.01 from the root."
+            ),
+            (
+                "This changes what the test problem tests: the source writes the polynomial term by term "
+                "to make it hard to evaluate accurately, and the expression evaluates it without that "
+                "cancellation."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -93,6 +121,7 @@ class ModifiedBurkardt2016P18(Formula):
                     (0.988, 1.012, 0.024),
                     (0.99, 1.013, 0.023),
                 ),
+                summary="The published intervals.",
             ),
         )
 

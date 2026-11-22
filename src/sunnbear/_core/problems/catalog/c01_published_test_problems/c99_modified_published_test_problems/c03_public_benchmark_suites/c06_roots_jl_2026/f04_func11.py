@@ -5,7 +5,14 @@ A change of formula f1.3.6.4 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedRootsJl2026Func11(Formula):
@@ -50,6 +57,23 @@ class ModifiedRootsJl2026Func11(Formula):
         ),
         location="test_derivative_free.jl, func11",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
+        interval="[-2, 1]",
+        notes=(
+            (
+                "The interval ends at 1, not at the published 2, so that it holds 1 of the published "
+                "interval's 2 roots: with an even number of roots, the function has the same sign at both "
+                "published bounds."
+            ),
+            (
+                "This changes what the test problem tests: the source finds every root in $[-2, 2]$, and "
+                "a solver on the modified interval finds only 1."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

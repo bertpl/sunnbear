@@ -3,7 +3,14 @@
 A change of formula f1.2.13.8 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedSabharwal2019T26(Formula):
@@ -31,6 +38,19 @@ class ModifiedSabharwal2019T26(Formula):
         ),
         location="Table 2, function 6",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5.1 \c"),),
+        expression=r"\tmp{u}^{2} + 5 \tmp{u} + 2",
+        interval="[-6, -0.9]",
+        notes=(
+            (
+                "The interval ends at $-0.9$, not at the published 0, so that it holds 1 of the published "
+                "interval's 2 roots: with an even number of roots, the function has the same sign at both "
+                "published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -15,3 +15,7 @@ class ModifiedAlefeldPotraShi1995(FormulaCategory):
 
     number = (1, 99, 1, 6)
     name = "Alefeld, Potra, Shi (1995)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces "
+        "Algorithm 748, which encloses zeros of continuous functions."
+    )

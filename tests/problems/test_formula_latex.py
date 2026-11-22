@@ -180,3 +180,17 @@ def test_texts_for_a_reader_gather_every_text():
         r"The sweep of $\param{p1}$ from 0 to 1.",
         r"An example cubic, with 1 root for $\param{p1} \le 0$ and up to 3 roots for a larger $\param{p1}$.",
     )
+
+
+@pytest.mark.usefixtures("isolated_formula_registry")
+def test_texts_for_a_reader_without_a_presentation():
+    """A formula without a presentation has only its meanings and its recipes' summaries as texts for a reader."""
+    # --- arrange ----------------------
+    params = (
+        FormulaParam("m", latex_symbol="m", meaning="The slope of the line."),
+        FormulaParam("b", latex_symbol="b"),
+    )
+    formula = _define_formula(params, None)()
+
+    # --- act / assert -----------------
+    assert formula.texts_for_a_reader() == ("The slope of the line.",)

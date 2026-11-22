@@ -3,7 +3,16 @@
 A change of formula f1.2.1.5 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 
@@ -34,7 +43,7 @@ class ModifiedBusDekker1975Iii(Formula):
 
     number = (1, 99, 2, 1, 5)
     name = "III"
-    params = (FormulaParam("n"),)
+    params = (FormulaParam("n", latex_symbol="n"),)
     source = FormulaSource(
         reference=(
             "Bus, J. C. P., Dekker, T. J. (1975). Two efficient algorithms with guaranteed convergence "
@@ -43,6 +52,19 @@ class ModifiedBusDekker1975Iii(Formula):
         ),
         location="Group III",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 11 \c"),),
+        expression=r"\tmp{u}^{\param{n}} + 2^{-918} \, \tmp{u}",
+        interval="[-1, 10]",
+        notes=(
+            (
+                r"The term $2^{-918} \, \tmp{u}$ keeps the function from being exactly 0 within about "
+                r"$10^{-13}$ of its root, where $\tmp{u}^{\param{n}}$ underflows to 0 in float64 at "
+                r"$\param{n} = 25$."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
@@ -60,7 +82,7 @@ class ModifiedBusDekker1975Iii(Formula):
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the parameter value of the modified test problem."""
-        return (ParamTable(names=("n",), rows=((25.0,),)),)
+        return (ParamTable(names=("n",), rows=((25.0,),), summary="The published parameter value $\\param{n} = 25$."),)
 
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them

@@ -3,7 +3,16 @@
 A change of formula f1.4.1.2 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedAtkinson1989136(Formula):
@@ -42,9 +51,9 @@ class ModifiedAtkinson1989136(Formula):
     number = (1, 99, 4, 1, 2)
     name = "(1.3.6)"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -53,6 +62,28 @@ class ModifiedAtkinson1989136(Formula):
         ),
         location="Eq. (1.3.6)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\tmp{u}^{3}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"The expression is the published function, $\x^3 - 3 \x^2 + 3 \x - 1$, evaluated at $\x + "
+                "1$ without the cancellation of its terms, on the published intervals shifted by $-1$."
+            ),
+            (
+                "The intervals are shifted because the largest bound of the published interval $[0.998, "
+                "1.002]$ is about 250 times its width, more than the benchmark suite inclusion conditions "
+                "allow."
+            ),
+            (
+                "This changes what the test problem tests on $[-0.002, 0.002]$: the source uses $[0.998, "
+                "1.002]$ to show the published function's band of rounding noise around its root, and the "
+                "expression has no such band."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -76,6 +107,7 @@ class ModifiedAtkinson1989136(Formula):
                     (-1.0, 1.0, 2.0),
                     (-0.002, 0.002, 0.004),
                 ),
+                summary="The published intervals, shifted by $-1$.",
             ),
         )
 

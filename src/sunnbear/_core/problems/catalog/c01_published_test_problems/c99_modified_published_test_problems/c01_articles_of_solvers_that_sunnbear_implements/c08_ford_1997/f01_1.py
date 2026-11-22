@@ -5,7 +5,14 @@ A change of formula f1.1.8.1 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedFord19971(Formula):
@@ -43,6 +50,19 @@ class ModifiedFord19971(Formula):
         ),
         location="Section “Numerical Tests”, function 1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x e^{-\c \ln(200/0.004)}"),),
+        expression=r"\sin{\left(\frac{0.01}{\tmp{u}} \right)} - 0.01",
+        interval="[0.004, 200]",
+        notes=(
+            (
+                r"$\c$ scales x, so that the root moves by the factor $(200/0.004)^{\c}$ and never reaches "
+                "0: the interval spans orders of magnitude next to the singularity at 0, and a shift "
+                "along x would move the lower bound across it."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SCALES_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

@@ -5,7 +5,16 @@ A change of formula f1.3.5.12 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedBorchers2026F12(Formula):
@@ -45,9 +54,9 @@ class ModifiedBorchers2026F12(Formula):
     number = (1, 99, 3, 5, 12)
     name = "f12"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -58,6 +67,37 @@ class ModifiedBorchers2026F12(Formula):
         ),
         location="§5.6, f12",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \param{c_scale} \c"),
+            (r"\tmp{t}", r"\frac{\tmp{u}}{\sqrt{e}} - 1"),
+        ),
+        expression=(
+            r"\begin{cases} \sum_{k=3}^{16} (-1)^{k+1} \frac{\tmp{t}^k}{k} & \text{if } |\tmp{t}| < "
+            r"\frac{1}{16} \\ \operatorname{log1p}(\tmp{t}) - \tmp{t} + \frac{\tmp{t}^2}{2} & "
+            r"\text{otherwise} \end{cases}"
+        ),
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"The expression equals the published function, $$\ln{\left(\tmp{u} \right)} + "
+                r"\frac{\tmp{u}^{2}}{2 e^{1}} - \frac{2 \tmp{u}}{\sqrt{e^{1}}} + 1,$$ without the "
+                "cancellation that makes the published function exactly 0 at many x-values next to the "
+                "root."
+            ),
+            (
+                r"$\operatorname{log1p}(z)$ is $\ln(1 + z)$, computed without rounding $1 + z$. Next to "
+                r"the root, the terms of $\operatorname{log1p}(\tmp{t}) - \tmp{t} + \frac{\tmp{t}^2}{2}$ "
+                r"cancel too, so that for $|\tmp{t}| < \frac{1}{16}$ the expression evaluates that "
+                "difference by its Taylor series."
+            ),
+            (
+                "This changes what the test problem tests: the source uses the function to show that root "
+                "finders in float64 locate its root only to about $10^{-5}$."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -90,6 +130,7 @@ class ModifiedBorchers2026F12(Formula):
                     (1.0, 3.4, 2.4),
                     (1.0, 2.5, 1.5),
                 ),
+                summary="The published intervals.",
             ),
         )
 

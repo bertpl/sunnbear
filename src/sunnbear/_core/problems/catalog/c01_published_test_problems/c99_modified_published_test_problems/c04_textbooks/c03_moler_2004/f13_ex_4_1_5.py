@@ -5,7 +5,14 @@ A change of formula f1.4.3.13 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedMoler2004Ex415(Formula):
@@ -34,6 +41,20 @@ class ModifiedMoler2004Ex415(Formula):
         ),
         location="Exercise 4.1, function 5",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        expression=(
+            r"\begin{cases} 0 & \text{if } \tmp{u} = \pi \\ \frac{1}{\tmp{u} - \pi} & \text{otherwise} " r"\end{cases}"
+        ),
+        interval="[0, 5]",
+        notes=(
+            (
+                r"The expression is 0 at the pole, $\tmp{u} = \pi$ in float64, where the published "
+                "function divides by 0."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

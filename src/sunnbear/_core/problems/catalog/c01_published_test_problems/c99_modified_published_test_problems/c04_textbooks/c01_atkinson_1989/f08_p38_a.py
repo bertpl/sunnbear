@@ -3,7 +3,14 @@
 A change of formula f1.4.1.8 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedAtkinson1989P38A(Formula):
@@ -33,6 +40,19 @@ class ModifiedAtkinson1989P38A(Formula):
         ),
         location="Problem 38(a)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 7 \c"),),
+        expression=r"\tmp{u}^{4} - 5.7 \tmp{u}^{3} - 0.47 \tmp{u}^{2} + 29.865 \tmp{u} - 26.1602",
+        interval="[-3, 4]",
+        notes=(
+            (
+                "The interval ends at 4, not at the published 5, so that it holds 3 of the published "
+                "interval's 4 roots: with an even number of roots, the function has the same sign at both "
+                "published bounds."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

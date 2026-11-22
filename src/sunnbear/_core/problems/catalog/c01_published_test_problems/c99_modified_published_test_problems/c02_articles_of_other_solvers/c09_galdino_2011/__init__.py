@@ -15,3 +15,7 @@ class ModifiedGaldino2011(FormulaCategory):
 
     number = (1, 99, 2, 9)
     name = "Galdino (2011)"
+    description = (
+        "The test problems are modified versions of those that come from the article that introduces a family "
+        "of regula falsi methods."
+    )

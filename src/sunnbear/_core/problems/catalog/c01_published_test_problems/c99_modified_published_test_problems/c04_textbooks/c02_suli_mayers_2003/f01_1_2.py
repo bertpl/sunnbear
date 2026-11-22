@@ -3,7 +3,16 @@
 A change of formula f1.4.2.1 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedSuliMayers200312(Formula):
@@ -47,10 +56,10 @@ class ModifiedSuliMayers200312(Formula):
     number = (1, 99, 4, 2, 1)
     name = "(1.2)"
     params = (
-        FormulaParam("M"),
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("M", latex_symbol="M"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -59,6 +68,30 @@ class ModifiedSuliMayers200312(Formula):
         ),
         location="Eq. (1.2)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"\frac{1}{2} - \frac{1}{1 + \param{M} \left|(\tmp{u} + 1.05) - 1.05\right|}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"The expression is the published function evaluated at $\tmp{u} + 1.05$, which moves the "
+                "function's minimum from 1.05 to 0, because the largest bound of the narrow published "
+                "interval, $[1.04999, 1.05001]$, is about 52,500 times its width, more than the benchmark "
+                "suite inclusion conditions allow."
+            ),
+            (
+                r"The modified intervals hold only the left root, $-1/\param{M}$, because each published "
+                r"interval holds both roots, $1.05 \pm 1/\param{M}$, so that the function has the same "
+                "sign at both published bounds."
+            ),
+            (
+                "This changes what the test problem tests: the source uses the function to show that an "
+                "interval on which it changes sign can be hard to find, and each modified interval is "
+                "already one."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, M: float, a: float, b: float, c_scale: float) -> float:
@@ -89,6 +122,7 @@ class ModifiedSuliMayers200312(Formula):
                     (2000000.0, -1e-05, 0.0, 1e-05),
                     (20000000.0, -1e-05, 0.0, 1e-05),
                 ),
+                summary="The published values of $\\param{M}$, on the modified intervals.",
             ),
         )
 

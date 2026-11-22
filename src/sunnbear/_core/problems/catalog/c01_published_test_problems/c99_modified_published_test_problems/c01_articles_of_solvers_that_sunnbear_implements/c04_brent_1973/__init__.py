@@ -16,3 +16,7 @@ class ModifiedBrent1973(FormulaCategory):
 
     number = (1, 99, 1, 4)
     name = "Brent (1973)"
+    description = (
+        "The test problems are modified versions of those that come from chapter 4 of the book Algorithms for "
+        "Minimization without Derivatives, which presents Brent's method."
+    )

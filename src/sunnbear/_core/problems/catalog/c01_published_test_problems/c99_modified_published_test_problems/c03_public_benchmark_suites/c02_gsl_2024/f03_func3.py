@@ -3,7 +3,14 @@
 A change of formula f1.3.2.3 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedGsl2024Func3(Formula):
@@ -39,6 +46,23 @@ class ModifiedGsl2024Func3(Formula):
         ),
         location="test_funcs.c, func3",
     )
+    presentation = FormulaPresentation(
+        expression=r"\x^{2} - 1.0 \cdot 10^{-8} + \c",
+        interval="[0, 1]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                r"problem, because its roots, $\pm 10^{-4}$, lie $10^{-4}$ from the lower bound 0, so that "
+                "a shift along x by more than $10^{-4}$ changes the function's sign there."
+            ),
+            (
+                "This changes what the test problem tests: the published root lies close to the lower "
+                r"bound of a wide interval, while adding $\c$ moves the root to $\sqrt{10^{-8} - \c}$, "
+                r"near 0.5 at $\c = -0.25$."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

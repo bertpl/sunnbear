@@ -3,7 +3,14 @@
 A change of formula f1.3.4.2 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 from sunnbear._core.utils.math_functions import real_root
 
 
@@ -40,6 +47,13 @@ class ModifiedGanchovski2026F100(Formula):
         ),
         location="f100",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 2.69 \c"),),
+        expression=r"\sqrt[3]{\frac{4 \tmp{u} - 3}{\tmp{u}}}",
+        interval="[0.03, e]",
+        notes=("The interval starts at 0.03, not at the published 0, where the function divides by 0.",),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

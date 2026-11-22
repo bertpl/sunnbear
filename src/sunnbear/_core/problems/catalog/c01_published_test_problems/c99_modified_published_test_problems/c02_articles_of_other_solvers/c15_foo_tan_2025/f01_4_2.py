@@ -5,7 +5,16 @@ A change of formula f1.2.15.1 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedFooTan202542(Formula):
@@ -29,7 +38,7 @@ class ModifiedFooTan202542(Formula):
 
     number = (1, 99, 2, 15, 1)
     name = "4.2"
-    params = (FormulaParam("y"),)
+    params = (FormulaParam("y", latex_symbol="y"),)
     source = FormulaSource(
         reference=(
             "Foo, W. G., Tan, C. H. (2025). Higher-Order Root-Finding Algorithm and its Applications. "
@@ -38,6 +47,22 @@ class ModifiedFooTan202542(Formula):
         ),
         location="Section 4.2",
     )
+    presentation = FormulaPresentation(
+        expression=(
+            r"\begin{cases} 0 & \text{for}\: \x = 0 \\- \x \log_{2}{\left(\x \right)} & "
+            r"\text{otherwise} \end{cases} - \left(1 - \x\right) \log_{2}{\left(1 - \x \right)} - "
+            r"\param{y} + \c"
+        ),
+        interval="[0, 0.5]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                r"problems, because a shift along x by any $\c > 0$ evaluates $\log_2 \x$ left of 0, "
+                "outside its domain."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float, y: float) -> float:
@@ -64,6 +89,7 @@ class ModifiedFooTan202542(Formula):
                     (0.8,),
                     (0.9,),
                 ),
+                summary="The published parameter values.",
             ),
         )
 

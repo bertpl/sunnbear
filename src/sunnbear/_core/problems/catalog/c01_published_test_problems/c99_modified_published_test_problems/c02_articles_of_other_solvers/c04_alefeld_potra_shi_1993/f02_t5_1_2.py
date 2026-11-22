@@ -3,7 +3,16 @@
 A change of formula f1.2.4.2 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 
 
 class ModifiedAlefeldPotraShi1993T512(Formula):
@@ -30,9 +39,9 @@ class ModifiedAlefeldPotraShi1993T512(Formula):
     number = (1, 99, 2, 4, 2)
     name = "T5.1-2"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -42,6 +51,24 @@ class ModifiedAlefeldPotraShi1993T512(Formula):
         ),
         location="Table 5.1, problem 2",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
+        expression=r"- 2 \sum_{i=1}^{20} \frac{\left(2 i - 5\right)^{2}}{\left(\tmp{u} - i^{2}\right)^{3}}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                "Each bound lies 1% of the published interval's width from its pole, rounded to 1 "
+                "significant digit, not $10^{-9}$ from it as published: a shift along x by more than "
+                "$10^{-9}$ would move a published bound across its pole."
+            ),
+            (
+                "This changes what the test problem tests: the modified intervals leave out the steepest "
+                r"part of the function next to each pole, as $|f|$ is at least about $2 \cdot 10^{27}$ at "
+                r"the published bounds and at most about $7 \cdot 10^{5}$ at the modified ones."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -100,6 +127,7 @@ class ModifiedAlefeldPotraShi1993T512(Formula):
                     (324.4, 360.6, 36.2),
                     (361.4, 399.6, 38.2),
                 ),
+                summary="The published intervals, with each bound moved away from its pole.",
             ),
         )
 

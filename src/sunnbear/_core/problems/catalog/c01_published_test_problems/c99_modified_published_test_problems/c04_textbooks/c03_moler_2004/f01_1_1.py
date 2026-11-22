@@ -3,7 +3,14 @@
 A change of formula f1.4.3.1 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedMoler200411(Formula):
@@ -35,6 +42,13 @@ class ModifiedMoler200411(Formula):
         ),
         location="§1.1",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3.96 \c"),),
+        expression=r"\frac{1}{\tmp{u}} - \left(\tmp{u} - 1\right)",
+        interval="[0.04, 4]",
+        notes=("The interval starts at 0.04, not at the published 0, where the function divides by 0.",),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

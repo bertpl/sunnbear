@@ -3,7 +3,14 @@
 A change of formula f1.2.18.14 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEllithy202630(Formula):
@@ -42,6 +49,18 @@ class ModifiedEllithy202630(Formula):
         ),
         location="dataset.json, problems 30 and 31",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
+        expression=r"\prod_{i=1}^{20} (\tmp{u} - i)",
+        interval="[19.02, 21]",
+        notes=(
+            (
+                "The interval starts at 19.02, not at the published 19, which is a root, so that the "
+                "function is not 0 there."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

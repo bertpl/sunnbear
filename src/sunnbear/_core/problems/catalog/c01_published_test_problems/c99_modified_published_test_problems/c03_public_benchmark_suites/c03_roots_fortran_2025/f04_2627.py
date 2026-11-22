@@ -6,7 +6,16 @@ A change of formula f1.3.3.4 may need a matching change of this module.
 import math
 import sys
 
-from sunnbear._core.problems.core import Formula, FormulaParam, FormulaSource, FormulaTestCase, ParamRecipe, ParamTable
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaParam,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+    ParamTable,
+)
 from sunnbear._core.utils.floats import TINY_LINEAR_TERM_SLOPE
 
 # MAX_EXP_ARGUMENT is the largest argument for which float64 exp does not overflow.
@@ -42,9 +51,9 @@ class ModifiedRootsFortran20252627(Formula):
     number = (1, 99, 3, 3, 4)
     name = "26–27"
     params = (
-        FormulaParam("a"),
-        FormulaParam("b"),
-        FormulaParam("c_scale"),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
+        FormulaParam("c_scale", latex_symbol="s"),
     )
     source = FormulaSource(
         reference=(
@@ -108,6 +117,33 @@ class ModifiedRootsFortran20252627(Formula):
         ),
         location="root_tests.f90, cases 26 and 27",
     )
+    presentation = FormulaPresentation(
+        definitions=(
+            (r"\tmp{u}", r"\x - \param{c_scale} \c"),
+            (
+                r"\fn{g}(\x)",
+                (
+                    r"\begin{cases} 0 & \text{if } 709.78 \, \x^2 < 1 \\ \frac{\x}{e^{1/\x^2}} & "
+                    r"\text{otherwise} \end{cases}"
+                ),
+            ),
+        ),
+        expression=r"\fn{g}(\tmp{u}) + 2^{-918} \, \tmp{u}",
+        interval=r"[\param{a}, \param{b}]",
+        notes=(
+            (
+                r"$\fn{g}(\x)$ is 0 where $e^{1/\x^2}$ exceeds the largest float64 value, which is about "
+                "$e^{709.78}$."
+            ),
+            (
+                r"The term $2^{-918} \, \tmp{u}$ keeps the function from being exactly 0 within about 0.04 "
+                r"of its root, where the published function, $\fn{g}(\tmp{u})$, underflows to 0 in "
+                "float64. This changes what the test problem tests: with the published function, a solver "
+                "may stop at any x-value within about 0.04 of the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, a: float, b: float, c_scale: float) -> float:
@@ -137,6 +173,7 @@ class ModifiedRootsFortran20252627(Formula):
                     (-1.0, 4.0, 5.0),
                     (-1.1234, 4.4567, 5.58),
                 ),
+                summary="The published intervals.",
             ),
         )
 

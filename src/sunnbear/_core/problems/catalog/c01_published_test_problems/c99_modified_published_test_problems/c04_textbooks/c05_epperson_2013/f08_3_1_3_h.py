@@ -5,7 +5,14 @@ A change of formula f1.4.5.8 may need a matching change of this module.
 
 import math
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson2013313H(Formula):
@@ -34,6 +41,18 @@ class ModifiedEpperson2013313H(Formula):
         ),
         location="Exercises 3.1-3(h), 3.2-5(e), 3.3-3(g)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3.11 \c"),),
+        expression=r"\tmp{u}^{2} - \sin{\left(\tmp{u} \right)}",
+        interval=r"[0.03, \pi]",
+        notes=(
+            (
+                "The interval starts at 0.03, not at the published 0, which is a root, so that the "
+                "function is not 0 there."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

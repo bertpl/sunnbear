@@ -3,7 +3,14 @@
 A change of formula f1.2.9.4 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedGaldino2011F4(Formula):
@@ -39,6 +46,19 @@ class ModifiedGaldino2011F4(Formula):
         ),
         location="Table IV, f4",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - \c"),),
+        expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",
+        interval="[1, 2]",
+        notes=(
+            (
+                "The expression equals the published function, $$(81 - p(108 - p(54 - p(12 - p)))) "
+                r"\operatorname{sgn}(p - 3), \quad p = \tmp{u} + 1.11111,$$ without the cancellation that "
+                "makes the published function exactly 0 at many x-values next to the root."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

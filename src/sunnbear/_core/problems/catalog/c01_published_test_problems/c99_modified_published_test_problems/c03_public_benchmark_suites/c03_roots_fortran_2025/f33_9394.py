@@ -3,7 +3,14 @@
 A change of formula f1.3.3.33 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedRootsFortran20259394(Formula):
@@ -86,6 +93,18 @@ class ModifiedRootsFortran20259394(Formula):
         ),
         location="root_tests.f90, case 93–94",
     )
+    presentation = FormulaPresentation(
+        expression=r"\left(\x - 10.0\right) \x + 23.0 - \x^{0.4} + \c",
+        interval="[0, 6]",
+        notes=(
+            (
+                r"$\c$ shifts the function along the y-axis, not along x as for the published test "
+                r"problem, because a shift along x by any $\c > 0$ evaluates $\x^{0.4}$ left of 0, where "
+                "it is not real."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_Y
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

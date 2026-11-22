@@ -3,7 +3,14 @@
 A change of formula f1.4.5.11 may need a matching change of this module.
 """
 
-from sunnbear._core.problems.core import Formula, FormulaSource, FormulaTestCase, ParamRecipe
+from sunnbear._core.problems.core import (
+    EffectOfC,
+    Formula,
+    FormulaPresentation,
+    FormulaSource,
+    FormulaTestCase,
+    ParamRecipe,
+)
 
 
 class ModifiedEpperson20133114B(Formula):
@@ -30,6 +37,20 @@ class ModifiedEpperson20133114B(Formula):
         ),
         location="Exercise 3.1-14(b)",
     )
+    presentation = FormulaPresentation(
+        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        expression=(
+            r"\begin{cases} 0 & \text{if } \tmp{u} = 1 \\ \frac{1}{\tmp{u} - 1} & \text{otherwise} " r"\end{cases}"
+        ),
+        interval="[0, 3]",
+        notes=(
+            (
+                r"The expression is 0 at the pole, $\tmp{u} = 1$ in float64, where the published function "
+                "divides by 0."
+            ),
+        ),
+    )
+    effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:

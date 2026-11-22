@@ -14,3 +14,7 @@ class ModifiedFooTan2025(FormulaCategory):
 
     number = (1, 99, 2, 15)
     name = "Foo, Tan (2025)"
+    description = (
+        "The test problems are modified versions of those that come from a preprint that introduces a "
+        "higher-order root-finding method and applies it to entropy functions."
+    )
