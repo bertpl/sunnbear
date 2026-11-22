@@ -20,9 +20,9 @@ class Publication:
     - a web page;
     - a code repository or a data set.
 
-    Each part that a publication declares, except its year, appears in its citation as written, and building the
-    publication checks this. The catalog's tests require a shipped publication to declare its citation key, year and
-    title, and its DOI or URL where its citation holds a link.
+    Each part that a publication declares appears in its citation as written, and building the publication checks this.
+    The catalog's tests require a shipped publication to declare its citation key, year and title, and its DOI or URL
+    where its citation holds a link.
 
     Attributes:
         citation: The full citation, as a reader would cite the publication, with its DOI or URL where it has one.
@@ -30,8 +30,8 @@ class Publication:
             surname, or a project's name, and the year's last 2 digits, with a lowercase letter where 2 keys would
             collide, such as "Brent71" or "Ganchovski26a".
         authors: The authors, each as the citation writes them, such as ``("Dowell, M.", "Jarratt, P.")``.
-        year: The year by which the catalog dates the publication. The citation may print another year, such as the
-            year of an issue that came out after the article appeared online, or none, as for a code repository.
+        year: The year of the publication as its citation gives it: an article's year is that of its issue, even
+            where it appeared online earlier, and a code repository's is that of the cited release or commit.
         title: The title of the article, book, web page or project.
         published_in: Where the publication appeared: an article's journal, a chapter's book, a book's publisher, or
             the website of a web page, such as "BIT" or "Prentice-Hall".
@@ -49,12 +49,12 @@ class Publication:
     url: str | None = None
 
     def __post_init__(self) -> None:
-        """Check that the citation holds every declared part but the year, and that the citation key fits the year.
+        """Check that the citation holds every declared part, and that the citation key fits the year.
 
         Raises:
             ValueError: If any of these holds:
-                - the citation does not hold a declared author, the title, where the publication appeared, the DOI or
-                  the URL;
+                - the citation does not hold a declared author, the year, the title, where the publication appeared,
+                  the DOI or the URL;
                 - the citation key is not a name, 2 digits and an optional letter;
                 - the citation key's 2 digits are not the last 2 digits of the year.
         """
@@ -70,7 +70,8 @@ class Publication:
                     f"Publication: the citation key {self.citation_key!r} does not end in the last 2 digits of the "
                     f"year {self.year}."
                 )
-        parts = [*self.authors, self.title, self.published_in, self.doi, self.url]
+        year = str(self.year) if self.year is not None else None
+        parts = [*self.authors, year, self.title, self.published_in, self.doi, self.url]
         missing = [part for part in parts if part is not None and part not in self.citation]
         if missing:
             raise ValueError(f"Publication: the citation {self.citation!r} does not hold {missing}.")

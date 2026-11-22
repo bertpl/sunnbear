@@ -29,6 +29,7 @@ def test_publication_whose_citation_holds_its_parts_is_accepted():
     "parts",
     [
         {"authors": ("Dowell, M.", "Jarrat, P.")},
+        {"year": 1972},
         {"title": "A modified regula falsi method for finding a root"},
         {"published_in": "BIT Numerical Mathematics"},
         {"doi": "10.1007/BF01934365"},
