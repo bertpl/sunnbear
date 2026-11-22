@@ -43,16 +43,16 @@ class FormulaCategory(FormulaTaxonomyNode):
         publication: The publication of the category's formulas (`Publication`), declared by a category that holds
             exactly the formulas of 1 publication; None by default. `FormulaRegistry.publication_of` finds it for each
             formula.
-        modifies_category_number: The number of the category whose formulas the formulas below this category modify,
-            or None (default). A formula below this category modifies the formula with the same trailing elements
-            below that category, and comes from its publication: below a category 1.99 that declares ``(1,)``,
-            formula 1.99.1.6.3 modifies formula 1.1.6.3.
+        modified_category_number: The number of another category, or None (default). Each formula below this
+            category modifies the formula of that other category whose number ends in the same elements, and comes
+            from the modified formula's publication: below a category 1.99 that declares ``(1,)``, formula 1.99.1.6.3
+            modifies formula 1.1.6.3.
     """
 
     description: ClassVar[str | None] = None
     is_builtin_only: ClassVar[bool] = False
     publication: ClassVar[Publication | None] = None
-    modifies_category_number: ClassVar[tuple[int, ...] | None] = None
+    modified_category_number: ClassVar[tuple[int, ...] | None] = None
 
     def __init_subclass__(cls, **kwargs: object) -> None:
         """Validate the subclass and register it with `FormulaRegistry`.
@@ -77,3 +77,13 @@ class FormulaCategory(FormulaTaxonomyNode):
                 "declares it, and every node below inherits it."
             )
         FormulaRegistry.register_category(cls)
+
+    def modified_formula_number(self, formula_number: tuple[int, ...]) -> tuple[int, ...] | None:
+        """Return the number of the formula that the formula numbered `formula_number`, below this category, modifies.
+
+        Returns None for a category that declares no `modified_category_number`.
+        """
+        if self.modified_category_number is None:
+            return None
+        else:
+            return (*self.modified_category_number, *formula_number[len(self.number) :])

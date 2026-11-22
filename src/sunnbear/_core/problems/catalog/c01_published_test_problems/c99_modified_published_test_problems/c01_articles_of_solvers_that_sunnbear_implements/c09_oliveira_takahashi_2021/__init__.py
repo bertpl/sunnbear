@@ -8,7 +8,8 @@ from . import f15_2_4
 class ModifiedOliveiraTakahashi2021(FormulaCategory):
     """`ModifiedOliveiraTakahashi2021` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.9, `OliveiraTakahashi2021`, and come from its publication.
+    Its formulas modify those of category 1.1.9, `OliveiraTakahashi2021`, and come from the publication of
+    `OliveiraTakahashi2021`.
     """
 
     number = (1, 99, 1, 9)

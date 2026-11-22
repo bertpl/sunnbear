@@ -42,8 +42,8 @@ class FormulaPresentation:
             formula's code computes an equivalent form of it. Empty by default.
         param_conditions: The conditions on the formula's parameters that `Formula.is_param_tuple_valid` checks, 1
             text per independent condition, such as "$\param{p}$ is an even integer of at least 2". A condition that
-            joins several parameters is 1 text, and a text writes a constant of the code as its value. Empty by
-            default.
+            joins several parameters is 1 text, and a text writes each constant of the formula's code as its numeric
+            value, not as the constant's name in the code. Empty by default.
     """
 
     expression: str

@@ -8,7 +8,7 @@ from . import f04_p04, f06_p06, f12_p12, f17_p18
 class ModifiedBurkardt2016(FormulaCategory):
     """`ModifiedBurkardt2016` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.3.1, `Burkardt2016`, and come from its publication.
+    Its formulas modify those of category 1.3.1, `Burkardt2016`, and come from the publication of `Burkardt2016`.
     """
 
     number = (1, 99, 3, 1)

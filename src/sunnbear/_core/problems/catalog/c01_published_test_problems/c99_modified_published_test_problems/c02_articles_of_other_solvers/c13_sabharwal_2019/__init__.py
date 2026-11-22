@@ -8,7 +8,7 @@ from . import f08_t2_6, f09_t2_8
 class ModifiedSabharwal2019(FormulaCategory):
     """`ModifiedSabharwal2019` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.2.13, `Sabharwal2019`, and come from its publication.
+    Its formulas modify those of category 1.2.13, `Sabharwal2019`, and come from the publication of `Sabharwal2019`.
     """
 
     number = (1, 99, 2, 13)

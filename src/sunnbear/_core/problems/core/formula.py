@@ -54,8 +54,8 @@ class Formula(FormulaTaxonomyNode, ABC):
         test_cases: The formula's own test cases (`FormulaTestCase`), which
             the generic formula test runs; every registered formula must
             declare at least 1.
-        location_in_publication: Where the formula appears in its publication (`FormulaRegistry.publication_of`),
-            such as "Table I, problem 12", or None (default) for a formula that no publication gives.
+        location_in_publication: Where the formula appears in its publication, which `FormulaRegistry.publication_of`
+            returns, such as "Table I, problem 12", or None (default) for a formula that no publication gives.
         presentation: What a reader sees of the formula (`FormulaPresentation`), or None (default). The catalog's
             tests require it of every shipped formula.
         effect_of_c: How the formula's code applies ``c`` (`EffectOfC`), or None (default). The catalog's tests
@@ -138,8 +138,8 @@ class Formula(FormulaTaxonomyNode, ABC):
         """Accept or reject a parameter tuple up front (default: accept all).
 
         This default is generic over arity; an override must name its
-        parameters, as for `parametrized_fun`. A formula that overrides it states the conditions for a reader in its
-        presentation's `param_conditions`.
+        parameters, as for `parametrized_fun`. A formula that overrides this method also states, in its
+        presentation's `param_conditions`, the conditions that the override checks.
         """
         return True
 

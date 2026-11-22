@@ -255,7 +255,7 @@ def test_published_formula_matches_the_survey(formula, sources, committed_formul
     # --- assert -----------------------
     assert not line.is_retired
     assert category.name == source.short_title
-    assert category.publication.citation == source.reference
+    assert FormulaRegistry.publication_of(formula).citation == source.reference
 
 
 def test_published_sources_in_the_catalog_are_complete(committed_formulas_table):
@@ -280,7 +280,7 @@ def test_published_sources_in_the_catalog_are_complete(committed_formulas_table)
 
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
 def test_modified_formula_has_its_published_formula(formula):
-    """Formula 1.99.x.y.z modifies formula 1.x.y.z, which exists and has its name and location in the publication."""
+    """Formula 1.99.x.y.z modifies formula 1.x.y.z, which exists with the same name and location in the publication."""
     # --- arrange ----------------------
     published_formulas = {published_formula.number: published_formula for published_formula in _PUBLISHED_FORMULAS}
 

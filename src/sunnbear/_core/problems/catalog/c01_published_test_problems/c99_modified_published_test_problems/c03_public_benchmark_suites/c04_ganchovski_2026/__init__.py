@@ -8,7 +8,7 @@ from . import f02_f100
 class ModifiedGanchovski2026(FormulaCategory):
     """`ModifiedGanchovski2026` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.3.4, `Ganchovski2026`, and come from its publication.
+    Its formulas modify those of category 1.3.4, `Ganchovski2026`, and come from the publication of `Ganchovski2026`.
     """
 
     number = (1, 99, 3, 4)

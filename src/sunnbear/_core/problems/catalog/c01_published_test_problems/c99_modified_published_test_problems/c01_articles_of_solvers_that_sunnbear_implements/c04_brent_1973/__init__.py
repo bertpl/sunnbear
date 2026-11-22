@@ -8,7 +8,7 @@ from . import f03_4_1
 class ModifiedBrent1973(FormulaCategory):
     """`ModifiedBrent1973` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.4, `Brent1973`, and come from its publication.
+    Its formulas modify those of category 1.1.4, `Brent1973`, and come from the publication of `Brent1973`.
     """
 
     number = (1, 99, 1, 4)

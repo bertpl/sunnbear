@@ -8,7 +8,7 @@ from . import f04_f4, f06_f6
 class ModifiedGaldino2011(FormulaCategory):
     """`ModifiedGaldino2011` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.2.9, `Galdino2011`, and come from its publication.
+    Its formulas modify those of category 1.2.9, `Galdino2011`, and come from the publication of `Galdino2011`.
     """
 
     number = (1, 99, 2, 9)

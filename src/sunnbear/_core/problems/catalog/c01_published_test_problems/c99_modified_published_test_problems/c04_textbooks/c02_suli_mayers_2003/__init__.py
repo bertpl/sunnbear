@@ -8,7 +8,7 @@ from . import f01_1_2, f05_1_33
 class ModifiedSuliMayers2003(FormulaCategory):
     """`ModifiedSuliMayers2003` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.4.2, `SuliMayers2003`, and come from its publication.
+    Its formulas modify those of category 1.4.2, `SuliMayers2003`, and come from the publication of `SuliMayers2003`.
     """
 
     number = (1, 99, 4, 2)

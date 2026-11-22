@@ -103,15 +103,15 @@ def test_formulas_declare_their_summaries():
 def test_formulas_declare_parameter_conditions_exactly_where_they_check_parameters():
     """A shipped formula's presentation declares parameter conditions exactly when it overrides `is_param_tuple_valid`.
 
-    Nothing compares a condition's text with the code that checks it.
+    The test does not compare a condition's text with the code that checks it, because the text is prose for a reader.
     """
     # --- act --------------------------
-    failing = [
-        formula.label
-        for formula in _SHIPPED_FORMULAS
-        if (type(formula).is_param_tuple_valid is not Formula.is_param_tuple_valid)
-        != (formula.presentation is not None and len(formula.presentation.param_conditions) > 0)
-    ]
+    failing = []
+    for formula in _SHIPPED_FORMULAS:
+        has_param_check = type(formula).is_param_tuple_valid is not Formula.is_param_tuple_valid
+        has_param_conditions = formula.presentation is not None and len(formula.presentation.param_conditions) > 0
+        if has_param_check != has_param_conditions:
+            failing.append(formula.label)
 
     # --- assert -----------------------
     assert failing == []

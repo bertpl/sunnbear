@@ -8,7 +8,7 @@ from . import f01_4_2, f02_4_3_1
 class ModifiedFooTan2025(FormulaCategory):
     """`ModifiedFooTan2025` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.2.15, `FooTan2025`, and come from its publication.
+    Its formulas modify those of category 1.2.15, `FooTan2025`, and come from the publication of `FooTan2025`.
     """
 
     number = (1, 99, 2, 15)

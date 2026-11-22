@@ -8,7 +8,7 @@ from . import f05_iii, f06_iv
 class ModifiedBusDekker1975(FormulaCategory):
     """`ModifiedBusDekker1975` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.2.1, `BusDekker1975`, and come from its publication.
+    Its formulas modify those of category 1.2.1, `BusDekker1975`, and come from the publication of `BusDekker1975`.
     """
 
     number = (1, 99, 2, 1)

@@ -29,7 +29,6 @@ def test_publication_whose_citation_holds_its_parts_is_accepted():
     "parts",
     [
         {"authors": ("Dowell, M.", "Jarrat, P.")},
-        {"year": 1972},
         {"title": "A modified regula falsi method for finding a root"},
         {"published_in": "BIT Numerical Mathematics"},
         {"doi": "10.1007/BF01934365"},
@@ -57,3 +56,9 @@ def test_citation_key_of_another_form_is_rejected(citation_key):
     """A citation key that is not a capitalized name, 2 digits and an optional letter is rejected."""
     with pytest.raises(ValueError, match="citation key"):
         Publication(citation=_CITATION, citation_key=citation_key)
+
+
+def test_citation_key_that_does_not_end_in_the_year_is_rejected():
+    """A citation key whose 2 digits are not the last 2 digits of the publication's year is rejected."""
+    with pytest.raises(ValueError, match="does not end in the last 2 digits"):
+        Publication(citation=_CITATION, citation_key="Dowell72", year=1971)

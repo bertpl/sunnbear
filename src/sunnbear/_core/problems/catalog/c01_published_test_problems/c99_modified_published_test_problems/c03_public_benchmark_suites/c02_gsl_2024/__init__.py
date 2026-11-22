@@ -8,7 +8,7 @@ from . import f03_func3, f05_func6
 class ModifiedGsl2024(FormulaCategory):
     """`ModifiedGsl2024` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.3.2, `Gsl2024`, and come from its publication.
+    Its formulas modify those of category 1.3.2, `Gsl2024`, and come from the publication of `Gsl2024`.
     """
 
     number = (1, 99, 3, 2)

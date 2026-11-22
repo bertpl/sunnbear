@@ -8,7 +8,7 @@ from . import f05_t4_7
 class ModifiedGao2026(FormulaCategory):
     """`ModifiedGao2026` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.14, `Gao2026`, and come from its publication.
+    Its formulas modify those of category 1.1.14, `Gao2026`, and come from the publication of `Gao2026`.
     """
 
     number = (1, 99, 1, 14)

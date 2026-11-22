@@ -8,7 +8,7 @@ from . import f01_1
 class ModifiedFord1997(FormulaCategory):
     """`ModifiedFord1997` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.8, `Ford1997`, and come from its publication.
+    Its formulas modify those of category 1.1.8, `Ford1997`, and come from the publication of `Ford1997`.
     """
 
     number = (1, 99, 1, 8)

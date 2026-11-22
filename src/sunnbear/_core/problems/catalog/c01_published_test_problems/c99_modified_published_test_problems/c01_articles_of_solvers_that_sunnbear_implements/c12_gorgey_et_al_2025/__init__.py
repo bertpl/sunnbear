@@ -8,7 +8,7 @@ from . import f01_equation_1, f02_equation_2, f04_equation_4
 class ModifiedGorgeyEtAl2025(FormulaCategory):
     """`ModifiedGorgeyEtAl2025` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.12, `GorgeyEtAl2025`, and come from its publication.
+    Its formulas modify those of category 1.1.12, `GorgeyEtAl2025`, and come from the publication of `GorgeyEtAl2025`.
     """
 
     number = (1, 99, 1, 12)

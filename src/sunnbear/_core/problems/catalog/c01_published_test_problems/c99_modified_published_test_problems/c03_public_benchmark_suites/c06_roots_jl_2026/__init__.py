@@ -8,7 +8,7 @@ from . import f02_func9, f03_func10, f04_func11
 class ModifiedRootsJl2026(FormulaCategory):
     """`ModifiedRootsJl2026` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.3.6, `RootsJl2026`, and come from its publication.
+    Its formulas modify those of category 1.3.6, `RootsJl2026`, and come from the publication of `RootsJl2026`.
     """
 
     number = (1, 99, 3, 6)

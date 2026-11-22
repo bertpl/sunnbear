@@ -8,7 +8,8 @@ from . import f03_12
 class ModifiedAlefeldPotraShi1995(FormulaCategory):
     """`ModifiedAlefeldPotraShi1995` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.6, `AlefeldPotraShi1995`, and come from its publication.
+    Its formulas modify those of category 1.1.6, `AlefeldPotraShi1995`, and come from the publication of
+    `AlefeldPotraShi1995`.
     """
 
     number = (1, 99, 1, 6)

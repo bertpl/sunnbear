@@ -1,6 +1,6 @@
 """The formula registry holds formulas and categories, finds a formula by number, and rebuilds a candidate from its id.
 
-It also finds the category that holds a formula, and the publication that a formula comes from.
+It also finds the category and the publication of a formula.
 
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
@@ -54,6 +54,8 @@ class FormulaRegistry:
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and
     category subclasses are imported.
+
+    It also finds the publication that a formula comes from, with `publication_of`.
     """
 
     _formulas_by_number: ClassVar[dict[tuple[int, ...], "Formula"]] = {}
@@ -137,10 +139,11 @@ class FormulaRegistry:
 
     @classmethod
     def publication_of(cls, formula: "Formula") -> Publication | None:
-        """Return the publication that `formula` comes from, or None for a formula that no publication gives.
+        """Return the publication of `formula`, or None for a formula that no publication gives.
 
         A formula comes from the publication of its category. A formula below a category that declares
-        `FormulaCategory.modifies_category_number` comes from the publication of the formula that it modifies.
+        `FormulaCategory.modified_category_number` modifies a formula of another category, and comes from that
+        formula's publication.
 
         Raises:
             FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
@@ -149,13 +152,14 @@ class FormulaRegistry:
         category = cls.category_of(formula)
         if category.publication is not None:
             return category.publication
-        # the closest category above the formula that declares which category its formulas modify
-        for n_elements in range(len(formula.number) - 1, 0, -1):
-            ancestor = cls._categories_by_number[formula.number[:n_elements]]
-            if ancestor.modifies_category_number is not None:
-                modified_number = (*ancestor.modifies_category_number, *formula.number[n_elements:])
-                return cls.publication_of(cls.formula_from_number(modified_number))
-        return None
+        else:
+            # find the closest category above the formula that declares which category its formulas modify
+            for n_elements in range(len(formula.number) - 1, 0, -1):
+                ancestor = cls._categories_by_number[formula.number[:n_elements]]
+                modified_formula_number = ancestor.modified_formula_number(formula.number)
+                if modified_formula_number is not None:
+                    return cls.publication_of(cls.formula_from_number(modified_formula_number))
+            return None
 
     @classmethod
     def candidate_from_id(cls, problem_id: ProblemId | str) -> CandidateTestProblem:

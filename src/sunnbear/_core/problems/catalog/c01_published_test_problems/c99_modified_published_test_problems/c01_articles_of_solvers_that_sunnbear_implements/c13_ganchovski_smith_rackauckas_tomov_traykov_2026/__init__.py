@@ -8,8 +8,8 @@ from . import f04_f27, f05_f29, f11_f40, f19_f75, f21_f81
 class ModifiedGanchovskiSmithRackauckasTomovTraykov2026(FormulaCategory):
     """`ModifiedGanchovskiSmithRackauckasTomovTraykov2026` holds the modified versions of the formulas of 1 publication.
 
-    Its formulas modify those of category 1.1.13, `GanchovskiSmithRackauckasTomovTraykov2026`, and come from its
-    publication.
+    Its formulas modify those of category 1.1.13, `GanchovskiSmithRackauckasTomovTraykov2026`, and come from the
+    publication of `GanchovskiSmithRackauckasTomovTraykov2026`.
     """
 
     number = (1, 99, 1, 13)
