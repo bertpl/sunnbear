@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -27,13 +26,7 @@ class SuliMayers2003Examples1113(Formula):
     number = (1, 4, 2, 2)
     name = "Examples 1.1–1.3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
-            "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
-        ),
-        location="Examples 1.1–1.3",
-    )
+    location_in_publication = "Examples 1.1–1.3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} - 2 \tmp{u} - 1",

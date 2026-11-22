@@ -8,10 +8,7 @@ from . import f12_f12, f13_5_2_2
 class ModifiedBorchers2026(FormulaCategory):
     """`ModifiedBorchers2026` holds the modified versions of the formulas of 1 publication.
 
-    Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". https://hwborchers.lima-
-    city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The page is unversioned and gives no author or
-    date; it is on the website of Hans W. Borchers, the author of the R package pracma. The chapter cites no source
-    for its test problems.
+    Its formulas modify those of category 1.3.5, `Borchers2026`, and come from the publication of `Borchers2026`.
     """
 
     number = (1, 99, 3, 5)

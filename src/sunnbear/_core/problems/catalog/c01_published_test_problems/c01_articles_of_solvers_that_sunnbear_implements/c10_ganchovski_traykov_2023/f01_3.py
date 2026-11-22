@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -27,14 +26,7 @@ class GanchovskiTraykov20233(Formula):
     number = (1, 1, 10, 1)
     name = "§3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving "
-            "non-linear equations in structural mechanics. IOP Conf. Series: Materials Science and "
-            "Engineering 1276, 012010. https://doi.org/10.1088/1757-899X/1276/1/012010."
-        ),
-        location="§3",
-    )
+    location_in_publication = "§3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"4 - \tan{\left(\tmp{u} \right)}",

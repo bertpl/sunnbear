@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -22,16 +21,7 @@ class Ellithy202623(Formula):
     number = (1, 2, 18, 8)
     name = "23"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root "
-            "finding. Journal of the Egyptian Mathematical Society 34(1), 91–115. "
-            "https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the author's repository "
-            "https://github.com/Abdelrhman-Ellithy/hybridroots, at commit "
-            "`7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
-        ),
-        location="dataset.json, problem 23",
-    )
+    location_in_publication = "dataset.json, problem 23"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.2 \c"),),
         expression=r"- 0.9 \tmp{u}^{2} + 1.7 \tmp{u} + 2.5",

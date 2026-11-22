@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -36,14 +35,7 @@ class ChapraCanale2015Prob518(Formula):
     number = (1, 4, 6, 23)
     name = "Prob. 5.18"
     params = (FormulaParam("osf", latex_symbol="o_{sf}"),)
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="Prob. 5.18",
-    )
+    location_in_publication = "Prob. 5.18"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{T}", r"\x - 40 \c"),

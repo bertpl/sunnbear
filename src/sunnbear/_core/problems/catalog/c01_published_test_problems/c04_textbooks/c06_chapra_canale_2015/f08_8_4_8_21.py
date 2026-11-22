@@ -11,7 +11,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -40,14 +39,7 @@ class ChapraCanale201584821(Formula):
     number = (1, 4, 6, 8)
     name = "§8.4, (8.21)"
     params = (FormulaParam("eps", latex_symbol=r"\varepsilon"),)
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="§8.4, Eq. (8.21), Fig. 8.5; Prob. 8.13",
-    )
+    location_in_publication = "§8.4, Eq. (8.21), Fig. 8.5; Prob. 8.13"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{u}", r"\x - 0.072 \c"),

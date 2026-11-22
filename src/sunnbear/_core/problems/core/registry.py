@@ -1,5 +1,7 @@
 """The formula registry holds formulas and categories, finds a formula by number, and rebuilds a candidate from its id.
 
+It also finds the category and the publication of a formula.
+
 Defining a concrete `Formula` or a `FormulaCategory` subclass registers one instance of it here,
 as a node of the formula taxonomy (see `taxonomy`). Checks run in 2 stages:
 
@@ -33,6 +35,7 @@ from sunnbear._core.utils.class_origin import is_sunnbear_module
 
 from .exceptions import FormulaTaxonomyError, InvalidParamsError, UnknownFormulaError
 from .identity import ProblemId
+from .publication import Publication
 from .taxonomy import FormulaTaxonomyNode
 from .test_problem import CandidateTestProblem
 
@@ -46,11 +49,13 @@ if TYPE_CHECKING:
 #  FormulaRegistry
 # ==================================================================================================
 class FormulaRegistry:
-    """`FormulaRegistry` lists formulas and categories, finds a formula by number, or rebuilds a candidate from its id.
+    """`FormulaRegistry` lists formulas and categories, finds a formula and its category, and rebuilds a candidate.
 
     `Formula.__init_subclass__` and `FormulaCategory.__init_subclass__` call `register_formula` and
     `register_category`, so the registry is complete as soon as the modules that define the formula and
     category subclasses are imported.
+
+    The registry also finds a formula's publication, with `publication_of`.
     """
 
     _formulas_by_number: ClassVar[dict[tuple[int, ...], "Formula"]] = {}
@@ -121,6 +126,40 @@ class FormulaRegistry:
             raise UnknownFormulaError(f"No registered formula with number {FormulaTaxonomyNode.format_number(number)}.")
         else:
             return formula
+
+    @classmethod
+    def category_of(cls, formula: "Formula") -> "FormulaCategory":
+        """Return the category that holds `formula`.
+
+        Raises:
+            FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
+        """
+        cls._ensure_taxonomy_validated()
+        return cls._categories_by_number[formula.number[:-1]]
+
+    @classmethod
+    def publication_of(cls, formula: "Formula") -> Publication | None:
+        """Return the publication of `formula`, or None for a formula that no publication gives.
+
+        A formula comes from the publication of its category. A formula below a category that declares
+        `FormulaCategory.original_category_number` modifies a formula of another category, and comes from that
+        formula's publication.
+
+        Raises:
+            FormulaTaxonomyError: If the registered nodes do not form a valid taxonomy tree.
+            UnknownFormulaError: If the formula that `formula` modifies is not registered.
+        """
+        category = cls.category_of(formula)
+        if category.publication is not None:
+            return category.publication
+        else:
+            # find the closest category above the formula that declares which category its formulas modify
+            for n_elements in range(len(formula.number) - 1, 0, -1):
+                ancestor = cls._categories_by_number[formula.number[:n_elements]]
+                original_formula_number = ancestor.original_formula_number(formula.number)
+                if original_formula_number is not None:
+                    return cls.publication_of(cls.formula_from_number(original_formula_number))
+            return None
 
     @classmethod
     def candidate_from_id(cls, problem_id: ProblemId | str) -> CandidateTestProblem:

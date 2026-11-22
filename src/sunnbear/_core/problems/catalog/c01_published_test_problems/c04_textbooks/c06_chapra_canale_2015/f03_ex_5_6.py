@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -36,14 +35,7 @@ class ChapraCanale2015Ex56(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="Example 5.6, §5.3.2, Fig. 5.14; Example 6.5; Example 7.6; Prob. 5.22, 5.24, 5.25",
-    )
+    location_in_publication = "Example 5.6, §5.3.2, Fig. 5.14; Example 6.5; Example 7.6; Prob. 5.22, 5.24, 5.25"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{10} - 1",

@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -33,14 +32,7 @@ class Romadani202554(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding "
-            "Methods into Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), "
-            "154–189. https://doi.org/10.62762/jam.2025.840767."
-        ),
-        location="Section 5.4",
-    )
+    location_in_publication = "Section 5.4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\cos^{3}{\left(e^{\frac{\tmp{u}}{2}} \right)} - \tmp{u}^{3}",

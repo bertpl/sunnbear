@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -32,14 +31,7 @@ class ChapraCanale2015Prob815(Formula):
     number = (1, 4, 6, 27)
     name = "Prob. 8.15"
     params = (FormulaParam("c_", latex_symbol="C"),)
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="Prob. 8.15",
-    )
+    location_in_publication = "Prob. 8.15"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\param{c_} - \left(10 - 20 \left(e^{- 0.2 \tmp{u}} - e^{- 0.75 \tmp{u}}\right)\right)",

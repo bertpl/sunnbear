@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -31,14 +30,7 @@ class BurdenFairesBurden2016214(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
-            "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
-            "the print year 2014."
-        ),
-        location="Exercises 2.1-4, 2.6-2(g)",
-    )
+    location_in_publication = "Exercises 2.1-4, 2.6-2(g)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{4} - 2 \tmp{u}^{3} - 4 \tmp{u}^{2} + 4 \tmp{u} + 4",

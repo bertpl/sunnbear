@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -27,13 +26,7 @@ class AndersonBjorck1973Ex6(Formula):
     number = (1, 1, 3, 1)
     name = "Ex. 6"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Anderson, N., Björck, Å. (1973). A new high order method of regula falsi type for "
-            "computing a root of an equation. BIT 13(3), 253–264. https://doi.org/10.1007/BF01951936."
-        ),
-        location="Ex. 6",
-    )
+    location_in_publication = "Ex. 6"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{- \param{n} \tmp{u}} \left(\tmp{u} - 1\right) + \tmp{u}^{\param{n}}",

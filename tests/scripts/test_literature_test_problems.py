@@ -12,6 +12,9 @@ import textwrap
 import pytest
 
 from sunnbear._core.problems.catalog.c01_published_test_problems import PublishedTestProblems
+from sunnbear._core.problems.catalog.c01_published_test_problems.c99_modified_published_test_problems import (
+    ModifiedPublishedTestProblems,
+)
 from sunnbear._core.problems.core import EffectOfC, FormulaRegistry
 
 _CATEGORY_1_FORMULAS = [formula for formula in FormulaRegistry.formulas() if formula.number[0] == 1]
@@ -242,7 +245,7 @@ def test_timeline_template_counts_every_status(script_modules):
 # ==================================================================================================
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
 def test_published_formula_matches_the_survey(formula, sources, committed_formulas_table):
-    """A published formula has an active line in `formulas.csv`, and its category and `source` match its source.
+    """A published formula has an active line in `formulas.csv`, and its category's name and citation match its source.
 
     The test does not check the location, because the module's author writes it as prose from the formula's rows' keys
     and the source's `where_in_source`.
@@ -250,12 +253,12 @@ def test_published_formula_matches_the_survey(formula, sources, committed_formul
     # --- arrange / act ----------------
     line = {line.number: line for line in committed_formulas_table.formulas}[formula.number]
     source = {source.source_id: source for source in sources}[line.source_id]
-    category = {category.number: category for category in FormulaRegistry.categories()}[formula.number[:3]]
+    category = FormulaRegistry.category_of(formula)
 
     # --- assert -----------------------
     assert not line.is_retired
     assert category.name == source.short_title
-    assert formula.source.reference == source.reference
+    assert FormulaRegistry.publication_of(formula).citation == source.reference
 
 
 def test_published_sources_in_the_catalog_are_complete(committed_formulas_table):
@@ -280,17 +283,17 @@ def test_published_sources_in_the_catalog_are_complete(committed_formulas_table)
 
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
 def test_modified_formula_has_its_published_formula(formula):
-    """Formula 1.99.x.y.z modifies formula 1.x.y.z, which exists and has the same name and `source`."""
+    """Formula 1.99.x.y.z modifies formula 1.x.y.z, which exists with the same name and location in the publication."""
     # --- arrange ----------------------
     published_formulas = {published_formula.number: published_formula for published_formula in _PUBLISHED_FORMULAS}
 
     # --- act --------------------------
-    published_formula = published_formulas.get((1, *formula.number[2:]))
+    published_formula = published_formulas.get(ModifiedPublishedTestProblems().original_formula_number(formula.number))
 
     # --- assert -----------------------
     assert published_formula is not None
     assert formula.name == published_formula.name
-    assert formula.source == published_formula.source
+    assert formula.location_in_publication == published_formula.location_in_publication
 
 
 @pytest.mark.parametrize(

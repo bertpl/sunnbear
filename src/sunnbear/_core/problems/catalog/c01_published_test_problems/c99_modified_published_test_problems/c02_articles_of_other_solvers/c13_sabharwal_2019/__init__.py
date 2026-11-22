@@ -8,8 +8,7 @@ from . import f08_t2_6, f09_t2_8
 class ModifiedSabharwal2019(FormulaCategory):
     """`ModifiedSabharwal2019` holds the modified versions of the formulas of 1 publication.
 
-    Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula Falsi Algorithms.
-    Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118.
+    Its formulas modify those of category 1.2.13, `Sabharwal2019`, and come from the publication of `Sabharwal2019`.
     """
 
     number = (1, 99, 2, 13)

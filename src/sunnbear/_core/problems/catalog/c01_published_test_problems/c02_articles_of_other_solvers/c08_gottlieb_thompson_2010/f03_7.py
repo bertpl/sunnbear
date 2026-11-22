@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class GottliebThompson20107(Formula):
     number = (1, 2, 8, 3)
     name = "7"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Gottlieb, R. G., Thompson, B. F. (2010). Bisected direct quadratic regula falsi. Applied "
-            "Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy: "
-            "http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
-        ),
-        location="Table 1, test 7",
-    )
+    location_in_publication = "Table 1, test 7"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\frac{1}{\tmp{u}} - 1",

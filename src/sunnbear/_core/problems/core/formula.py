@@ -29,7 +29,6 @@ from .param_values import DEDUP_DIGITS, ParamNotation, deduplicate_param_tuples
 from .presentation import FormulaPresentation, LatexTemplate
 from .recipes import ParamRecipe
 from .registry import FormulaRegistry
-from .source import FormulaSource
 from .taxonomy import FormulaTaxonomyNode
 from .test_cases import FormulaTestCase
 from .test_problem import CandidateTestProblem
@@ -55,8 +54,9 @@ class Formula(FormulaTaxonomyNode, ABC):
         test_cases: The formula's own test cases (`FormulaTestCase`), which
             the generic formula test runs; every registered formula must
             declare at least 1.
-        source: The formula's publication (`FormulaSource`), or None (default)
-            for a formula that no publication gives.
+        location_in_publication: Where the formula appears in its publication, such as "Table I, problem 12", or None
+            (default) for a formula that no publication gives. `FormulaRegistry.publication_of` returns the publication
+            itself.
         presentation: What a reader sees of the formula (`FormulaPresentation`), or None (default). The catalog's
             tests require it of every shipped formula.
         effect_of_c: How the formula's code applies ``c`` (`EffectOfC`), or None (default). The catalog's tests
@@ -66,7 +66,7 @@ class Formula(FormulaTaxonomyNode, ABC):
     params: ClassVar[tuple[FormulaParam, ...]] = ()
     jit: ClassVar[bool] = True
     test_cases: ClassVar[tuple[FormulaTestCase, ...]] = ()
-    source: ClassVar[FormulaSource | None] = None
+    location_in_publication: ClassVar[str | None] = None
     presentation: ClassVar[FormulaPresentation | None] = None
     effect_of_c: ClassVar[EffectOfC | None] = None
     # populated lazily per concrete class by _compiled_formula (annotation only — no value,
@@ -139,7 +139,8 @@ class Formula(FormulaTaxonomyNode, ABC):
         """Accept or reject a parameter tuple up front (default: accept all).
 
         This default is generic over arity; an override must name its
-        parameters, as for `parametrized_fun`.
+        parameters, as for `parametrized_fun`. A formula that overrides this method also states, in its
+        presentation's `param_conditions`, the conditions that the override checks.
         """
         return True
 

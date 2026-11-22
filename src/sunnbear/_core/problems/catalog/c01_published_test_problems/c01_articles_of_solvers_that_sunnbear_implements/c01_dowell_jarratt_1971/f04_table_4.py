@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -27,13 +26,7 @@ class DowellJarratt1971Table4(Formula):
     number = (1, 1, 1, 4)
     name = "Table 4"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Dowell, M., Jarratt, P. (1971). A modified regula falsi method for computing the root of "
-            "an equation. BIT 11(2), 168–174. https://doi.org/10.1007/BF01934364."
-        ),
-        location="Table 4",
-    )
+    location_in_publication = "Table 4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \left(1 - \tmp{u}\right)^{\param{n}}",

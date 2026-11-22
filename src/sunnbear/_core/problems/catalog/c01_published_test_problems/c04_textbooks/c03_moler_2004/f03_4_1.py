@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -30,15 +29,7 @@ class Moler200441(Formula):
     number = (1, 4, 3, 3)
     name = "§4.1"
     params = (FormulaParam("M", latex_symbol="M"),)
-    source = FormulaSource(
-        reference=(
-            "Moler, C. B. (2004). Numerical Computing with MATLAB. SIAM, Philadelphia (print edition); "
-            "The MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web "
-            "edition, 1 PDF per chapter: https://www.mathworks.com/moler/chapters.html; chapter 4: "
-            "https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
-        ),
-        location="§4.1, §4.2, §4.4, §4.5",
-    )
+    location_in_publication = "§4.1, §4.2, §4.4, §4.5"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \param{M}",

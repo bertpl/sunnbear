@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -39,17 +38,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026F27(Formula):
     number = (1, 99, 1, 13, 4)
     name = "f27"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
-            "the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. "
-            "https://doi.org/10.3390/a19050332. Supplementary materials: "
-            "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
-            "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
-        ),
-        location="Table 2, f27",
-    )
+    location_in_publication = "Table 2, f27"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",

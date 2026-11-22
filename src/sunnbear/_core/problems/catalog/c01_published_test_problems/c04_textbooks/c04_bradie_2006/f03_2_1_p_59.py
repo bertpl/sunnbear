@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -38,15 +37,9 @@ class Bradie200621P59(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location=(
-            "§2.1 (p. 59); Examples 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; "
-            "§2.2 (p. 74); §2.4 (p. 98); Exercises 2.1-10, 2.2-10, 2.4-13, 2.5-12 to 2.5-14, 2.5-17"
-        ),
+    location_in_publication = (
+        "§2.1 (p. 59); Examples 2.1–2.3, 2.8, 2.9, 2.11–2.13; Tables 2.1–2.3, 2.5, 2.6; Fig. 2.1; §2.2 (p."
+        " 74); §2.4 (p. 98); Exercises 2.1-10, 2.2-10, 2.4-13, 2.5-12 to 2.5-14, 2.5-17"
     )
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),

@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -26,13 +25,7 @@ class Bradie2006Fig222(Formula):
     number = (1, 4, 4, 5)
     name = "Fig. 2.2#2"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location="Fig. 2.2, function 2",
-    )
+    location_in_publication = "Fig. 2.2, function 2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\sqrt[7]{\tmp{u} - 1}",

@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -39,16 +38,7 @@ class LiZhouLangeTian2026Ex372(Formula):
         FormulaParam("mu", latex_symbol=r"\mu"),
         FormulaParam("sigma", latex_symbol=r"\sigma"),
     )
-    source = FormulaSource(
-        reference=(
-            "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "
-            "algorithm with strongly stable convergence and an acceleration technique for root–finding "
-            "problems. Statistics and Computing 36(4), 197. https://doi.org/10.1007/s11222-026-10902-z."
-            " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
-            "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
-        ),
-        location="Example 3; Section 7.2",
-    )
+    location_in_publication = "Example 3; Section 7.2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=(

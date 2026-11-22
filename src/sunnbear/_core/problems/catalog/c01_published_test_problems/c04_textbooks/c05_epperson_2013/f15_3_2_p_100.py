@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -33,13 +32,7 @@ class Epperson201332P100(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
-            "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
-        ),
-        location="§3.2 (p. 100), Fig. 3.4, Table 3.3; Example 3.19, Table 3.16",
-    )
+    location_in_publication = "§3.2 (p. 100), Fig. 3.4, Table 3.3; Example 3.19, Table 3.16"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",

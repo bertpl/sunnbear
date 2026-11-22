@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -26,13 +25,7 @@ class Atkinson1989P38A(Formula):
     number = (1, 4, 1, 8)
     name = "P38(a)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
-            "Sons, New York. ISBN 0-471-62489-6."
-        ),
-        location="Problem 38(a)",
-    )
+    location_in_publication = "Problem 38(a)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=r"\tmp{u}^{4} - 5.7 \tmp{u}^{3} - 0.47 \tmp{u}^{2} + 29.865 \tmp{u} - 26.1602",

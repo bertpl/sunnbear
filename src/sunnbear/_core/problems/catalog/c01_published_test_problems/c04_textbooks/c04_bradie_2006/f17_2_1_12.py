@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -25,13 +24,7 @@ class Bradie20062112(Formula):
     number = (1, 4, 4, 17)
     name = "2.1-12"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location="Exercises 2.1-12, 2.2-7, 2.4-6, 2.5-8",
-    )
+    location_in_publication = "Exercises 2.1-12, 2.2-7, 2.4-6, 2.5-8"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.09 \c"),),
         expression=r"\frac{1}{\tmp{u}} - 37",

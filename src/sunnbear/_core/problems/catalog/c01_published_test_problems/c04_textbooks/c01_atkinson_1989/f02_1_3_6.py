@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -32,13 +31,7 @@ class Atkinson1989136(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & "
-            "Sons, New York. ISBN 0-471-62489-6."
-        ),
-        location="Eq. (1.3.6)",
-    )
+    location_in_publication = "Eq. (1.3.6)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} + 3 \tmp{u} - 1",

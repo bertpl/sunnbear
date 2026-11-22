@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,17 +23,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026F26(Formula):
     number = (1, 1, 13, 3)
     name = "f26"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to "
-            "the modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332. "
-            "https://doi.org/10.3390/a19050332. Supplementary materials: "
-            "https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder "
-            "`MDPI-Algorithms-Data` of the authors' repository "
-            "https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
-        ),
-        location="Table 2, f26",
-    )
+    location_in_publication = "Table 2, f26"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{4}\right)^{3}",

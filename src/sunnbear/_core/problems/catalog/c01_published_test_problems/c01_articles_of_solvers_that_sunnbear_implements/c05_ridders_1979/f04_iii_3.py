@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -28,14 +27,7 @@ class Ridders1979Iii3(Formula):
     number = (1, 1, 5, 4)
     name = "III.3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous"
-            " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
-            "https://doi.org/10.1109/TCS.1979.1084580."
-        ),
-        location="Section III, function 3",
-    )
+    location_in_publication = "Section III, function 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 270 \c"),),
         expression=r"\sin{\left(\frac{\pi \tmp{u}}{180} \right)}",

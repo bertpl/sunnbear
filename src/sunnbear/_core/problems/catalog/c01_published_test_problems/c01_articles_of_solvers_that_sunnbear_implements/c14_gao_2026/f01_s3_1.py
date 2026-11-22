@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -25,13 +24,7 @@ class Gao2026S31(Formula):
     number = (1, 1, 14, 1)
     name = "S3.1"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
-            "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
-        ),
-        location="Section 3, function 1",
-    )
+    location_in_publication = "Section 3, function 1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"\sqrt[3]{\tmp{u}}",

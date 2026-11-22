@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -27,13 +26,7 @@ class AlefeldPotra199210(Formula):
     number = (1, 2, 3, 5)
     name = "10"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
-            "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
-        ),
-        location="Table 1, problem 10",
-    )
+    location_in_publication = "Table 1, problem 10"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} + \sin{\left(\frac{\tmp{u}}{\param{n}} \right)} - \frac{1}{4}",

@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -31,13 +30,7 @@ class Gao2026T47(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied "
-            "Mathematics Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
-        ),
-        location="Table 4, function 7",
-    )
+    location_in_publication = "Table 4, function 7"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(

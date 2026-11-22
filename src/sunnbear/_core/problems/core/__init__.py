@@ -38,6 +38,8 @@ Ownership summary:
   `is_param_tuple_valid` — one class, one module, in `catalog`; defining the
   class registers it. It also declares what a reader sees of it: its `presentation`
   (`FormulaPresentation`, in the LaTeX notation that the `presentation` package describes) and its `effect_of_c`.
+  A formula from a publication declares its `location_in_publication`; the category that holds the formulas of 1
+  publication declares the `Publication`, which `FormulaRegistry.publication_of` finds for each formula.
 - the framework owns everything mechanical: numba compilation — once per
   formula, not per candidate (`Formula.jit`, `Formula._compiled_formula`),
   identity (`ProblemId` — the formula number and its named parameter tuple, stable, rendered in
@@ -59,9 +61,9 @@ from .param_values import (
     deduplicate_param_tuples,
 )
 from .presentation import PLAIN_MARKER_MACROS, FormulaPresentation, LatexTemplate
+from .publication import Publication
 from .recipes import ParamAxis, ParamGrid, ParamRecipe, ParamTable
 from .registry import FormulaRegistry
-from .source import FormulaSource
 from .test_cases import FormulaTestCase
 from .test_problem import CandidateTestProblem, TestProblem
 from .types import XCFun, XFun

@@ -1,6 +1,6 @@
 """This category holds the formulas of Bradie (2006)."""
 
-from sunnbear._core.problems.core import FormulaCategory
+from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
     f01_2_p_55,
@@ -35,15 +35,17 @@ from . import (
 
 
 class Bradie2006(FormulaCategory):
-    """`Bradie2006` is the category of the formulas of 1 publication.
-
-    Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, Upper Saddle River, NJ.
-    ISBN 0-13-013054-0.
-    """
+    """`Bradie2006` is the category of the formulas of 1 publication."""
 
     number = (1, 4, 4)
     name = "Bradie (2006)"
     description = (
         "The test problems come from chapter 2, on rootfinding, of the textbook A Friendly "
         "Introduction to Numerical Analysis."
+    )
+    publication = Publication(
+        citation=(
+            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, Upper"
+            " Saddle River, NJ. ISBN 0-13-013054-0."
+        )
     )

@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -25,17 +24,7 @@ class ParidaGupta20051(Formula):
     number = (1, 2, 5, 1)
     name = "1"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple "
-            "zeros of nonlinear equations. Applied Mathematics and Computation 177(2), 769–776. "
-            "https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006"
-            " but no issue number; the issue number is Crossref's. The year 2005 of the title follows "
-            'the article\'s copyright line, "© 2005 Elsevier Inc.", which is also the year in the DOI; '
-            "the article prints no online date."
-        ),
-        location="Example 1",
-    )
+    location_in_publication = "Example 1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 40 \c"),),
         expression=r"\tmp{u}^{5} - 300 \tmp{u}^{2} - 126 \tmp{u} + 5005",

@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -31,14 +30,7 @@ class AlefeldPotraShi1993T512(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
-            "equations. Mathematics of Computation 61(204), 733–744. "
-            "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
-        ),
-        location="Table 5.1, problem 2",
-    )
+    location_in_publication = "Table 5.1, problem 2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"- 2 \sum_{i=1}^{20} \frac{\left(2 i - 5\right)^{2}}{\left(\tmp{u} - i^{2}\right)^{3}}",

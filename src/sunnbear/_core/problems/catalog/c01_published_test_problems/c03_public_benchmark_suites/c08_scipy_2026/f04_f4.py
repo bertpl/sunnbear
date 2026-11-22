@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -25,21 +24,7 @@ class Scipy2026F4(Formula):
     number = (1, 3, 8, 4)
     name = "f4"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`, "
-            "https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites "
-            "2 sources:\n"
-            '- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of '
-            'Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344, '
-            'https://dl.acm.org/doi/10.1145/210089.210111; the module misprints the volume as "Volume '
-            '221" and gives no issue or pages\n'
-            '- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the '
-            'zero of a nonlinear function without using derivatives", Advances in Engineering Software '
-            "28.3 (1997): 145-149 (no DOI in the module)"
-        ),
-        location="Collection “original”, f4",
-    )
+    location_in_publication = "Collection “original”, f4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.23 \c"),),
         expression=(

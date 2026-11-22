@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -37,14 +36,7 @@ class AlefeldPotraShi1993T514(Formula):
         FormulaParam("b", latex_symbol=r"x_{\max}"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G., Potra, F. A., Shi, Y. (1993). On enclosing simple roots of nonlinear "
-            "equations. Mathematics of Computation 61(204), 733–744. "
-            "https://doi.org/10.1090/s0025-5718-1993-1192965-2."
-        ),
-        location="Table 5.1, problem 4",
-    )
+    location_in_publication = "Table 5.1, problem 4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{\param{n}} - \param{a_}",

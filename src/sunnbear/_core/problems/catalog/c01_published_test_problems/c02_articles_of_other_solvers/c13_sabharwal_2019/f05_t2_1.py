@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -34,13 +33,7 @@ class Sabharwal2019T21(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula "
-            "Falsi Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
-        ),
-        location="Table 2, functions 1, 2 and 3",
-    )
+    location_in_publication = "Table 2, functions 1, 2 and 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{2} - \param{k}",

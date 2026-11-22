@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class BadrAlmotairiElGhamry2021P10(Formula):
     number = (1, 2, 14, 2)
     name = "P10"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Badr, E., Almotairi, S., El Ghamry, A. (2021). A comparative study among new hybrid root "
-            "finding algorithms and traditional methods. Mathematics 9(11), 1306. "
-            "https://doi.org/10.3390/math9111306."
-        ),
-        location="Table 1, P10",
-    )
+    location_in_publication = "Table 1, P10"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"\tmp{u} \cos{\left(\tmp{u} \right)} + 1",

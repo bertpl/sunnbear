@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class Romadani202551(Formula):
     number = (1, 2, 17, 1)
     name = "5.1"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding "
-            "Methods into Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), "
-            "154–189. https://doi.org/10.62762/jam.2025.840767."
-        ),
-        location="Section 5.1",
-    )
+    location_in_publication = "Section 5.1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{7} - 2 \tmp{u}^{6} + 4 \tmp{u}^{5} - 1",

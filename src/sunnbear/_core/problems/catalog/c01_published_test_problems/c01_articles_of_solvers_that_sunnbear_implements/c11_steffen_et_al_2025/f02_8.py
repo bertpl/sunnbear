@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -45,14 +44,7 @@ class SteffenEtAl20258(Formula):
         FormulaParam("Tr", latex_symbol="T_r"),
         FormulaParam("Pr", latex_symbol="P_r"),
     )
-    source = FormulaSource(
-        reference=(
-            "Steffen, V., Della Pasqua, C. C., de Oliveira, M. S., da Silva, E. A. (2025). Halving "
-            "interval guaranteed for Dekker and Brent root finding methods. Examples and "
-            "Counterexamples 7, 100173. https://doi.org/10.1016/j.exco.2024.100173."
-        ),
-        location="Eq. (8)",
-    )
+    location_in_publication = "Eq. (8)"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{u}", r"\x - 3 \c"),

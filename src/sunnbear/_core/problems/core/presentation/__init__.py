@@ -1,9 +1,11 @@
 r"""This package holds what a reader sees of a formula: its math in LaTeX, and texts about it.
 
 A formula declares a `FormulaPresentation`: its expression and its interval in LaTeX, the definitions of the temporary
-variables and intermediate functions that the expression uses, a summary and notes. Every one of them is written in
-sunnbear's LaTeX notation, described below. `LatexTemplate` holds 1 text in that notation, checks it, and lists the
-parameters, temporary variables and intermediate functions that the text names.
+variables and intermediate functions that the expression uses, a summary, notes and the conditions on the formula's
+parameters. Every one of them is written in sunnbear's LaTeX notation, described below.
+
+`LatexTemplate` holds 1 text in that notation, checks it, and lists the parameters, temporary variables and intermediate
+functions that the text names.
 
 `Formula` renders a text for a consumer, such as the website, in 1 of 2 forms:
 
@@ -18,8 +20,8 @@ A text is 1 of 2 kinds:
 
 - **LaTeX math:** each side of a definition, the expression and the interval. The whole text is math, with no ``$``.
 - **A text for a reader:** prose that marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does. The
-  texts for a reader are a presentation's summary and notes, a parameter's meaning, a recipe's summary and a
-  category's description.
+  texts for a reader are a presentation's summary, notes and parameter conditions, a parameter's meaning, a recipe's
+  summary and a category's description.
 
 The LaTeX of both kinds uses this notation:
 

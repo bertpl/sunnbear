@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,13 +23,7 @@ class Epperson2013Fig38(Formula):
     number = (1, 4, 5, 13)
     name = "Fig. 3.8"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. "
-            "John Wiley & Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
-        ),
-        location="Fig. 3.8",
-    )
+    location_in_publication = "Fig. 3.8"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\frac{\tmp{u}^{2}}{2} - \frac{1}{2}",

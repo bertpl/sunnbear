@@ -20,8 +20,12 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     An example is a published test problem whose function is not defined left of its interval: a shift along x by any
     ``c > 0`` evaluates that function outside its domain.
 
-    Formula 1.99.x.y.z modifies formula 1.x.y.z, and has the same name and `source`; subcategories 1.99.x and 1.99.x.y
-    have the names of subcategories 1.x and 1.x.y.
+    Formula 1.99.x.y.z modifies formula 1.x.y.z, and has the same name and location in the publication; subcategories
+    1.99.x and 1.99.x.y have the names of subcategories 1.x and 1.x.y.
+
+    A category of this subcategory declares no publication, because no publication gives the formulas that it holds;
+    `original_category_number` lets `FormulaRegistry.publication_of` find the publication of the formula that each
+    formula modifies.
 
     Each formula holds 1 modification, which keeps the test problems as close to the published ones as the conditions
     allow. A modification may combine several changes where 1 change alone leaves a test problem that does not satisfy
@@ -60,3 +64,4 @@ class ModifiedPublishedTestProblems(FormulaCategory):
         "own interval. Where such a shift does not work, such as next to a pole or the end of the function's "
         r"domain, $\c$ is added to the function's value or scales x instead."
     )
+    original_category_number = (1,)

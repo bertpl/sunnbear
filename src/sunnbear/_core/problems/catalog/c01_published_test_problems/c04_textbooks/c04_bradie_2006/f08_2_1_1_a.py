@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -27,13 +26,7 @@ class Bradie2006211A(Formula):
     number = (1, 4, 4, 8)
     name = "2.1-1(a)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, "
-            "Upper Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        location="Exercises 2.1-1(a), 2.2-1(a), 2.4-1(a), 2.5-1(a)",
-    )
+    location_in_publication = "Exercises 2.1-1(a), 2.2-1(a), 2.4-1(a), 2.5-1(a)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(1 + \tmp{u} \right)} - \cos{\left(\tmp{u} \right)}",

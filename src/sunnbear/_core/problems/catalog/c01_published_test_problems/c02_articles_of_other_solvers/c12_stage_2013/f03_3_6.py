@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,14 +23,7 @@ class Stage201336(Formula):
     number = (1, 2, 12, 3)
     name = "3.6"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International "
-            "Journal of Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF: "
-            "https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
-        ),
-        location="§3.6",
-    )
+    location_in_publication = "§3.6"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"1 - \frac{3 \tmp{u}}{4}",

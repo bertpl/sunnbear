@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -29,14 +28,7 @@ class Romadani202552(Formula):
     number = (1, 2, 17, 2)
     name = "5.2"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Romadani, M. N. H. (2025). From Theory to Code: Transforming Classical Root-Finding "
-            "Methods into Efficient Python Implementations. ICCK Journal of Applied Mathematics 1(3), "
-            "154–189. https://doi.org/10.62762/jam.2025.840767."
-        ),
-        location="Section 5.2",
-    )
+    location_in_publication = "Section 5.2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \cos^{3}{\left(2 \tmp{u} \right)}",

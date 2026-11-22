@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -33,16 +32,7 @@ class Ford19973(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Ford, J. A. (1997). Improved Illinois-type methods for the solution of nonlinear "
-            "equations. Scientia Iranica 4(1&2), 28–34. The article has no working DOI: the journal's "
-            "page, https://scientiairanica.sharif.edu/article_21758.html, lists "
-            "10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the "
-            "University of Essex technical report CSM-257 (1995)."
-        ),
-        location="Section “Numerical Tests”, function 3",
-    )
+    location_in_publication = "Section “Numerical Tests”, function 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{e^{\frac{21000}{\tmp{u}}}}{1.11 \cdot 10^{11} \tmp{u}^{2}} - 1",

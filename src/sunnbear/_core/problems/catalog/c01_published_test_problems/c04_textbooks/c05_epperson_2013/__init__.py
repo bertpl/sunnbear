@@ -1,6 +1,6 @@
 """This category holds the formulas of Epperson (2013)."""
 
-from sunnbear._core.problems.core import FormulaCategory
+from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
     f01_ex_3_1,
@@ -30,15 +30,17 @@ from . import (
 
 
 class Epperson2013(FormulaCategory):
-    """`Epperson2013` is the category of the formulas of 1 publication.
-
-    Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley & Sons, Hoboken,
-    NJ. ISBN 978-1-118-36759-9.
-    """
+    """`Epperson2013` is the category of the formulas of 1 publication."""
 
     number = (1, 4, 5)
     name = "Epperson (2013)"
     description = (
         "The test problems come from chapter 3, on root-finding, of the textbook An Introduction to"
         " Numerical Methods and Analysis."
+    )
+    publication = Publication(
+        citation=(
+            "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley &"
+            " Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
+        )
     )

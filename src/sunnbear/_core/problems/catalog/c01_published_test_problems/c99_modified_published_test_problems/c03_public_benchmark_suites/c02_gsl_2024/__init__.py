@@ -8,9 +8,7 @@ from . import f03_func3, f05_func6
 class ModifiedGsl2024(FormulaCategory):
     """`ModifiedGsl2024` holds the modified versions of the formulas of 1 publication.
 
-    GNU Scientific Library (GSL), release 2.8, files `roots/test_funcs.c` and `roots/test.c` (copyright Reid
-    Priedhorsky, Brian Gough), https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files
-    cite no source for their functions.
+    Its formulas modify those of category 1.3.2, `Gsl2024`, and come from the publication of `Gsl2024`.
     """
 
     number = (1, 99, 3, 2)

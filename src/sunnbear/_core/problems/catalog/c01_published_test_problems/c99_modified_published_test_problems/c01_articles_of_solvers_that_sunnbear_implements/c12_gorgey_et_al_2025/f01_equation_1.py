@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -34,14 +33,7 @@ class ModifiedGorgeyEtAl2025Equation1(Formula):
     number = (1, 99, 1, 12, 1)
     name = "Equation 1"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method"
-            " in solving nonlinear equations using Scilab programming. Data Analytics and Applied "
-            "Mathematics 6(1), 23–35. https://doi.org/10.15282/daam.v6i1.11307."
-        ),
-        location="Equation 1",
-    )
+    location_in_publication = "Equation 1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 5.56 \c"),),
         expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",

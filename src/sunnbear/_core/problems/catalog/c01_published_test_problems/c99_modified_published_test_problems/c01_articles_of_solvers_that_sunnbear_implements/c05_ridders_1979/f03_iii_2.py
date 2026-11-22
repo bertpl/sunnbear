@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -35,14 +34,7 @@ class ModifiedRidders1979Iii2(Formula):
     number = (1, 99, 1, 5, 3)
     name = "III.2"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous"
-            " function. IEEE Transactions on Circuits and Systems 26(11), 979–980. "
-            "https://doi.org/10.1109/TCS.1979.1084580."
-        ),
-        location="Section III, function 2",
-    )
+    location_in_publication = "Section III, function 2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.48 \c"),),
         expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",

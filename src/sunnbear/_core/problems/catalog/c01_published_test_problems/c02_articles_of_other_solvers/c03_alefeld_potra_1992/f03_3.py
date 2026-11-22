@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -22,13 +21,7 @@ class AlefeldPotra19923(Formula):
     number = (1, 2, 3, 3)
     name = "3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
-            "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
-        ),
-        location="Table 1, problem 3",
-    )
+    location_in_publication = "Table 1, problem 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
         expression=r"11 \tmp{u}^{11} - 1",

@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -26,14 +25,7 @@ class BurdenFairesBurden2016236B(Formula):
     number = (1, 4, 7, 35)
     name = "2.3-6(b)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
-            "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
-            "the print year 2014."
-        ),
-        location="Exercise 2.3-6(b)",
-    )
+    location_in_publication = "Exercise 2.3-6(b)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
         expression=r"\ln{\left(\tmp{u} - 1 \right)} + \cos{\left(\tmp{u} - 1 \right)}",

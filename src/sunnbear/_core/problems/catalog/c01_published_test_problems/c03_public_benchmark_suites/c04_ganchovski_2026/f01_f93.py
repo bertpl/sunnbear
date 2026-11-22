@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -34,22 +33,7 @@ class Ganchovski2026F93(Formula):
     number = (1, 3, 4, 1)
     name = "f93"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the "
-            "repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding at commit "
-            "`b3309e9a5177d6305ac84deba6537adb9b878c5e`: "
-            "https://raw.githubusercontent.com/Proektsoft-EOOD/ModAB-Root-Finding/b3309e9a5177d6305ac84deba6537adb9b878c5e/Test%20functions.pdf."
-            "\n"
-            "- The PDF prints no author or date: its metadata give 2026-09-29 as its creation date. The"
-            " repository's README puts it under the MIT License of `C/LICENSE`, which names Ned "
-            "Ganchovski as the copyright holder.\n"
-            '- An earlier version was posted on ResearchGate in 2023 as "Additional test functions", '
-            "https://www.researchgate.net/publication/373922895_Additional_test_functions; "
-            "roots-fortran (`roots_fortran`) cites that version."
-        ),
-        location="f93, f94, f95, f96, f97, f98 and f99",
-    )
+    location_in_publication = "f93, f94, f95, f96, f97, f98 and f99"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\tmp{u}^{\param{n}} - 0.001",

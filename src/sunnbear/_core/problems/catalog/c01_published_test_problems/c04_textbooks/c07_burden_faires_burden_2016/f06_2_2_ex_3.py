@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -45,14 +44,7 @@ class BurdenFairesBurden201622Ex3(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. "
-            "Cengage Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and "
-            "the print year 2014."
-        ),
-        location="§2.2 Example 3; Fig. 2.5; Exercises 2.5-1(c), 2.1-5(a), 2.5-8, 2.2-10",
-    )
+    location_in_publication = "§2.2 Example 3; Fig. 2.5; Exercises 2.5-1(c), 2.1-5(a), 2.5-8, 2.2-10"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \param{k}^{- \tmp{u}}",

@@ -7,7 +7,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -24,15 +23,7 @@ class Borchers2026F3(Formula):
     number = (1, 3, 5, 3)
     name = "f3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding". '
-            "https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The "
-            "page is unversioned and gives no author or date; it is on the website of Hans W. Borchers,"
-            " the author of the R package pracma. The chapter cites no source for its test problems."
-        ),
-        location="§5.6, f3",
-    )
+    location_in_publication = "§5.6, f3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2.4 \c"),),
         expression=r"35 \tmp{u}^{35} - 1",

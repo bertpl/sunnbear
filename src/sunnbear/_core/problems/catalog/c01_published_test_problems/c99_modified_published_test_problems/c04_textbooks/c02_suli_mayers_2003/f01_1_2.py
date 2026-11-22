@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -61,13 +60,7 @@ class ModifiedSuliMayers200312(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
-            "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
-        ),
-        location="Eq. (1.2)",
-    )
+    location_in_publication = "Eq. (1.2)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{1}{2} - \frac{1}{1 + \param{M} \left|(\tmp{u} + 1.05) - 1.05\right|}",

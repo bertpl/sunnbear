@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -35,14 +34,7 @@ class GorgeyEtAl2025Equation3(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Gorgey, A., Azim, F. A., Zulkifly, Z. H., Hassim, H. (2025). Efficiency of Ridders' method"
-            " in solving nonlinear equations using Scilab programming. Data Analytics and Applied "
-            "Mathematics 6(1), 23–35. https://doi.org/10.15282/daam.v6i1.11307."
-        ),
-        location="Equation 3",
-    )
+    location_in_publication = "Equation 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{4}\right)^{3}",

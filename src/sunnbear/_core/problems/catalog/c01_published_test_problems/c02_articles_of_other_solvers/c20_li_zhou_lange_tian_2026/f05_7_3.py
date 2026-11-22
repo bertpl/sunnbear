@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -29,16 +28,7 @@ class LiZhouLangeTian202673(Formula):
     number = (1, 2, 20, 5)
     name = "7.3"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Li, X.-J., Zhou, H., Lange, K., Tian, G.-L. (2026). The upper–crossing/solution (US) "
-            "algorithm with strongly stable convergence and an acceleration technique for root–finding "
-            "problems. Statistics and Computing 36(4), 197. https://doi.org/10.1007/s11222-026-10902-z."
-            " Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The "
-            "authors' R code: https://github.com/Xunjian-Li/US-algorithm.git."
-        ),
-        location="Section 7.3",
-    )
+    location_in_publication = "Section 7.3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 7 \c"),),
         expression=r"- 0.5 \tmp{u} - 2 \sin{\left(\tmp{u} \right)} + 1",

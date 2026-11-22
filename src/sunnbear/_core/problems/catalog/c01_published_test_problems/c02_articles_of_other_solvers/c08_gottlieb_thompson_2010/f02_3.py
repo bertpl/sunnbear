@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -31,14 +30,7 @@ class GottliebThompson20103(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Gottlieb, R. G., Thompson, B. F. (2010). Bisected direct quadratic regula falsi. Applied "
-            "Mathematical Sciences 4(15), 709–718. No DOI; the publisher's copy: "
-            "http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf."
-        ),
-        location="Table 1, test 3",
-    )
+    location_in_publication = "Table 1, test 3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"11 \tmp{u}^{11} - 1",

@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -33,13 +32,7 @@ class AlefeldPotra19921(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Alefeld, G. E., Potra, F. A. (1992). Some efficient methods for enclosing simple zeros of "
-            "nonlinear equations. BIT 32(2), 334–344. https://doi.org/10.1007/bf01994885."
-        ),
-        location="Table 1, problems 1 and 4",
-    )
+    location_in_publication = "Table 1, problems 1 and 4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3} - \param{k}",

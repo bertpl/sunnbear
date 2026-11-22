@@ -11,7 +11,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -36,13 +35,7 @@ class SuliMayers2003Example17(Formula):
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
-    source = FormulaSource(
-        reference=(
-            "Süli, E., Mayers, D. F. (2003). An Introduction to Numerical Analysis. Cambridge "
-            "University Press, Cambridge. https://doi.org/10.1017/CBO9780511801181."
-        ),
-        location="Example 1.7; Table 1.3; Exercises 1.3, 1.4",
-    )
+    location_in_publication = "Example 1.7; Table 1.3; Exercises 1.3, 1.4"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\tmp{u}} - \tmp{u} - 2",

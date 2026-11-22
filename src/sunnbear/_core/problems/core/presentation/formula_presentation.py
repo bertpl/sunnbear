@@ -10,7 +10,7 @@ from .latex_template import LatexTemplate
 # ==================================================================================================
 @dataclass(frozen=True)
 class FormulaPresentation:
-    r"""`FormulaPresentation` holds a formula's definitions, expression and interval in LaTeX, its summary and notes.
+    r"""`FormulaPresentation` holds a formula's math in LaTeX, and its summary, notes and parameter conditions.
 
     An expression that uses temporary variables or intermediate functions lists them in `definitions`. `Formula` joins
     the definitions and the expression into 1 aligned display, so no field contains the ``\\`` or ``&`` that separate
@@ -25,6 +25,7 @@ class FormulaPresentation:
     | `interval` | LaTeX math, with no ``$`` |
     | `summary` | a text for a reader, with its math as ``$…$`` inline and ``$$…$$`` for display |
     | `notes` | texts for a reader, with their math as ``$…$`` inline and ``$$…$$`` for display |
+    | `param_conditions` | texts for a reader, with their math as ``$…$`` inline and ``$$…$$`` for display |
 
     Attributes:
         expression: The right side of ``f(x, c) = …``, as the formula's code computes it, including the conditions
@@ -39,6 +40,10 @@ class FormulaPresentation:
             function with many roots". None by default; the catalog's tests require it of every shipped formula.
         notes: Paragraphs for a reader, such as a note that gives the original expression as display math when the
             formula's code computes an equivalent form of it. Empty by default.
+        param_conditions: The conditions on the formula's parameters that `Formula.is_param_tuple_valid` checks, 1
+            text per independent condition, such as "$\param{p}$ is an even integer of at least 2". A condition that
+            joins several parameters is 1 text, and a text writes each constant of the formula's code as its numeric
+            value, not as the constant's name in the code. Empty by default.
     """
 
     expression: str
@@ -46,6 +51,7 @@ class FormulaPresentation:
     definitions: tuple[tuple[str, str], ...] = ()
     summary: str | None = None
     notes: tuple[str, ...] = ()
+    param_conditions: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         r"""Check the notation of every field, and that each temporary variable and function is defined before its use.
@@ -89,9 +95,9 @@ class FormulaPresentation:
 
     @property
     def texts_for_a_reader(self) -> tuple[str, ...]:
-        """Return the summary, where given, and the notes."""
+        """Return the summary, where given, the notes and the parameter conditions."""
         summary = (self.summary,) if self.summary is not None else ()
-        return (*summary, *self.notes)
+        return (*summary, *self.notes, *self.param_conditions)
 
     @property
     def math_placeholder_names(self) -> frozenset[str]:

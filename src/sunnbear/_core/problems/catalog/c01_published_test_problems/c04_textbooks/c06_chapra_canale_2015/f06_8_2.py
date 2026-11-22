@@ -8,7 +8,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -35,14 +34,7 @@ class ChapraCanale201582(Formula):
     number = (1, 4, 6, 6)
     name = "§8.2"
     params = (FormulaParam("pCO2", latex_symbol=r"p_{\mathrm{CO_2}}"),)
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="§8.2, Eq. (8.14)",
-    )
+    location_in_publication = "§8.2, Eq. (8.14)"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{\mathrm{pH}}", r"\x - 10 \c"),

@@ -10,7 +10,6 @@ from sunnbear._core.problems.core import (
     Formula,
     FormulaParam,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
     ParamTable,
@@ -29,15 +28,7 @@ class Norton19852(Formula):
     number = (1, 2, 2, 1)
     name = "2"
     params = (FormulaParam("n", latex_symbol="n"),)
-    source = FormulaSource(
-        reference=(
-            "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational "
-            "interpolation. ACM Transactions on Mathematical Software 11(2), 120–134. "
-            "https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the "
-            "Collected Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
-        ),
-        location="Section 4, function 2",
-    )
+    location_in_publication = "Section 4, function 2"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} e^{- \param{n}} + 1 - 2 e^{- \param{n} \tmp{u}}",

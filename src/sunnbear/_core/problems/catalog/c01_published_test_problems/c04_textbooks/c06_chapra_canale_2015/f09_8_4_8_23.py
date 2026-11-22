@@ -9,7 +9,6 @@ from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
     FormulaPresentation,
-    FormulaSource,
     FormulaTestCase,
     ParamRecipe,
 )
@@ -33,14 +32,7 @@ class ChapraCanale201584823(Formula):
     number = (1, 4, 6, 9)
     name = "§8.4, (8.23)"
     params = ()
-    source = FormulaSource(
-        reference=(
-            "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. "
-            "McGraw-Hill Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in "
-            "2021."
-        ),
-        location="§8.4, Eq. (8.23), Fig. 8.6",
-    )
+    location_in_publication = "§8.4, Eq. (8.23), Fig. 8.6"
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{u}", r"\x - 0.072 \c"),
