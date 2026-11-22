@@ -87,7 +87,7 @@ class NearEdgePower(Formula):
         )
 
     def is_param_tuple_valid(self, p: float, d: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if p > 0.0 and d >= 0.0:
             return d**p < 0.5
         else:

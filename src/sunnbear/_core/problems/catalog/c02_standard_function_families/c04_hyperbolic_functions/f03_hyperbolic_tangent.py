@@ -113,7 +113,7 @@ class HyperbolicTangent(Formula):
         )
 
     def is_param_tuple_valid(self, b: float, d: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if b > 0.0 and 0.0 < d < 2.0:
             return abs(d - 1.0) < math.tanh(b)
         else:

@@ -78,7 +78,7 @@ class OneSidedLinearPlusPower(Formula):
         return (ParamGrid(axes=(power_axis, weight_axis), summary=summary),)
 
     def is_param_tuple_valid(self, p: float, w: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if p != int(p):
             return False
         else:

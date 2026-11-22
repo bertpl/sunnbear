@@ -61,7 +61,7 @@ class InverseHyperbolicSine(Formula):
         )
 
     def is_param_tuple_valid(self, b: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return b > 0.0
 
     test_cases = (

@@ -93,7 +93,7 @@ class WilkinsonPolynomial(Formula):
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return is_valid_degree(n)
 
     test_cases = (

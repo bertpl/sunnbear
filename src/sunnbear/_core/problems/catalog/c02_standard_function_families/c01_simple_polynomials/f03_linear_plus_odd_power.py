@@ -63,7 +63,7 @@ class LinearPlusOddPower(Formula):
         return slope_recipes(power_axis(LOWEST_POWER))
 
     def is_param_tuple_valid(self, p: float, m: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         return is_valid_power(p, LOWEST_POWER)
 
     test_cases = (

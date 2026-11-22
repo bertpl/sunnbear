@@ -142,7 +142,7 @@ class JacobiPolynomial(Formula):
         return (ParamTable(names=self.param_names, rows=rows, summary=summary),)
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:
-        """Check the conditions that the presentation's `param_conditions` state for a reader."""
+        """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if not is_valid_degree(n):
             return False
         else:
