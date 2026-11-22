@@ -102,5 +102,12 @@ class RootsFortran2025(FormulaCategory):
             " Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`).\n  - The brackets of 4 cases"
             " differ: case 146 starts at 0.51, as roots-fortran's own comment explains, and cases 155–157 bracket"
             " each root of f42 in place of `[0, 4]`."
-        )
+        ),
+        citation_key="RootsFortran25",
+        authors=("Williams, J.",),
+        year=2025,
+        title="roots-fortran",
+        url=(
+            "https://github.com/jacobwilliams/roots-fortran/blob/390e7ea30751fe2ab23ddb876a3563e07bef1b76/test/root_tests.f90"
+        ),
     )

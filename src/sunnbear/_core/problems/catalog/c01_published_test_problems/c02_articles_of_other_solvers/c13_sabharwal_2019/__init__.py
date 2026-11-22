@@ -27,5 +27,11 @@ class Sabharwal2019(FormulaCategory):
         citation=(
             "Sabharwal, C. L. (2019). Blended Root Finding Algorithm Outperforms Bisection and Regula Falsi"
             " Algorithms. Mathematics 7(11), 1118. https://doi.org/10.3390/math7111118."
-        )
+        ),
+        citation_key="Sabharwal19",
+        authors=("Sabharwal, C. L.",),
+        year=2019,
+        title="Blended Root Finding Algorithm Outperforms Bisection and Regula Falsi Algorithms",
+        published_in="Mathematics",
+        doi="10.3390/math7111118",
     )

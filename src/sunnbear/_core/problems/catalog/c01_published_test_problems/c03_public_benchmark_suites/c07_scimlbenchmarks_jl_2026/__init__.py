@@ -13,11 +13,19 @@ class ScimlbenchmarksJl2026(FormulaCategory):
     description = "The test problems come from the Interval Rootfinding Test Suite of SciMLBenchmarks.jl."
     publication = Publication(
         citation=(
-            'SciMLBenchmarks.jl, "Interval Rootfinding Test Suite" by Fabian Gittins (the front matter of the'
-            " file), file `benchmarks/IntervalNonlinearProblem/suite.jmd` at commit"
+            'SciMLBenchmarks.jl (2026), "Interval Rootfinding Test Suite" by Fabian Gittins (the front matter of'
+            " the file), file `benchmarks/IntervalNonlinearProblem/suite.jmd` at commit"
             " `8a67931f726eeb53604926a6dd6bfc750316b4c4`,"
             " https://github.com/SciML/SciMLBenchmarks.jl/blob/8a67931f726eeb53604926a6dd6bfc750316b4c4/benchmarks/IntervalNonlinearProblem/suite.jmd,"
             ' MIT license. The file names no source for its functions; it calls them "a selection of challenging'
             ' test functions from the literature".'
-        )
+        ),
+        citation_key="SciMLBenchmarks26",
+        authors=("Fabian Gittins",),
+        year=2026,
+        title="Interval Rootfinding Test Suite",
+        published_in="SciMLBenchmarks.jl",
+        url=(
+            "https://github.com/SciML/SciMLBenchmarks.jl/blob/8a67931f726eeb53604926a6dd6bfc750316b4c4/benchmarks/IntervalNonlinearProblem/suite.jmd"
+        ),
     )

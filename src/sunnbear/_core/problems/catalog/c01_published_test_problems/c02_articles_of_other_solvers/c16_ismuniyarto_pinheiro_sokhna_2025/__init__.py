@@ -17,5 +17,14 @@ class IsmuniyartoPinheiroSokhna2025(FormulaCategory):
             " methods for nonlinear equations: applications to break-even point determination. Interval:"
             " Indonesian Journal of Mathematical Education 3(2), 213–218."
             " https://doi.org/10.37251/ijome.v3i2.2782. The first author has a single name."
-        )
+        ),
+        citation_key="Ismuniyarto25",
+        authors=("Ismuniyarto", "Pinheiro, D.", "Sokhna, E. H. L."),
+        year=2025,
+        title=(
+            "A numerical study of bracketing root-finding methods for nonlinear equations: applications to "
+            "break-even point determination"
+        ),
+        published_in="Interval: Indonesian Journal of Mathematical Education",
+        doi="10.37251/ijome.v3i2.2782",
     )

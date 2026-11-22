@@ -13,7 +13,7 @@ class Scipy2026(FormulaCategory):
     description = "The test problems come from the module of test problems for SciPy's root finders, release 1.18.1."
     publication = Publication(
         citation=(
-            "SciPy 1.18.1, module `scipy/optimize/_tstutils.py`,"
+            "SciPy 1.18.1 (2026), module `scipy/optimize/_tstutils.py`,"
             " https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites 2"
             ' sources:\n- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of'
             ' Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344,'
@@ -21,5 +21,9 @@ class Scipy2026(FormulaCategory):
             ' gives no issue or pages\n- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for'
             ' finding the zero of a nonlinear function without using derivatives", Advances in Engineering'
             " Software 28.3 (1997): 145-149 (no DOI in the module)"
-        )
+        ),
+        citation_key="SciPy26",
+        year=2026,
+        title="SciPy",
+        url="https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py",
     )

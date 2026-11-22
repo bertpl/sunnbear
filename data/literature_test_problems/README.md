@@ -33,9 +33,9 @@ A source's id is its file name: `<year>_<author names>` for a publication, optio
 
 | field | content |
 |---|---|
-| `title` | `Authors (year): subject`; `timeline.html` shows the part before the colon |
+| `title` | `Authors (citation year): subject`, where the citation year is the year by which `reference` cites the source: an article's issue year, a book's edition year, or a code suite's release or commit year; `timeline.html` shows the part before the colon |
 | `reference` | the full reference with its DOI, or its URL where it has none |
-| `year` | the year of the edition or version that `reference` cites (see **Year** below) |
+| `year` | the year that places the source on the timeline (see **Year** below) |
 | `subcategory` | the subcategory of category 1 where the source's formulas belong (see **Subcategory** below) |
 | `where_in_source` | the tables, sections or files of the source that hold the functions |
 | `transcribed_from` | what the rows were read from, and which one is followed where they differ |
@@ -44,7 +44,11 @@ A source's id is its file name: `<year>_<author names>` for a publication, optio
 | `[[relations]]` | optional, any number: `sources`, the ids of other sources, and `text`, how this source's rows relate to theirs |
 | `[[rows]]` | 1 table per row, below |
 
-**Year.** A textbook's year is that of the cited edition, and a code suite's that of the cited release or commit. An article that appeared online before its issue takes the online year, so the year can differ from the one in its id (`2021_oliveira_takahashi` appeared online in 2020).
+**Year.** The `year` field orders the sources in time, by when the cited version of each source became public; the title and `reference` give the source's citation year. The `year` field depends on the kind of source:
+
+- **textbook:** the year of the cited edition;
+- **code suite:** the year of the cited release or commit;
+- **article:** the year that it appeared, which is the year of the online date that it prints, or its copyright year where it prints no online date. Its `year` can then differ from its citation year, and its id keeps the year that it was first given: `2021_oliveira_takahashi` appeared online in 2020, while its issue is dated 2021, and `2005_parida_gupta` carries the copyright year 2005, while its issue is dated 2006.
 
 The generated files list the sources in time order: by year, then by id without its leading year.
 
@@ -290,7 +294,7 @@ The class docstring of `ModifiedPublishedTestProblems` describes subcategory 1.9
 4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where each row gives its own values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
 5. Write the source's package and its formula modules (§ Formula modules), and import the package in its subcategory's `__init__.py`. The package's `FormulaCategory` subclass gives:
    - a `description` that says what the source is, such as "The test problems come from the article that introduces Ridders' method.";
-   - a `publication`, a `Publication` whose `citation` is the source's `reference`.
+   - a `publication`, a `Publication` whose `citation` is the source's `reference`, and whose other fields hold the parts of that citation, apart from its citation key and its year; the `Publication` docstring describes each field. The `Publication`'s `year` is the year at the end of the source's package name, which can differ from the source's `year`.
 6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 
 ## Regenerating

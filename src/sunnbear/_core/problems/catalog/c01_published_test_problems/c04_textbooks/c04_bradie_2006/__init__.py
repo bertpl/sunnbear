@@ -47,5 +47,10 @@ class Bradie2006(FormulaCategory):
         citation=(
             "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, Upper"
             " Saddle River, NJ. ISBN 0-13-013054-0."
-        )
+        ),
+        citation_key="Bradie06",
+        authors=("Bradie, B.",),
+        year=2006,
+        title="A Friendly Introduction to Numerical Analysis",
+        published_in="Pearson Prentice Hall",
     )

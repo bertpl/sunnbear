@@ -36,5 +36,11 @@ class Moler2004(FormulaCategory):
             " MathWorks, Natick, MA (electronic edition). ISBN 0-89871-560-1. The author's web edition, 1 PDF per"
             " chapter: https://www.mathworks.com/moler/chapters.html; chapter 4:"
             " https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
-        )
+        ),
+        citation_key="Moler04",
+        authors=("Moler, C. B.",),
+        year=2004,
+        title="Numerical Computing with MATLAB",
+        published_in="SIAM",
+        url="https://www.mathworks.com/moler/chapters.html",
     )

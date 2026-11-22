@@ -25,5 +25,12 @@ class Ganchovski2026(FormulaCategory):
             ' copyright holder.\n- An earlier version was posted on ResearchGate in 2023 as "Additional test'
             ' functions", https://www.researchgate.net/publication/373922895_Additional_test_functions;'
             " roots-fortran (`roots_fortran`) cites that version."
-        )
+        ),
+        citation_key="Ganchovski26b",
+        authors=("Ganchovski, N.",),
+        year=2026,
+        title="Root-finding Test Functions",
+        url=(
+            "https://raw.githubusercontent.com/Proektsoft-EOOD/ModAB-Root-Finding/b3309e9a5177d6305ac84deba6537adb9b878c5e/Test%20functions.pdf"
+        ),
     )

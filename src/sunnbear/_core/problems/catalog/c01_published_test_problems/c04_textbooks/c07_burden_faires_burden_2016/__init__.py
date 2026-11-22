@@ -69,5 +69,10 @@ class BurdenFairesBurden2016(FormulaCategory):
             "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. Cengage"
             " Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and the print year"
             " 2014."
-        )
+        ),
+        citation_key="Burden16",
+        authors=("Burden, R. L.", "Faires, J. D.", "Burden, A. M."),
+        year=2016,
+        title="Numerical Analysis",
+        published_in="Cengage Learning",
     )

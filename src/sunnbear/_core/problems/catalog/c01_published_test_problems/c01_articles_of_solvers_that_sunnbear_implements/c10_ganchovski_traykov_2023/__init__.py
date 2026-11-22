@@ -19,5 +19,11 @@ class GanchovskiTraykov2023(FormulaCategory):
             "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving non-linear"
             " equations in structural mechanics. IOP Conf. Series: Materials Science and Engineering 1276,"
             " 012010. https://doi.org/10.1088/1757-899X/1276/1/012010."
-        )
+        ),
+        citation_key="Ganchovski23",
+        authors=("Ganchovski, N.", "Traykov, A."),
+        year=2023,
+        title="Modified Anderson-Bjork's method for solving non-linear equations in structural mechanics",
+        published_in="IOP Conf. Series: Materials Science and Engineering",
+        doi="10.1088/1757-899X/1276/1/012010",
     )

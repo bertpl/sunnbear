@@ -17,5 +17,10 @@ class Atkinson1989(FormulaCategory):
         citation=(
             "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & Sons, New"
             " York. ISBN 0-471-62489-6."
-        )
+        ),
+        citation_key="Atkinson89",
+        authors=("Atkinson, K. E.",),
+        year=1989,
+        title="An Introduction to Numerical Analysis",
+        published_in="John Wiley & Sons",
     )

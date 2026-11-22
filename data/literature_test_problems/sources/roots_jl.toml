@@ -1,6 +1,6 @@
 title = 'Roots.jl (2026): the derivative-free and benchmark test problems of v3.0.11'
 reference = '''
-Roots.jl v3.0.11, the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test, MIT license. The functions of the rows are in 2 files:
+Roots.jl v3.0.11 (2026), the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test, MIT license. The functions of the rows are in 2 files:
 - `test/test_derivative_free.jl`, https://github.com/JuliaMath/Roots.jl/blob/v3.0.11/test/test_derivative_free.jl
 - `test/runbenchmarks.jl`, https://github.com/JuliaMath/Roots.jl/blob/v3.0.11/test/runbenchmarks.jl
 

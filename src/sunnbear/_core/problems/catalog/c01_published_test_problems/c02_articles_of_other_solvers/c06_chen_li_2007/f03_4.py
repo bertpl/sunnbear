@@ -1,4 +1,4 @@
-"""This module holds a formula of Chen, Li (2006).
+"""This module holds a formula of Chen, Li (2007).
 
 The formula comes from the row with the key ``4`` in the survey of published test problems.
 """
@@ -14,8 +14,8 @@ from sunnbear._core.problems.core import (
 )
 
 
-class ChenLi20064(Formula):
-    """This formula comes from Chen, Li (2006).
+class ChenLi20074(Formula):
+    """This formula comes from Chen, Li (2007).
 
     The survey writes the source's function as ``x*exp(-x) - 0.1``; the formula's interval is ``[0, 1]``.
 

@@ -1,6 +1,6 @@
-title = 'Chen, Li (2006): exponential regula falsi methods'
+title = 'Chen, Li (2007): exponential regula falsi methods'
 reference = '''
-Chen, J., Li, W. (2007). An improved exponential regula falsi methods with quadratic convergence of both diameter and point for solving nonlinear equations. Applied Numerical Mathematics 57(1), 80–88. Published online 14 February 2006. https://doi.org/10.1016/j.apnum.2006.01.001. The article prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The year 2006 of the title follows the online date that the article prints; the issue is dated 2007.
+Chen, J., Li, W. (2007). An improved exponential regula falsi methods with quadratic convergence of both diameter and point for solving nonlinear equations. Applied Numerical Mathematics 57(1), 80–88. Published online 14 February 2006. https://doi.org/10.1016/j.apnum.2006.01.001. The article prints the volume and the year 2007 but no issue number; the issue number is Crossref's. The survey lists the article under 2006, the year of the online date that the article prints; the issue is dated 2007.
 '''
 year = 2006
 subcategory = '1.2'
@@ -26,7 +26,7 @@ The article cites the 1992 and 1993 articles only for the convergence of the dia
 
 [[relations]]
 sources = ['2005_parida_gupta']
-text = 'Example 3 is Example 3 of Parida & Gupta (2005), on the same interval; the 2 articles share no other function.'
+text = 'Example 3 is Example 3 of Parida & Gupta (2006), on the same interval; the 2 articles share no other function.'
 
 [[relations]]
 sources = ['2012_suhadolnik']

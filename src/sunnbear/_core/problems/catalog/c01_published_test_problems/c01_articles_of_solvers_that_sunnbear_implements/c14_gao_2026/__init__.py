@@ -18,5 +18,11 @@ class Gao2026(FormulaCategory):
         citation=(
             "Gao, F. (2026). Fast and stable root-finding using clipped power interpolations. Applied Mathematics"
             " Letters 178, 109928. https://doi.org/10.1016/j.aml.2026.109928."
-        )
+        ),
+        citation_key="Gao26",
+        authors=("Gao, F.",),
+        year=2026,
+        title="Fast and stable root-finding using clipped power interpolations",
+        published_in="Applied Mathematics Letters",
+        doi="10.1016/j.aml.2026.109928",
     )

@@ -15,9 +15,14 @@ class Gsl2024(FormulaCategory):
     )
     publication = Publication(
         citation=(
-            "GNU Scientific Library (GSL), release 2.8, files `roots/test_funcs.c` and `roots/test.c` (copyright"
-            " Reid Priedhorsky, Brian Gough),"
+            "GNU Scientific Library (GSL), release 2.8 (2024), files `roots/test_funcs.c` and `roots/test.c`"
+            " (copyright Reid Priedhorsky, Brian Gough),"
             " https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite no source"
             " for their functions."
-        )
+        ),
+        citation_key="GSL24",
+        authors=("Reid Priedhorsky", "Brian Gough"),
+        year=2024,
+        title="GNU Scientific Library (GSL)",
+        url="https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8",
     )

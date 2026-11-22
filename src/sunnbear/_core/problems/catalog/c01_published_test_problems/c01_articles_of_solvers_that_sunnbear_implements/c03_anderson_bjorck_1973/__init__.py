@@ -18,5 +18,11 @@ class AndersonBjorck1973(FormulaCategory):
         citation=(
             "Anderson, N., Björck, Å. (1973). A new high order method of regula falsi type for computing a root"
             " of an equation. BIT 13(3), 253–264. https://doi.org/10.1007/BF01951936."
-        )
+        ),
+        citation_key="Anderson73",
+        authors=("Anderson, N.", "Björck, Å."),
+        year=1973,
+        title="A new high order method of regula falsi type for computing a root of an equation",
+        published_in="BIT",
+        doi="10.1007/BF01951936",
     )

@@ -16,5 +16,11 @@ class Ridders1979(FormulaCategory):
             "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous function."
             " IEEE Transactions on Circuits and Systems 26(11), 979–980."
             " https://doi.org/10.1109/TCS.1979.1084580."
-        )
+        ),
+        citation_key="Ridders79",
+        authors=("Ridders, C. J. F.",),
+        year=1979,
+        title="A new algorithm for computing a single root of a real continuous function",
+        published_in="IEEE Transactions on Circuits and Systems",
+        doi="10.1109/TCS.1979.1084580",
     )

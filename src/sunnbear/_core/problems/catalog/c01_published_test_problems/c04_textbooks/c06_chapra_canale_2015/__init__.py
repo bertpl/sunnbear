@@ -47,5 +47,10 @@ class ChapraCanale2015(FormulaCategory):
         citation=(
             "Chapra, S. C., Canale, R. P. (2015). Numerical Methods for Engineers, 7th edition. McGraw-Hill"
             " Education, New York, NY. ISBN 978-0-07-339792-4. The 8th edition appeared in 2021."
-        )
+        ),
+        citation_key="Chapra15",
+        authors=("Chapra, S. C.", "Canale, R. P."),
+        year=2015,
+        title="Numerical Methods for Engineers",
+        published_in="McGraw-Hill Education",
     )

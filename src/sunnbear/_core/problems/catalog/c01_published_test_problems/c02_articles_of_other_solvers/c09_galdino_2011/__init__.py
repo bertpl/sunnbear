@@ -16,5 +16,11 @@ class Galdino2011(FormulaCategory):
             "Galdino, S. (2011). A family of regula falsi root-finding methods. Proceedings of the 2011 World"
             " Congress on Engineering and Technology, IEEE Press, Shanghai, pp. 514–517. ISBN 978-1-61284-365-0."
             " No DOI; the author's copy: http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543."
-        )
+        ),
+        citation_key="Galdino11",
+        authors=("Galdino, S.",),
+        year=2011,
+        title="A family of regula falsi root-finding methods",
+        published_in="Proceedings of the 2011 World Congress on Engineering and Technology",
+        url="http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543",
     )

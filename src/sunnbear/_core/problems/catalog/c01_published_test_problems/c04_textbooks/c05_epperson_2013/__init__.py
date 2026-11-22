@@ -42,5 +42,10 @@ class Epperson2013(FormulaCategory):
         citation=(
             "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley &"
             " Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
-        )
+        ),
+        citation_key="Epperson13",
+        authors=("Epperson, J. F.",),
+        year=2013,
+        title="An Introduction to Numerical Methods and Analysis",
+        published_in="John Wiley & Sons",
     )
