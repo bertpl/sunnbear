@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add parameter conditions and structured publications to the formula catalog, and give the published formulas readable names
+
 ### Changed
 
 ### Deprecated
