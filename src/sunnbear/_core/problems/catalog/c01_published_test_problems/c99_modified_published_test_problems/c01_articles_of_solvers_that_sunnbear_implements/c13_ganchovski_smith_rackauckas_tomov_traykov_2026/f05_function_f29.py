@@ -48,6 +48,9 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF29(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3\right)^{5}\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function with a root of multiplicity 5 and a steep rise toward the upper bound of the wide interval."
+        ),
         notes=(
             (
                 r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without the cancellation that makes the "

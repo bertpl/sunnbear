@@ -44,6 +44,7 @@ class ModifiedFord1997Function1(Formula):
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(200/0.004)}"),),
         expression=r"\sin{\left(\frac{0.01}{\tmp{u}} \right)} - 0.01",
         interval="[0.004, 200]",
+        summary="A function with a maximum of 0.99 near the lower bound and 1 root, where the slope is about $-0.01$.",
         notes=(
             (
                 r"$\c$ scales x, so that the root moves by the factor $(200/0.004)^{\c}$ and never reaches "

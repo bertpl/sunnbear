@@ -37,6 +37,7 @@ class ModifiedMoler2004Section11(Formula):
         definitions=((r"\tmp{u}", r"\x - 3.96 \c"),),
         expression=r"\frac{1}{\tmp{u}} - \left(\tmp{u} - 1\right)",
         interval="[0.04, 4]",
+        summary="A decreasing function with a pole 0.04 below the lower bound and 1 root, the golden ratio.",
         notes=("The interval starts at 0.04, not at the published 0, where the function divides by 0.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X

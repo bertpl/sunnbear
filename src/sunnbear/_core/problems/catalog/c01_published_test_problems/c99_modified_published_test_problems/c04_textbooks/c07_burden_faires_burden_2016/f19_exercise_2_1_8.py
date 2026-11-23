@@ -39,6 +39,10 @@ class ModifiedBurdenFairesBurden2016Exercise218(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.6 \c"),),
         expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
         interval="[4, 4.6]",
+        summary=(
+            r"A decreasing function with 1 simple root, steep next to the upper bound because of the pole at $\x = "
+            r"3\pi/2$."
+        ),
         notes=(
             (
                 "The interval ends at 4.6, not at the published 5, so that it holds the root and no pole. "

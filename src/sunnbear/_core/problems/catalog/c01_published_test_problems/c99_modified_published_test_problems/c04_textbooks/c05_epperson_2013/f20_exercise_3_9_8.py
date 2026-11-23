@@ -37,6 +37,7 @@ class ModifiedEpperson2013Exercise398(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
         expression=r"2 \sin{\left(\pi \tmp{u} \right)} + \tmp{u}",
         interval="[1.3, 2]",
+        summary="A function that decreases from the lower bound to a minimum and then increases through 1 simple root.",
         notes=(
             (
                 "The interval starts at 1.3, not at the published 1, so that it holds 1 of the published "

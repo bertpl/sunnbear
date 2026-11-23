@@ -41,6 +41,10 @@ class ModifiedRootsJl2026FunctionFunc10(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
         expression=r"\arcsin{\left(\tmp{u}^{2} - 1 \right)} - \frac{\tmp{u}}{2} + 1",
         interval="[-0.2, 1]",
+        summary=(
+            "A function with 1 root and a kink at the function's minimum, where the argument of the arcsine reaches "
+            "$-1$, the edge of the arcsine's domain."
+        ),
         notes=(
             (
                 "The interval starts at $-0.2$, not at the published $-0.5$, so that it holds 1 of the "

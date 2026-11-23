@@ -44,18 +44,18 @@ class ModifiedChapraCanale2015EquationPt23(Formula):
     ``-expm1(-(x/m)*t)`` computes ``1 - exp(-(x/m)*t)`` without the subtraction; the subtraction of ``v`` stays, because
     it is the function's definition: the velocity after ``t`` seconds minus ``v``.
 
-    The subtraction of ``v`` still leaves f exactly 0 at x-values at most about 8 float64 values away from the root, so
-    that bisection can still stop early for some values of ``c``. The formula modifies the function no further, because
-    no equivalent form removes the subtraction of ``v``.
+    The subtraction of ``v`` still leaves f exactly 0 at x-values up to about 30 float64 values away from the root,
+    so that bisection can still stop early for some values of ``c``. The formula modifies the function no further,
+    because no equivalent form removes the subtraction of ``v``.
     """
 
     number = (1, 99, 4, 6, 1)
     name = "Equation (PT2.3)"
     params = (
-        FormulaParam("g", latex_symbol="g"),
-        FormulaParam("m", latex_symbol="m"),
-        FormulaParam("v", latex_symbol="v"),
-        FormulaParam("t", latex_symbol="t"),
+        FormulaParam("g", latex_symbol="g", meaning=r"The gravitational acceleration, in $\mathrm{m/s^2}$."),
+        FormulaParam("m", latex_symbol="m", meaning="The parachutist's mass, in kg."),
+        FormulaParam("v", latex_symbol="v", meaning="The target velocity, in m/s."),
+        FormulaParam("t", latex_symbol="t", meaning="The duration of the free fall, in s."),
     )
     location_in_publication = (
         "Eqs. (PT2.3), (PT2.4); Examples 5.1, 5.3–5.5; Fig. 5.1, 5.6, 5.7, 5.13; Prob. 5.14, 5.21, 5.23,"
@@ -68,6 +68,10 @@ class ModifiedChapraCanale2015EquationPt23(Formula):
             r"\frac{\tmp{u}}{\param{m}} \param{t}\right)\right) - \param{v}"
         ),
         interval="[3, 5]",
+        summary=(
+            "A decreasing function with 1 simple root, the drag coefficient at which a falling parachutist "
+            r"reaches a target velocity after $\param{t}$ seconds."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$\frac{\param{g} \param{m}}{\tmp{u}} "

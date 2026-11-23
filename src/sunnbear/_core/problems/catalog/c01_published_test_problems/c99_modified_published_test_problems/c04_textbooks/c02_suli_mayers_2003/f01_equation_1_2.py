@@ -65,6 +65,10 @@ class ModifiedSuliMayers2003Equation12(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{1}{2} - \frac{1}{1 + \param{M} \left|(\tmp{u} + 1.05) - 1.05\right|}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A decreasing function with 1 simple root at the interval's midpoint, except on $[-10^{-5}, 0]$ for "
+            r"$\param{M} \geq 2 \cdot 10^{6}$, where the root lies within $5 \cdot 10^{-7}$ of the upper bound."
+        ),
         notes=(
             (
                 r"The expression is the published function evaluated at $\tmp{u} + 1.05$, which moves the "

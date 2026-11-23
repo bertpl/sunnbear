@@ -34,6 +34,10 @@ class ModifiedEllithy2026Problem21(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
         expression=r"\left(\tmp{u}^{2} - 4\right) \left(\tmp{u} + 1.5\right) \left(\tmp{u} - 0.5\right)",
         interval="[0, 1.98]",
+        summary=(
+            "A quartic that dips below 0 between a simple root inside the interval and a second root just above the "
+            "upper bound."
+        ),
         notes=(
             (
                 "The interval ends at 1.98, not at the published 2, which is a root, so that the function "

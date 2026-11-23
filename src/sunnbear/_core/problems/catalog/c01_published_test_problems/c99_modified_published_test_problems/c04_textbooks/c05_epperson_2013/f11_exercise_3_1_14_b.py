@@ -36,6 +36,7 @@ class ModifiedEpperson2013Exercise3114B(Formula):
             r"\begin{cases} 0 & \text{if } \tmp{u} = 1 \\ \frac{1}{\tmp{u} - 1} & \text{otherwise} " r"\end{cases}"
         ),
         interval="[0, 3]",
+        summary=r"A hyperbola that changes sign only at the pole, jumping from $-\infty$ to $+\infty$.",
         notes=(
             (
                 r"The expression is 0 at the pole, $\tmp{u} = 1$ in float64, where the published function "

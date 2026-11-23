@@ -36,6 +36,7 @@ class ModifiedRootsFortran2025Case86(Formula):
     presentation = FormulaPresentation(
         expression=r"\left(\left(\x - 13.0\right) \x + 47.0\right) \x - 36.0 - \sqrt{\x} + \c",
         interval="[0, 2]",
+        summary=r"A cubic minus $\sqrt{\x}$, with 1 root and an infinite slope at the lower bound.",
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "

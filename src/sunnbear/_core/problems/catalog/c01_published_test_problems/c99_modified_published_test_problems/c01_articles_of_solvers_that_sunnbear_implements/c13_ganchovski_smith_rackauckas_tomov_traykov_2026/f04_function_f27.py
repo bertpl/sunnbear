@@ -43,6 +43,10 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",
         interval="[1, 3]",
+        summary=(
+            "A function that changes sign at a root of multiplicity 4 and is still only about $10^{-4}$ in magnitude at"
+            " 0.1 from that root."
+        ),
         notes=(
             (
                 "The expression equals the published function, $$(81 - p(108 - p(54 - p(12 - p)))) "

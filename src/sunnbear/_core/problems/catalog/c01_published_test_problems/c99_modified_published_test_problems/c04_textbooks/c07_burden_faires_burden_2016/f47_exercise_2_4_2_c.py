@@ -46,6 +46,7 @@ class ModifiedBurdenFairesBurden2016Exercise242C(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - e^{- \tmp{u}}\right)^{3}",
         interval="[3, 4]",
+        summary="A decreasing cube, below $10^{-3}$ in magnitude from the lower bound to 0.1 past the triple root.",
         notes=(
             (
                 r"The expression equals the published function, $$\sin^{3}{\left(\tmp{u} \right)} + 3 e^{- "

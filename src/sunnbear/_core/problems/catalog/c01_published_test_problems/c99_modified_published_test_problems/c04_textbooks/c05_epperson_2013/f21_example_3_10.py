@@ -37,6 +37,10 @@ class ModifiedEpperson2013Example310(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{4} - \tmp{u} - 1",
         interval="[-2, 1]",
+        summary=(
+            "A convex quartic that falls steeply from the lower bound through 1 simple root to a minimum near "
+            "the upper bound."
+        ),
         notes=(
             (
                 "The interval ends at 1, not at the published 2, so that it holds 1 of the published "

@@ -43,6 +43,10 @@ class ModifiedBradie2006Example210(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"2 \tmp{u} \sin^{2}{\left(\frac{\tmp{u}}{2} \right)}",
         interval="[-2, 1]",
+        summary=(
+            "An odd function with a triple root, around which the function is below $10^{-3}$ in magnitude on a band "
+            "0.25 wide."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$\tmp{u} \left(1 - \cos{\left(\tmp{u} "

@@ -58,6 +58,10 @@ class ModifiedChandrupatla1997Function2(Formula):
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(\param{b}/\param{a})}"),),
         expression=r"1 - \frac{1}{\tmp{u}^{2}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An increasing function with 1 root, steep near the lower bound because of a pole at $\x = 0$, and within "
+            r"0.01 of 1 above $\x = 10$."
+        ),
         notes=(
             (
                 r"$\c$ scales x, so that the root moves by the factor $(\param{b}/\param{a})^{\c}$ and "

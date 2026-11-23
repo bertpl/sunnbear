@@ -41,6 +41,10 @@ class ModifiedGaldino2011FunctionF4(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",
         interval="[1, 2]",
+        summary=(
+            r"A function that changes sign at its root of multiplicity 4, with values below $2 \cdot 10^{-4}$ between "
+            "that root and the upper bound."
+        ),
         notes=(
             (
                 "The expression equals the published function, $$(81 - p(108 - p(54 - p(12 - p)))) "

@@ -38,6 +38,7 @@ class ModifiedEpperson2013Exercise313H(Formula):
         definitions=((r"\tmp{u}", r"\x - 3.11 \c"),),
         expression=r"\tmp{u}^{2} - \sin{\left(\tmp{u} \right)}",
         interval=r"[0.03, \pi]",
+        summary=r"A convex function with 1 simple root on the interval and a second simple root at $\x = 0$.",
         notes=(
             (
                 "The interval starts at 0.03, not at the published 0, which is a root, so that the "

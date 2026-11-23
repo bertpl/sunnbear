@@ -37,6 +37,7 @@ class ModifiedAtkinson1989Problem38A(Formula):
         definitions=((r"\tmp{u}", r"\x - 7 \c"),),
         expression=r"\tmp{u}^{4} - 5.7 \tmp{u}^{3} - 0.47 \tmp{u}^{2} + 29.865 \tmp{u} - 26.1602",
         interval="[-3, 4]",
+        summary="A quartic with 3 simple roots, the upper 2 on either side of a local maximum of 3.6.",
         notes=(
             (
                 "The interval ends at 4, not at the published 5, so that it holds 3 of the published "

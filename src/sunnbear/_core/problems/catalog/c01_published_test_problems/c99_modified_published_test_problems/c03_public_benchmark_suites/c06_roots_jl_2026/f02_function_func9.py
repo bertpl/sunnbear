@@ -47,6 +47,10 @@ class ModifiedRootsJl2026FunctionFunc9(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.7 \c"),),
         expression=r"\tanh{\left(\tmp{u} \right)} - \tan{\left(\tmp{u} \right)}",
         interval="[5, 7.7]",
+        summary=(
+            "A hyperbolic tangent minus a tangent, decreasing through 1 root, and steep toward both bounds, which lie "
+            "near poles of the tangent."
+        ),
         notes=(
             (
                 "The interval ends at 7.7, not at the published 12, so that it holds 1 root and no pole: "

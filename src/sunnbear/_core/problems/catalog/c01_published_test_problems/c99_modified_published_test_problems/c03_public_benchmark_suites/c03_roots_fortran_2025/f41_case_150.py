@@ -38,6 +38,7 @@ class ModifiedRootsFortran2025Case150(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3.0\right)^{5}\right)",
         interval="[2.6, 3.6]",
+        summary="A function that stays below $10^{-4}$ in magnitude within 0.15 of its root of multiplicity 5.",
         notes=(
             (
                 r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without the cancellation that makes the "

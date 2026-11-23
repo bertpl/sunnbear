@@ -41,6 +41,9 @@ class ModifiedBurdenFairesBurden2016Exercise241C(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 2^{- \tmp{u}}\right)^{3}",
         interval="[0, 1]",
+        summary=(
+            "An increasing cube that stays below $10^{-3}$ in magnitude on a band 0.14 wide around the triple root."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$\tmp{u}^{3} - 3 \tmp{u}^{2} \cdot 2^{- "

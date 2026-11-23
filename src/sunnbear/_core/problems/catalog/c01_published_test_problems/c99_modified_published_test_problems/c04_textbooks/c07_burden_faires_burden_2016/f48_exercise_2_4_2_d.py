@@ -43,6 +43,10 @@ class ModifiedBurdenFairesBurden2016Exercise242D(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(e^{\tmp{u}} - 3 \tmp{u}^{2}\right)^{3}",
         interval="[3, 5]",
+        summary=(
+            "An increasing cube, below 1 in magnitude only on a band 0.1 wide around the triple root, and near "
+            r"$4 \cdot 10^{5}$ at the upper bound."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$e^{3 \tmp{u}} - 27 \tmp{u}^{6} + 27 "

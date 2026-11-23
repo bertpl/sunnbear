@@ -42,6 +42,7 @@ class ModifiedMoler2004Section48(Formula):
         definitions=((r"\tmp{u}", r"\x - 30 \c"),),
         expression=r"J_{0}\left(\tmp{u}\right)",
         interval="[0, 30]",
+        summary="The Bessel function $J_0$, an oscillation of decaying amplitude, with 9 simple roots.",
         notes=(
             (
                 r"The interval ends at 30, not at the published $10\pi$, so that it holds 9 of the "

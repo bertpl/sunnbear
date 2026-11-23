@@ -44,6 +44,7 @@ class ModifiedBurkardt2016ProblemP04(Formula):
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(20/10^{-5})}"),),
         expression=r"e^{\tmp{u}} - \frac{1.0}{100.0 \tmp{u} \tmp{u}}",
         interval="[10^{-5}, 20]",
+        summary=r"An increasing function with 1 root, steep next to the lower bound because of a pole at $\x = 0$.",
         notes=(
             (
                 r"$\c$ scales x, so that the root moves by the factor $(20/10^{-5})^{\c}$ and never "

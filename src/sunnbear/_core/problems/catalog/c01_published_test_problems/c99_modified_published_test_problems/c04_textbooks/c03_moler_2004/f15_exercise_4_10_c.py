@@ -40,6 +40,7 @@ class ModifiedMoler2004Exercise410C(Formula):
         definitions=((r"\tmp{u}", r"\x - 29.4 \c"),),
         expression=r"J_{0}\left(\tmp{u}\right) - Y_{0}\left(\tmp{u}\right)",
         interval=r"[2, 10 \pi]",
+        summary="A function with 9 simple roots and an oscillation of decaying amplitude.",
         notes=(
             (
                 "The interval starts at 2, not at the published 0, where $Y_0$ is not finite, so that it "

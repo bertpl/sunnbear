@@ -45,6 +45,7 @@ class ModifiedBurdenFairesBurden2016Exercise213(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.8 \c"),),
         expression=r"\left(\tmp{u} - 3\right) \left(\left(\tmp{u} - 2\right)^{2} - 2\right)",
         interval="[3.2, 4]",
+        summary="A cubic with 1 simple root and a shallow minimum of $-0.11$ next to the lower bound.",
         notes=(
             (
                 r"The expression equals the published function, $$\tmp{u}^{3} - 7 \tmp{u}^{2} + 14 \tmp{u} "

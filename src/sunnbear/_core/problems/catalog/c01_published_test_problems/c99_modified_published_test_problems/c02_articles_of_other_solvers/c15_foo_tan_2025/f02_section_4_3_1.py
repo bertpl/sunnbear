@@ -41,7 +41,7 @@ class ModifiedFooTan2025Section431(Formula):
     number = (1, 99, 2, 15, 2)
     name = "Section 4.3.1"
     params = (
-        FormulaParam("q", latex_symbol="q"),
+        FormulaParam("q", latex_symbol="q", meaning=r"The alphabet size of the $\param{q}$-ary entropy."),
         FormulaParam("y", latex_symbol="y"),
     )
     location_in_publication = "Section 4.3.1"
@@ -54,6 +54,10 @@ class ModifiedFooTan2025Section431(Formula):
             r"\end{cases}}{\ln{\left(\param{q} \right)}} - \param{y} + \c"
         ),
         interval="[0, 1]",
+        summary=(
+            r"The $\param{q}$-ary entropy function minus $\param{y}$, at most 0.008 above the line $\x - \param{y}$, "
+            r"with 1 root just below $\param{y}$."
+        ),
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "
