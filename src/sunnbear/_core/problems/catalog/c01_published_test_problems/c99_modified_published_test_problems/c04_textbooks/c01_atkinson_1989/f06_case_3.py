@@ -38,6 +38,9 @@ class ModifiedAtkinson1989Case3(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{3}",
         interval="[0, 3]",
+        summary=(
+            "A function with a triple root and values below $10^{-3}$ in magnitude on a band 0.2 wide around that root."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$-1 + \tmp{u} \left(3 + \tmp{u} \left(-3 "

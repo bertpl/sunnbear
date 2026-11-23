@@ -75,6 +75,10 @@ class ModifiedBradie2006Section21Page67(Formula):
             r"\left(\param{goal} - \param{initial_investment}\right) & \text{otherwise} \end{cases}"
         ),
         interval="[0.01, 0.1]",
+        summary=(
+            "A savings balance minus a goal as a slightly convex function of the annual interest rate, with 1 simple "
+            "root in the lower half of the interval."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$\param{initial_investment} \left(1 + "

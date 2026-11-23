@@ -63,6 +63,10 @@ class ModifiedChandrupatla1997Function7(Formula):
         ),
         expression=r"\fn{g}(\tmp{u}) + 2^{-918} \, \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function so flat at its root that the function stays below $10^{-270}$ in magnitude on a band 0.08 wide "
+            "around that root."
+        ),
         notes=(
             (
                 r"The term $2^{-918} \, \tmp{u}$ keeps the function from being exactly 0 within about 0.04 "

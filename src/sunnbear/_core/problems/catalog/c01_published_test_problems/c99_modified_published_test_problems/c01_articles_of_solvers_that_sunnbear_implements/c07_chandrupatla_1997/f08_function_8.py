@@ -52,6 +52,10 @@ class ModifiedChandrupatla1997Function8(Formula):
             r"\param{xi}\right) e^{- \tmp{u}}} - 1013 + \frac{1628}{\tmp{u}}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A decreasing function with 1 root and a pole just below the lower bound, leveling off toward $-1013$ on "
+            "the 2 widest intervals."
+        ),
         notes=(
             (
                 r"$\c$ scales x, so that the root moves by the factor $(\param{b}/\param{a})^{\c}$ and "

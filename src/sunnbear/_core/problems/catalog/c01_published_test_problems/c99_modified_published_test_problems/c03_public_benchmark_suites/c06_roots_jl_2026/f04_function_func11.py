@@ -40,6 +40,10 @@ class ModifiedRootsJl2026FunctionFunc11(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 1]",
+        summary=(
+            "An exponential minus a cosine, steep toward the lower bound, with 1 root and a shallow minimum between "
+            "that root and the upper bound."
+        ),
         notes=(
             (
                 "The interval ends at 1, not at the published 2, so that it holds 1 of the published "

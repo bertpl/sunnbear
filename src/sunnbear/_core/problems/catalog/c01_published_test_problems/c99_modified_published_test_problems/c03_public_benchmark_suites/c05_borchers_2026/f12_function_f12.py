@@ -69,6 +69,10 @@ class ModifiedBorchers2026FunctionF12(Formula):
             r"\text{otherwise} \end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "An increasing function so flat at its triple root that the function stays below $10^{-5}$ in magnitude "
+            "within 0.05 of that root."
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$\ln{\left(\tmp{u} \right)} + "

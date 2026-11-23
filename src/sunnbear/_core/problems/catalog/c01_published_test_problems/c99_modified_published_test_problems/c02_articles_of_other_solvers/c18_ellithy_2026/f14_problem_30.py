@@ -43,6 +43,10 @@ class ModifiedEllithy2026Problem30(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
         expression=r"\prod_{i=1}^{20} (\tmp{u} - i)",
         interval="[19.02, 21]",
+        summary=(
+            "Wilkinson's polynomial, above $10^{15}$ in magnitude over most of the interval, with 1 root inside it and "
+            "another just below the lower bound."
+        ),
         notes=(
             (
                 "The interval starts at 19.02, not at the published 19, which is a root, so that the "

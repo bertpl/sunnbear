@@ -43,6 +43,7 @@ class ModifiedMoler2004Exercise43(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(17 \tmp{u} - 25\right) \left(16 \tmp{u} - 25\right) \left(3 \tmp{u} - 5\right)",
         interval="[1, 2]",
+        summary="A cubic with 3 simple roots about 0.1 apart, between which the cubic stays within 0.33 of 0.",
         notes=(
             (
                 r"The expression equals the published function, $$816 \tmp{u}^{3} - 3835 \tmp{u}^{2} + "

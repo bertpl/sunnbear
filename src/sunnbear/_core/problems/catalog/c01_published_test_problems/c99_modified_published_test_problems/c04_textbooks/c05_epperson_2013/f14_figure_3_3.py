@@ -41,6 +41,10 @@ class ModifiedEpperson2013Figure33(Formula):
             r"\frac{4 e^{2 - \frac{\tmp{u}}{2}} \left(1 + \frac{\ln{\left(\tmp{u} " r"\right)}}{\tmp{u}}\right)}{3}"
         ),
         interval="[0.08, 8]",
+        summary=(
+            "A function that rises steeply from $-289$ at the lower bound through 1 simple root to a maximum, "
+            "and then decays toward 0."
+        ),
         notes=(
             (r"The interval starts at 0.08, not at the published 0, where $\ln(\tmp{u})/\tmp{u}$ is not " "finite."),
         ),

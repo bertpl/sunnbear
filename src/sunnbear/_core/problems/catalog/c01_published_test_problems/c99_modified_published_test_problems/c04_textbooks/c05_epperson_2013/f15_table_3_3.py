@@ -39,6 +39,10 @@ class ModifiedEpperson2013Table33(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.19 \c"),),
         expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
         interval="[0.01, 0.2]",
+        summary=(
+            r"An increasing hyperbola with 1 simple root, steep next to the lower bound because of the pole at $\x = "
+            r"0$."
+        ),
         notes=(
             (
                 "The interval starts at 0.01, the lower bound of the source's other interval, not at the "

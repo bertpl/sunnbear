@@ -47,7 +47,14 @@ class ModifiedBurkardt2016ProblemP12(Formula):
     number = (1, 99, 3, 1, 12)
     name = "Problem p12"
     params = (
-        FormulaParam("factor", latex_symbol=r"\mathit{factor}"),
+        FormulaParam(
+            "factor",
+            latex_symbol=r"\mathit{factor}",
+            meaning=(
+                r"The scale of $\fn{g}$: for $\x \neq 1$, "
+                r"$\fn{g}(\x) = \param{factor} (\x - 1) e^{-1/(\x - 1)^2}$."
+            ),
+        ),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
@@ -68,6 +75,10 @@ class ModifiedBurkardt2016ProblemP12(Formula):
         ),
         expression=r"\fn{g}(\tmp{u}) + 2^{-918} (\tmp{u} - 1)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function so flat at its root that the function stays below $10^{-270}$ in magnitude on a band 0.08 wide "
+            'around that root, referred to in the source as "Flat Stanley".'
+        ),
         notes=(
             (
                 r"The term $2^{-918} (\tmp{u} - 1)$ keeps the function from being exactly 0 within about "

@@ -44,6 +44,10 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF75(Formula):
             r"81}{1 + \sqrt{1 - \left(3 \tmp{u} - 1\right)^{2} / 81}}"
         ),
         interval="[-1, 1]",
+        summary=(
+            "A pair of elliptical arcs that cross 0 at the root with a slope of 0, referred to in the source as "
+            '"Circles".'
+        ),
         notes=(
             (
                 r"The expression equals the published function, $$\operatorname{sign}{\left(3 \tmp{u} - 1 "

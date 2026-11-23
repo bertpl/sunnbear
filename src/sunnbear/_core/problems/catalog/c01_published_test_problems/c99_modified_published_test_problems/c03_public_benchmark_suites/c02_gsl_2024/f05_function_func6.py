@@ -41,6 +41,7 @@ class ModifiedGsl2024FunctionFunc6(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.0007 \c"),),
         expression=r"\tmp{u}^{7}",
         interval="[-0.0005, 0.0002]",
+        summary="A 7th power on an interval so narrow that the function stays below $10^{-23}$ in magnitude there.",
         notes=(
             (
                 r"The expression is the published function, $(\x - 1)^7$, evaluated at $\x + 1$, on the "

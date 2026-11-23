@@ -47,6 +47,10 @@ class ModifiedSuliMayers2003Equation133(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A parabola whose roots, the fixed points of the logistic map, are $\x = 1 - 1/\param{a_}$ and $\x = 0$, "
+            "just below the lower bound."
+        ),
         notes=(
             (
                 "The interval starts at 0.01, not at the published 0, which is a root, so that the "

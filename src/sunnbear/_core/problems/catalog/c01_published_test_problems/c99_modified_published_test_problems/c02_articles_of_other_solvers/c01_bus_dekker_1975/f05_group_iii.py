@@ -48,6 +48,7 @@ class ModifiedBusDekker1975GroupIii(Formula):
         definitions=((r"\tmp{u}", r"\x - 11 \c"),),
         expression=r"\tmp{u}^{\param{n}} + 2^{-918} \, \tmp{u}",
         interval="[-1, 10]",
+        summary="An odd function, below 0.01 in magnitude within 0.83 of its root.",
         notes=(
             (
                 r"The term $2^{-918} \, \tmp{u}$ keeps the function from being exactly 0 within about "

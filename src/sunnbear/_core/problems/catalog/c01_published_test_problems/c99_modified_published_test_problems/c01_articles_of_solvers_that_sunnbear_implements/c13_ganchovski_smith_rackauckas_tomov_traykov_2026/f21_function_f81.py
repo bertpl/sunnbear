@@ -46,6 +46,10 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF81(Formula):
             r"\\-1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1.02, 1]",
+        summary=(
+            r"A function negative only up to $\x = -1$ and, above that point, oscillating ever faster toward $\x = -1$ "
+            r'and touching 0 infinitely often, referred to in the source as "Warsaw".'
+        ),
         notes=(
             (
                 "The interval starts at $-1.02$, not at the published $-1$, where the function jumps from "

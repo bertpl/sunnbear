@@ -66,6 +66,10 @@ class ModifiedChapraCanale2015Problem510(Formula):
             r"\tmp{t}\right)\right)\right)"
         ),
         interval="[4.5, 6]",
+        summary=(
+            "A quartic with 1 simple root on the interval and, left of that root, a local maximum of $-1$ and a "
+            "local minimum only 0.12 lower."
+        ),
         notes=(
             (
                 r"The expression is the Taylor expansion of the published polynomial, $$\tmp{u}^{4} - 8 "

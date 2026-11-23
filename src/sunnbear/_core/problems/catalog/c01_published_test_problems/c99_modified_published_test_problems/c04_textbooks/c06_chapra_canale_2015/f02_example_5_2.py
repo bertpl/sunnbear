@@ -52,6 +52,10 @@ class ModifiedChapraCanale2015Example52(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\sin{\left(10 \tmp{u} \right)} + \cos{\left(3 \tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "An oscillating function with 5 simple roots on $[3.3, 5]$, including a pair only 0.035 apart, and "
+            "on $[4.2, 4.26]$ only the lower root of that pair."
+        ),
         notes=(
             (
                 "The intervals are the published $[3, 5]$ and $[4.2, 4.3]$, narrowed to $[3.3, 5]$ and "

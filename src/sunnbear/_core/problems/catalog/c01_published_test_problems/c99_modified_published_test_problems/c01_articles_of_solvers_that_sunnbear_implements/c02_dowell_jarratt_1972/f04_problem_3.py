@@ -42,6 +42,10 @@ class ModifiedDowellJarratt1972Problem3(Formula):
     presentation = FormulaPresentation(
         expression=r"\sum_{n=-\infty}^{\infty} (-1)^n \x^{(3n^2 + n)/2} - 1 + \c",
         interval="[-0.9999, -0.0001]",
+        summary=(
+            r"The Euler function $\prod_{k \ge 1} (1 - \x^k)$ minus 1, nearly flat at $-1$ next to the lower bound, "
+            r"with 1 root and a second just past the upper bound."
+        ),
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "

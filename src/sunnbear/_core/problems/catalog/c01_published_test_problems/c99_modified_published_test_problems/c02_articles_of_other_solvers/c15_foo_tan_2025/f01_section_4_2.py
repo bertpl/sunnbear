@@ -46,6 +46,10 @@ class ModifiedFooTan2025Section42(Formula):
             r"\param{y} + \c"
         ),
         interval="[0, 0.5]",
+        summary=(
+            r"The binary entropy function minus $\param{y}$, with 1 root, 0.013 above the lower bound at $\param{y} = "
+            r"0.1$, and a slope that grows like $-\log_2(\x)$ toward that bound."
+        ),
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "

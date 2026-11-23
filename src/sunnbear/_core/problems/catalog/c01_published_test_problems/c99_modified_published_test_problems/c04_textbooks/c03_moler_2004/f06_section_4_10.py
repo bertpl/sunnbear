@@ -40,6 +40,9 @@ class ModifiedMoler2004Section410(Formula):
             r"\frac{1}{\left(\tmp{u} - 0.3\right)^{2} + 0.01} + \frac{1}{\left(\tmp{u} - " r"0.9\right)^{2} + 0.04} - 6"
         ),
         interval="[-1, 1]",
+        summary=(
+            'A function with 2 steep peaks and 1 simple root left of the peaks, referred to in the source as "humps".'
+        ),
         notes=(
             (
                 "The interval ends at 1, not at the published 2, so that it holds 1 of the published "

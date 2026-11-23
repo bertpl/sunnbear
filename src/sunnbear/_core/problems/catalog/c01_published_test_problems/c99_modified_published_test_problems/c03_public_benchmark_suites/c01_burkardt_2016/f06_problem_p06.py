@@ -44,6 +44,10 @@ class ModifiedBurkardt2016ProblemP06(Formula):
             r"\tmp{u}\right)^{3}}"
         ),
         interval="[0.08, 20]",
+        summary=(
+            r"An increasing function with 1 simple root in the lower 4% of the interval, and values up to about $5 "
+            r"\cdot 10^8$ at the upper bound."
+        ),
         notes=(
             (
                 "The interval starts at 0.08, not at the published $10^{-5}$, so that it holds 1 of the "

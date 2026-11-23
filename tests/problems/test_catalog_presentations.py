@@ -85,7 +85,6 @@ def test_formulas_declare_what_a_reader_sees():
     assert failing == []
 
 
-@pytest.mark.skip(reason="the formulas of category 1 declare no summary")
 def test_formulas_declare_their_summaries():
     """A shipped formula's presentation holds its summary."""
     # --- act --------------------------

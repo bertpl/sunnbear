@@ -38,6 +38,7 @@ class ModifiedMoler2004Function5(Formula):
             r"\begin{cases} 0 & \text{if } \tmp{u} = \pi \\ \frac{1}{\tmp{u} - \pi} & \text{otherwise} " r"\end{cases}"
         ),
         interval="[0, 5]",
+        summary="A hyperbola whose only sign change is a jump through 0 at the pole.",
         notes=(
             (
                 r"The expression is 0 at the pole, $\tmp{u} = \pi$ in float64, where the published "

@@ -58,6 +58,10 @@ class ModifiedGao2026Function7(Formula):
         ),
         expression=r"\fn{g}(\tmp{u}) + 2^{-918} \, \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function so flat at its root that the function stays below $10^{-270}$ in magnitude on a band 0.08 wide "
+            "around that root."
+        ),
         notes=(
             (
                 r"$\fn{g}(\x)$ is 0 for $|\x| < 10^{-100}$, where float64 rounds $\x e^{-1/\x^2}$ to 0 "

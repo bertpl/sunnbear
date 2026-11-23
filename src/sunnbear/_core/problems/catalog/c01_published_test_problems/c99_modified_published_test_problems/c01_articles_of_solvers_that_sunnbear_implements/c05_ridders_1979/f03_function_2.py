@@ -39,6 +39,10 @@ class ModifiedRidders1979Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.48 \c"),),
         expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",
         interval="[0.02, 1.5]",
+        summary=(
+            "A function near $-1000$ over the lower 80% of the interval, rising steeply through 1 root toward a pole "
+            "just past the upper bound."
+        ),
         notes=(
             (
                 "The interval starts at 0.02, not at the published 0, because a shift along x evaluates "

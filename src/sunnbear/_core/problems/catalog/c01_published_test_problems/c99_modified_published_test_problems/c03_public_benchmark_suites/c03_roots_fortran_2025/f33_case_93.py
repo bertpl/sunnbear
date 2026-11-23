@@ -34,6 +34,7 @@ class ModifiedRootsFortran2025Case93(Formula):
     presentation = FormulaPresentation(
         expression=r"\left(\x - 10.0\right) \x + 23.0 - \x^{0.4} + \c",
         interval="[0, 6]",
+        summary=r"A quadratic minus $\x^{0.4}$, with 1 root and an infinite slope at the lower bound.",
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "

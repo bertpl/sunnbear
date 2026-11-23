@@ -37,6 +37,7 @@ class ModifiedGorgeyEtAl2025Equation2(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0.02, 2]",
+        summary="The natural logarithm, steep next to the lower bound.",
         notes=(r"The interval starts at 0.02, not at the published 0, where $\ln(\tmp{u})$ is not finite.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X

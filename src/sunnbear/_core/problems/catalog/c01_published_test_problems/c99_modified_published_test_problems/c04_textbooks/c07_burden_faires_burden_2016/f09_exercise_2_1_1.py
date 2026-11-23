@@ -35,6 +35,7 @@ class ModifiedBurdenFairesBurden2016Exercise211(Formula):
     presentation = FormulaPresentation(
         expression=r"\sqrt{\x} - \cos{\left(\x \right)} + \c",
         interval="[0, 1]",
+        summary="An increasing function with an infinite slope at the lower bound and 1 simple root.",
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "
