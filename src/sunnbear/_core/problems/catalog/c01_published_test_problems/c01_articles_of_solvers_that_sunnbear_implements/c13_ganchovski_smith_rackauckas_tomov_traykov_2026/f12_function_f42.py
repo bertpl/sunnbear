@@ -37,6 +37,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF42(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u}^{2} - \tmp{u} - 6\right) \left(\tmp{u}^{2} - 3 \tmp{u} + 2\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A quartic with the same 3 simple roots on each of its 2 intervals, the highest only 0.14 below $\pi$, the"
+            r" upper bound of the narrow interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

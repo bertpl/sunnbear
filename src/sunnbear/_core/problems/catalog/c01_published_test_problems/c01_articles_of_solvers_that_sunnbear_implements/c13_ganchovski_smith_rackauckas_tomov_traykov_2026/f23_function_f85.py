@@ -28,6 +28,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF85(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - 0.5 \tmp{u} - 0.3",
         interval="[-10, 10]",
+        summary="A sine minus a line, with 3 roots, the upper 2 on either side of a local maximum only 0.042 above 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -38,6 +38,10 @@ class Brent1973Equation42(Formula):
             r"\end{cases}"
         ),
         interval="[-1001200, 0]",
+        summary=(
+            r"An exponential that underflows to exactly 0 in floating point over 99.8% of the interval, continued below"
+            r" $\x = -10^6$ by a parabola that opens downward."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

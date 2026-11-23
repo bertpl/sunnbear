@@ -36,13 +36,35 @@ class SteffenEtAl2025Equation8(Formula):
     number = (1, 1, 11, 2)
     name = "Equation (8)"
     params = (
-        FormulaParam("lambda_", latex_symbol=r"\lambda"),
-        FormulaParam("sigma", latex_symbol=r"\sigma"),
-        FormulaParam("Lambda", latex_symbol=r"\Lambda"),
-        FormulaParam("Gamma", latex_symbol=r"\Gamma"),
-        FormulaParam("omega", latex_symbol=r"\omega"),
-        FormulaParam("Tr", latex_symbol="T_r"),
-        FormulaParam("Pr", latex_symbol="P_r"),
+        FormulaParam(
+            "lambda_",
+            latex_symbol=r"\lambda",
+            meaning=(
+                r"Together with $\param{sigma}$, a constant that selects the cubic equation of state; "
+                "2 for Peng–Robinson."
+            ),
+        ),
+        FormulaParam(
+            "sigma",
+            latex_symbol=r"\sigma",
+            meaning=(
+                r"Together with $\param{lambda_}$, a constant that selects the cubic equation of state; "
+                r"$-1$ for Peng–Robinson."
+            ),
+        ),
+        FormulaParam(
+            "Lambda", latex_symbol=r"\Lambda", meaning="The equation of state's constant in its attraction parameter."
+        ),
+        FormulaParam(
+            "Gamma", latex_symbol=r"\Gamma", meaning="The equation of state's constant in its covolume parameter."
+        ),
+        FormulaParam("omega", latex_symbol=r"\omega", meaning="The fluid's acentric factor."),
+        FormulaParam(
+            "Tr", latex_symbol="T_r", meaning="The reduced temperature, the temperature over the critical temperature."
+        ),
+        FormulaParam(
+            "Pr", latex_symbol="P_r", meaning="The reduced pressure, the pressure over the critical pressure."
+        ),
     )
     location_in_publication = "Eq. (8)"
     presentation = FormulaPresentation(
@@ -63,6 +85,10 @@ class SteffenEtAl2025Equation8(Formula):
             r"+ \frac{\param{Lambda} \fn{\alpha}(\param{omega}, \param{Tr})}{\param{Gamma}^2 \param{Pr}}\right)"
         ),
         interval="[14, 17]",
+        summary=(
+            "The Peng–Robinson equation of state, a cubic in the ratio of volume to covolume, on an interval around the"
+            " vapor-phase root, the largest of its 3."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

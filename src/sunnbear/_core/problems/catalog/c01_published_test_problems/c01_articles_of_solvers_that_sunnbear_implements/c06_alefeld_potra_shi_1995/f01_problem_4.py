@@ -40,6 +40,10 @@ class AlefeldPotraShi1995Problem4(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{\param{n}} - \param{a_}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An even power, flatter around $\x = 0$ and steeper toward the upper bound for larger $\param{n}$, with 1 "
+            r"simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -26,6 +26,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF45(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.5 \c"),),
         expression=r"\tmp{u}^{7}",
         interval="[-1, 1.5]",
+        summary="A 7th power with a root of multiplicity 7, below $10^{-4}$ in magnitude within 0.25 of that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

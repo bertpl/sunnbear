@@ -32,6 +32,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF35(Formula):
             r"\leq \frac{2}{3} \\-1 & \text{otherwise} \end{cases}\right) - 0.1"
         ),
         interval="[-11, 9]",
+        summary=(
+            r"The signed square root of $2/3 - \x$, lowered by 0.1, with an infinite slope at $\x = 2/3$ and its root "
+            r"at $\x = 2/3 - 0.01$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

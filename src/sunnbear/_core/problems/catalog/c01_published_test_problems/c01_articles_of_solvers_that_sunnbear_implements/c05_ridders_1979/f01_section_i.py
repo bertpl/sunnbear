@@ -28,6 +28,10 @@ class Ridders1979SectionI(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 5",
         interval="[-1, 3]",
+        summary=(
+            "A cubic with a local maximum and a local minimum in the lower half of the interval, both below $-4$, and 1"
+            " root in the upper half."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

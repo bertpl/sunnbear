@@ -30,6 +30,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF84(Formula):
             r" 4\right) \left(\tmp{u} - 5\right) - 0.05"
         ),
         interval="[0.5, 5.5]",
+        summary=(
+            "A quintic with 5 simple roots, each within 0.013 of an integer, and much flatter between its roots than "
+            "toward the bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

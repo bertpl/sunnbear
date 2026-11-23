@@ -28,6 +28,9 @@ class OliveiraTakahashi2021IllBehavedFunction9(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} + \frac{\sin{\left(\tmp{u} \cdot 10^{6} \right)}}{10} + \frac{1}{10^{3}}",
         interval="[-1, 1]",
+        summary=(
+            r"A line plus a fast sine of amplitude 0.1, with about 64,000 roots on a band 0.2 wide around $\x = 0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

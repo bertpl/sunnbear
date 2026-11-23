@@ -29,6 +29,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
             r"\text{otherwise} \end{cases}"
         ),
         interval="[-11, 9]",
+        summary=(
+            r"A hyperbola that changes sign only at its pole, where it is undefined, with its value set to 0 at $\x = "
+            r"0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

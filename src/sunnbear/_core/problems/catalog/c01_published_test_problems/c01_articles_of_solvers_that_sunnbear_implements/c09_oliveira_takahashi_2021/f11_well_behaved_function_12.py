@@ -28,6 +28,10 @@ class OliveiraTakahashi2021WellBehavedFunction12(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\phi{\left(\tmp{u} - 1 \right)} - \frac{\sqrt{2}}{4}",
         interval="[-1, 1]",
+        summary=(
+            "The normal density minus a constant, with 1 simple root, increasing toward its peak at the upper bound, "
+            "where its slope is 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

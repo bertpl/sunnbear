@@ -28,6 +28,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF25(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} - 4\right)^{5} \ln{\left(\tmp{u} \right)}",
         interval="[3.6, 5.6]",
+        summary="A 5th power times a slowly varying logarithm, with a root of multiplicity 5.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

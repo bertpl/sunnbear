@@ -34,6 +34,10 @@ class OliveiraTakahashi2021WellBehavedFunction9(Formula):
             r"\frac{1}{10^{3}} + \sum_{i=1}^{10} \frac{\sin{\left(\frac{\pi i^{3} \tmp{u}}{2} " r"\right)}}{\pi i^{3}}"
         ),
         interval="[-1, 1]",
+        summary=(
+            r"A sum of 10 sines of rapidly rising frequency, with about 500 local extrema but only 1 simple root, near "
+            r'$\x = 0$, referred to in the source as "Weierstrass".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

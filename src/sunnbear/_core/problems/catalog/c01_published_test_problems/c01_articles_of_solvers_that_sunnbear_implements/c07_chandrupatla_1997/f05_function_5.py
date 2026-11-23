@@ -35,6 +35,9 @@ class Chandrupatla1997Function5(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{9}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A 9th power, flat at its root of multiplicity 9 and below $10^{-4}$ in magnitude within 0.35 of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

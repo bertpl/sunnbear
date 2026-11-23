@@ -37,6 +37,10 @@ class Ford1997Function2(Formula):
             r"\frac{\left(\tmp{u} - 1\right) \prod_{i=1}^{10} \left(\tmp{u}^{2} + \tmp{u} + " r"i\right)}{10^{8}}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A polynomial of degree 21 with 1 real root, within 0.19 of 0 from $\x = -1$ up to that root, and growing "
+            r"steeply above it."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

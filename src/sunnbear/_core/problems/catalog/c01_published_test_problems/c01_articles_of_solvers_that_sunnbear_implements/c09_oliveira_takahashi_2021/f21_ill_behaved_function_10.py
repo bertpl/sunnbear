@@ -36,6 +36,10 @@ class OliveiraTakahashi2021IllBehavedFunction10(Formula):
             r"\\0 & \text{otherwise} \end{cases} - 1"
         ),
         interval="[-1, 1]",
+        summary=(
+            "A sine that oscillates ever faster toward the lower bound, with infinitely many roots that accumulate at "
+            'that bound, referred to in the source as "Warsaw".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

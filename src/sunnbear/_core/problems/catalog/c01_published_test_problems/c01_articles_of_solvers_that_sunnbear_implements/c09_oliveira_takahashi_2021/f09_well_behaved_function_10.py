@@ -28,6 +28,10 @@ class OliveiraTakahashi2021WellBehavedFunction10(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\frac{\tmp{u} + \frac{2}{3}}{\tmp{u} + \frac{101}{100}}",
         interval="[-1, 1]",
+        summary=(
+            "A ratio of 2 lines with 1 simple root, steep next to the lower bound, which lies only 0.01 above the "
+            "ratio's pole."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -28,6 +28,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF88(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.9 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)} - \tmp{u} + 2 - 0.05",
         interval="[0.1, 3]",
+        summary=(
+            "A logarithm minus a line, with 1 root near the lower bound and a second root only 0.07 above the upper "
+            "bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

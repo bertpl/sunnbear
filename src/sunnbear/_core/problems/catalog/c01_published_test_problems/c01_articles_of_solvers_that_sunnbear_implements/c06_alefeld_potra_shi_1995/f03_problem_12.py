@@ -25,12 +25,16 @@ class AlefeldPotraShi1995Problem12(Formula):
 
     number = (1, 1, 6, 3)
     name = "Problem 12"
-    params = (FormulaParam("n", latex_symbol="n"),)
+    params = (FormulaParam("n", latex_symbol="n", meaning=r"The root lies at $\x = \param{n}$."),)
     location_in_publication = "Table I, problem 12"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 99 \c"),),
         expression=r"\tmp{u}^{\frac{1}{\param{n}}} - \param{n}^{\frac{1}{\param{n}}}",
         interval="[1, 100]",
+        summary=(
+            r"An increasing, concave function with 1 simple root, flatter for larger $\param{n}$, and within 0.12 of 0 "
+            r"over the whole interval at $\param{n} = 33$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

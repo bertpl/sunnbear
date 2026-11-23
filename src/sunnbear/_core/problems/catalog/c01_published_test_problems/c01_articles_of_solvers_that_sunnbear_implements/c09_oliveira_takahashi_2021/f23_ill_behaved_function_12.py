@@ -32,6 +32,10 @@ class OliveiraTakahashi2021IllBehavedFunction12(Formula):
             r"\frac{1}{10^{2}}}}\right\rfloor - \frac{1}{10}\right)^{3}"
         ),
         interval="[-1, 1]",
+        summary=(
+            "The cube of a sawtooth on a rising line, with 101 triple roots and 100 jumps across 0 on a band about 1 "
+            "wide."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

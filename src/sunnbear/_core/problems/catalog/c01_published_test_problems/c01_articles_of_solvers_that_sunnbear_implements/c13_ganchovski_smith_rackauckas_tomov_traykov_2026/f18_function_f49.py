@@ -36,6 +36,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF49(Formula):
             r"\\\sqrt[3]{\tmp{u}} - \tmp{u} - 1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1, 1]",
+        summary=(
+            r"A cubic piece holding the 1 root, joined continuously at $\x = 0$ to a cube-root piece that starts with "
+            r"an infinite slope and stays below $-0.6$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

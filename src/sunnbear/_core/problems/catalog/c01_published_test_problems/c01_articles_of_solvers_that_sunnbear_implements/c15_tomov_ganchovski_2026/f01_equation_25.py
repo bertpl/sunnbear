@@ -41,6 +41,7 @@ class TomovGanchovski2026Equation25(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary="A piecewise function whose slope is continuous at its root and whose second derivative jumps there.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

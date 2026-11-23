@@ -30,6 +30,10 @@ class OliveiraTakahashi2021IllBehavedFunction3(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} - \frac{1}{3}\right)^{2} \arctan{\left(\tmp{u} - \frac{1}{3} \right)}",
         interval="[-1, 1]",
+        summary=(
+            "A square times an arctangent, forming a triple root, with the function below $10^{-3}$ in magnitude "
+            "within 0.1 of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

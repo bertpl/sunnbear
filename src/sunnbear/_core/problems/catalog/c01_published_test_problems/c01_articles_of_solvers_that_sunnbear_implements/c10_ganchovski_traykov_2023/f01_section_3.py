@@ -31,6 +31,10 @@ class GanchovskiTraykov2023Section3(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"4 - \tan{\left(\tmp{u} \right)}",
         interval="[0, 1.5]",
+        summary=(
+            "A decreasing function with 1 root close to the upper bound, steep there because of the tangent's pole at "
+            r"$\x = \pi/2$, just above that bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

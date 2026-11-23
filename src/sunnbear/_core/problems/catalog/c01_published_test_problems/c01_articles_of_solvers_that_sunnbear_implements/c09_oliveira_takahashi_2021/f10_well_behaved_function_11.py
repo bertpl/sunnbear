@@ -32,6 +32,10 @@ class OliveiraTakahashi2021WellBehavedFunction11(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\Phi{\left(\tmp{u} - 1 \right)} - \frac{\sqrt{2}}{4}",
         interval="[-1, 1]",
+        summary=(
+            "The normal cumulative distribution function minus a constant, convex with 1 simple root, and steepest at "
+            "its inflection point, the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

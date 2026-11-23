@@ -33,6 +33,10 @@ class DowellJarratt1971Table3(Formula):
             r"\left(1 + \left(1 - \param{n}\right)^{2}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{2}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A concave parabola whose maximum grows about as $\param{n}^2/4$, with 1 root that approaches the lower "
+            r"bound as $\param{n}$ grows."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

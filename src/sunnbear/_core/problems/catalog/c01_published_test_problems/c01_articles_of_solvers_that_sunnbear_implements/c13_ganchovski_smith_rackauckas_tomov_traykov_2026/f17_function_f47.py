@@ -34,6 +34,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF47(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.499 \c"),),
         expression=(r"\frac{1}{\sqrt{\tmp{u}}} - 2 \ln{\left(5 \cdot 10^{\param{k}} \sqrt{\tmp{u}} \right)} + " r"0.8"),
         interval="[0.0005, 0.5]",
+        summary=(
+            r"A decreasing function, steep at the lower bound, with its 1 root in the lowest 2% of the interval, and in"
+            r" the lowest 0.2% at $\param{k} = 7$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

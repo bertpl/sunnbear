@@ -31,6 +31,7 @@ class GorgeyEtAl2025Equation2(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0, 2]",
+        summary=r"The natural logarithm, $-\infty$ at the lower bound and steep next to it.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

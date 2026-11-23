@@ -37,6 +37,10 @@ class Ridders1979Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function near $-1000$ over the lower 80% of the wide interval, rising steeply through its 1 root toward "
+            "a pole just past that interval's upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

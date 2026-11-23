@@ -28,6 +28,7 @@ class Gao2026Table2Function1(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u}^{5}",
         interval="[-1, 3]",
+        summary="A 5th power, below $10^{-4}$ in magnitude within 0.15 of its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

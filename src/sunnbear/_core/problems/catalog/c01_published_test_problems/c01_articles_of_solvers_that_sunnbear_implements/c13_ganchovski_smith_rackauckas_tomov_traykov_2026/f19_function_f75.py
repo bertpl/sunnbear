@@ -33,6 +33,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF75(Formula):
             r" - 1\right)^{2}}{81}}\right)"
         ),
         interval="[-1, 1]",
+        summary=(
+            r"A pair of elliptical arcs that cross 0 at the root with a slope of 0, exactly 0 in floating point on a "
+            r'band $4.5 \cdot 10^{-8}$ wide, referred to in the source as "Circles".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

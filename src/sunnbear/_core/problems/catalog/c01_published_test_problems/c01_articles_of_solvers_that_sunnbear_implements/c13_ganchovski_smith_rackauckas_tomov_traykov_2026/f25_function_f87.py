@@ -26,6 +26,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF87(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.4 \c"),),
         expression=r"\frac{1}{\tmp{u} - 0.5} - 2 - 0.05",
         interval="[0.6, 2]",
+        summary=(
+            "A hyperbola with a pole 0.1 below the lower bound, steep next to that bound, and 1 root in the lower "
+            "third of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
