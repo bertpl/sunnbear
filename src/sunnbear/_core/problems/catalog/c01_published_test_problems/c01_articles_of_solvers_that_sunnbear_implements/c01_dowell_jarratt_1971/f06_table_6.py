@@ -35,7 +35,7 @@ class DowellJarratt1971Table6(Formula):
         interval="[0, 1]",
         summary=(
             r"An increasing function with 1 root, flatter around it as $\param{n}$ grows, and below $10^{-3}$ in "
-            r"magnitude over a fifth of the interval at $\param{n} = 15$."
+            r"magnitude over 20% of the interval at $\param{n} = 15$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

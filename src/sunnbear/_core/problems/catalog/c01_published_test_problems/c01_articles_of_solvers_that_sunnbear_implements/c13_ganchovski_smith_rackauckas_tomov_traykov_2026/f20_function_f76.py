@@ -33,7 +33,9 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF76(Formula):
             r" \\-1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1, 1]",
-        summary="A step function with no root, which jumps from $-1$ to about 1 only $10^{-6}$ above the lower bound.",
+        summary=(
+            "A step function with no root, which jumps from $-1$ to about 1 at only $10^{-6}$ above the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

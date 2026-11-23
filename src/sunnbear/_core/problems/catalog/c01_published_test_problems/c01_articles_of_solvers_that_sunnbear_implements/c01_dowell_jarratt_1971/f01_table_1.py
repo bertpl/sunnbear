@@ -31,8 +31,8 @@ class DowellJarratt1971Table1(Formula):
         expression=r"\sin{\left(\tmp{u} \right)} - 0.5",
         interval="[0, 1.5]",
         summary=(
-            "A sine with 1 simple root, concave on the interval and nearly flat at the upper bound, just below the "
-            "sine's maximum."
+            r"A sine with 1 simple root, concave on the interval and nearly flat at the upper bound, which lies just "
+            r"below the sine's maximum at $\x = \pi/2$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

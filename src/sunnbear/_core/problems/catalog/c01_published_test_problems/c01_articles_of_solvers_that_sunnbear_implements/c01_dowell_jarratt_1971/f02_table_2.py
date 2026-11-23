@@ -34,7 +34,7 @@ class DowellJarratt1971Table2(Formula):
         expression=r"2 \tmp{u} e^{- \param{n}} + 1 - 2 e^{- \param{n} \tmp{u}}",
         interval="[0, 1]",
         summary=(
-            r"An increasing concave function with 1 root, which for large $\param{n}$ lies near the lower bound, and "
+            r"An increasing concave function that, for large $\param{n}$, has its 1 root near the lower bound and is "
             r"nearly 1 over most of the rest of the interval."
         ),
     )

@@ -40,7 +40,7 @@ class SteffenEtAl2025Equation8(Formula):
             "lambda_",
             latex_symbol=r"\lambda",
             meaning=(
-                r"With $\param{sigma}$, the constant that selects the cubic equation of state, "
+                r"Together with $\param{sigma}$, a constant that selects the cubic equation of state; "
                 "2 for Peng–Robinson."
             ),
         ),
@@ -48,7 +48,7 @@ class SteffenEtAl2025Equation8(Formula):
             "sigma",
             latex_symbol=r"\sigma",
             meaning=(
-                r"With $\param{lambda_}$, the constant that selects the cubic equation of state, "
+                r"Together with $\param{lambda_}$, a constant that selects the cubic equation of state; "
                 r"$-1$ for Peng–Robinson."
             ),
         ),

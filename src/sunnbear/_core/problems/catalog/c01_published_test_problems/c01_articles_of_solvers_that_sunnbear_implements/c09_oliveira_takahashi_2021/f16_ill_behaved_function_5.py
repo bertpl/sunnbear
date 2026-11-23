@@ -31,7 +31,7 @@ class OliveiraTakahashi2021IllBehavedFunction5(Formula):
         ),
         interval="[-1, 1]",
         summary=(
-            "A step function with no root, which jumps from $-1$ to about $10^{-6}$ only $10^{-6}$ above the lower "
+            "A step function with no root, which jumps from $-1$ to about $10^{-6}$ at only $10^{-6}$ above the lower "
             "bound."
         ),
     )
