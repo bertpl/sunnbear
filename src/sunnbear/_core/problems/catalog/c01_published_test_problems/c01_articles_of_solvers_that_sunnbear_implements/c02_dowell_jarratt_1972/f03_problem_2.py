@@ -37,6 +37,10 @@ class DowellJarratt1972Problem2(Formula):
             r"\tmp{u}\right) Y_{0}\left(\param{K}\right)"
         ),
         interval="[0.1, 1]",
+        summary=(
+            r"A cross product of Bessel functions with 1 root, close to the lower bound for $\param{K} = 2.5$, and a "
+            r"shallow minimum in the upper quarter of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

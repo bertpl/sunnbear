@@ -35,6 +35,10 @@ class Chandrupatla1997Function4(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"6 \left(\tmp{u} - 2\right)^{5}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A 5th power with a root of multiplicity 5 and values of about $6 \cdot 10^{50}$ in magnitude at the "
+            r"bounds of the widest interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

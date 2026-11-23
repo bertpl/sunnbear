@@ -36,6 +36,7 @@ class Chandrupatla1997Function1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3} - 2 \tmp{u} - 5",
         interval=r"[\param{a}, \param{b}]",
+        summary="A cubic with 1 real root, whose 2 local extrema, both below 0, lie only in the 2 widest intervals.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -28,6 +28,10 @@ class OliveiraTakahashi2021IllBehavedFunction2(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{\tmp{u}} \left(\tmp{u} \cdot 10^{6} - 1\right)^{3}",
         interval="[-1, 1]",
+        summary=(
+            r"An exponential times a cube, with a triple root just above $\x = 0$ and a magnitude above $10^{17}$ at "
+            r"both bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

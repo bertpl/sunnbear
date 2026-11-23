@@ -36,6 +36,10 @@ class DowellJarratt1972Problem3(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sum_{n=-\infty}^{\infty} (-1)^n \tmp{u}^{(3n^2 + n)/2} - 1",
         interval="[-0.9999, -0.0001]",
+        summary=(
+            r"The Euler function $\prod_{k \ge 1} (1 - \x^k)$ minus 1, nearly flat at $-1$ next to the lower bound, "
+            r"with 1 root and a second just past the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

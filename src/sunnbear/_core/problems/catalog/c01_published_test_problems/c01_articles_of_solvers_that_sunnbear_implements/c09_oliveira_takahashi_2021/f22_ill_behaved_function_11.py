@@ -32,6 +32,10 @@ class OliveiraTakahashi2021IllBehavedFunction11(Formula):
             r"\frac{1}{10^{2}}}}\right\rfloor - \frac{1}{10}"
         ),
         interval="[-1, 1]",
+        summary=(
+            "A sawtooth with teeth 0.01 wide on a rising line, with 101 simple roots and 100 jumps across 0 on a band "
+            "about 1 wide."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

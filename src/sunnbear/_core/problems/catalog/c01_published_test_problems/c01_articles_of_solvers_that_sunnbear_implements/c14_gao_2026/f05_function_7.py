@@ -40,6 +40,10 @@ class Gao2026Function7(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "An odd function with all derivatives 0 at its root, so flat there that it is exactly 0 in floating point "
+            "on a band 0.073 wide."
+        ),
         notes=(
             r"The expression is 0 for $|\tmp{u}| < 10^{-100}$, where float64 rounds $\tmp{u} e^{-1/\tmp{u}^2}$ to 0 "
             r"anyway; the published function is 0 only at $\tmp{u} = 0$.",

@@ -30,6 +30,10 @@ class OliveiraTakahashi2021IllBehavedFunction7(Formula):
             r"\left(\frac{\tmp{u}}{2}\right)^{2} + \left\lceil{\frac{\tmp{u}}{2}}\right\rceil - " r"\frac{1}{2}"
         ),
         interval="[-1, 1]",
+        summary=(
+            r"A parabola plus a unit step, with no root: its only sign change is a jump from $-1/2$ to $1/2$ at $\x = "
+            r"0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

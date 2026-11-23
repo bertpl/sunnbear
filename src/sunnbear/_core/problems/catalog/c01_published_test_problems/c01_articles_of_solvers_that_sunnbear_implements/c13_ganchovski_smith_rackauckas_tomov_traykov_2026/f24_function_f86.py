@@ -29,6 +29,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF86(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"e^{\tmp{u}} - 1 - \tmp{u} - \frac{\tmp{u}^{2}}{2} - 0.005",
         interval="[-2, 2]",
+        summary=(
+            r"The exponential minus its Taylor polynomial of degree 2, lowered by 0.005, so that its 1 root lies 0.3 "
+            r"above a stationary inflection at $\x = 0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

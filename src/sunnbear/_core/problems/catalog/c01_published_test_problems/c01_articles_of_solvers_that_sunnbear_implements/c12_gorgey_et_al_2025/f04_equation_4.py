@@ -30,6 +30,10 @@ class GorgeyEtAl2025Equation4(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - 1",
         interval="[2, 4]",
+        summary=(
+            "A function with a root of multiplicity 5, around which it is exactly 0 in floating point on a band "
+            "0.0012 wide."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

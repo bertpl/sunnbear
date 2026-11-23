@@ -38,6 +38,10 @@ class Ford1997Function4(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{2 \tmp{u}}{e^{20}} + 1 - 2 e^{- 20 \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An increasing function with 1 simple root close to $\x = 0$, within $10^{-4}$ of 1 above $\x = 0.5$, and "
+            r"falling steeply below $\x = 0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

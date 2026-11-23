@@ -42,6 +42,10 @@ class Brent1973Equation41(Formula):
             r"\end{cases}"
         ),
         interval="[-1, 4]",
+        summary=(
+            "An odd function with all derivatives 0 at its root, so flat there that it is exactly 0 in floating point "
+            "on a band 0.073 wide."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

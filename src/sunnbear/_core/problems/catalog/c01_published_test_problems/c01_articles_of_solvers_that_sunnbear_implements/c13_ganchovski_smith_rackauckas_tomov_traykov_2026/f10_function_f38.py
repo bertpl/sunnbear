@@ -35,6 +35,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF38(Formula):
             r"\text{otherwise} \end{cases}"
         ),
         interval="[-11, 9]",
+        summary=r"A step of height 1 with no root, only $10^{-3}$ below 0 left of the step at $\param{d} = 10^{-3}$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

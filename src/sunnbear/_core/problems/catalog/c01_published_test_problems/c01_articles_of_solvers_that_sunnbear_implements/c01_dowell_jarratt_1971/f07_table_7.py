@@ -31,6 +31,10 @@ class DowellJarratt1971Table7(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
         expression=r"\frac{\param{n} \tmp{u} - 1}{\left(\param{n} - 1\right) \tmp{u}}",
         interval="[0.01, 1]",
+        summary=(
+            r"A hyperbola, steep at the lower bound because of a pole at $\x = 0$, with 1 root that nears that bound as"
+            r" $\param{n}$ grows."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

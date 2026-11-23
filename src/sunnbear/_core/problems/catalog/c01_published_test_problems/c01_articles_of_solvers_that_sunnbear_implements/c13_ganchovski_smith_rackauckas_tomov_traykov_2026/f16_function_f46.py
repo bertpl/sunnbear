@@ -28,6 +28,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF46(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.61 \c"),),
         expression=r"\frac{e^{- 5 \tmp{u}} - \tmp{u} - 0.5}{\tmp{u}^{5}}",
         interval="[0.09, 0.7]",
+        summary=(
+            "A function with 1 root close to the lower bound, where it is steep, and a deep minimum just above the "
+            "root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

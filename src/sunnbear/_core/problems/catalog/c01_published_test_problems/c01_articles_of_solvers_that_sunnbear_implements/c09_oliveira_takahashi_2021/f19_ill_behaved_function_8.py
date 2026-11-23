@@ -28,6 +28,10 @@ class OliveiraTakahashi2021IllBehavedFunction8(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left\lceil{10 \tmp{u} - 1}\right\rceil + \frac{1}{2}",
         interval="[-1, 1]",
+        summary=(
+            "A staircase with unit steps 0.1 apart, taking only half-integer values, so that its sign change at "
+            r"$\x = 0$ is a jump, not a root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

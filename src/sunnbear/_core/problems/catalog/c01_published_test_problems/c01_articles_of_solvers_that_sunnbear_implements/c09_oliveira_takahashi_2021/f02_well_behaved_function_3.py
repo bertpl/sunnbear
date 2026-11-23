@@ -28,6 +28,7 @@ class OliveiraTakahashi2021WellBehavedFunction3(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} + \frac{1}{2}",
         interval="[-1, 1]",
+        summary=r"An increasing sine with 1 simple root, steepest at its inflection point $\x = 0$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

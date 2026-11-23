@@ -36,6 +36,10 @@ class Brent1973Row1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{9}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A 9th power, below $10^{-9}$ in magnitude within 0.1 of its root, and above $2 \cdot 10^5$ at the upper "
+            r"bound of the wide interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

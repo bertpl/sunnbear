@@ -33,6 +33,7 @@ class SteffenEtAl2025Equation6(Formula):
             r"e^{- \frac{\tmp{u}^{2}}{4}} - 2 \cos{\left(\tmp{u} \right)} + \frac{\tmp{u}}{2} - " r"\frac{5}{2}"
         ),
         interval="[1, 3]",
+        summary="A function with 3 roots, increasing on the interval, which holds the lowest of them.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

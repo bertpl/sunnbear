@@ -30,6 +30,10 @@ class DowellJarratt1971Table1(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - 0.5",
         interval="[0, 1.5]",
+        summary=(
+            "A sine with 1 simple root, concave on the interval and nearly flat at the upper bound, just below the "
+            "sine's maximum."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

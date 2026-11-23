@@ -32,6 +32,7 @@ class OliveiraTakahashi2021Equation23(Formula):
         definitions=((r"\tmp{u}", r"\x - 200 \c"),),
         expression=r"\left(\tmp{u} - \left(100 + 10 \pi\right)\right) \left(\tmp{u} - 10 \pi\right)",
         interval="[-100, 100]",
+        summary="A parabola with 1 of its 2 simple roots on the interval and its minimum close to the upper bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

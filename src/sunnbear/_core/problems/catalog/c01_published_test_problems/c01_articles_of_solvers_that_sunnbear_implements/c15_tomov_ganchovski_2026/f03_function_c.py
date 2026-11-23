@@ -29,6 +29,7 @@ class TomovGanchovski2026FunctionC(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}",
         interval="[-1, 1]",
+        summary="The identity function, with its root at the midpoint of the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -35,6 +35,10 @@ class Chandrupatla1997Function6(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{19}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A 19th power, flat at its root of multiplicity 19 and below $10^{-4}$ in magnitude within 0.6 of that "
+            "root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

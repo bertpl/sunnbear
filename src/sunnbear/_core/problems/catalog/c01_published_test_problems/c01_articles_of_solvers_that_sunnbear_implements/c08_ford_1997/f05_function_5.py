@@ -37,6 +37,10 @@ class Ford1997Function5(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\frac{1}{\tmp{u}} - 25} - 1",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A decreasing function with 1 root, within $10^{-4}$ of $-1$ over 90% of the widest interval and steep "
+            "toward its lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

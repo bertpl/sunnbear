@@ -26,6 +26,10 @@ class OliveiraTakahashi2021WellBehavedFunction4(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"4 \tmp{u}^{5} + \tmp{u}^{2} + 1",
         interval="[-1, 1]",
+        summary=(
+            "A quintic, nearly flat between a local maximum and minimum above 0 and steep near both bounds, with 1 "
+            "simple root near the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

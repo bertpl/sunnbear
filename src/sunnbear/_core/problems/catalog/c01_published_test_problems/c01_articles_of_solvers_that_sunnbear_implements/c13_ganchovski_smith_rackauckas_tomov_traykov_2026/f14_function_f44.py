@@ -26,6 +26,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF44(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.5 \c"),),
         expression=r"\tmp{u}^{5}",
         interval="[-1, 1.5]",
+        summary="A 5th power with a root of multiplicity 5, below $10^{-3}$ in magnitude within 0.25 of it.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

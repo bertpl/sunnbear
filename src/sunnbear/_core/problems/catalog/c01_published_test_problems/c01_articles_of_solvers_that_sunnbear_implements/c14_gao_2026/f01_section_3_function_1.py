@@ -29,6 +29,7 @@ class Gao2026Section3Function1(Formula):
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"\sqrt[3]{\tmp{u}}",
         interval="[-5, 1]",
+        summary="The real cube root, with an infinite slope at its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

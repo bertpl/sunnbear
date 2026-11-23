@@ -28,6 +28,7 @@ class Gao2026Table2Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=r"\tmp{u}^{7}",
         interval="[-3, 5]",
+        summary="A 7th power, below $10^{-4}$ in magnitude within 0.26 of its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

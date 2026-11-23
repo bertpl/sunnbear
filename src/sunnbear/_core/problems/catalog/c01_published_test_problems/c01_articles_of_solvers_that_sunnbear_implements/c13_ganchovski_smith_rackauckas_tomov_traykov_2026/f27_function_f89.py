@@ -28,6 +28,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF89(Formula):
         definitions=((r"\tmp{u}", r"\x - 9 \c"),),
         expression=r"\sin{\left(20 \tmp{u} \right)} + 0.1 \tmp{u} - 0.1",
         interval="[-4, 5]",
+        summary="A sine with about 29 periods on a slowly rising line, with 57 simple roots.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

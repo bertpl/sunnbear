@@ -28,6 +28,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF26(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{4}\right)^{3}",
         interval="[2, 4]",
+        summary="A function with a triple root, below 0.07 in magnitude over the lower 40% of the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

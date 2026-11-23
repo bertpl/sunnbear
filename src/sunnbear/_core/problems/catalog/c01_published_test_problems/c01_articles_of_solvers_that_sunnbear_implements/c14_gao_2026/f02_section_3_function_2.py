@@ -29,6 +29,7 @@ class Gao2026Section3Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - 15 \c"),),
         expression=r"\frac{\sqrt[5]{\tmp{u}}}{1 + \sqrt[5]{\left|{\tmp{u}}\right|}}",
         interval="[-5, 10]",
+        summary=r"A function with an infinite slope at its root, nearly flat where $|\x| > 1$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

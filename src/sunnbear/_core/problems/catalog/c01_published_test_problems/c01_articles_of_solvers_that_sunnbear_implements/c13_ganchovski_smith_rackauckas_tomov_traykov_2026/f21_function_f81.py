@@ -38,6 +38,10 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF81(Formula):
             r"\\-1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1, 1]",
+        summary=(
+            "A function negative only at the lower bound, above which it oscillates ever faster toward that bound and "
+            'touches 0 infinitely often, referred to in the source as "Warsaw".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

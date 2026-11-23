@@ -26,6 +26,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF43(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.5 \c"),),
         expression=r"\tmp{u}^{3}",
         interval="[-1, 1.5]",
+        summary="A cube with a triple root, below 0.02 in magnitude within 0.25 of it.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

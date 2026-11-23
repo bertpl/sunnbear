@@ -27,6 +27,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF37(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\left(\tmp{u} - \frac{7}{9}\right)^{3} + \frac{\tmp{u} - \frac{7}{9}}{10^{3}}",
         interval="[-11, 9]",
+        summary="A cubic plus a small linear term, increasing, with a simple root where its slope is only $10^{-3}$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

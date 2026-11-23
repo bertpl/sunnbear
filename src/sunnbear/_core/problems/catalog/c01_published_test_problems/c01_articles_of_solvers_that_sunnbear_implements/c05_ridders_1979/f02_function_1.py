@@ -37,6 +37,10 @@ class Ridders1979Function1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 10",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A function nearly flat at $-10$ for $\x < 0$ and growing exponentially above its 1 root, to $2.7 \cdot "
+            r"10^{45}$ at the upper bound of the wide interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
