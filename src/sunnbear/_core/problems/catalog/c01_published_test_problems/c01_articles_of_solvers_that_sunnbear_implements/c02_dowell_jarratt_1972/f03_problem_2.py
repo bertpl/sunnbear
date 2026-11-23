@@ -38,8 +38,8 @@ class DowellJarratt1972Problem2(Formula):
         ),
         interval="[0.1, 1]",
         summary=(
-            r"A cross product of Bessel functions with a shallow minimum in the upper quarter of the interval and 1 "
-            r"root, close to the lower bound for $\param{K} = 2.5$."
+            r"A difference of 2 products of Bessel functions, with a shallow minimum in the upper quarter of the "
+            r"interval and 1 root, close to the lower bound for $\param{K} = 2.5$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -86,8 +86,8 @@ class SteffenEtAl2025Equation8(Formula):
         ),
         interval="[14, 17]",
         summary=(
-            "The Peng–Robinson equation of state, a cubic in volume over covolume, on an interval around the vapor-"
-            "phase root, the largest of its 3."
+            "The Peng–Robinson equation of state, a cubic in the ratio of volume to covolume, on an interval around the"
+            " vapor-phase root, the largest of its 3."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

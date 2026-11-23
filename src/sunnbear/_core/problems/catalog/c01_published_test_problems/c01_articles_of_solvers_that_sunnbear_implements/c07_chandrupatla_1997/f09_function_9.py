@@ -39,7 +39,7 @@ class Chandrupatla1997Function9(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A function with 1 simple root and a narrow dip to about $-3.7 \cdot 10^{4}$ just above the lower bound, "
-            r"where 2 terms with poles at $\x = 0$ cancel."
+            r"the point where 2 terms with poles at $\x = 0$ cancel."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
