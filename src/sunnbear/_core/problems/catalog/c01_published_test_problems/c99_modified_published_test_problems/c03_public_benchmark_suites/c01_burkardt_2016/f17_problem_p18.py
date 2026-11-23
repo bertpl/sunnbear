@@ -71,6 +71,10 @@ class ModifiedBurkardt2016ProblemP18(Formula):
                 "to make it hard to evaluate accurately, and the expression evaluates it without that "
                 "cancellation."
             ),
+            (
+                "The source takes this polynomial from Cleve B. Moler, Numerical Computing with MATLAB, SIAM (2004), "
+                "ISBN 978-0-898716-60-3."
+            ),
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

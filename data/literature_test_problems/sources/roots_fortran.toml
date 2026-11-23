@@ -1,6 +1,20 @@
 title = 'roots-fortran (2025): the test problems of `root_tests.f90` at commit 390e7ea'
-reference = '''
-Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25, the last commit to the file), https://github.com/jacobwilliams/roots-fortran/blob/390e7ea30751fe2ab23ddb876a3563e07bef1b76/test/root_tests.f90, BSD-3-Clause license.
+reference = 'Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25), https://github.com/jacobwilliams/roots-fortran/blob/390e7ea30751fe2ab23ddb876a3563e07bef1b76/test/root_tests.f90, BSD-3-Clause license.'
+year = 2025
+subcategory = '1.3'
+where_in_source = '''
+the subroutine `problems` of the program `root_tests`, a `select case (nprob)` over the cases `nprob = 1, ..., 157` (`num_of_problems = 157`).
+- A block such as `case (2:11)` gives 1 function, with 1 bracket per case number.
+- A case may set a list `ns` of values of an integer `n`; the driver then runs the case once per value. A case without `ns` runs once.
+'''
+transcribed_from = '''
+the code of the file at commit `390e7ea`: the assignments to `f`, the bounds `a` and `b`, and the lists `ns`. Each case also holds 2 strings for a LaTeX results table, the function (`latex`) and the bracket (`bounds`); where they differ from the code, the rows follow the code (cases 70, 147).
+'''
+rows_summary = "120, 1 per `case` block, covering the file's 157 numbered cases. With each value of `n` counted, the driver makes 223 runs."
+notes = '''
+About the source:
+
+Commit `390e7ea` (2025-01-25) is the last commit to the file.
 
 The program's header comment gives 1 reference, without naming cases: Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344 (no DOI in the file).
 
@@ -22,19 +36,7 @@ Comments name these sources for cases or blocks, as they give them:
   - That PDF is the 2023 version of Ganchovski's "Root-finding Test Functions", whose revision of 2026-09-29 is `ganchovski_test_functions`.
   - Cases 146–157 are its f01, f02, f04, f28–f32, f41 and f42, with f42 split over cases 155–157, and follow the PDF where it differs from the C# code of Tomov & Ganchovski's benchmark (`2026_tomov_ganchovski_benchmark`).
   - The brackets of 4 cases differ: case 146 starts at 0.51, as roots-fortran's own comment explains, and cases 155–157 bracket each root of f42 in place of `[0, 4]`.
-'''
-year = 2025
-subcategory = '1.3'
-where_in_source = '''
-the subroutine `problems` of the program `root_tests`, a `select case (nprob)` over the cases `nprob = 1, ..., 157` (`num_of_problems = 157`).
-- A block such as `case (2:11)` gives 1 function, with 1 bracket per case number.
-- A case may set a list `ns` of values of an integer `n`; the driver then runs the case once per value. A case without `ns` runs once.
-'''
-transcribed_from = '''
-the code of the file at commit `390e7ea`: the assignments to `f`, the bounds `a` and `b`, and the lists `ns`. Each case also holds 2 strings for a LaTeX results table, the function (`latex`) and the bracket (`bounds`); where they differ from the code, the rows follow the code (cases 70, 147).
-'''
-rows_summary = "120, 1 per `case` block, covering the file's 157 numbered cases. With each value of `n` counted, the driver makes 223 runs."
-notes = '''
+
 How to read the rows:
 - **`key`** holds the case number, or the range of case numbers of a block.
 - **`f`** is the code's expression with `**` written as `^` and the `_wp` kind suffix dropped. Helper variables are written out: `dn` and `di` are `n` and `i` converted to real, and `t1`, `emx` and `ex` are replaced by their expressions. `pi` is `acos(-1.0)`. `sign(1.0, y)` is Fortran's 1.0 with the sign of `y`.

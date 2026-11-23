@@ -1,9 +1,5 @@
 title = 'Ganchovski (2026): Root-finding Test Functions, revision of 2026-09-29'
-reference = '''
-Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding at commit `b3309e9a5177d6305ac84deba6537adb9b878c5e`: https://raw.githubusercontent.com/Proektsoft-EOOD/ModAB-Root-Finding/b3309e9a5177d6305ac84deba6537adb9b878c5e/Test%20functions.pdf.
-- The PDF prints no author or date: its metadata give 2026-09-29 as its creation date. The repository's README puts it under the MIT License of `C/LICENSE`, which names Ned Ganchovski as the copyright holder.
-- An earlier version was posted on ResearchGate in 2023 as "Additional test functions", https://www.researchgate.net/publication/373922895_Additional_test_functions; roots-fortran (`roots_fortran`) cites that version.
-'''
+reference = 'Ganchovski, N. (2026). Root-finding Test Functions. The file `Test functions.pdf` in the repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding at commit `b3309e9a5177d6305ac84deba6537adb9b878c5e`: https://raw.githubusercontent.com/Proektsoft-EOOD/ModAB-Root-Finding/b3309e9a5177d6305ac84deba6537adb9b878c5e/Test%20functions.pdf.'
 year = 2026
 subcategory = '1.3'
 where_in_source = '''
@@ -21,6 +17,11 @@ the PDF's page images, checked against its text layer.
 '''
 rows_summary = '101, 1 per function.'
 notes = '''
+About the source:
+
+- The PDF prints no author or date: its metadata give 2026-09-29 as its creation date. The repository's README puts it under the MIT License of `C/LICENSE`, which names Ned Ganchovski as the copyright holder.
+- An earlier version was posted on ResearchGate in 2023 as "Additional test functions", https://www.researchgate.net/publication/373922895_Additional_test_functions; roots-fortran (`roots_fortran`) cites that version.
+
 How to read the rows:
 - **`log` is the natural log**, printed `ln`. **`exp(u)`** writes both the PDF's `exp(u)` and its `e^u`; `e` alone (f68, f100) is Euler's number.
 - **`if(c; a; b)`** writes the PDF's case brace "if c: a, else: b": `a` where `c` holds, `b` otherwise. `==` and `!=` write the PDF's `≡` and `≠`.

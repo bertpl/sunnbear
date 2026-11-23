@@ -43,6 +43,12 @@ class Burkardt2016ProblemP18(Formula):
             r"$(\x - 1)^7$ written out as a polynomial and scaled by $10^{14}$, whose rounding errors decide its sign "
             r"over about 90% of the interval."
         ),
+        notes=(
+            (
+                "The source takes this polynomial from Cleve B. Moler, Numerical Computing with MATLAB, SIAM (2004), "
+                "ISBN 978-0-898716-60-3."
+            ),
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
