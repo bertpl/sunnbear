@@ -48,7 +48,9 @@ class ChebyshevSecondKindPolynomial(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{y}", r"\x - \frac{\c}{\param{n}^2}"),),
         expression=r"U_{\param{n}}(\tmp{y})",
-        interval=interval_by_parity_latex("[-1, 1]", r"\left[-\cos\frac{1.5 \pi}{\param{n} + 1}, 1\right]"),
+        interval=interval_by_parity_latex(
+            "[-1, 1]", r"\left[-\cos\left(\frac{1.5 \pi}{\param{n} + 1}\right), 1\right]"
+        ),
         summary=(
             "The Chebyshev polynomial of the second kind, whose amplitude grows from the middle of its interval toward "
             "the bounds."

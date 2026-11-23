@@ -37,7 +37,7 @@ class InverseHyperbolicCosine(Formula):
     name = "Inverse hyperbolic cosine"
     params = (FormulaParam("b", latex_symbol="b"),)
     presentation = FormulaPresentation(
-        expression=r"\frac{\operatorname{arcosh} \x}{\operatorname{arcosh} \param{b}} - 0.5 + \c",
+        expression=r"\frac{\operatorname{arcosh}(\x)}{\operatorname{arcosh}(\param{b})} - 0.5 + \c",
         interval=r"[1, \param{b}]",
         summary="The inverse hyperbolic cosine, with an infinite slope at the lower bound, the edge of its domain.",
         param_conditions=(r"$\param{b} > 1$",),

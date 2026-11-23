@@ -42,7 +42,7 @@ class ModifiedRidders1979Function2(Formula):
         notes=(
             (
                 "The interval starts at 0.02, not at the published 0, because a shift along x evaluates "
-                r"the function left of 0, where its base, $\tan \tmp{u}$, is negative."
+                r"the function left of 0, where its base, $\tan(\tmp{u})$, is negative."
             ),
         ),
     )

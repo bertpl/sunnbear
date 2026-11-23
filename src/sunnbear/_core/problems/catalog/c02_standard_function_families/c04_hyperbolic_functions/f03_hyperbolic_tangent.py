@@ -55,7 +55,7 @@ class HyperbolicTangent(Formula):
             r"\begin{cases} "
             r"\frac{2 e^{2 \tmp{u}}}{1 + e^{2 \tmp{u}}} - \param{d} "
             r"& \text{if } \tmp{u} < 0 \text{ and } \param{d} \le 0.5 \\ "
-            r"\tanh \tmp{u} + (1 - \param{d}) & \text{otherwise} "
+            r"\tanh(\tmp{u}) + (1 - \param{d}) & \text{otherwise} "
             r"\end{cases}"
         ),
         interval=r"[-\param{b}, \param{b}]",
@@ -70,7 +70,7 @@ class HyperbolicTangent(Formula):
         param_conditions=(
             r"$\param{b} > 0$",
             r"$0 < \param{d} < 2$",
-            r"$|\param{d} - 1| < \tanh \param{b}$, so that the root lies inside the interval",
+            r"$|\param{d} - 1| < \tanh(\param{b})$, so that the root lies inside the interval",
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

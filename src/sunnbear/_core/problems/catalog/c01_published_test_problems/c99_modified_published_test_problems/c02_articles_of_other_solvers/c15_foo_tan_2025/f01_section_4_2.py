@@ -49,7 +49,7 @@ class ModifiedFooTan2025Section42(Formula):
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "
-                r"problems, because a shift along x by any $\c > 0$ evaluates $\log_2 \x$ left of 0, "
+                r"problems, because a shift along x by any $\c > 0$ evaluates $\log_2(\x)$ left of 0, "
                 "outside its domain."
             ),
         ),

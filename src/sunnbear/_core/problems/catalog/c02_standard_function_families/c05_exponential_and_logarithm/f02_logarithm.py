@@ -38,7 +38,7 @@ class Logarithm(Formula):
     name = "Logarithm"
     params = (FormulaParam("d", latex_symbol="d"),)
     presentation = FormulaPresentation(
-        expression=r"\frac{2 \ln \x}{\ln(1 / \param{d})} + 1 + \c",
+        expression=r"\frac{2 \ln(\x)}{\ln(1 / \param{d})} + 1 + \c",
         interval=r"[\param{d}, 1]",
         summary=(
             r"The logarithm, steep next to the lower bound and flat over most of the interval for a small "

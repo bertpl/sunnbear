@@ -31,7 +31,7 @@ class AlefeldPotraShi1993Problem13(Formula):
         definitions=((r"\tmp{u}", r"\x - 10^{4} \c"),),
         expression=(
             r"\begin{cases} "
-            r"\frac{\param{n}}{20} \left(\frac{\tmp{u}}{1.5} + \sin \tmp{u} - 1\right) & \text{if } \tmp{u} \ge 0 \\ "
+            r"\frac{\param{n}}{20} \left(\frac{\tmp{u}}{1.5} + \sin(\tmp{u}) - 1\right) & \text{if } \tmp{u} \ge 0 \\ "
             r"-\frac{\param{n}}{20} & \text{otherwise} "
             r"\end{cases}"
         ),

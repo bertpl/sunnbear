@@ -35,7 +35,7 @@ class InverseHyperbolicSine(Formula):
     name = "Inverse hyperbolic sine"
     params = (FormulaParam("b", latex_symbol="b"),)
     presentation = FormulaPresentation(
-        expression=r"\frac{\operatorname{arsinh} \x}{\operatorname{arsinh} \param{b}} + \c",
+        expression=r"\frac{\operatorname{arsinh}(\x)}{\operatorname{arsinh}(\param{b})} + \c",
         interval=r"[-\param{b}, \param{b}]",
         summary="The inverse hyperbolic sine, close to a signed logarithm on a wide interval.",
         param_conditions=(r"$\param{b} > 0$",),
