@@ -28,6 +28,7 @@ class Moler2004Function4(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\arctan{\left(\tmp{u} \right)} - \frac{\pi}{3}",
         interval="[0, 5]",
+        summary=r"An arctangent, nearly flat toward the upper bound, with 1 simple root at $\sqrt{3}$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

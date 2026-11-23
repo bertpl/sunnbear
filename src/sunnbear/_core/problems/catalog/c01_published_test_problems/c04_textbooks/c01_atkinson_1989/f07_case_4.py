@@ -38,6 +38,7 @@ class Atkinson1989Case4(Formula):
             r"\end{cases}"
         ),
         interval="[0, 3]",
+        summary="A function with all derivatives 0 at its root, and exactly 0 in floating point on a band 0.073 wide.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -41,6 +41,10 @@ class ChapraCanale2015Figure84(Formula):
         ),
         expression=r"e^{-\tmp{R} \tmp{t} / (2 \tmp{L})} \cos(\tmp{\omega} \tmp{t}) - 0.01",
         interval="[0, 400]",
+        summary=(
+            "The relative charge left on an RLC circuit's capacitor after 0.05 s minus 1%, increasing in the "
+            "resistance, with 1 simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

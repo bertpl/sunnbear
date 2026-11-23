@@ -35,6 +35,10 @@ class Bradie2006Exercise2114(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u} - 0.5\right) \left(\tmp{u} + 1\right)^{3} \left(\tmp{u} - 2\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A quintic, flat around its triple root, with 2 further simple roots and all 3 roots inside each of the 6 "
+            "intervals."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

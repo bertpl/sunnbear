@@ -31,6 +31,7 @@ class BurdenFairesBurden2016Exercise229(Formula):
         definitions=((r"\tmp{u}", r"\x - 6.28 \c"),),
         expression=r"\tmp{u} - \left(\pi + 0.5 \sin{\left(\frac{\tmp{u}}{2} \right)}\right)",
         interval=r"[0, 2 \pi]",
+        summary="An increasing function with a slope between 0.75 and 1.25 on the whole interval and 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

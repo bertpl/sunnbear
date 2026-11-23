@@ -40,6 +40,9 @@ class SuliMayers2003Example17(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\tmp{u}} - \tmp{u} - 2",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function decreasing on the lower interval and increasing on the upper one, with 1 simple root on each."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

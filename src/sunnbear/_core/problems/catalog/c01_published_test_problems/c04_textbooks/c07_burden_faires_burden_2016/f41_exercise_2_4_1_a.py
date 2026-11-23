@@ -30,6 +30,10 @@ class BurdenFairesBurden2016Exercise241A(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 2 \tmp{u} e^{- \tmp{u}} + e^{- 2 \tmp{u}}",
         interval="[0, 1]",
+        summary=(
+            r"The square of $\x - e^{-\x}$ written out, never negative in exact arithmetic but negative at many floats "
+            r"within $8 \cdot 10^{-9}$ of the double root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

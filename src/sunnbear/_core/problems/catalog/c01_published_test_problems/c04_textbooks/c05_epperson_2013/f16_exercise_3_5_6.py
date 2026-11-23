@@ -30,6 +30,7 @@ class Epperson2013Exercise356(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"4 \tmp{u} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 2]",
+        summary="A function close to a line, with a slope between 3 and 5 everywhere and 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

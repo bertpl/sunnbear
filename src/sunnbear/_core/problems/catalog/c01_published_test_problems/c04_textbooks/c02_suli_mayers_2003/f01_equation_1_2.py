@@ -40,6 +40,7 @@ class SuliMayers2003Equation12(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{1}{2} - \frac{1}{1 + \param{M} \left|{\tmp{u} - 1.05}\right|}",
         interval=r"[\param{a}, \param{b}]",
+        summary=r"A function with 2 simple roots only $2/\param{M}$ apart, around a kink at $\x = 1.05$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

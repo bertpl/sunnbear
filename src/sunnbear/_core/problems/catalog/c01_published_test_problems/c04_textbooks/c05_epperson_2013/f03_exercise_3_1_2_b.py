@@ -30,6 +30,9 @@ class Epperson2013Exercise312B(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)} + \tmp{u}",
         interval="[0.1, 1]",
+        summary=(
+            "An increasing function, steepest at the lower bound, with the root $W(1)$, the Lambert W function at 1."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

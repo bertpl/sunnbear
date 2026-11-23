@@ -44,6 +44,10 @@ class BurdenFairesBurden2016Section2Pages4748(Formula):
             r"\end{cases}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A decreasing function with 1 root, and with rounding in $e^\x - 1$ making the function negative on 2 "
+            r"bands within $3.5 \cdot 10^{-16}$ of the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

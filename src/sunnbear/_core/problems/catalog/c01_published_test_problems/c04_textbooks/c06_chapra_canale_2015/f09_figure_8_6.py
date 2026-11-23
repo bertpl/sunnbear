@@ -43,6 +43,10 @@ class ChapraCanale2015Figure86(Formula):
             r"+ \frac{2.51}{\tmp{\mathrm{Re}} \sqrt{\tmp{u}}}\right)\right)^2}"
         ),
         interval="[0.008, 0.08]",
+        summary=(
+            "The fixed-point form of the Colebrook equation for the friction factor, increasing and concave, with 1 "
+            "simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

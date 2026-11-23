@@ -28,6 +28,10 @@ class ChapraCanale2015Problem51(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"- 0.5 \tmp{u}^{2} + 2.5 \tmp{u} + 4.5",
         interval="[5, 10]",
+        summary=(
+            "A concave parabola that decreases on the interval, which holds only the larger of the parabola's 2 simple "
+            "roots."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

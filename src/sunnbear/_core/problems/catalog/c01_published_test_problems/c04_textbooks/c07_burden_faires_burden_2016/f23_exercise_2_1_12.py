@@ -38,6 +38,10 @@ class BurdenFairesBurden2016Exercise2112(Formula):
             r" \left(\tmp{u} - 2\right)"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A polynomial with 5 distinct roots, 2 to 4 of them on each interval, and with a double root, at which the "
+            "sign does not change."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

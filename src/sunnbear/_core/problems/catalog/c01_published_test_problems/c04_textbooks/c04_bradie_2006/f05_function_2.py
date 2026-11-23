@@ -30,6 +30,9 @@ class Bradie2006Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\sqrt[7]{\tmp{u} - 1}",
         interval="[0, 2]",
+        summary=(
+            "A function with an infinite slope at its 1 root and a magnitude of 0.1 at only $10^{-7}$ from that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

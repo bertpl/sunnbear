@@ -32,6 +32,9 @@ class ChapraCanale2015Problem613(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{0.5 \tmp{u}} - \left(5 - 5 \tmp{u}\right)",
         interval="[0, 2]",
+        summary=(
+            "An increasing convex function whose slope changes by only 16% across the interval, with 1 simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

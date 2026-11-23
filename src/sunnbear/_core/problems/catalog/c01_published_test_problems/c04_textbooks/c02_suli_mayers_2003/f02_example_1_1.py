@@ -31,6 +31,7 @@ class SuliMayers2003Example11(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} - 2 \tmp{u} - 1",
         interval="[1, 2]",
+        summary="A convex function, 7.5 times as steep at the upper bound as at the lower bound, with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

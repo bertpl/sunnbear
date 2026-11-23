@@ -31,6 +31,10 @@ class BurdenFairesBurden2016Exercise242D(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{3 \tmp{u}} - 27 \tmp{u}^{6} + 27 \tmp{u}^{4} e^{\tmp{u}} - 9 \tmp{u}^{2} e^{2 \tmp{u}}",
         interval="[3, 5]",
+        summary=(
+            r"The cube of $e^{\x} - 3 \x^2$ written out as 4 terms that cancel to rounding noise within $3 \cdot "
+            r"10^{-5}$ of the triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

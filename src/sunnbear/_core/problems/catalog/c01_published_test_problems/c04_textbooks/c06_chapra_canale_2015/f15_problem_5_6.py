@@ -30,6 +30,10 @@ class ChapraCanale2015Problem56(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\ln{\left(\tmp{u}^{2} \right)} - 0.7",
         interval="[0.5, 2]",
+        summary=(
+            r"An even function with a logarithmic singularity at $\x = 0$, increasing and concave on the interval, "
+            r"which holds the positive one of the function's 2 roots."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -31,6 +31,10 @@ class BurdenFairesBurden2016Exercise241B(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\cos{\left(\tmp{u} + \sqrt{2} \right)} + \tmp{u} \left(\frac{\tmp{u}}{2} + \sqrt{2}\right)",
         interval="[-2, -1]",
+        summary=(
+            r"A function below 0.005 on the whole interval, with a root of multiplicity 4 and a sign that rounding "
+            r"decides within $3 \cdot 10^{-4}$ of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,12 +30,16 @@ class ChapraCanale2015Problem815(Formula):
 
     number = (1, 4, 6, 27)
     name = "Problem 8.15"
-    params = (FormulaParam("c_", latex_symbol="C"),)
+    params = (FormulaParam("c_", latex_symbol="C", meaning="The target concentration of dissolved oxygen, in mg/L."),)
     location_in_publication = "Prob. 8.15"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\param{c_} - \left(10 - 20 \left(e^{- 0.2 \tmp{u}} - e^{- 0.75 \tmp{u}}\right)\right)",
         interval="[0, 2]",
+        summary=(
+            "A target concentration minus the oxygen sag curve downstream of a sewage discharge, increasing through 1 "
+            "simple root and flattening toward a maximum just beyond the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

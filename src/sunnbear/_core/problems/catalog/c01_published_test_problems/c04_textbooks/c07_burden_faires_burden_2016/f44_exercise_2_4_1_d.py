@@ -35,6 +35,10 @@ class BurdenFairesBurden2016Exercise241D(Formula):
             r"\tmp{u}} - \ln{\left(2 \right)}^{3}"
         ),
         interval="[-1, 0]",
+        summary=(
+            r"The cube $(e^{2\x} - \ln 2)^3$ written out, below $10^{-3}$ in magnitude on a band 0.145 wide around the "
+            r"triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

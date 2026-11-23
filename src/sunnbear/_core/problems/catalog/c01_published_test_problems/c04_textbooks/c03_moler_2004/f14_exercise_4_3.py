@@ -31,6 +31,7 @@ class Moler2004Exercise43(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"816 \tmp{u}^{3} - 3835 \tmp{u}^{2} + 6000 \tmp{u} - 3125",
         interval="[1, 2]",
+        summary="A cubic with 3 simple roots about 0.1 apart, between which the cubic stays within 0.33 of 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -45,6 +45,7 @@ class Moler2004Section44(Formula):
             r"\operatorname{sign}{\left(\tmp{u} - \param{a_} \right)} \sqrt{\left|{\tmp{u} - " r"\param{a_}}\right|}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary="The signed square root, with an infinite slope at its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

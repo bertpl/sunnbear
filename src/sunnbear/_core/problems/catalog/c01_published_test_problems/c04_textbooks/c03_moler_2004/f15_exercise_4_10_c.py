@@ -29,6 +29,9 @@ class Moler2004Exercise410C(Formula):
         definitions=((r"\tmp{u}", r"\x - 31.4 \c"),),
         expression=r"J_{0}\left(\tmp{u}\right) - Y_{0}\left(\tmp{u}\right)",
         interval=r"[0, 10 \pi]",
+        summary=(
+            r"A function, $+\infty$ at the lower bound, with 10 simple roots and an oscillation of decaying amplitude."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

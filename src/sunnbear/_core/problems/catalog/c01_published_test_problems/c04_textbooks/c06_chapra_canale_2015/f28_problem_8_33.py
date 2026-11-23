@@ -29,10 +29,10 @@ class ChapraCanale2015Problem833(Formula):
     number = (1, 4, 6, 28)
     name = "Problem 8.33"
     params = (
-        FormulaParam("R", latex_symbol="R"),
-        FormulaParam("C", latex_symbol="C"),
-        FormulaParam("L", latex_symbol="L"),
-        FormulaParam("Z", latex_symbol="Z"),
+        FormulaParam("R", latex_symbol="R", meaning="The resistance, in ohms."),
+        FormulaParam("C", latex_symbol="C", meaning="The capacitance, in farads."),
+        FormulaParam("L", latex_symbol="L", meaning="The inductance, in henries."),
+        FormulaParam("Z", latex_symbol="Z", meaning="The target impedance, in ohms."),
     )
     location_in_publication = "Prob. 8.33"
     presentation = FormulaPresentation(
@@ -42,6 +42,10 @@ class ChapraCanale2015Problem833(Formula):
             r"\frac{1}{\tmp{\omega} \param{L}}\right)^{2}}"
         ),
         interval="[1, 1000]",
+        summary=(
+            "The impedance equation of a parallel RLC circuit in the angular frequency, with 1 simple root, right of "
+            "which the function stays between 0 and 0.009."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -29,6 +29,9 @@ class Atkinson1989Case1(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\left(\tmp{u} - 1\right) \left(1 + \left(\tmp{u} - 1\right)^{2}\right)",
         interval="[0, 3]",
+        summary=(
+            "An increasing cubic whose 1 real root is also the cubic's inflection point, where the slope is smallest."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

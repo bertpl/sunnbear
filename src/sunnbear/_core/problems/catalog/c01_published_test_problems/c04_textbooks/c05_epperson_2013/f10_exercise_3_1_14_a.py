@@ -28,6 +28,7 @@ class Epperson2013Exercise3114A(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\frac{1}{\tmp{u}^{2} + 1}",
         interval="[0, 5]",
+        summary="A positive, decreasing function, flat at the lower bound, with no real root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -53,6 +53,10 @@ class Bradie2006Section21Page67(Formula):
             r"\end{cases}"
         ),
         interval="[0.01, 0.1]",
+        summary=(
+            "A savings balance minus a goal as a slightly convex function of the annual interest rate, with 1 simple "
+            "root in the lower half of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

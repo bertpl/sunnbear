@@ -29,6 +29,10 @@ class Epperson2013Exercise31125(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.004 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{5}",
         interval="[0.998, 1.002]",
+        summary=(
+            r"A 5th power that stays below $4 \cdot 10^{-14}$ in magnitude on the whole interval and yet has the "
+            r"correct computed sign everywhere."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -29,10 +29,10 @@ class ChapraCanale2015Problem515(Formula):
     number = (1, 4, 6, 20)
     name = "Problem 5.15"
     params = (
-        FormulaParam("g", latex_symbol="g"),
-        FormulaParam("L", latex_symbol="L"),
-        FormulaParam("t", latex_symbol="t"),
-        FormulaParam("v", latex_symbol="v"),
+        FormulaParam("g", latex_symbol="g", meaning=r"The gravitational acceleration, in $\mathrm{m/s^2}$."),
+        FormulaParam("L", latex_symbol="L", meaning="The pipe's length, in m."),
+        FormulaParam("t", latex_symbol="t", meaning="The time since the tank started to drain, in s."),
+        FormulaParam("v", latex_symbol="v", meaning="The target outflow velocity, in m/s."),
     )
     location_in_publication = "Prob. 5.15"
     presentation = FormulaPresentation(
@@ -42,6 +42,10 @@ class ChapraCanale2015Problem515(Formula):
             r"\param{L}} \param{t} \right)}"
         ),
         interval="[0, 2]",
+        summary=(
+            "A target velocity minus the outflow velocity of a tank drained through a long pipe, decreasing in the "
+            "tank's initial head through 1 simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

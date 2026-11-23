@@ -31,6 +31,7 @@ class BurdenFairesBurden2016Exercise219(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} - 2 - \cos{\left(e^{\tmp{u}} - 2 \right)}",
         interval="[0.5, 1.5]",
+        summary=r"An increasing function whose 1 root lies where $e^\x - 2$ equals the fixed point of the cosine.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

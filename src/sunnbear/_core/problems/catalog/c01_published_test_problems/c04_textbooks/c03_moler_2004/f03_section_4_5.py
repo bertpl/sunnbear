@@ -34,6 +34,7 @@ class Moler2004Section45(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \param{M}",
         interval="[1, 2]",
+        summary="A parabola with 1 simple root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

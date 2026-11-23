@@ -33,6 +33,10 @@ class Epperson2013Figure312(Formula):
             r"+ \frac{5 \tmp{u}}{16} - \frac{1}{32}"
         ),
         interval="[0.45, 0.55]",
+        summary=(
+            r"$(\x - 1/2)^5$ written out as a polynomial, whose rounding errors decide the polynomial's sign within "
+            r"about $7 \cdot 10^{-4}$ of the root of multiplicity 5."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

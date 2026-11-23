@@ -37,6 +37,10 @@ class Epperson2013Table33(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A hyperbola with 1 simple root, and on $[-0.2, 0.2]$ also a pole at $\x = 0$, where the function changes "
+            r"sign as well."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

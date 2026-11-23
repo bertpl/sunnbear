@@ -46,6 +46,10 @@ class Bradie2006Example22(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tan{\left(\pi \tmp{u} \right)} - \tmp{u} - 6",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An increasing function with 1 simple root and the tangent's pole at $\x = 0.5$, the upper bound of the "
+            r"widest interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

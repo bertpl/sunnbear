@@ -30,6 +30,7 @@ class Bradie2006Exercise2116B(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u}^{2} - 10 \tmp{u} + 7",
         interval="[0, 1]",
+        summary="A cubic nearly straight on the interval, which holds 1 of the cubic's 3 real roots.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

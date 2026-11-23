@@ -28,6 +28,7 @@ class Bradie2006Exercise2111(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 13",
         interval="[2, 3]",
+        summary="A convex cubic whose only real root lies in the lower half of the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

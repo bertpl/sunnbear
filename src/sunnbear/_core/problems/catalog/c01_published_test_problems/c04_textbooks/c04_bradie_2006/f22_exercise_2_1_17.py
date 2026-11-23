@@ -35,6 +35,10 @@ class Bradie2006Exercise2117(Formula):
             r"\tmp{\zeta}^{2} - 8 \tmp{\zeta}^{4}\right)"
         ),
         interval="[0, 0.5]",
+        summary=(
+            r"An even function, decreasing from a maximum at the lower bound $\x = 0$ to 1 simple root in the upper "
+            r"fifth of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

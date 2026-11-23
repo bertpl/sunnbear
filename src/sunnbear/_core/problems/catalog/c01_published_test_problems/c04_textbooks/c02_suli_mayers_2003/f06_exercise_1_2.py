@@ -42,6 +42,10 @@ class SuliMayers2003Exercise12(Formula):
             r"\end{cases}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A function between the lines $\x$ and $2\x$, with infinitely many local extrema near the lower bound, "
+            r"which is the function's only root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

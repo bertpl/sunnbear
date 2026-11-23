@@ -32,6 +32,10 @@ class BurdenFairesBurden2016Exercise232(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"- \tmp{u}^{3} - \cos{\left(\tmp{u} \right)}",
         interval="[-1, 0]",
+        summary=(
+            "A decreasing function with 1 simple root in the lowest 15% of the interval and a slope of 0 at the upper "
+            "bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

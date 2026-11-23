@@ -28,6 +28,7 @@ class ChapraCanale2015Problem52(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"5 \tmp{u}^{3} - 5 \tmp{u}^{2} + 6 \tmp{u} - 2",
         interval="[0, 1]",
+        summary=r"A cubic with a positive slope for every $\x$ and so 1 real root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

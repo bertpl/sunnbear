@@ -35,6 +35,10 @@ class Bradie2006Exercise229(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{4} - 18 \tmp{u}^{2} + 45",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An even quartic with 1 simple root on each interval, the lower root at an inflection point and the upper "
+            r"root above a local minimum at the bound $\x = 3$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

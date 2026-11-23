@@ -38,7 +38,7 @@ class ChapraCanale2015Figure85(Formula):
 
     number = (1, 4, 6, 8)
     name = "Figure 8.5"
-    params = (FormulaParam("eps", latex_symbol=r"\varepsilon"),)
+    params = (FormulaParam("eps", latex_symbol=r"\varepsilon", meaning="The roughness of the pipe's wall, in m."),)
     location_in_publication = "§8.4, Eq. (8.21), Fig. 8.5; Prob. 8.13"
     presentation = FormulaPresentation(
         definitions=(
@@ -51,6 +51,10 @@ class ChapraCanale2015Figure85(Formula):
             r"+ \frac{2.51}{\tmp{\mathrm{Re}} \sqrt{\tmp{u}}}\right)"
         ),
         interval="[0.008, 0.08]",
+        summary=(
+            "The Colebrook equation for the friction factor of turbulent pipe flow, decreasing and about 30 times as "
+            "steep at the lower bound as at the upper."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

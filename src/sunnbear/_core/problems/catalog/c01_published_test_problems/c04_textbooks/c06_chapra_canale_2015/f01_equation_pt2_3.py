@@ -35,10 +35,10 @@ class ChapraCanale2015EquationPt23(Formula):
     number = (1, 4, 6, 1)
     name = "Equation (PT2.3)"
     params = (
-        FormulaParam("g", latex_symbol="g"),
-        FormulaParam("m", latex_symbol="m"),
-        FormulaParam("v", latex_symbol="v"),
-        FormulaParam("t", latex_symbol="t"),
+        FormulaParam("g", latex_symbol="g", meaning=r"The gravitational acceleration, in $\mathrm{m/s^2}$."),
+        FormulaParam("m", latex_symbol="m", meaning="The parachutist's mass, in kg."),
+        FormulaParam("v", latex_symbol="v", meaning="The target velocity, in m/s."),
+        FormulaParam("t", latex_symbol="t", meaning="The duration of the free fall, in s."),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
@@ -54,6 +54,10 @@ class ChapraCanale2015EquationPt23(Formula):
             r"\param{t}}\right) - \param{v}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A decreasing function with 1 simple root, the drag coefficient at which a falling parachutist reaches a "
+            r"target velocity after $\param{t}$ seconds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

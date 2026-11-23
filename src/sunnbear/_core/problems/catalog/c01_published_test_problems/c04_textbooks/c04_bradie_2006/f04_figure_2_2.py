@@ -29,6 +29,9 @@ class Bradie2006Figure22(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{7}",
         interval="[0, 2]",
+        summary=(
+            "A function flat at its root of multiplicity 7 and below $10^{-7}$ in magnitude within 0.1 of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

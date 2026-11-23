@@ -31,7 +31,16 @@ class SuliMayers2003Example14(Formula):
 
     number = (1, 4, 2, 3)
     name = "Example 1.4"
-    params = (FormulaParam("alpha", latex_symbol=r"\alpha"),)
+    params = (
+        FormulaParam(
+            "alpha",
+            latex_symbol=r"\alpha",
+            meaning=(
+                r"The exponent of $k$ in the terms $2^{-k^{\param{alpha}}}$, $k = 0, 1, 2, \ldots$, each of which "
+                r"$\fn{g}$ maps to the next."
+            ),
+        ),
+    )
     location_in_publication = "Example 1.4"
     presentation = FormulaPresentation(
         definitions=(
@@ -48,6 +57,10 @@ class SuliMayers2003Example14(Formula):
             r"\end{cases}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A function with its only root at the lower bound, where the slope is 0 for $\param{alpha} = 1/2$, $1/2$ "
+            r"for $\param{alpha} = 1$ and 1 for $\param{alpha} = 2$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

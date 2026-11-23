@@ -29,6 +29,7 @@ class ChapraCanale2015Problem53(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"-25 + 82 \tmp{u} - 90 \tmp{u}^{2} + 44 \tmp{u}^{3} - 8 \tmp{u}^{4} + 0.7 \tmp{u}^{5}",
         interval="[0.5, 1]",
+        summary="An increasing quintic with only 1 real root, steepest at the lower bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

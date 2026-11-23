@@ -32,6 +32,7 @@ class BurdenFairesBurden2016Exercise216B(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} + 3 \cos{\left(\tmp{u} \right)} - e^{\tmp{u}}",
         interval="[1, 2]",
+        summary="A decreasing, concave function with 1 simple root in the lower quarter of the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

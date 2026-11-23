@@ -27,10 +27,14 @@ class ChapraCanale2015Problem85(Formula):
     number = (1, 4, 6, 26)
     name = "Problem 8.5"
     params = (
-        FormulaParam("K", latex_symbol="K"),
-        FormulaParam("ca0", latex_symbol="c_{a0}"),
-        FormulaParam("cb0", latex_symbol="c_{b0}"),
-        FormulaParam("cc0", latex_symbol="c_{c0}"),
+        FormulaParam(
+            "K",
+            latex_symbol="K",
+            meaning=r"The equilibrium constant of the reversible reaction $2A + B \rightleftharpoons C$.",
+        ),
+        FormulaParam("ca0", latex_symbol="c_{a0}", meaning="The initial concentration of A."),
+        FormulaParam("cb0", latex_symbol="c_{b0}", meaning="The initial concentration of B."),
+        FormulaParam("cc0", latex_symbol="c_{c0}", meaning="The initial concentration of C."),
     )
     location_in_publication = "Prob. 8.5"
     presentation = FormulaPresentation(
@@ -40,6 +44,10 @@ class ChapraCanale2015Problem85(Formula):
             r"\left(\param{cb0} - \tmp{u}\right)}"
         ),
         interval="[0, 20]",
+        summary=(
+            "A chemical-equilibrium condition, nearly constant over the lower half of the interval, then falling "
+            "through 1 simple root toward a double pole just beyond the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

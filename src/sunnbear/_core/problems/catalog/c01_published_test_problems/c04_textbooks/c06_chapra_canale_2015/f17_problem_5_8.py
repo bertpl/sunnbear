@@ -28,6 +28,7 @@ class ChapraCanale2015Problem58(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 18",
         interval="[4, 5]",
+        summary="A parabola, increasing and close to a line on the interval, with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

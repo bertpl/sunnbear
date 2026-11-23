@@ -29,6 +29,7 @@ class ChapraCanale2015Problem54(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"-12 - 21 \tmp{u} + 18 \tmp{u}^{2} - 2.75 \tmp{u}^{3}",
         interval="[-1, 0]",
+        summary="A cubic with 3 real roots, decreasing and convex on the interval, which holds only the lowest root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

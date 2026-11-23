@@ -34,14 +34,18 @@ class ChapraCanale2015Problem517(Formula):
     number = (1, 4, 6, 22)
     name = "Problem 5.17"
     params = (
-        FormulaParam("R", latex_symbol="R"),
-        FormulaParam("V", latex_symbol="V"),
+        FormulaParam("R", latex_symbol="R", meaning="The tank's radius, in m."),
+        FormulaParam("V", latex_symbol="V", meaning=r"The volume of water in the tank, in $\mathrm{m^3}$."),
     )
     location_in_publication = "Prob. 5.17, 5.19, 6.19, 8.9"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{h}", r"\x - 3 \c"),),
         expression=r"\param{V} - \frac{\pi \tmp{h}^{2} \left(3 \param{R} - \tmp{h}\right)}{3}",
         interval="[0, 3]",
+        summary=(
+            "A cubic, flat at the lower bound, with 1 simple root: the depth at which a spherical tank holds a given "
+            "volume of water."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
