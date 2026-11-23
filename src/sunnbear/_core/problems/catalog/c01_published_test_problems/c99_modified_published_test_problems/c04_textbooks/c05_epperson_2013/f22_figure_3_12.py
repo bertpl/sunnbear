@@ -48,7 +48,7 @@ class ModifiedEpperson2013Figure312(Formula):
         interval="[0.45, 0.55]",
         summary=(
             r"A 5th power whose magnitude stays below $4 \cdot 10^{-7}$ on the whole interval and at most about "
-            r"$10^{-10}$ on its middle 20%."
+            r"$10^{-10}$ on the interval's middle 20%."
         ),
         notes=(
             (
