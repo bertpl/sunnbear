@@ -52,6 +52,12 @@ class Burkardt2016ProblemP16(Formula):
             r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest at $\x = 0$, which lies "
             r"close to its root."
         ),
+        notes=(
+            (
+                "The source cites 2 books for this equation: Peter Colwell, Solving Kepler's Equation Over Three "
+                "Centuries, Willmann-Bell (1993), and Jean Meeus, Astronomical Algorithms, Willmann-Bell (1991)."
+            ),
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

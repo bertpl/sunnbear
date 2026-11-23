@@ -1,9 +1,5 @@
 title = 'SciPy (2026): the `_tstutils` test problems of release 1.18.1'
-reference = '''
-SciPy 1.18.1 (2026), module `scipy/optimize/_tstutils.py`, https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py. The module cites 2 sources:
-- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344, https://dl.acm.org/doi/10.1145/210089.210111; the module misprints the volume as "Volume 221" and gives no issue or pages
-- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives", Advances in Engineering Software 28.3 (1997): 145-149 (no DOI in the module)
-'''
+reference = 'SciPy 1.18.1 (2026), module `scipy/optimize/_tstutils.py`, https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py.'
 year = 2026
 subcategory = '1.3'
 where_in_source = '''
@@ -18,6 +14,12 @@ The module docstring names only the first 3 collections. A list `functions = [f2
 transcribed_from = "the code of the module in SciPy 1.18.1: function bodies and test-case lists. Where a docstring or the module's `description` string differs from the code, the rows follow the code (`f6`, `aps14_f`, `aps15_f`)."
 rows_summary = "32, 1 per function (6 + 15 + 2 + 9), covering the module's 211 test cases (6 + 154 + 6 + 45)."
 notes = '''
+About the source:
+
+The module cites 2 sources:
+- [1] Alefeld, G. E., Potra, F. A. and Shi, Y., "Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Trans. Math. Softw. 21(3), September 1995, pp. 327–344, https://dl.acm.org/doi/10.1145/210089.210111; the module misprints the volume as "Volume 221" and gives no issue or pages
+- [2] Chandrupatla, T. R., "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives", Advances in Engineering Software 28.3 (1997): 145-149 (no DOI in the module)
+
 How to read the rows:
 - **`name`** holds the function's docstring, since the module gives no other names; `fun1`–`fun9` have none.
 - **Each test case also gives a root**, which the rows leave out. The `original` and `aps` cases add a start `x0` for Newton and Halley, which the rows also leave out; the `chandrupatla` cases add the number of function evaluations that Chandrupatla's algorithm needed.

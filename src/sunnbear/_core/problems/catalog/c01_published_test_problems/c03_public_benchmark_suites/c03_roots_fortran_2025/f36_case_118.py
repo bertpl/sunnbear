@@ -27,6 +27,12 @@ class RootsFortran2025Case118(Formula):
         expression=r"\tmp{u}^{3} - \tmp{u} - 2.0",
         interval="[1, 2]",
         summary="A cubic with 1 simple root, increasing and convex on the interval.",
+        notes=(
+            (
+                'The source takes this function from the example of the English Wikipedia article "ITP method", '
+                "https://en.wikipedia.org/wiki/ITP_method."
+            ),
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

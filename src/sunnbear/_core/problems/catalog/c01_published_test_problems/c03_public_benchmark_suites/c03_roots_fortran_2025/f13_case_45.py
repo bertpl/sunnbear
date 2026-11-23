@@ -36,6 +36,14 @@ class RootsFortran2025Case45(Formula):
             r"A hyperbola with 1 root close to the lower bound, steep there because of a pole at $\x = 0$, and nearly "
             "flat over the upper half."
         ),
+        notes=(
+            (
+                "The source takes this function from problem 11 of G. E. Alefeld, F. A. Potra and Yixun Shi, "
+                '"Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Transactions on Mathematical Software '
+                r"21(3), 327–344 (1995), https://doi.org/10.1145/210089.210111. The article gives the function at "
+                r"$\param{n} = 20$ among other values; the value $\param{n} = 30$ is the source's own choice."
+            ),
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

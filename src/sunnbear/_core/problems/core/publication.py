@@ -20,12 +20,15 @@ class Publication:
     - a web page;
     - a code repository or a data set.
 
-    Each part that a publication declares appears in its citation as written, and building the publication checks this.
+    The citation is 1 paragraph, and each part that a publication declares appears in it as written; building the
+    publication checks both.
     The catalog's tests require a shipped publication to declare its citation key, year and title, and its DOI or URL
     where its citation holds a link.
 
     Attributes:
-        citation: The full citation, as a reader would cite the publication, with its DOI or URL where it has one.
+        citation: The full citation in 1 paragraph, as a reader would cite the publication, with its DOI or URL where
+            it has one. Notes about the publication go in the ``notes`` of its file in the survey of published test
+            problems, or in the ``notes`` of the presentation of the formula that they concern.
         citation_key: A short name of the publication, unique among the shipped publications: the first author's
             surname, or a project's name, and the year's last 2 digits, with a lowercase letter where 2 keys would
             collide, such as "Brent71" or "Ganchovski26a".
@@ -49,15 +52,18 @@ class Publication:
     url: str | None = None
 
     def __post_init__(self) -> None:
-        """Check that the citation holds every declared part, and that the citation key fits the year.
+        """Check that the citation is 1 paragraph holding every declared part, and that the citation key fits the year.
 
         Raises:
             ValueError: If any of these holds:
+                - the citation holds a line break;
                 - the citation does not hold a declared author, the year, the title, where the publication appeared,
                   the DOI or the URL;
                 - the citation key is not a name, 2 digits and an optional letter;
                 - the citation key's 2 digits are not the last 2 digits of the year.
         """
+        if "\n" in self.citation:
+            raise ValueError(f"Publication: the citation {self.citation!r} is not 1 paragraph.")
         if self.citation_key is not None:
             match = _CITATION_KEY_PATTERN.fullmatch(self.citation_key)
             if match is None:

@@ -48,6 +48,13 @@ class Burkardt2016ProblemP15(Formula):
             r"An odd function with an infinite slope at its root, and below $2 \cdot 10^{-7}$ in magnitude beyond $|\x|"
             r" = 4$ on the wide interval."
         ),
+        notes=(
+            (
+                "The source takes this function from George C. Donovan, Arnold R. Miller and Timothy J. Moreland, "
+                '"Pathological Functions for Newton\'s Method", The American Mathematical Monthly 100(1), 53–58 '
+                "(1993), https://doi.org/10.1080/00029890.1993.11990365."
+            ),
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
