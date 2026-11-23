@@ -37,6 +37,10 @@ class RootsFortran2025Case71(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "The identity function, with its root $10^{-4}$ above the lower bound of one interval and near the upper "
+            "bound of another, wide one."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

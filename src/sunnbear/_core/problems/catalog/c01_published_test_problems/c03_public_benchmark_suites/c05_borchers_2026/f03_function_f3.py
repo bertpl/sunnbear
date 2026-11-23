@@ -28,6 +28,10 @@ class Borchers2026FunctionF3(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.4 \c"),),
         expression=r"35 \tmp{u}^{35} - 1",
         interval="[-0.5, 1.9]",
+        summary=(
+            "A 35th power minus 1, with 1 root, exactly $-1$ in floating point on a band 0.63 wide, and steep toward "
+            "the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -33,6 +33,10 @@ class Burkardt2016ProblemP19(Formula):
             r"\cos{\left(100.0 \tmp{u} \right)} - 4.0 \operatorname{erf}{\left(30.0 \tmp{u} - 10.0 " r"\right)}"
         ),
         interval="[0, 1]",
+        summary=(
+            "A cosine with about 16 periods plus a smooth step from 4 to $-4$, with its 1 root in the step, referred to"
+            ' in the source as "The jumping cosine".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

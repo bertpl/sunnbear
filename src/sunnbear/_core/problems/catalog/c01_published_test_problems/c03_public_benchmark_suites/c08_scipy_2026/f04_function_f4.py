@@ -35,6 +35,10 @@ class Scipy2026FunctionF4(Formula):
             r"\end{cases}"
         ),
         interval=r"[0.5, \sqrt{3}]",
+        summary=(
+            r"A piecewise linear function that jumps from $-0.9$ to $1.1$ at its root, the only value of $\x$ where it "
+            "is 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

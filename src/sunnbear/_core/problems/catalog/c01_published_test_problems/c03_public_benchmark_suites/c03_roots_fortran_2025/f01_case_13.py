@@ -26,6 +26,7 @@ class RootsFortran2025Case13(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\tmp{u}^{3} - 2.0 \tmp{u} - \tmp{u} + 3.0",
         interval="[-3, 2]",
+        summary="A cubic with 1 root, left of both its local extrema, and a local minimum whose value is only 1.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

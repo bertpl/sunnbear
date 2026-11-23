@@ -42,6 +42,10 @@ class Scipy2026FunctionF6(Formula):
             r"\end{cases}"
         ),
         interval=r"[0.5, \sqrt{3}]",
+        summary=(
+            "A function of pseudo-random values, negative below the root and positive above it, whose magnitude does "
+            "not depend on the distance to the root."
+        ),
         notes=(
             r"$U(\tmp{u})$ is a pseudo-random value in $[0, 1)$ that depends only on $\tmp{u}$ and is distributed "
             r"uniformly: evaluations at the same $\tmp{u}$ give the same value, and evaluations at different values "

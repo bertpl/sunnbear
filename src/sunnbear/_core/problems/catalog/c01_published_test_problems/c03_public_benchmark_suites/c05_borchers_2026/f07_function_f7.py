@@ -30,6 +30,10 @@ class Borchers2026FunctionF7(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.4 \c"),),
         expression=r"\tmp{u}^{2} + \sin{\left(\frac{\tmp{u}}{9} \right)} - \frac{1}{4}",
         interval="[-0.5, 1.9]",
+        summary=(
+            "A function close to a parabola, with a minimum and 1 root inside the interval, and a second root just "
+            "below the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

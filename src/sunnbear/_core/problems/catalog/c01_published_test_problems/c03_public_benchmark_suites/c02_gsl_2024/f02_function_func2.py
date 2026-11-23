@@ -32,6 +32,7 @@ class Gsl2024FunctionFunc2(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.33 \c"),),
         expression=r"\sqrt{\left|{\tmp{u}}\right|} \operatorname{sign}{\left(\tmp{u} \right)}",
         interval=r"\left[- \frac{1}{3}, 1\right]",
+        summary="The signed square root, with an infinite slope at its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

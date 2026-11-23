@@ -28,6 +28,10 @@ class Borchers2026FunctionF11(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
         expression=r"\tmp{u}^{9} + 0.0001",
         interval="[-1.2, 0]",
+        summary=(
+            "A 9th power plus $10^{-4}$, with its 1 root in the upper third of the interval, where its values stay "
+            "below $10^{-4}$ in magnitude."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

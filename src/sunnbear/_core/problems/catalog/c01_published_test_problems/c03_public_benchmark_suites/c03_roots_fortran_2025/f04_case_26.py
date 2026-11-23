@@ -46,6 +46,10 @@ class RootsFortran2025Case26(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "An odd function with all derivatives 0 at its root, so flat there that it is exactly 0 on a band 0.075 "
+            "wide."
+        ),
         notes=(
             r"The expression is 0 where $e^{1/\tmp{u}^2}$ exceeds the largest float64 value, which is about "
             r"$e^{709.78}$.",

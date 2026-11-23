@@ -28,6 +28,7 @@ class Scipy2026FunctionF2(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.23 \c"),),
         expression=r"\tmp{u}^{2} - 1",
         interval=r"[0.5, \sqrt{3}]",
+        summary="A parabola, increasing on the interval, with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

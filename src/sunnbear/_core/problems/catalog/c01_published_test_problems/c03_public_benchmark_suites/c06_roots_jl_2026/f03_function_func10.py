@@ -31,6 +31,10 @@ class RootsJl2026FunctionFunc10(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\arcsin{\left(\tmp{u}^{2} - 1 \right)} - \frac{\tmp{u}}{2} + 1",
         interval="[-0.5, 1]",
+        summary=(
+            "A function with 2 roots and a kink at its minimum, where the argument of the arcsine reaches $-1$, the "
+            "edge of the arcsine's domain."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

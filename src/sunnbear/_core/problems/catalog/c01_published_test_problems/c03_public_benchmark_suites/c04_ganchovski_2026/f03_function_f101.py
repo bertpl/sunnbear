@@ -30,6 +30,10 @@ class Ganchovski2026FunctionF101(Formula):
             r"\begin{cases} - \tmp{u}^{2} & \text{for}\: \tmp{u} < 0 \\7 \tmp{u}^{2} & \text{otherwise} " r"\end{cases}"
         ),
         interval="[-3, 1]",
+        summary=(
+            "A piecewise quadratic that changes sign at its root despite a slope of 0 there, and is 7 times as "
+            "steep above the root as below."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

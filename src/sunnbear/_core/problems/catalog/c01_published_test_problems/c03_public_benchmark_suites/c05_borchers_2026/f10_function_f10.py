@@ -31,6 +31,7 @@ class Borchers2026FunctionF10(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.6 \c"),),
         expression=r"\tmp{u}^{2} + \tmp{u} \sin{\left(\sqrt{75} \tmp{u} \right)} - 0.2",
         interval="[0.4, 1]",
+        summary="A function that decreases at both bounds, with 1 root between a local minimum and a local maximum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

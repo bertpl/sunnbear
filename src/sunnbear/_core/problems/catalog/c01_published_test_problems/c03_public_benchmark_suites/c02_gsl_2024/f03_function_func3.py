@@ -28,6 +28,10 @@ class Gsl2024FunctionFunc3(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 1.0 \cdot 10^{-8}",
         interval="[0, 1]",
+        summary=(
+            "A parabola with its minimum at the lower bound, negative only within $10^{-4}$ of that bound, where it is "
+            "no lower than $-10^{-8}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

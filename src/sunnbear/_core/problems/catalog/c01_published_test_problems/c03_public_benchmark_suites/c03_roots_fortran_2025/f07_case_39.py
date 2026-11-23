@@ -30,6 +30,10 @@ class RootsFortran2025Case39(Formula):
             r"\tmp{u}^{2} + \frac{5205601.0}{100.0} \tmp{u} - \frac{4005001.0}{100.0}"
         ),
         interval="[0, 10]",
+        summary=(
+            r"A quintic with 1 root near the lower bound, and complex roots $10 \pm 0.32i$ that lower its value at the "
+            r"upper bound to 0.3% of its maximum."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

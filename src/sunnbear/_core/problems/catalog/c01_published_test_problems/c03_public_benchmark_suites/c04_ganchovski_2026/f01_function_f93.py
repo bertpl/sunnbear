@@ -38,6 +38,10 @@ class Ganchovski2026FunctionF93(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\tmp{u}^{\param{n}} - 0.001",
         interval="[-10, 10]",
+        summary=(
+            r"An odd power minus 0.001, nearly flat on a band around $\x = 0$ that ends at its root, and of magnitude "
+            r"$10^{\param{n}}$ at the bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -38,6 +38,10 @@ class Burkardt2016ProblemP13(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\param{slope} \left(\tmp{u} - 100.0\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A line so flat that its values stay below $10^{-9}$ in magnitude within 100 of its root, referred to in "
+            'the source as "Lazy Boy".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

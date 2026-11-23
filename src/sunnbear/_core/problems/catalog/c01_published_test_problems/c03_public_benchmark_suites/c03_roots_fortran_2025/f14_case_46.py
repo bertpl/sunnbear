@@ -32,6 +32,10 @@ class RootsFortran2025Case46(Formula):
             r"\arctan{\left(\frac{\tmp{u}}{3.0} \right)} \tmp{u}^{2} + e^{\tmp{u}} - 1.0"
         ),
         interval="[-10, 5]",
+        summary=(
+            "A rising function plus sines, with 1 root, local extrema only near that root, and 1 local maximum whose "
+            "value lies between $-0.2$ and 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -29,6 +29,10 @@ class Ganchovski2026FunctionF100(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.72 \c"),),
         expression=r"\sqrt[3]{\frac{4 \tmp{u} - 3}{\tmp{u}}}",
         interval="[0, e]",
+        summary=(
+            r"The cube root of a rational function, with an infinite slope at its root, and tending to $-\infty$ toward"
+            r" the lower bound, where it is undefined."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

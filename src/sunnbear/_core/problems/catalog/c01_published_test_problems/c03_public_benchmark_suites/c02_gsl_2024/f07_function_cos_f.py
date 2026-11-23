@@ -36,6 +36,10 @@ class Gsl2024FunctionCosF(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\cos{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "The cosine on 2 intervals that mirror each other, each with 1 root and with a zero slope at its "
+            r"bound $\x = 0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

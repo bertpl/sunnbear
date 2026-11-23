@@ -41,6 +41,10 @@ class Borchers2026FunctionF12(Formula):
             r"\ln{\left(\tmp{u} \right)} + \frac{\tmp{u}^{2}}{2 e^{1}} - \frac{2 \tmp{u}}{\sqrt{e^{1}}} " r"+ 1"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An increasing function so flat at its triple root that rounding errors decide its sign within about $2 "
+            r"\cdot 10^{-5}$ of the root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

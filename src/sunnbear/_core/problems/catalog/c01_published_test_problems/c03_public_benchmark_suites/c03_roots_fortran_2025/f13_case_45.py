@@ -32,6 +32,10 @@ class RootsFortran2025Case45(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
         expression=r"\frac{\param{n} \tmp{u} - 1.0}{\left(\param{n} - 1.0\right) \tmp{u}}",
         interval="[0.01, 1]",
+        summary=(
+            r"A hyperbola with 1 root close to the lower bound, steep there because of a pole at $\x = 0$, and nearly "
+            "flat over the upper half."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

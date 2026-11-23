@@ -28,6 +28,7 @@ class RootsFortran2025Case41(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\arctan{\left(\tmp{u} \right)}",
         interval="[-2, 3]",
+        summary="The arctangent, steepest at its 1 root and flattening toward both bounds.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

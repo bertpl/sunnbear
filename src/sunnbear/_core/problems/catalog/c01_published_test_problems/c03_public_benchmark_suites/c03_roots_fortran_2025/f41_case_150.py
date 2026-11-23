@@ -28,6 +28,10 @@ class RootsFortran2025Case150(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\left(\tmp{u} - 3.0\right)^{5}} - 1.0",
         interval="[2.6, 3.6]",
+        summary=(
+            "A function with a root of multiplicity 5, around which it is exactly 0 in floating point on a band "
+            "0.0012 wide."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

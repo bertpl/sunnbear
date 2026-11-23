@@ -30,6 +30,10 @@ class RootsJl2026FunctionFunc11(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 2]",
+        summary=(
+            "An exponential minus a cosine, with 1 root on either side of a shallow minimum, and much larger values "
+            "toward the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

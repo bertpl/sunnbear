@@ -38,6 +38,10 @@ class RootsFortran2025Case84(Formula):
             r"\tmp{u}^{4} - 1.0"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"$\x^4 (\x + 1)^3 (\x - 3) - 1$ multiplied out, with 1 root on each interval, flat around the intervals' "
+            r"shared bound and steep at their outer bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

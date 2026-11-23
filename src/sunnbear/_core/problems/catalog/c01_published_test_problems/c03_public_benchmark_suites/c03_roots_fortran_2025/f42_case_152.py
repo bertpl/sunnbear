@@ -28,6 +28,10 @@ class RootsFortran2025Case152(Formula):
         definitions=((r"\tmp{u}", r"\x - 4.95 \c"),),
         expression=r"\pi - \frac{1.0}{\tmp{u}}",
         interval="[0.05, 5]",
+        summary=(
+            "An increasing function with a pole just below the lower bound, steep next to that bound and nearly flat "
+            "over most of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

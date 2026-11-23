@@ -38,6 +38,10 @@ class Borchers2026FunctionF6(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u} - 1\right) e^{- 9 \tmp{u}} + \tmp{u}^{9}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A function with 1 root on a flat stretch, falling steeply toward the lower bound, to about $-7 \cdot "
+            r"10^{5}$ on the interval that starts at $-1.4$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -37,6 +37,10 @@ class RootsFortran2025Case95(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(0.04 \tmp{u} - 0.4\right) \tmp{u} + 0.5 - \sin{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A shallow parabola minus a sine, with 1 root on each of 4 adjacent intervals and local extrema on 2 of "
+            "them."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

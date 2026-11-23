@@ -29,7 +29,14 @@ class Burkardt2016ProblemP12(Formula):
     number = (1, 3, 1, 12)
     name = "Problem p12"
     params = (
-        FormulaParam("factor", latex_symbol=r"\mathit{factor}"),
+        FormulaParam(
+            "factor",
+            latex_symbol=r"\mathit{factor}",
+            meaning=(
+                r"The function's scale: away from $\x = 1$, the function equals "
+                r"$\param{factor} (\x - 1) e^{-1/(\x - 1)^2}$."
+            ),
+        ),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
@@ -46,6 +53,10 @@ class Burkardt2016ProblemP12(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function with all derivatives 0 at its root, and exactly 0 in floating point on a band 0.073 wide, "
+            'referred to in the source as "Flat Stanley".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

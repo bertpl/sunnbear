@@ -28,6 +28,10 @@ class Gsl2024FunctionFunc1(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.9 \c"),),
         expression=r"\tmp{u}^{20} - 1",
         interval="[0.1, 2]",
+        summary=(
+            "A polynomial of degree 20, nearly constant at $-1$ over the lower third of the interval and rising to "
+            "about $10^6$ at the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

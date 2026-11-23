@@ -29,6 +29,10 @@ class Scipy2026FunctionF3(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.23 \c"),),
         expression=r"\tmp{u} \left(\tmp{u} - 1.0\right) \left(\tmp{u} - 2.0\right) \left(\tmp{u} - 3.0\right)",
         interval=r"[0.5, \sqrt{3}]",
+        summary=(
+            "A quartic with 1 of its 4 simple roots on the interval, and a local maximum between that root and the "
+            "upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

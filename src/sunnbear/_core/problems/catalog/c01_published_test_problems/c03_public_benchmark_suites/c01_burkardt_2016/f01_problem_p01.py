@@ -39,6 +39,7 @@ class Burkardt2016ProblemP01(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - 0.5 \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
+        summary="A sine minus a line, with many local extrema, 3 roots on the wide interval and 1 on the narrow one.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

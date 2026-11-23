@@ -35,6 +35,10 @@ class RootsFortran2025Case75(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\left(\tmp{u} \tmp{u} - 27.0\right) \tmp{u} - 54.0\right) \tmp{u} - 10.0",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A quartic with 1 root on each of 4 adjacent intervals, 2 of which meet at $\x = -3$, where the quartic "
+            r"has a local minimum."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

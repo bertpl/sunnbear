@@ -34,8 +34,8 @@ class Burkardt2016ProblemP16(Formula):
     number = (1, 3, 1, 16)
     name = "Problem p16"
     params = (
-        FormulaParam("e", latex_symbol="e"),
-        FormulaParam("m", latex_symbol="m"),
+        FormulaParam("e", latex_symbol="e", meaning="The orbit's eccentricity."),
+        FormulaParam("m", latex_symbol="m", meaning="The mean anomaly, in degrees."),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
@@ -48,6 +48,10 @@ class Burkardt2016ProblemP16(Formula):
             r"\tmp{u}}{180.0} \right)}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest at $\x = 0$, which lies "
+            r"close to its root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

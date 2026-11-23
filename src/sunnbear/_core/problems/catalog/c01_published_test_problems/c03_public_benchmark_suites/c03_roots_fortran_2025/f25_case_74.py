@@ -26,6 +26,10 @@ class RootsFortran2025Case74(Formula):
         definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=r"\left(\left(\tmp{u} - 3.0\right) \tmp{u} - 9.0\right) \tmp{u} - 6.0",
         interval="[0, 8]",
+        summary=(
+            "A cubic that falls from the lower bound to a minimum and then rises steeply, with 1 simple root on the "
+            "rise."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

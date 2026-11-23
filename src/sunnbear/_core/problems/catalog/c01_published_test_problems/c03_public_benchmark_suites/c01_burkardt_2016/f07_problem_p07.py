@@ -35,6 +35,7 @@ class Burkardt2016ProblemP07(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3}",
         interval=r"[\param{a}, \param{b}]",
+        summary="A cube, flat at its triple root, which lies close to the upper bound of the narrow interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

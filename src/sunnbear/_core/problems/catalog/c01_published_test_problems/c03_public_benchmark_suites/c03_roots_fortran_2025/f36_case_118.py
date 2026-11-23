@@ -26,6 +26,7 @@ class RootsFortran2025Case118(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 2.0",
         interval="[1, 2]",
+        summary="A cubic with 1 simple root, increasing and convex on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
