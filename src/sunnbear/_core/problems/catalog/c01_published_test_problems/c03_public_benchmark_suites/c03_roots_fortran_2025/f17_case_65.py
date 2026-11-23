@@ -27,7 +27,7 @@ class RootsFortran2025Case65(Formula):
         expression=r"\left(\tmp{u} - 1.0\right)^{6} - 1.0",
         interval="[1, 2.1]",
         summary=(
-            "A sixth power minus 1, within 0.01 of $-1$ over the lower 40% of the interval, with 1 root near the upper "
+            "A 6th power minus 1, within 0.01 of $-1$ over the lower 40% of the interval, with 1 root near the upper "
             "bound."
         ),
     )

@@ -38,8 +38,8 @@ class RootsFortran2025Case71(Formula):
         expression=r"\tmp{u}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "The identity function, with its root $10^{-4}$ above the lower bound of 1 interval and near the upper "
-            "bound of a wide one."
+            "The identity function, with its root $10^{-4}$ above the lower bound of one interval and near the upper "
+            "bound of another, wide one."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

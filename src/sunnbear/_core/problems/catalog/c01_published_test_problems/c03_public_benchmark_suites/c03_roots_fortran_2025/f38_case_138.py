@@ -41,8 +41,8 @@ class RootsFortran2025Case138(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"The signed square root of $2/3 - \x$, lowered by 0.1, with its root 0.01 below $\x = 2/3$, where the "
-            r"slope is infinite."
+            r"The signed square root of $2/3 - \x$, lowered by 0.1, with an infinite slope at $\x = 2/3$ and its root "
+            r"0.01 lower."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

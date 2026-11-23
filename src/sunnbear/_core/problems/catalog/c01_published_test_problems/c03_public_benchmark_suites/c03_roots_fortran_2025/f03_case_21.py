@@ -31,7 +31,7 @@ class RootsFortran2025Case21(Formula):
         interval="[0, 1.01]",
         summary=(
             r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, steeper at the lower bound, with "
-            r"its 1 root closer to it."
+            r"its 1 root closer to that bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

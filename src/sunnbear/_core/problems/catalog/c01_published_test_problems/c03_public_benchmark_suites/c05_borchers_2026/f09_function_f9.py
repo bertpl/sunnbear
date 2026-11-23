@@ -31,8 +31,8 @@ class Borchers2026FunctionF9(Formula):
         expression=r"\tan{\left(\tmp{u} \right)} - \tmp{u} - 0.0463025",
         interval="[-0.9, 1.5]",
         summary=(
-            r"A function with 1 root, nearly constant around $\x = 0$ and steep toward the upper bound, close to the "
-            r"tangent's pole at $\pi/2$."
+            r"A tangent minus a line, with 1 root, nearly constant around $\x = 0$ and steep toward the upper bound, "
+            r"which lies close to the tangent's pole at $\pi/2$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

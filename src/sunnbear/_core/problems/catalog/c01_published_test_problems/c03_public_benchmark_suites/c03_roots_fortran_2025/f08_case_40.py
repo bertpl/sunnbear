@@ -27,8 +27,8 @@ class RootsFortran2025Case40(Formula):
         expression=r"\left(\tmp{u} - 1.0\right)^{5}",
         interval="[0, 10]",
         summary=(
-            "A fifth power, with its root of multiplicity 5 near the lower bound, and below $10^{-4}$ in magnitude "
-            "within 0.15 of that root."
+            "A 5th power, with its root of multiplicity 5 near the lower bound, and below $10^{-4}$ in magnitude within"
+            " 0.15 of that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -31,8 +31,8 @@ class RootsFortran2025Case39(Formula):
         ),
         interval="[0, 10]",
         summary=(
-            r"A quintic with 1 root near the lower bound, and complex roots $10 \pm 0.32i$ that bring it down to 0.3% "
-            r"of its maximum at the upper bound."
+            r"A quintic with 1 root near the lower bound, and complex roots $10 \pm 0.32i$ that lower its value at the "
+            r"upper bound to 0.3% of its maximum."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

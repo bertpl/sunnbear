@@ -32,7 +32,10 @@ class Burkardt2016ProblemP12(Formula):
         FormulaParam(
             "factor",
             latex_symbol=r"\mathit{factor}",
-            meaning=r"The function's scale: away from $\x = 1$, it equals $\param{factor} (\x - 1) e^{-1/(\x - 1)^2}$.",
+            meaning=(
+                r"The function's scale: away from $\x = 1$, the function equals "
+                r"$\param{factor} (\x - 1) e^{-1/(\x - 1)^2}$."
+            ),
         ),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),

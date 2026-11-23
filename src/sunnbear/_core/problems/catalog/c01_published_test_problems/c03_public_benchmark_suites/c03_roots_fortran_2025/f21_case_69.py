@@ -39,7 +39,7 @@ class RootsFortran2025Case69(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{2} - \param{k}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A parabola with 1 root close to the lower bound on both intervals.",
+        summary="A parabola on 2 intervals, each with 1 root close to its lower bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

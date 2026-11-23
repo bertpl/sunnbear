@@ -29,8 +29,8 @@ class Borchers2026FunctionF8(Formula):
         expression=r"\frac{9 - \frac{1}{\tmp{u}}}{8}",
         interval="[0.001, 1.201]",
         summary=(
-            r"A hyperbola with 1 root, steep next to the lower bound, close to its pole at $\x = 0$, and nearly flat "
-            r"over the upper half."
+            r"A hyperbola with 1 root, steep next to the lower bound, which lies close to its pole at $\x = 0$, and "
+            r"nearly flat over the upper half."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

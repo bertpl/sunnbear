@@ -33,8 +33,8 @@ class RootsFortran2025Case46(Formula):
         ),
         interval="[-10, 5]",
         summary=(
-            "Sines on a rising trend, with 1 root and local extrema only near it, one of which comes within 0.2 of 0 "
-            "without crossing it."
+            "A rising function plus sines, with 1 root, local extrema only near that root, and 1 local maximum within "
+            "0.2 of 0 that does not reach 0."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

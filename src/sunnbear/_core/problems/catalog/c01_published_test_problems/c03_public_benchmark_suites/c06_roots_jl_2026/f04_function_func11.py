@@ -31,7 +31,7 @@ class RootsJl2026FunctionFunc11(Formula):
         expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 2]",
         summary=(
-            "An exponential minus a cosine, with 2 roots on either side of a shallow minimum, and much larger values "
+            "An exponential minus a cosine, with 1 root on either side of a shallow minimum, and much larger values "
             "toward the lower bound."
         ),
     )

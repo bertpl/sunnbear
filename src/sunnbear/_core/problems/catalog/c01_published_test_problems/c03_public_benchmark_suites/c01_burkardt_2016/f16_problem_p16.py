@@ -49,8 +49,8 @@ class Burkardt2016ProblemP16(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest at $\x = 0$, close to its "
-            r"root."
+            r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest at $\x = 0$, which lies "
+            r"close to its root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -31,8 +31,8 @@ class Borchers2026Section522(Formula):
         expression=r"\tmp{u} \sin{\left(\pi \tmp{u} \right)}",
         interval="[-2, 2]",
         summary=(
-            r"An even function with a double root at $\x = 0$, simple roots at $\x = \pm 1$, and roots at both bounds "
-            r"that rounding hides."
+            r"An even function with a double root at $\x = 0$, simple roots at $\x = \pm 1$, and roots at both bounds, "
+            r"where rounding makes its computed values nonzero."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -32,8 +32,8 @@ class ScimlbenchmarksJl2026FunctionG(Formula):
         expression=r"e^{\tmp{u}} - 1.0 \cdot 10^{-15}",
         interval="[-100, 0]",
         summary=(
-            "An exponential minus $10^{-15}$, at most $10^{-15}$ in magnitude on the 65% of the interval below its "
-            "root, and constant in floating point on the lowest 29%."
+            "An exponential minus $10^{-15}$, with its root at 65% of the interval, at most $10^{-15}$ in magnitude "
+            "below that root, and constant in floating point on the lowest 29%."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
