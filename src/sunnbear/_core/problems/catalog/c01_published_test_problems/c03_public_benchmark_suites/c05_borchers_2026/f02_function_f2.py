@@ -28,6 +28,10 @@ class Borchers2026FunctionF2(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
         expression=r"11 \tmp{u}^{11} - 1",
         interval="[0.4, 1.6]",
+        summary=(
+            "An 11th power minus 1, with 1 root, nearly flat at $-1$ over the lower fifth of the interval and steep "
+            "toward the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

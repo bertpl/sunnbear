@@ -39,6 +39,7 @@ class Gsl2024FunctionSinF(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\sin{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary="The sine on 3 intervals, monotonic on each, with 1 simple root on each.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

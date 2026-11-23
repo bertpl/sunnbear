@@ -34,6 +34,7 @@ class Borchers2026FunctionF1(Formula):
             r"\frac{\sqrt{3}}{18}"
         ),
         interval="[0, 1.2]",
+        summary="An increasing function with 1 root, flat at the lower bound, where its first 2 derivatives are 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

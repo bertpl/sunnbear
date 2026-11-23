@@ -28,6 +28,10 @@ class RootsFortran2025Case149(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\left(\tmp{u} - 7.14\right)^{3} \right)}",
         interval="[7, 8]",
+        summary=(
+            r"A function with a triple root, around which it stays below $3 \cdot 10^{-3}$ in magnitude over the "
+            r"lower fifth of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

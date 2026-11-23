@@ -37,6 +37,10 @@ class Burkardt2016ProblemP02(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"2.0 \tmp{u} - e^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A nearly straight line with 1 root, made steep toward the lower bound of the wide interval by its "
+            "exponential."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

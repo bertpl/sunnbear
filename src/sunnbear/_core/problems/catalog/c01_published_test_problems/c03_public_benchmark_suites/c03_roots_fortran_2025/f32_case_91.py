@@ -41,6 +41,7 @@ class RootsFortran2025Case91(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\tmp{u}} + \tmp{u} - \param{k}",
         interval=r"[\param{a}, \param{b}]",
+        summary="An increasing, convex function with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

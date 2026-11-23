@@ -28,6 +28,7 @@ class RootsFortran2025Case64(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin^{2}{\left(\tmp{u} \right)} - \tmp{u}^{2} + 1.0",
         interval="[-2, -1]",
+        summary="A concave function, increasing over the interval, with 1 root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

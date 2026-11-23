@@ -30,6 +30,7 @@ class RootsJl2026FunctionF4(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.57 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \frac{\tmp{u}}{2}",
         interval=r"\left[0, \frac{\pi}{2}\right]",
+        summary="A cosine minus a line, decreasing over the interval, with 1 root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

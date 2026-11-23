@@ -29,6 +29,9 @@ class RootsFortran2025Case66(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.8 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} e^{\tmp{u}} + \ln{\left(\tmp{u}^{2} + 1.0 \right)}",
         interval="[-0.9, -0.1]",
+        summary=(
+            "A function with 1 root, after which it falls to a local minimum and rises again toward the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

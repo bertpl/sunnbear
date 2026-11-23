@@ -29,6 +29,9 @@ class RootsFortran2025Case154(Formula):
         definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\frac{2.0 \tmp{u}}{e^{5.0}} - 2.0 e^{- 5.0 \tmp{u}} + 1.0",
         interval="[0, 10]",
+        summary=(
+            "An increasing function with its root near the lower bound, rising quickly to about 1 and then nearly flat."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

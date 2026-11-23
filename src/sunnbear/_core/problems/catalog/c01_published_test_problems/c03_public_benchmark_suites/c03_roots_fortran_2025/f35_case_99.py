@@ -30,6 +30,10 @@ class RootsFortran2025Case99(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} + \tmp{u}",
         interval="[-10, 10]",
+        summary=(
+            "An increasing function whose root is minus the fixed point of the cosine, with 3 inflections where its "
+            "slope is 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

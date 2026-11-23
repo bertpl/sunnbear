@@ -27,6 +27,10 @@ class RootsFortran2025Case37(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\tmp{u}^{3} - 5.0 \tmp{u}^{2} + 12.0 \tmp{u} - 8.0",
         interval="[-10, 10]",
+        summary=(
+            r"An increasing cubic with 1 real root and complex roots $2 \pm 2i$ near it, so that it is flattest close "
+            r"to that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

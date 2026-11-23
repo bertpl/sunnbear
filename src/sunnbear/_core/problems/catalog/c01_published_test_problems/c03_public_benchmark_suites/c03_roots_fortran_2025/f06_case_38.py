@@ -29,6 +29,10 @@ class RootsFortran2025Case38(Formula):
             r"\tmp{u}^{5} - 61.0 \tmp{u}^{4} + 1368.0 \tmp{u}^{3} - 13548.0 \tmp{u}^{2} + 54256.0 " r"\tmp{u} - 42016.0"
         ),
         interval="[0, 10]",
+        summary=(
+            r"A quintic with 1 root near the lower bound, and complex roots $10 \pm 2i$ that bring it down to 12% of "
+            r"its maximum at the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

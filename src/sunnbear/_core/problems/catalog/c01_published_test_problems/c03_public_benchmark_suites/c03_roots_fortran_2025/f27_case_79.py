@@ -37,6 +37,10 @@ class RootsFortran2025Case79(Formula):
             r"\left(\left(\left(\tmp{u} - 20.0\right) \tmp{u} + 133.0\right) \tmp{u} - 330.0\right) " r"\tmp{u} + 236.0"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A quartic symmetric about $\x = 5$, with 1 root on each interval and shallow minima close to the bounds "
+            r"$\x = 2$ and $\x = 8$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

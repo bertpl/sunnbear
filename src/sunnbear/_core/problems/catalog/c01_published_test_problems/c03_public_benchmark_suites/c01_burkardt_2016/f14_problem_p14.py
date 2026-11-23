@@ -39,6 +39,10 @@ class Burkardt2016ProblemP14(Formula):
             r"0.9\right)^{2} + 0.04} + 2.0 \tmp{u} - 5.2"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A line plus 2 peaks, with 3 roots, the upper 2 close together around a shallow minimum, referred to in "
+            'the source as "The Camel".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,6 +30,7 @@ class RootsJl2026FunctionF9(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)} + \sqrt{\tmp{u}} - 5",
         interval="[7, 10]",
+        summary="A logarithm plus a square root, increasing and close to a line on the interval, with 1 root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

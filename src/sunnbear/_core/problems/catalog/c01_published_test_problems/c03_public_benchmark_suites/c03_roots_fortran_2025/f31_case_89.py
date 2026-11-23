@@ -37,6 +37,7 @@ class RootsFortran2025Case89(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{1.0 - \tmp{u}} \left(\tmp{u} - 1.0\right) \cdot 10.0 - 1.0",
         interval=r"[\param{a}, \param{b}]",
+        summary=r"A function with 1 root on each interval and its maximum at their shared bound, $\x = 2$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

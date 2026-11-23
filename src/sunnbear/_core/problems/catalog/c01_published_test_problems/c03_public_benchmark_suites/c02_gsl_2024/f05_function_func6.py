@@ -28,6 +28,7 @@ class Gsl2024FunctionFunc6(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.0007 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{7}",
         interval="[0.9995, 1.0002]",
+        summary="A 7th power on an interval so narrow that it stays below $10^{-23}$ in magnitude.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

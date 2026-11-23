@@ -26,6 +26,10 @@ class RootsFortran2025Case73(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\left(\tmp{u} - 1.0\right) \tmp{u} \tmp{u} - 1.0",
         interval="[0, 5]",
+        summary=(
+            "A cubic that is nearly flat over the lower fifth of the interval and steep toward the upper bound, with 1 "
+            "simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

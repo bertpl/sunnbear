@@ -30,6 +30,10 @@ class Gsl2024FunctionFunc4(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.33 \c"),),
         expression=r"\tmp{u} e^{- \tmp{u}}",
         interval=r"\left[- \frac{1}{3}, 2\right]",
+        summary=(
+            "A function with 1 root and a maximum inside the interval, past which it decreases and, beyond the upper "
+            "bound, tends to 0 without changing sign."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

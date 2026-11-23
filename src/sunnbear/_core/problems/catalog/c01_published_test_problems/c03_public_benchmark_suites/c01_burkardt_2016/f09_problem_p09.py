@@ -42,6 +42,10 @@ class Burkardt2016ProblemP09(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A continuous piecewise linear function whose root lies on its steeper middle piece, referred to in the "
+            'source as "The Newton Baffler".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

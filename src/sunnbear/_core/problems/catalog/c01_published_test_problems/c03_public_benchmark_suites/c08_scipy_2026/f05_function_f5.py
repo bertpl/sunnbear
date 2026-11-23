@@ -34,6 +34,10 @@ class Scipy2026FunctionF5(Formula):
             r"\end{cases}"
         ),
         interval=r"[0.5, \sqrt{3}]",
+        summary=(
+            "A hyperbola that changes sign only at its pole, from large positive to large negative values, with its "
+            "value at the pole set to 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

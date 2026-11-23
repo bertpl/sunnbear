@@ -31,6 +31,10 @@ class Borchers2026FunctionF4(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
         expression=r"2 \left(\frac{\tmp{u}}{e^{9}} - e^{- 9 \tmp{u}}\right) + 1",
         interval="[-0.5, 0.7]",
+        summary=(
+            "An exponential plus a negligible linear term, with 1 root, steep toward the lower bound and nearly flat "
+            "toward the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

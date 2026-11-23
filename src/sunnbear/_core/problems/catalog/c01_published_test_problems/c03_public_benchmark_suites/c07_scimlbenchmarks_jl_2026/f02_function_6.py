@@ -33,6 +33,7 @@ class ScimlbenchmarksJl2026Function6(Formula):
         definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\sin{\left(20 \tmp{u} \right)} + \sin{\left(\tmp{u} \right)} + \tmp{u} - \param{p}",
         interval="[-5, 5]",
+        summary="A fast oscillation around an increasing trend, with 11 simple roots, the upper 2 only 0.023 apart.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

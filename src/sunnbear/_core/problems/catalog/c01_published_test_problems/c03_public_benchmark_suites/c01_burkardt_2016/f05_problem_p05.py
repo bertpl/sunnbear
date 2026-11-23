@@ -35,6 +35,7 @@ class Burkardt2016ProblemP05(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u} + 3.0\right) \left(\tmp{u} - 1.0\right) \left(\tmp{u} - 1.0\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary="A cubic with a simple root and a double root, where it touches 0 without changing sign.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

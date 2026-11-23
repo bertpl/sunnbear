@@ -35,6 +35,10 @@ class Burkardt2016ProblemP10(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\frac{20.0 \tmp{u}}{100.0 \tmp{u} \tmp{u} + 1.0}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A rational function with 1 root between a nearby minimum and maximum, decaying toward 0 farther out, "
+            'referred to in the source as "The Repeller".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -44,6 +44,10 @@ class Burkardt2016ProblemP15(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An odd function with an infinite slope at its root, and below $2 \cdot 10^{-7}$ in magnitude beyond $|\x|"
+            r" = 4$ on the wide interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

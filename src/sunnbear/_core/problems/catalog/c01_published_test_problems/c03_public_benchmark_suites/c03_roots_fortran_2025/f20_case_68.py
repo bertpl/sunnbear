@@ -28,6 +28,7 @@ class RootsFortran2025Case68(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.1 \c"),),
         expression=r"\tmp{u} - 3.0 \ln{\left(\tmp{u} \right)}",
         interval="[1, 2.1]",
+        summary="A decreasing convex function with 1 root in the upper quarter of the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

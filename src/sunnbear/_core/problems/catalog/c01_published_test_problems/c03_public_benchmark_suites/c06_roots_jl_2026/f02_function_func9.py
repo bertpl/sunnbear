@@ -41,6 +41,10 @@ class RootsJl2026FunctionFunc9(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tanh{\left(\tmp{u} \right)} - \tan{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A hyperbolic tangent minus a tangent, with 2 roots and 2 poles on the wide interval, and 1 root and 2 "
+            "poles on the narrow one."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -31,6 +31,10 @@ class RootsFortran2025Case44(Formula):
             r"3.0 \tmp{u}^{2} \sin{\left(\tmp{u} \cdot 20.0 \right)} + \cos{\left(\tmp{u} \cdot 2.0 " r"\right)}"
         ),
         interval="[-0.7, 0.4]",
+        summary=(
+            r"An oscillation whose amplitude grows with $|\x|$, with 1 root close to the lower bound and no local "
+            r"minimum below 0.2 after it."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

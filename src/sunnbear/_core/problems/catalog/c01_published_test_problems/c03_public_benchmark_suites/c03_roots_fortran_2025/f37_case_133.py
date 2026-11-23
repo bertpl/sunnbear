@@ -40,6 +40,10 @@ class RootsFortran2025Case133(Formula):
             r"\param{y1}\right)"
         ),
         interval="[0, 157.08]",
+        summary=(
+            "A decreasing line, given in 2-point form by its values at the 2 bounds, with its root near the middle of "
+            "the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
