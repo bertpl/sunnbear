@@ -53,8 +53,8 @@ class ModifiedChapraCanale2015Example52(Formula):
         expression=r"\sin{\left(10 \tmp{u} \right)} + \cos{\left(3 \tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "An oscillating function with 5 simple roots on $[3.3, 5]$, including a pair only 0.035 apart, and "
-            "on $[4.2, 4.26]$ only the lower root of that pair."
+            "An oscillating function with 5 simple roots on $[3.3, 5]$, including a pair only 0.035 apart, of which "
+            "only the lower root lies on $[4.2, 4.26]$."
         ),
         notes=(
             (

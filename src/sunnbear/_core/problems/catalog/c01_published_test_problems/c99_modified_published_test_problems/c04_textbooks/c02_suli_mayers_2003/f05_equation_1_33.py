@@ -49,7 +49,7 @@ class ModifiedSuliMayers2003Equation133(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A parabola whose roots, the fixed points of the logistic map, are $\x = 1 - 1/\param{a_}$ and $\x = 0$, "
-            "just below the lower bound."
+            r"the second just below the lower bound."
         ),
         notes=(
             (

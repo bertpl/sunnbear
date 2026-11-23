@@ -44,8 +44,8 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
         expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",
         interval="[1, 3]",
         summary=(
-            r"A function that changes sign at a root of order 4 and is still only about $10^{-4}$ in magnitude at 0.1 "
-            "from that root."
+            "A function that changes sign at a root of multiplicity 4 and is still only about $10^{-4}$ in magnitude at"
+            " 0.1 from that root."
         ),
         notes=(
             (
