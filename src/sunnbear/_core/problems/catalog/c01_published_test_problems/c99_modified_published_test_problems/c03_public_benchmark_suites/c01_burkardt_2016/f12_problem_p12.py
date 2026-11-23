@@ -59,9 +59,10 @@ class ModifiedBurkardt2016ProblemP12(Formula):
             (
                 r"\fn{g}(\x)",
                 (
-                    r"\begin{cases} -\exp\left(\ln \param{factor} + \ln|\x - 1| - \frac{1}{(\x - 1)^2}\right) "
-                    r"& \text{if } \x < 1 \\ 0 & \text{if } \x = 1 \\ \exp\left(\ln \param{factor} + \ln|\x - "
-                    r"1| - \frac{1}{(\x - 1)^2}\right) & \text{otherwise} \end{cases}"
+                    r"\begin{cases} -\exp\left(\ln(\param{factor}) + \ln\left(\left|\x - 1\right|\right) "
+                    r"- \frac{1}{(\x - 1)^2}\right) & \text{if } \x < 1 \\ 0 & \text{if } \x = 1 \\ "
+                    r"\exp\left(\ln(\param{factor}) + \ln\left(\left|\x - 1\right|\right) "
+                    r"- \frac{1}{(\x - 1)^2}\right) & \text{otherwise} \end{cases}"
                 ),
             ),
         ),

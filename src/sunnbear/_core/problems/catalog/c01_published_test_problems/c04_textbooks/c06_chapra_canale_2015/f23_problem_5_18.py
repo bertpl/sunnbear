@@ -51,7 +51,7 @@ class ChapraCanale2015Problem518(Formula):
             (r"\tmp{T_a}", r"\tmp{T} + 273.15"),
         ),
         expression=(
-            r"\ln \param{osf} - \left(-139.34411 + \frac{1.575701 \cdot 10^{5}}{\tmp{T_a}} "
+            r"\ln(\param{osf}) - \left(-139.34411 + \frac{1.575701 \cdot 10^{5}}{\tmp{T_a}} "
             r"- \frac{6.642308 \cdot 10^{7}}{\tmp{T_a}^2} + \frac{1.243800 \cdot 10^{10}}{\tmp{T_a}^3} "
             r"- \frac{8.621949 \cdot 10^{11}}{\tmp{T_a}^4}\right)"
         ),

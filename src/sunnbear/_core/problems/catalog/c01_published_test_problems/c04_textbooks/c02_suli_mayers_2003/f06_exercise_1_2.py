@@ -33,7 +33,7 @@ class SuliMayers2003Exercise12(Formula):
     presentation = FormulaPresentation(
         definitions=(
             (r"\tmp{u}", r"\x - \c"),
-            (r"\fn{g}(\x)", r"-\x \sin^2 \frac{1}{\x}"),
+            (r"\fn{g}(\x)", r"-\x \sin^2\left(\frac{1}{\x}\right)"),
         ),
         expression=(
             r"\begin{cases} "

@@ -42,7 +42,7 @@ class ModifiedBurdenFairesBurden2016Exercise218(Formula):
         notes=(
             (
                 "The interval ends at 4.6, not at the published 5, so that it holds the root and no pole. "
-                r"The bound 4.6 lies left of the pole of $\tan \tmp{u}$ at $3\pi/2$, which is a second "
+                r"The bound 4.6 lies left of the pole of $\tan(\tmp{u})$ at $3\pi/2$, which is a second "
                 "sign change, so the function has the same sign at both published bounds."
             ),
         ),

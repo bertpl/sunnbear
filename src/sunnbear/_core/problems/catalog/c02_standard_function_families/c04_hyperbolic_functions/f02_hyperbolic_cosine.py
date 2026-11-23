@@ -41,15 +41,15 @@ class HyperbolicCosine(Formula):
             (r"\tmp{u}", r"\x - \c"),
             (r"\tmp{v}", r"\frac{\param{b}}{2}"),
         ),
-        expression=r"2 \sinh\frac{\tmp{u} + \tmp{v}}{2} \, \sinh\frac{\tmp{u} - \tmp{v}}{2}",
+        expression=r"2 \sinh\left(\frac{\tmp{u} + \tmp{v}}{2}\right) \, \sinh\left(\frac{\tmp{u} - \tmp{v}}{2}\right)",
         interval=r"[0, \param{b}]",
         summary=(
             "The hyperbolic cosine, with its minimum next to the lower bound and its root in the middle of the "
             "interval."
         ),
         notes=(
-            r"The expression equals $$\cosh(\x - \c) - \cosh\frac{\param{b}}{2},$$ in a form that loses no "
-            "precision to cancellation next to the root.",
+            r"The expression equals $$\cosh(\x - \c) - \cosh\left(\frac{\param{b}}{2}\right),$$ in a form that "
+            "loses no precision to cancellation next to the root.",
         ),
         param_conditions=(r"$\param{b} > 0$",),
     )

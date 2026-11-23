@@ -43,7 +43,7 @@ class InverseHyperbolicTangent(Formula):
         ),
     )
     presentation = FormulaPresentation(
-        expression=r"\frac{\operatorname{artanh} \x}{\operatorname{artanh}(1 - \param{d})} + \c",
+        expression=r"\frac{\operatorname{artanh}(\x)}{\operatorname{artanh}(1 - \param{d})} + \c",
         interval=r"[-(1 - \param{d}), 1 - \param{d}]",
         summary=(
             r"The inverse hyperbolic tangent, steep next to both bounds for a small $\param{d}$, because both bounds "

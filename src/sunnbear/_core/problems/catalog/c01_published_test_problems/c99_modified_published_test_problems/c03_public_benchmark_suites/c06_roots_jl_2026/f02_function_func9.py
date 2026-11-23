@@ -50,7 +50,7 @@ class ModifiedRootsJl2026FunctionFunc9(Formula):
         notes=(
             (
                 "The interval ends at 7.7, not at the published 12, so that it holds 1 root and no pole: "
-                r"7.7 lies left of the pole of $\tan \tmp{u}$ at $5\pi/2$, and the published interval "
+                r"7.7 lies left of the pole of $\tan(\tmp{u})$ at $5\pi/2$, and the published interval "
                 "holds 2 roots and 2 poles, so that the function has the same sign at both published "
                 "bounds."
             ),

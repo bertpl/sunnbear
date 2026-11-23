@@ -46,10 +46,12 @@ class Burkardt2016ProblemP12(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(
             r"\begin{cases} "
-            r"-\exp\left(\ln \param{factor} + \ln|\tmp{u} - 1| - \frac{1}{(\tmp{u} - 1)^2}\right) "
+            r"-\exp\left(\ln(\param{factor}) + \ln\left(\left|\tmp{u} - 1\right|\right) "
+            r"- \frac{1}{(\tmp{u} - 1)^2}\right) "
             r"& \text{if } \tmp{u} < 1 \\ "
             r"0 & \text{if } \tmp{u} = 1 \\ "
-            r"\exp\left(\ln \param{factor} + \ln|\tmp{u} - 1| - \frac{1}{(\tmp{u} - 1)^2}\right) & \text{otherwise} "
+            r"\exp\left(\ln(\param{factor}) + \ln\left(\left|\tmp{u} - 1\right|\right) "
+            r"- \frac{1}{(\tmp{u} - 1)^2}\right) & \text{otherwise} "
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",

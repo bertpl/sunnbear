@@ -47,7 +47,7 @@ class SuliMayers2003Example14(Formula):
             (r"\tmp{u}", r"\x - \c"),
             (
                 r"\fn{g}(\x)",
-                r"2^{-\left(1 + \left(\log_2 \frac{1}{\x}\right)^{1/\param{alpha}}\right)^{\param{alpha}}}",
+                r"2^{-\left(1 + \left(\log_2\left(\frac{1}{\x}\right)\right)^{1/\param{alpha}}\right)^{\param{alpha}}}",
             ),
         ),
         expression=(

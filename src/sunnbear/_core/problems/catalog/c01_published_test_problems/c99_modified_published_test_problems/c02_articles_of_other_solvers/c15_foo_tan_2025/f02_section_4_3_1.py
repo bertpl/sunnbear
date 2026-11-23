@@ -58,7 +58,7 @@ class ModifiedFooTan2025Section431(Formula):
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "
                 "problems, because a shift along x in either direction evaluates a logarithm outside its "
-                r"domain, $\ln \x$ left of 0 or $\ln(1 - \x)$ right of 1."
+                r"domain, $\ln(\x)$ left of 0 or $\ln(1 - \x)$ right of 1."
             ),
         ),
     )

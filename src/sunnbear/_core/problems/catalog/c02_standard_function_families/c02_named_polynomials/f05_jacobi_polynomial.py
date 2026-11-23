@@ -78,8 +78,8 @@ class JacobiPolynomial(Formula):
         ),
         interval=interval_by_parity_latex(
             "[-1, 1]",
-            r"\left[-\cos\frac{(1.25 + \param{beta}/2) \pi}{\param{n} + (\param{alpha} + \param{beta} + 1)/2}, "
-            r"1\right]",
+            r"\left[-\cos\left(\frac{(1.25 + \param{beta}/2) \pi}"
+            r"{\param{n} + (\param{alpha} + \param{beta} + 1)/2}\right), 1\right]",
         ),
         summary=(
             r"The Jacobi polynomial, whose amplitude toward the upper bound depends on $\param{alpha}$, and toward the "

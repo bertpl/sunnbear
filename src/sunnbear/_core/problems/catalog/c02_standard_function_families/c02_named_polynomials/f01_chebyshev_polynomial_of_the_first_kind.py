@@ -46,13 +46,13 @@ class ChebyshevFirstKindPolynomial(Formula):
     name = "Chebyshev polynomial of the first kind"
     params = (FormulaParam("n", latex_symbol="n"),)
     presentation = FormulaPresentation(
-        expression=r"\cos(\param{n} \arccos \x) + \c",
-        interval=interval_by_parity_latex("[-1, 1]", r"\left[-\cos\frac{\pi}{\param{n}}, 1\right]"),
+        expression=r"\cos(\param{n} \arccos(\x)) + \c",
+        interval=interval_by_parity_latex("[-1, 1]", r"\left[-\cos\left(\frac{\pi}{\param{n}}\right), 1\right]"),
         summary=(
             "The Chebyshev polynomial of the first kind, which oscillates with the same amplitude across its interval."
         ),
         notes=(
-            r"On $[-1, 1]$, $\cos(\param{n} \arccos \x)$ is the Chebyshev polynomial of the first kind, "
+            r"On $[-1, 1]$, $\cos(\param{n} \arccos(\x))$ is the Chebyshev polynomial of the first kind, "
             r"$T_{\param{n}}(\x)$.",
         ),
         param_conditions=(r"$\param{n}$ is an integer of at least 1",),

@@ -78,7 +78,7 @@ class GegenbauerPolynomial(Formula):
         definitions=((r"\tmp{y}", r"\x - \frac{\c}{\param{n}^2}"),),
         expression=(r"\frac{C^{(\param{alpha})}_{\param{n}}(\tmp{y})}{C^{(\param{alpha})}_{\param{n}}(1)}"),
         interval=interval_by_parity_latex(
-            "[-1, 1]", r"\left[-\cos\frac{(1 + \param{alpha}/2) \pi}{\param{n} + \param{alpha}}, 1\right]"
+            "[-1, 1]", r"\left[-\cos\left(\frac{(1 + \param{alpha}/2) \pi}{\param{n} + \param{alpha}}\right), 1\right]"
         ),
         summary=(
             r"The Gegenbauer polynomial, whose amplitude, from the middle of its interval toward the bounds, shrinks "
