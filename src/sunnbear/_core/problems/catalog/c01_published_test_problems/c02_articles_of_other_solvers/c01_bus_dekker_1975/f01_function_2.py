@@ -31,6 +31,10 @@ class BusDekker1975Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} e^{- \param{n}} + 1 - 2 e^{- \param{n} \tmp{u}}",
         interval="[0, 1]",
+        summary=(
+            r"An increasing function with 1 simple root in the lower half of the interval, nearer the lower bound for "
+            r"larger $\param{n}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

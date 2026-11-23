@@ -34,7 +34,14 @@ class LiZhouLangeTian2026Example3(Formula):
     number = (1, 2, 20, 2)
     name = "Example 3"
     params = (
-        FormulaParam("p", latex_symbol="p"),
+        FormulaParam(
+            "p",
+            latex_symbol="p",
+            meaning=(
+                r"The probability level of the root, which is the $\param{p}$-quantile of the normal distribution with "
+                r"mean $\param{mu}$ and standard deviation $\param{sigma}$."
+            ),
+        ),
         FormulaParam("mu", latex_symbol=r"\mu"),
         FormulaParam("sigma", latex_symbol=r"\sigma"),
     )
@@ -46,6 +53,10 @@ class LiZhouLangeTian2026Example3(Formula):
             r"\operatorname{erfc}\left(-\frac{\tmp{u} - \param{mu}}{\param{sigma} \sqrt{2}}\right)"
         ),
         interval="[-2.5, -0.5]",
+        summary=(
+            "A decreasing function whose only root is the 5% quantile of a normal distribution, nearly flat at the "
+            "lower bound."
+        ),
         notes=(
             r"The expression equals $$\param{p} - \Phi\left(\frac{\tmp{u} - \param{mu}}{\param{sigma}}\right),$$ with "
             r"$\Phi$ the cumulative distribution function of the standard normal distribution.",

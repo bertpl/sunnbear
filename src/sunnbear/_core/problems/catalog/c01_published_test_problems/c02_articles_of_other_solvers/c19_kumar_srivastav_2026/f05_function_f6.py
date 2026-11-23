@@ -30,6 +30,10 @@ class KumarSrivastav2026FunctionF6(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - 0.3",
         interval="[0, 2]",
+        summary=(
+            "A function with 1 simple root near the lower bound, rising to a maximum inside the interval and then "
+            "falling."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

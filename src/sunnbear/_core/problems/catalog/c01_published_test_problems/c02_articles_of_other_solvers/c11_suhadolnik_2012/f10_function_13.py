@@ -28,6 +28,7 @@ class Suhadolnik2012Function13(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"e^{- \tmp{u}} - \tmp{u} - \sin{\left(\tmp{u} \right)}",
         interval="[0, 0.5]",
+        summary="A decreasing function with 1 root and a slope that changes by less than 20% across the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,6 +30,10 @@ class ChenLi2007Example2(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u} - e^{\sin{\left(\tmp{u} \right)}} + 1",
         interval="[1, 4]",
+        summary=(
+            "A function within 0.025 of its minimum over the lower 10% of the interval, then increasing through 1 "
+            "simple root in the lower quarter."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

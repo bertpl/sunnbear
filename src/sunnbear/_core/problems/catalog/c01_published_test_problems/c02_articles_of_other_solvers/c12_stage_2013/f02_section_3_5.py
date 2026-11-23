@@ -28,6 +28,10 @@ class Stage2013Section35(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[-10, 10]",
+        summary=(
+            "A decreasing function whose root is the fixed point of the cosine, with 3 inflection points where the "
+            "slope is 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -33,6 +33,10 @@ class Norton1985Function5(Formula):
             r"\left(1 + \left(1 - \param{n}\right)^{4}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{4}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A quartic whose maximum exceeds 3000 for $\param{n} \geq 10$, and whose 1 root then lies within $2 \cdot "
+            r"10^{-4}$ of the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

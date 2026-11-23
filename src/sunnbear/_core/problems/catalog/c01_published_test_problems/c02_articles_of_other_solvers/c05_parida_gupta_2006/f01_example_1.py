@@ -29,6 +29,10 @@ class ParidaGupta2006Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - 40 \c"),),
         expression=r"\tmp{u}^{5} - 300 \tmp{u}^{2} - 126 \tmp{u} + 5005",
         interval="[-20, 20]",
+        summary=(
+            "A quintic with 3 simple roots, the upper 2 only about 0.001 apart, on either side of a minimum just below "
+            "0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

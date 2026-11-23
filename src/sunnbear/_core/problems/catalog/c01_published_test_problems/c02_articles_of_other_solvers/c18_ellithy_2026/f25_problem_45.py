@@ -31,6 +31,10 @@ class Ellithy2026Problem45(Formula):
             r"\left(10.0 + \frac{3.592}{\tmp{u}^{2}}\right) \left(\tmp{u} - 0.04267\right) - 0.08206 " r"\cdot 300"
         ),
         interval="[2, 3]",
+        summary=(
+            "The van der Waals equation for the molar volume of carbon dioxide, nearly a line on the interval, which "
+            "holds the equation's only real root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

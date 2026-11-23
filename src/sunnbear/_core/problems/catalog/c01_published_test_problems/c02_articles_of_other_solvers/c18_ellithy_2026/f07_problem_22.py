@@ -26,6 +26,7 @@ class Ellithy2026Problem22(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} - 4 \tmp{u} + 13",
         interval="[-3, -2]",
+        summary="A cubic whose 1 root lies within 0.05 of the upper bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

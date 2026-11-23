@@ -30,6 +30,10 @@ class GottliebThompson2010Test1(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"3 \sin{\left(\tmp{u} \right)} - 2",
         interval="[0, 1]",
+        summary=(
+            "A sine, $-2$ at the lower bound and only 0.52 at the upper bound, with 1 simple root in the upper 30% of "
+            "the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

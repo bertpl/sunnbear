@@ -42,6 +42,10 @@ class LiZhouLangeTian2026Section71(Formula):
             r"\param{a3} \tmp{\theta}^{\param{m}} + \param{a2} \tmp{\theta}^2 + \param{a1} \tmp{\theta} + \param{a0}"
         ),
         interval="[0, 2]",
+        summary=(
+            r"A decreasing cubic with 1 simple root for both parameter sets, at the midpoint of the interval for "
+            r"$\param{a2} = 1$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

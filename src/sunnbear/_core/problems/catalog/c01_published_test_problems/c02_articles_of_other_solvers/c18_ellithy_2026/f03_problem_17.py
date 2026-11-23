@@ -32,8 +32,8 @@ class Ellithy2026Problem17(Formula):
     number = (1, 2, 18, 3)
     name = "Problem 17"
     params = (
-        FormulaParam("e", latex_symbol="e"),
-        FormulaParam("M", latex_symbol="M"),
+        FormulaParam("e", latex_symbol="e", meaning="The orbit's eccentricity."),
+        FormulaParam("M", latex_symbol="M", meaning="The mean anomaly, in radians."),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
@@ -43,6 +43,10 @@ class Ellithy2026Problem17(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \param{e} \sin{\left(\tmp{u} \right)} - \param{M}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"Kepler's equation for the eccentric anomaly, at eccentricities $\param{e}$ from 0.5 to 0.99, with 1 "
+            r"simple root on each interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

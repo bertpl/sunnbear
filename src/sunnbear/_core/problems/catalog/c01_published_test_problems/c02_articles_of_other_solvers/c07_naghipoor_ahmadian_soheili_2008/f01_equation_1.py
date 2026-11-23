@@ -30,6 +30,10 @@ class NaghipoorAhmadianSoheili2008Equation1(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 1",
         interval="[-1, 1]",
+        summary=(
+            "A function whose root is the omega constant $W(1)$ and whose minimum lies at the lower bound, where the "
+            "slope is 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -33,6 +33,7 @@ class LiZhouLangeTian2026Section73(Formula):
         definitions=((r"\tmp{u}", r"\x - 7 \c"),),
         expression=r"- 0.5 \tmp{u} - 2 \sin{\left(\tmp{u} \right)} + 1",
         interval="[0, 7]",
+        summary="A function with 3 simple roots, the upper 2 on either side of a local maximum 0.71 above 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

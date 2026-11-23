@@ -29,6 +29,10 @@ class Sabharwal2019Function4(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{2} - \tmp{u} - 2",
         interval="[1, 4]",
+        summary=(
+            r"A quadratic that factors as $(\x - 2)(\x + 1)$, increasing on the interval, which holds only the "
+            r"quadratic's upper root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

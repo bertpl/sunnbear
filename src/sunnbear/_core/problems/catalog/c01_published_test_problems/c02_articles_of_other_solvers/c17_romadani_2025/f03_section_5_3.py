@@ -38,6 +38,10 @@ class Romadani2025Section53(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{- \tmp{u}} - e^{- 2 \tmp{u}} - e^{- 3 \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A function with 1 simple root, steep near $\x = -2$ on the 2 wider intervals, and positive but below "
+            r"$10^{-9}$ over most of the widest interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

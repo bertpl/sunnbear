@@ -28,6 +28,10 @@ class Galdino2011FunctionF7(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - e^{\tmp{u} - 1}",
         interval="[4, 5]",
+        summary=(
+            r"A function that rises from its 1 simple root, in the lower 30% of the interval, to about $8 \cdot "
+            r"10^{13}$ at the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

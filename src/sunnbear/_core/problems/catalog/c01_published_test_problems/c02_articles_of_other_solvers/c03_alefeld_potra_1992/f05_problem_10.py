@@ -31,6 +31,10 @@ class AlefeldPotra1992Problem10(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} + \sin{\left(\frac{\tmp{u}}{\param{n}} \right)} - \frac{1}{4}",
         interval="[0, 1]",
+        summary=(
+            r"A function whose slope rises from $1/\param{n}$ at the lower bound to about 2 at the upper bound, with 1 "
+            r"simple root near the middle."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

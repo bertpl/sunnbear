@@ -28,6 +28,9 @@ class BadrAlmotairiElGhamry2021ProblemP12(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} + e^{\frac{\tmp{u}}{2}} - 5",
         interval="[1, 2]",
+        summary=(
+            "A function whose slope nearly doubles across the interval, with 1 simple root past the interval's middle."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -26,6 +26,7 @@ class Sabharwal2019Function5(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}^{2} + 2 \tmp{u} - 7",
         interval="[1, 3]",
+        summary=r"A quadratic whose only root on the interval is $2\sqrt{2} - 1$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

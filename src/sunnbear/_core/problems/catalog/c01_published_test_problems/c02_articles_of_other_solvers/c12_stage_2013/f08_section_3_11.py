@@ -41,6 +41,10 @@ class Stage2013Section311(Formula):
             r"\end{cases}"
         ),
         interval="[-10, 10]",
+        summary=(
+            r"A Heaviside step with no root, only a jump across 0 at $\x = 1/3$, and close to 0 below the jump for "
+            r"$\param{d} = 10^{-3}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

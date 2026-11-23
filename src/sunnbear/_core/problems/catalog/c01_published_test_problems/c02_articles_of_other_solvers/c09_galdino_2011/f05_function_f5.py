@@ -30,6 +30,10 @@ class Galdino2011FunctionF5(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\left(\tmp{u} - 7.143\right)^{3} \right)}",
         interval="[7, 8]",
+        summary=(
+            r"A function with a triple root and values below $3 \cdot 10^{-3}$ in magnitude over the lower fifth of the"
+            r" interval, around that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

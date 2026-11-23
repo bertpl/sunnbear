@@ -28,6 +28,10 @@ class ParidaGupta2006Example2(Formula):
         definitions=((r"\tmp{u}", r"\x - 32 \c"),),
         expression=r"3 \tmp{u}^{2} - 11.12 \tmp{u} + 9.1389",
         interval="[-30, 2]",
+        summary=(
+            "A parabola with its minimum and 1 root in the upper 3% of a wide interval, and the parabola's other root "
+            "0.48 above the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

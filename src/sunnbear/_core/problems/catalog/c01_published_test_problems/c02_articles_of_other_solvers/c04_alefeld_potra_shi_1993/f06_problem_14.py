@@ -43,6 +43,10 @@ class AlefeldPotraShi1993Problem14(Formula):
             r"\end{cases}"
         ),
         interval=r"[-10^{4}, 10^{-4}]",
+        summary=(
+            r"A continuous function that is flat outside a band within $10^{-4}$ of the upper bound and rises "
+            r"exponentially across that band through 1 simple root, more steeply for larger $\param{n}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

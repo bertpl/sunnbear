@@ -30,6 +30,10 @@ class Galdino2011FunctionF2(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 4\right)^{5} \ln{\left(\tmp{u} \right)}",
         interval="[3.5, 4.5]",
+        summary=(
+            r"A 5th power times a slowly varying logarithm, with a root of multiplicity 5 and values below $1.5 \cdot "
+            r"10^{-5}$ in magnitude within 0.1 of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

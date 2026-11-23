@@ -30,6 +30,10 @@ class ChenLi2007Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - 4.5 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0.5, 5]",
+        summary=(
+            "The natural logarithm, 10 times as steep at the lower bound as at the upper bound, with 1 root near the "
+            "lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

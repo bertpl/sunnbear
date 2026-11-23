@@ -27,6 +27,10 @@ class Ellithy2026Problem42(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u}^{6} - 8 \tmp{u}^{5} + 24 \tmp{u}^{4} - 32 \tmp{u}^{3} + 16 \tmp{u}^{2}",
         interval="[0, 4]",
+        summary=(
+            r"The polynomial $\x^2 (\x - 2)^4$ multiplied out, never negative in exact arithmetic but negative at many "
+            r"floats within $5 \cdot 10^{-4}$ of $\x = 2$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

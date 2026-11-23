@@ -32,6 +32,10 @@ class AlefeldPotra1992Problem2(Formula):
             r"\frac{\sqrt{3}}{18}"
         ),
         interval="[0.1, 1]",
+        summary=(
+            "A function with 1 simple root, nearly flat at the lower bound, where the slope is about 1% of that at the "
+            "upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

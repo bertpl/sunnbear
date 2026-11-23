@@ -28,6 +28,7 @@ class Suhadolnik2012Function17(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.833 \c"),),
         expression=r"\tmp{u}^{3}",
         interval=r"\left[-0.5, \frac{1}{3}\right]",
+        summary="A cube with a triple root, below 0.02 in magnitude within 0.25 of that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

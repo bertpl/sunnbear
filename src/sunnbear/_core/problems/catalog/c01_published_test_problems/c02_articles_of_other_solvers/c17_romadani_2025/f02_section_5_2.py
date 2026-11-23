@@ -33,6 +33,7 @@ class Romadani2025Section52(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \cos^{3}{\left(2 \tmp{u} \right)}",
         interval="[2.5, 3]",
+        summary="A decreasing function with 1 simple root near an inflection point, where the function is steepest.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

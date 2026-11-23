@@ -28,6 +28,10 @@ class Suhadolnik2012Function12(Formula):
         definitions=((r"\tmp{u}", r"\x - 2.8 \c"),),
         expression=r"e^{\tmp{u}} - 2 \tmp{u} - 1",
         interval="[0.2, 3]",
+        summary=(
+            r"A convex function with a minimum and 1 root on the interval, and a second root at $\x = 0$, just below "
+            r"the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

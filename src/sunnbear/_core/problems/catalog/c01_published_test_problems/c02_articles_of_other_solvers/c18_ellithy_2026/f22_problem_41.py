@@ -26,6 +26,10 @@ class Ellithy2026Problem41(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\left(\tmp{u} + 0.3\right)^{7} - 0.01",
         interval="[-2, 1]",
+        summary=(
+            r"A 7th power, nearly flat around $\x = -0.3$, with 1 root and values below 0.02 in magnitude over 37% of "
+            r"the interval around that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

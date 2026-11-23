@@ -28,6 +28,10 @@ class Sabharwal2019Figure4(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\left(1.5 - \tmp{u}\right)^{9} - 8",
         interval="[0, 1.5]",
+        summary=(
+            "A function falling steeply through its 1 simple root in the lowest 20% of the interval, then nearly "
+            "constant at $-8$ over the upper half."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

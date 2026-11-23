@@ -28,6 +28,7 @@ class KumarSrivastav2026FunctionF2(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + \tmp{u} - 1",
         interval="[0, 1]",
+        summary="A cubic with 1 simple root, increasing and convex on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

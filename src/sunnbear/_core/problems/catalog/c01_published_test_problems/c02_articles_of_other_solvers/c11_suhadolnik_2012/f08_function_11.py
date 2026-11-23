@@ -37,6 +37,10 @@ class Suhadolnik2012Function11(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\arctan{\left(\tmp{u} \right)} - 1",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "An arctangent with 1 root in the lower fifth of both intervals, flattening above that root to a slope "
+            "below 0.02."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

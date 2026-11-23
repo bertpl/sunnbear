@@ -31,6 +31,7 @@ class KumarSrivastav2026FunctionF4(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"(\tmp{u} - \param{x_star})^3 + 0.05 (\tmp{u} - \param{x_star})",
         interval="[0, 1]",
+        summary="An increasing cubic, flattest at its simple root, where the slope is only 0.05.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

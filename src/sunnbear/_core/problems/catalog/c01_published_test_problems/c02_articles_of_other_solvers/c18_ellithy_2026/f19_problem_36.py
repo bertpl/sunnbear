@@ -26,6 +26,10 @@ class Ellithy2026Problem36(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} - 1.8\right)^{6} \left(\tmp{u} - 1.81\right)",
         interval="[0, 2]",
+        summary=(
+            "A function that touches 0 at a root of multiplicity 6, 0.01 below a simple root where the slope is only "
+            "$10^{-12}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -31,6 +31,7 @@ class BusDekker1975GroupIii(Formula):
         definitions=((r"\tmp{u}", r"\x - 11 \c"),),
         expression=r"\tmp{u}^{\param{n}}",
         interval="[-1, 10]",
+        summary="An odd power, below 0.01 in magnitude within 0.2 of its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

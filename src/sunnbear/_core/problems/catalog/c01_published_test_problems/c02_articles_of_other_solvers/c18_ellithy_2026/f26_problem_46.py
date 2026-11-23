@@ -30,6 +30,7 @@ class Ellithy2026Problem46(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{\frac{\tmp{u}}{2}} - 1.5",
         interval="[0, 1]",
+        summary="An increasing convex function with 1 root 0.06 below the upper bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -34,6 +34,10 @@ class BusDekker1975Function3(Formula):
             r"\left(1 + \left(1 - \param{n}\right)^{2}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{2}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A concave parabola with a maximum of about $\param{n}^2/4$ for $\param{n} \geq 5$, and 1 root that nears "
+            r"the lower bound as $\param{n}$ grows."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

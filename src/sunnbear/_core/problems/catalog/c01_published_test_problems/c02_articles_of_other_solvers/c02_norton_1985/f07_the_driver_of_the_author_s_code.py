@@ -28,6 +28,10 @@ class Norton1985TheDriverOfTheAuthorSCode(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{7} + 28 \tmp{u}^{4} - 480",
         interval="[1, 2]",
+        summary=(
+            "A polynomial whose 1 simple root lies in the upper tenth of the interval, with a slope at that root about "
+            "10 times the slope at the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

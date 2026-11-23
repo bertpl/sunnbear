@@ -30,6 +30,7 @@ class KumarSrivastav2026FunctionF5(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(1 + \tmp{u} \right)} - 0.4",
         interval="[0, 1]",
+        summary="An increasing function whose slope halves across the interval, with 1 simple root near the midpoint.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

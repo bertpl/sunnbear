@@ -33,6 +33,7 @@ class Ellithy2026Problem47(Formula):
             r"\cos{\left(\tmp{u} \right)} + 1.0 \left(1 - \cos{\left(\tmp{u} \right)}\right)^{2} - 0.05 " r"\tmp{u}^{2}"
         ),
         interval="[3, 6]",
+        summary="A function with 1 root near the middle of the interval and a maximum just above the lower bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

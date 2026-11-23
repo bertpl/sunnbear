@@ -28,6 +28,10 @@ class Sabharwal2019Figure2(Formula):
         definitions=((r"\tmp{u}", r"\x - 3.3 \c"),),
         expression=r"4 - \left(3 - \tmp{u}\right)^{3}",
         interval="[0.2, 3.5]",
+        summary=(
+            "An increasing cubic with 1 simple root, steep at the lower bound and nearly flat around a stationary "
+            "inflection point near the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
