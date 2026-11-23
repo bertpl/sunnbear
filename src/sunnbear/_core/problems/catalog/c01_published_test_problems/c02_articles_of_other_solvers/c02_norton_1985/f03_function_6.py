@@ -33,6 +33,10 @@ class Norton1985Function6(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 1\right) e^{- \param{n} \tmp{u}} + \tmp{u}^{\param{n}}",
         interval="[0, 1]",
+        summary=(
+            r"An increasing function with 1 root, flatter around it as $\param{n}$ grows, and below $10^{-3}$ in "
+            r"magnitude over 38% of the interval at $\param{n} = 20$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

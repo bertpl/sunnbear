@@ -28,6 +28,7 @@ class Galdino2011FunctionF3(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{4}\right)^{3}",
         interval="[2, 3]",
+        summary="A function with a triple root, below $10^{-3}$ in magnitude on a band 0.19 wide around that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

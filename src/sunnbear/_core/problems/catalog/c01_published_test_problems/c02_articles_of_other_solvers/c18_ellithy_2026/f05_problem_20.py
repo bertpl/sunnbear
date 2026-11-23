@@ -39,6 +39,10 @@ class Ellithy2026Problem20(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\tmp{u}^{2}} - e^{\param{k} \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A function negative between its roots $\x = 0$ and $\x = \param{k}$, the first of which is the lower "
+            r"bound of the wide interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

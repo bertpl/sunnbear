@@ -41,6 +41,10 @@ class FooTan2025Section42(Formula):
             r"\right)} - \param{y}"
         ),
         interval="[0, 0.5]",
+        summary=(
+            r"The binary entropy function minus $\param{y}$, with 1 root, 0.013 above the lower bound at $\param{y} = "
+            r"0.1$, and a slope that grows like $-\log_2 \x$ toward that bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -26,6 +26,10 @@ class Ellithy2026Problem23(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.2 \c"),),
         expression=r"- 0.9 \tmp{u}^{2} + 1.7 \tmp{u} + 2.5",
         interval="[2.8, 3]",
+        summary=(
+            "A parabola that is nearly a line on the interval, 0.2 wide, which lies past the parabola's maximum and "
+            "holds 1 of the 2 roots."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

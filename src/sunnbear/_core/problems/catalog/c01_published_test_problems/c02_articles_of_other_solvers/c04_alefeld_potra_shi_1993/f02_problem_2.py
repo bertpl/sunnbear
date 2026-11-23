@@ -35,6 +35,10 @@ class AlefeldPotraShi1993Problem2(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"- 2 \sum_{i=1}^{20} \frac{\left(2 i - 5\right)^{2}}{\left(\tmp{u} - i^{2}\right)^{3}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A sum of poles of order 3, with 1 simple root on each interval and values beyond $10^{27}$ in magnitude at"
+            " the interval's bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

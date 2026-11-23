@@ -26,6 +26,7 @@ class Ellithy2026Problem40(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u}^{5} - 3 \tmp{u}^{4} + 2 \tmp{u}^{3} - \tmp{u} + 0.1",
         interval="[-1, 3]",
+        summary="A quintic with 3 simple roots, the lower 2 around a maximum of 0.32, against 51 at the upper bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

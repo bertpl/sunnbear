@@ -33,6 +33,10 @@ class BusDekker1975Function5(Formula):
             r"\left(1 + \left(1 - \param{n}\right)^{4}\right) \tmp{u} - \left(1 - \param{n} " r"\tmp{u}\right)^{4}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"A quartic whose maximum exceeds 40 for $\param{n} \geq 4$, and whose 1 root then lies within 0.011 of "
+            r"the lower bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

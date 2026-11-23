@@ -30,6 +30,10 @@ class Sabharwal2019Function8(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[-1, 1]",
+        summary=(
+            "An increasing function with no root on the interval, below $-4$ throughout, and with its only real root "
+            "0.52 above the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -28,6 +28,10 @@ class Suhadolnik2012Function10(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
         expression=r"e^{\tmp{u}^{2} + 7 \tmp{u} - 30} - 1",
         interval="[2.6, 3.5]",
+        summary=(
+            "A function that never falls below $-1$ but grows steeply above its 1 root, to about 850 at the upper "
+            "bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

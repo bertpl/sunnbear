@@ -41,6 +41,10 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
             r"\frac{200 \tmp{n}}{{1.2}^{\tmp{n}} - 1}\right)"
         ),
         interval="[2, 10]",
+        summary=(
+            r"A break-even equation in the year $\x$, with 1 root, steepest at the lower bound, which lies 2 above a "
+            r"pole at $\x = 0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

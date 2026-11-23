@@ -31,6 +31,10 @@ class BusDekker1975Function4(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \left(1 - \tmp{u}\right)^{\param{n}}",
         interval="[0, 1]",
+        summary=(
+            r"An increasing polynomial with 1 simple root, convex at $\param{n} = 1$, and for larger $\param{n}$ "
+            r"concave below an inflection point and convex above it."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

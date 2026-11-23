@@ -30,6 +30,10 @@ class NaghipoorAhmadianSoheili2008Equation4(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.8 \c"),),
         expression=r"\frac{1}{\tmp{u}} - \sin{\left(\tmp{u} \right)} + 1",
         interval="[-1.3, -0.5]",
+        summary=(
+            r"A decreasing function with 1 root, steepest at the upper bound, which lies 0.5 below the pole at $\x = "
+            r"0$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

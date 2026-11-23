@@ -40,6 +40,10 @@ class Ellithy2026Problem16(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\sin{\left(\param{k} \tmp{u} \right)} - \param{m} \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A function falling from a maximum near the lower bound through 1 root, and, at $\param{k} = 20$, on to a "
+            r"minimum near the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

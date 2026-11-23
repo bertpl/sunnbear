@@ -28,6 +28,10 @@ class AlefeldPotraShi1993Problem1(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.57 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{2}",
         interval=r"\left[\frac{\pi}{2}, \pi\right]",
+        summary=(
+            "A decreasing function whose slope triples in magnitude across the interval, with 1 simple root in the "
+            "lower quarter."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

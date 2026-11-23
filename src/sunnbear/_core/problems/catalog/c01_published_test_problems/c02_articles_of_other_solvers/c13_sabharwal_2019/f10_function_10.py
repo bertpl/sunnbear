@@ -28,6 +28,10 @@ class Sabharwal2019Function10(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} \sin{\left(\tmp{u} \right)} - 1",
         interval="[0, 2]",
+        summary=(
+            "An increasing function with 1 simple root, flat at the lower bound and nearly flat at the upper bound, "
+            "just below a maximum."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

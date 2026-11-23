@@ -35,6 +35,10 @@ class GottliebThompson2010Test3(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"11 \tmp{u}^{11} - 1",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An 11th power minus 1, with 1 root, within 0.01 of $-1$ below $\x = 0.52$ and steep toward the upper "
+            r"bound of both intervals."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

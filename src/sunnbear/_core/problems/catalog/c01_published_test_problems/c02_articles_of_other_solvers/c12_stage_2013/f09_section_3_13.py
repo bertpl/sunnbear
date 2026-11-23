@@ -49,6 +49,7 @@ class Stage2013Section313(Formula):
             r"\end{cases}"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary="A hyperbola that changes sign only at its pole, where the formula sets the function to 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

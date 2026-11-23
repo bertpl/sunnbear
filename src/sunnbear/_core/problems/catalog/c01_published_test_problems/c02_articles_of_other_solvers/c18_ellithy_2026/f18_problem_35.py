@@ -26,6 +26,10 @@ class Ellithy2026Problem35(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}^{25} - 1",
         interval="[0, 2]",
+        summary=(
+            r"A function within 0.004 of $-1$ over the lower 40% of the interval and above $3 \cdot 10^7$ at the upper "
+            r"bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -31,6 +31,10 @@ class Galdino2011FunctionF4(Formula):
         ),
         expression=r"(81 - \tmp{p}(108 - \tmp{p}(54 - \tmp{p}(12 - \tmp{p})))) \operatorname{sgn}(\tmp{p} - 3)",
         interval="[1, 2]",
+        summary=(
+            r"A 4th power in Horner form times the sign of its base, with rounding errors deciding its sign within "
+            r"about $5 \cdot 10^{-4}$ of its root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

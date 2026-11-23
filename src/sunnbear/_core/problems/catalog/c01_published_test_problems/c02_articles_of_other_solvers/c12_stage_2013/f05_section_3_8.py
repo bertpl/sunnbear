@@ -32,6 +32,7 @@ class Stage2013Section38(Formula):
             r"\end{cases}"
         ),
         interval="[-10, 10]",
+        summary=r"The signed square root of $2/3 - \x$, with an infinite slope at its root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

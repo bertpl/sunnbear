@@ -26,6 +26,10 @@ class Ellithy2026Problem26(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}^{5} - 3 \tmp{u}^{4} + 25",
         interval="[-3, -1]",
+        summary=(
+            "A quintic, increasing on the interval and 10 times steeper at the lower bound than at its 1 root, which "
+            "lies in the upper third."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

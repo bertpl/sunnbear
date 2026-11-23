@@ -26,6 +26,7 @@ class Ellithy2026Problem19(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{3} + 4 \left(\tmp{u} - 1\right)^{2} - 10",
         interval="[0, 3]",
+        summary="A cubic with a local minimum inside the interval and 1 root in the interval's upper third.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

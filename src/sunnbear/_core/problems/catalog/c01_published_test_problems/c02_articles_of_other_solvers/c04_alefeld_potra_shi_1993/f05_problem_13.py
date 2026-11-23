@@ -36,6 +36,10 @@ class AlefeldPotraShi1993Problem13(Formula):
             r"\end{cases}"
         ),
         interval=r"\left[-10^{4}, \frac{\pi}{2}\right]",
+        summary=(
+            r"A continuous function, constant over nearly all of the interval and increasing after a kink at $\x = 0$, "
+            r"through 1 simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

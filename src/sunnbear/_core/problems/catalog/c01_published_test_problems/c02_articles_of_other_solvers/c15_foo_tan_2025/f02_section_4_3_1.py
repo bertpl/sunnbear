@@ -34,7 +34,7 @@ class FooTan2025Section431(Formula):
     number = (1, 2, 15, 2)
     name = "Section 4.3.1"
     params = (
-        FormulaParam("q", latex_symbol="q"),
+        FormulaParam("q", latex_symbol="q", meaning=r"The alphabet size of the $\param{q}$-ary entropy."),
         FormulaParam("y", latex_symbol="y"),
     )
     location_in_publication = "Section 4.3.1"
@@ -50,6 +50,10 @@ class FooTan2025Section431(Formula):
         interval=(
             r"\left[0, "
             r"\frac{170141183460469231731687303715884105726}{170141183460469231731687303715884105727}\right]"
+        ),
+        summary=(
+            r"The $\param{q}$-ary entropy function minus $\param{y}$, at most 0.008 above the line $\x - \param{y}$, "
+            r"with 1 root just below $\param{y}$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

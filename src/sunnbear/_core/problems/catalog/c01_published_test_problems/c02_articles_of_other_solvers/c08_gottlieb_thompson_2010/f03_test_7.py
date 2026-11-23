@@ -28,6 +28,10 @@ class GottliebThompson2010Test7(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\frac{1}{\tmp{u}} - 1",
         interval="[0.5, 2]",
+        summary=(
+            "A hyperbola, steep near the lower bound because of its pole 0.5 below that bound, with 1 root at a third "
+            "of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

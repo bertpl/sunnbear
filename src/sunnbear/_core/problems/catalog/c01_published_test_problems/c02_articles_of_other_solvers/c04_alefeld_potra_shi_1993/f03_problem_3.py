@@ -39,6 +39,10 @@ class AlefeldPotraShi1993Problem3(Formula):
         definitions=((r"\tmp{u}", r"\x - 40 \c"),),
         expression=r"\param{a_} \tmp{u} e^{\param{b_} \tmp{u}}",
         interval="[-9, 31]",
+        summary=(
+            r"A function with 1 simple root, above $10^6$ at the lower bound and below 0.01 in magnitude over the "
+            r"upper half of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -39,6 +39,10 @@ class Norton1985Function8(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.7 \c"),),
         expression=r"\tmp{u}^{\param{n}} + \param{a_} \tmp{u} + \param{b_}",
         interval="[-0.7, 1]",
+        summary=(
+            r"An increasing function whose 1 simple root is an inflection point where the derivatives of order 2 to "
+            r"$\param{n} - 1$ are all 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

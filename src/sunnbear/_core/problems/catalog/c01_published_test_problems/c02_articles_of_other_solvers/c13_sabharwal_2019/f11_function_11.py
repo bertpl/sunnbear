@@ -28,6 +28,10 @@ class Sabharwal2019Function11(Formula):
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"4 \tmp{u}^{4} + 3 \tmp{u}^{3} + 2 \tmp{u}^{2} + \tmp{u} + 1",
         interval="[-6, 0]",
+        summary=(
+            "A quartic with no real root, about 4600 at the lower bound and falling to a positive minimum of 0.83 near "
+            "the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
