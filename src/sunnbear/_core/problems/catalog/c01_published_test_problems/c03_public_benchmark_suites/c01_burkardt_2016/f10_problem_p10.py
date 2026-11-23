@@ -36,8 +36,8 @@ class Burkardt2016ProblemP10(Formula):
         expression=r"\frac{20.0 \tmp{u}}{100.0 \tmp{u} \tmp{u} + 1.0}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A rational function with 1 root between a nearby minimum and maximum, decaying toward 0 farther out, "
-            'referred to in the source as "The Repeller".'
+            "A rational function with 1 root between a local minimum and a local maximum, both close to the root, "
+            'decaying toward 0 farther out, referred to in the source as "The Repeller".'
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

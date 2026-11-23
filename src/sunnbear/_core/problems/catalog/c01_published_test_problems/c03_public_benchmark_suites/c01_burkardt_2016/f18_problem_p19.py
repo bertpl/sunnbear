@@ -34,8 +34,8 @@ class Burkardt2016ProblemP19(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            "A cosine with about 16 periods plus a smooth step from 4 to $-4$, whose 1 root lies in the step, referred"
-            ' to in the source as "The jumping cosine".'
+            "A cosine with about 16 periods plus a smooth step from 4 to $-4$, with its 1 root in the step, referred to"
+            ' in the source as "The jumping cosine".'
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -43,8 +43,8 @@ class Burkardt2016ProblemP06(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function with 2 roots on the wide interval, so that its bounds have the same sign, and 1 on the narrow "
-            r"one, which starts $8 \cdot 10^{-10}$ above the lower root."
+            r"A function with 2 roots on the wide interval, so that it has the same sign at both bounds of that "
+            r"interval, and 1 on the narrow one, which starts $8 \cdot 10^{-10}$ above the lower root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

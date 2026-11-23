@@ -33,8 +33,8 @@ class RootsFortran2025Case46(Formula):
         ),
         interval="[-10, 5]",
         summary=(
-            "A rising function plus sines, with 1 root, local extrema only near that root, and 1 local maximum within "
-            "0.2 of 0 that does not reach 0."
+            "A rising function plus sines, with 1 root, local extrema only near that root, and 1 local maximum whose "
+            "value lies between $-0.2$ and 0."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

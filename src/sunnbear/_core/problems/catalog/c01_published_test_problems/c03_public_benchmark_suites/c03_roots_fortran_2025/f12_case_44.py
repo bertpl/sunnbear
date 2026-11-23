@@ -32,8 +32,8 @@ class RootsFortran2025Case44(Formula):
         ),
         interval="[-0.7, 0.4]",
         summary=(
-            r"An oscillation whose amplitude grows with $|\x|$, with 1 root close to the lower bound and no local "
-            r"minimum below 0.2 after it."
+            r"An oscillation whose amplitude grows with $|\x|$, with 1 root close to the lower bound and, above that "
+            r"root, no local minimum below 0.2."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
