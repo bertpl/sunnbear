@@ -63,3 +63,9 @@ def test_citation_key_that_does_not_end_in_the_year_is_rejected():
     """A citation key whose 2 digits are not the last 2 digits of the publication's year is rejected."""
     with pytest.raises(ValueError, match="does not end in the last 2 digits"):
         Publication(citation=_CITATION, citation_key="Dowell72", year=1971)
+
+
+def test_citation_of_more_than_1_paragraph_is_rejected():
+    """A citation that holds a line break, such as a second paragraph of notes, is rejected."""
+    with pytest.raises(ValueError, match="is not 1 paragraph"):
+        Publication(citation=f"{_CITATION}\n\nA note about the publication.")

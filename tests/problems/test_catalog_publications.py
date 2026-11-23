@@ -72,15 +72,6 @@ def test_citation_keys_are_unique():
     assert [key for key, count in counts.items() if count > 1] == []
 
 
-def test_citations_are_1_paragraph():
-    """A shipped publication's citation is 1 paragraph: the citation alone, without notes about the source."""
-    # --- act --------------------------
-    failing = [category.label for category in _SINGLE_PUBLICATION_CATEGORIES if "\n" in category.publication.citation]
-
-    # --- assert -----------------------
-    assert failing == []
-
-
 def test_publications_declare_their_parts():
     """A shipped publication declares its citation key, its title, a DOI or URL, and the year in its category's name.
 
