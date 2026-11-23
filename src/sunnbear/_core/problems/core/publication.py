@@ -25,7 +25,8 @@ class Publication:
     where its citation holds a link.
 
     Attributes:
-        citation: The full citation, as a reader would cite the publication, with its DOI or URL where it has one.
+        citation: The full citation, as a reader would cite the publication, with its DOI or URL where it has one, in
+            1 paragraph and without notes about the source.
         citation_key: A short name of the publication, unique among the shipped publications: the first author's
             surname, or a project's name, and the year's last 2 digits, with a lowercase letter where 2 keys would
             collide, such as "Brent71" or "Ganchovski26a".

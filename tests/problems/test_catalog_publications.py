@@ -73,7 +73,7 @@ def test_citation_keys_are_unique():
 
 
 def test_citations_are_1_paragraph():
-    """A shipped publication's citation is 1 paragraph: the citation alone, without notes on how the rows were taken."""
+    """A shipped publication's citation is 1 paragraph: the citation alone, without notes about the source."""
     # --- act --------------------------
     failing = [category.label for category in _SINGLE_PUBLICATION_CATEGORIES if "\n" in category.publication.citation]
 

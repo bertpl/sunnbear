@@ -40,8 +40,8 @@ class RootsFortran2025Case45(Formula):
             (
                 "The source takes this function from problem 11 of G. E. Alefeld, F. A. Potra and Yixun Shi, "
                 '"Algorithm 748: Enclosing Zeros of Continuous Functions", ACM Transactions on Mathematical Software '
-                r"21(3), 327–344 (1995), https://doi.org/10.1145/210089.210111, which gives it at $\param{n} = 20$ "
-                r"among other values; $\param{n} = 30$ is the source's own."
+                r"21(3), 327–344 (1995), https://doi.org/10.1145/210089.210111. The article gives the function at "
+                r"$\param{n} = 20$ among other values; the value $\param{n} = 30$ is the source's own choice."
             ),
         ),
     )
