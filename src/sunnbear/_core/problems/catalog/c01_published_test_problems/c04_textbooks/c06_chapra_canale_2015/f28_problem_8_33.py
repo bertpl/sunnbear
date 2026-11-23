@@ -43,8 +43,8 @@ class ChapraCanale2015Problem833(Formula):
         ),
         interval="[1, 1000]",
         summary=(
-            "The impedance equation of a parallel RLC circuit in the angular frequency, with 1 simple root, right of "
-            "which the function stays between 0 and 0.009."
+            "The impedance equation of a parallel RLC circuit in terms of the angular frequency, with 1 simple root, "
+            "right of which the function stays between 0 and 0.009."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

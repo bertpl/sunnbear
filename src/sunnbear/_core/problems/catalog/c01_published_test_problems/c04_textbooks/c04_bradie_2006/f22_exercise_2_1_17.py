@@ -36,8 +36,8 @@ class Bradie2006Exercise2117(Formula):
         ),
         interval="[0, 0.5]",
         summary=(
-            r"An even function, decreasing from a maximum at the lower bound $\x = 0$ to 1 simple root in the upper "
-            r"fifth of the interval."
+            r"An even function, decreasing from a maximum at the lower bound $\x = 0$ to 1 simple root in the upper 20%"
+            r" of the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

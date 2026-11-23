@@ -39,8 +39,8 @@ class BurdenFairesBurden2016Exercise2111(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A polynomial with 5 roots on the wide intervals and 3 on the narrow ones, and below 0.01 in magnitude "
-            "within 0.11 of the triple root."
+            "A polynomial with 5 roots on the wide intervals and 3 on the narrow ones, among them a triple root, within"
+            " 0.11 of which the polynomial stays below 0.01 in magnitude."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

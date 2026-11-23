@@ -37,7 +37,7 @@ class Bradie2006Exercise229(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"An even quartic with 1 simple root on each interval, the lower root at an inflection point and the upper "
-            r"root above a local minimum at the bound $\x = 3$."
+            r"root right of a local minimum at the bound $\x = 3$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -36,8 +36,8 @@ class SuliMayers2003Example14(Formula):
             "alpha",
             latex_symbol=r"\alpha",
             meaning=(
-                r"The exponent of $k$ in the terms $2^{-k^{\param{alpha}}}$, $k = 0, 1, 2, \ldots$, each of which "
-                r"$\fn{g}$ maps to the next."
+                r"The exponent of $k$ in the terms $2^{-k^{\param{alpha}}}$ for $k = 0, 1, 2, \ldots$; $\fn{g}$ maps "
+                "each term to the next."
             ),
         ),
     )

@@ -31,8 +31,8 @@ class BurdenFairesBurden2016Exercise236B(Formula):
         expression=r"\ln{\left(\tmp{u} - 1 \right)} + \cos{\left(\tmp{u} - 1 \right)}",
         interval="[1.3, 2]",
         summary=(
-            "An increasing, concave function with 1 simple root close to the lower bound, which lies 0.3 above the "
-            r"logarithm's singularity at $\x = 1$."
+            r"An increasing, concave function with 1 simple root close to the lower bound, which lies 0.3 above the "
+            r"singularity of $\ln(\x - 1)$ at $\x = 1$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -36,7 +36,7 @@ class BurdenFairesBurden2016Example2(Formula):
         expression=r"\tmp{u} - \frac{\tmp{u}^{2} - 1}{3}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A downward parabola, increasing through the lower root on $[-1, 1]$ and decreasing through the upper root "
+            "A concave parabola, increasing through the lower root on $[-1, 1]$ and decreasing through the upper root "
             "on $[3, 4]$."
         ),
     )

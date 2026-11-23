@@ -44,8 +44,8 @@ class ChapraCanale2015Problem839(Formula):
         ),
         interval="[10, 50]",
         summary=(
-            "The rocket equation with a gravity term in the time, decreasing through 1 simple root toward a logarithmic"
-            " singularity 9.7 beyond the upper bound."
+            "The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
+            "logarithmic singularity 9.7 s beyond the upper bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

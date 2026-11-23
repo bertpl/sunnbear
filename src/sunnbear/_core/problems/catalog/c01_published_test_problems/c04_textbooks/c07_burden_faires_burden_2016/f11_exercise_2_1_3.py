@@ -36,7 +36,7 @@ class BurdenFairesBurden2016Exercise213(Formula):
         expression=r"\tmp{u}^{3} - 7 \tmp{u}^{2} + 14 \tmp{u} - 6",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A cubic with 1 root on each interval and a shallow minimum of $-0.11$ between the upper 2 roots, next to "
+            "A cubic with 1 root on each interval and, between the upper 2 roots, a shallow minimum of $-0.11$ next to "
             "the lower bound of $[3.2, 4]$."
         ),
     )
