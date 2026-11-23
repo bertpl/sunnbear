@@ -34,8 +34,8 @@ class Norton1985Function2(Formula):
         expression=r"2 \tmp{u} e^{- \param{n}} + 1 - 2 e^{- \param{n} \tmp{u}}",
         interval="[0, 1]",
         summary=(
-            r"An increasing function whose root nears the lower bound as $\param{n}$ grows, and which at $\param{n} = "
-            r"20$ is nearly 1 over most of the interval."
+            r"An increasing function whose root nears the lower bound as $\param{n}$ grows, with values near 1 over "
+            r"most of the interval at $\param{n} = 20$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

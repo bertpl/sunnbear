@@ -28,7 +28,7 @@ class Suhadolnik2012Function5(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.947 \c"),),
         expression=r"2 \sin{\left(\tmp{u} \right)} - 1",
         interval=r"\left[0.1, \frac{\pi}{3}\right]",
-        summary="A sine on an interval where it is increasing and concave, with 1 simple root near the middle.",
+        summary="A sine, increasing and concave on the interval, with 1 simple root near the middle.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

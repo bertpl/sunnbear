@@ -29,7 +29,7 @@ class GottliebThompson2010Test7(Formula):
         expression=r"\frac{1}{\tmp{u}} - 1",
         interval="[0.5, 2]",
         summary=(
-            "A hyperbola, steep near the lower bound because of its pole 0.5 below that bound, with 1 root at a third "
+            "A hyperbola, steep near the lower bound because of the pole 0.5 below that bound, with 1 root at a third "
             "of the interval."
         ),
     )

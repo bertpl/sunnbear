@@ -28,7 +28,9 @@ class Sabharwal2019Function6(Formula):
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"\tmp{u}^{2} + 5 \tmp{u} + 2",
         interval="[-6, 0]",
-        summary="A parabola with both of its simple roots on the interval, so that it is positive at both bounds.",
+        summary=(
+            "A parabola with both of its simple roots on the interval, so that the parabola is positive at both bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

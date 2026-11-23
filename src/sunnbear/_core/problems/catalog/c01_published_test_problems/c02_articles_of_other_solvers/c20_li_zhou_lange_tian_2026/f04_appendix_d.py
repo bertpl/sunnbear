@@ -31,8 +31,8 @@ class LiZhouLangeTian2026AppendixD(Formula):
         expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} + \tmp{u} + 1",
         interval="[0, 2]",
         summary=(
-            "A cubic, point-symmetric about the midpoint of the interval, with 1 simple root there and a local extremum"
-            " near each bound."
+            "A cubic, point-symmetric about the midpoint of the interval, with 1 simple root at that midpoint and a "
+            "local extremum near each bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

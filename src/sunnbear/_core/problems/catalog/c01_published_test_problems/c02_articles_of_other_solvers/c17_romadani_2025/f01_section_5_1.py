@@ -29,7 +29,7 @@ class Romadani2025Section51(Formula):
         expression=r"\tmp{u}^{7} - 2 \tmp{u}^{6} + 4 \tmp{u}^{5} - 1",
         interval="[0, 1]",
         summary=(
-            "An increasing polynomial with 1 simple root, flat at the lower bound, where its first 4 derivatives are 0."
+            "An increasing polynomial with 1 simple root, flat at the lower bound, where the first 4 derivatives are 0."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

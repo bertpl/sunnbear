@@ -30,7 +30,7 @@ class Zhang2011Section3(Formula):
         definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}^{3}",
         interval="[-4, 4]",
-        summary=r"A function with 1 simple root, decreasing except on a rise of only 0.018 just below $\x = 0$.",
+        summary=r"A function with 1 simple root, decreasing except where it rises by only 0.018 just below $\x = 0$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
