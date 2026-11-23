@@ -31,8 +31,8 @@ class Galdino2011FunctionF6(Formula):
         expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - 1",
         interval="[2.5, 3.5]",
         summary=(
-            "A function with a root of multiplicity 5, around which it is exactly 0 in floating point on a band 0.0012 "
-            "wide."
+            "A function with a root of multiplicity 5, exactly 0 in floating point on a band 0.0012 wide around that "
+            "root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -38,7 +38,7 @@ class Sabharwal2019Function1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{2} - \param{k}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A parabola with 1 simple root on each of its 3 intervals, close to the lower bound on the widest one.",
+        summary="A parabola with 1 simple root on each of the 3 intervals, close to the lower bound on the widest one.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

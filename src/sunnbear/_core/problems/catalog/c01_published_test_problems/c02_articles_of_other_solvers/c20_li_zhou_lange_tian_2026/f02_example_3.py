@@ -38,8 +38,8 @@ class LiZhouLangeTian2026Example3(Formula):
             "p",
             latex_symbol="p",
             meaning=(
-                r"The root is the $\param{p}$-quantile of the normal distribution with mean $\param{mu}$ and "
-                r"standard deviation $\param{sigma}$."
+                r"The probability level of the root, which is the $\param{p}$-quantile of the normal distribution with "
+                r"mean $\param{mu}$ and standard deviation $\param{sigma}$."
             ),
         ),
         FormulaParam("mu", latex_symbol=r"\mu"),

@@ -43,8 +43,8 @@ class LiZhouLangeTian2026Section71(Formula):
         ),
         interval="[0, 2]",
         summary=(
-            "A decreasing cubic with 1 simple root for both parameter sets, at the midpoint of the interval for the "
-            "first."
+            r"A decreasing cubic with 1 simple root for both parameter sets, at the midpoint of the interval for "
+            r"$\param{a2} = 1$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
