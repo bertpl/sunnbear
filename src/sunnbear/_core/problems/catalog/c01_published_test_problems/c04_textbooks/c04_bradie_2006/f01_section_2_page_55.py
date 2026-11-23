@@ -31,9 +31,9 @@ class Bradie2006Section2Page55(Formula):
     number = (1, 4, 4, 1)
     name = "Section 2 (page 55)"
     params = (
-        FormulaParam("R", latex_symbol="R", meaning="The sphere's radius."),
-        FormulaParam("rho_o", latex_symbol=r"\rho_{o}", meaning="The sphere's density."),
-        FormulaParam("rho_f", latex_symbol=r"\rho_{f}", meaning="The fluid's density."),
+        FormulaParam("R", latex_symbol="R", meaning="The sphere's radius, in cm."),
+        FormulaParam("rho_o", latex_symbol=r"\rho_{o}", meaning=r"The sphere's density, in $\mathrm{g/cm^3}$."),
+        FormulaParam("rho_f", latex_symbol=r"\rho_{f}", meaning=r"The fluid's density, in $\mathrm{g/cm^3}$."),
     )
     location_in_publication = "§2 (p. 55); §2.2 (p. 78); Exercise 2.2-15"
     presentation = FormulaPresentation(
@@ -44,8 +44,8 @@ class Bradie2006Section2Page55(Formula):
         ),
         interval="[0, 10]",
         summary=(
-            "A decreasing cubic for the depth to which a floating sphere sinks, with 1 simple root and a slope of 0 at "
-            "both bounds."
+            "A decreasing cubic whose 1 simple root is the depth to which a floating sphere sinks, with a slope of 0 at"
+            " both bounds."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

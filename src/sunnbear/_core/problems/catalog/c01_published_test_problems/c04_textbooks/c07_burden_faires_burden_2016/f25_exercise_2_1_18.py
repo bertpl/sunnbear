@@ -29,7 +29,7 @@ class BurdenFairesBurden2016Exercise2118(Formula):
         expression=r"\tmp{u}^{3} + \tmp{u} - 4",
         interval="[1, 4]",
         summary=(
-            "An increasing cubic with its 1 real root in the lowest 13% of the interval, and values of $-2$ and 64 at "
+            "An increasing cubic with its 1 real root in the lower 13% of the interval, and values of $-2$ and 64 at "
             "the bounds."
         ),
     )

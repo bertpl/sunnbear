@@ -29,7 +29,7 @@ class BurdenFairesBurden2016Exercise227(Formula):
         expression=r"\tmp{u}^{4} - 3 \tmp{u}^{2} - 3",
         interval="[1, 2]",
         summary=(
-            "A quartic that varies by only 0.25 over the lowest 40% of the interval, with 1 simple root close to the "
+            "A quartic that varies by only 0.25 over the lower 40% of the interval, with 1 simple root close to the "
             "upper bound."
         ),
     )

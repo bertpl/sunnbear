@@ -26,7 +26,7 @@ class Moler2004Function2(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}^{3} - 0.001",
         interval="[-1, 1]",
-        summary=r"A cubic with 1 simple root close above $\x = 0$, where the slope is 0.",
+        summary=r"A cubic with a slope of 0 at $\x = 0$ and 1 simple root close above that point.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

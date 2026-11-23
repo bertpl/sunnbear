@@ -52,7 +52,7 @@ class ChapraCanale2015Figure85(Formula):
         ),
         interval="[0.008, 0.08]",
         summary=(
-            "The Colebrook equation for the friction factor of turbulent pipe flow, decreasing and about 30 times as "
+            "The Colebrook equation for the friction factor, decreasing through 1 simple root and about 30 times as "
             "steep at the lower bound as at the upper."
         ),
     )

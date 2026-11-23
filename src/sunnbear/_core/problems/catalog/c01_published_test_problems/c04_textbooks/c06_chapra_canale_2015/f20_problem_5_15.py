@@ -43,8 +43,8 @@ class ChapraCanale2015Problem515(Formula):
         ),
         interval="[0, 2]",
         summary=(
-            "A target velocity minus the outflow velocity of a tank drained through a long pipe, decreasing in the "
-            "tank's initial head through 1 simple root."
+            "A target velocity minus the outflow velocity of a tank drained through a long pipe, as a decreasing "
+            "function of the tank's initial head with 1 simple root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
