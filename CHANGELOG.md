@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add a summary for readers to every formula of the published test problems
+
 ### Changed
 
 ### Deprecated
