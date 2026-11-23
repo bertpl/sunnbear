@@ -33,6 +33,10 @@ class Moler2004Section410(Formula):
             r"\frac{1}{\left(\tmp{u} - 0.3\right)^{2} + 0.01} + \frac{1}{\left(\tmp{u} - 0.9\right)^{2} " r"+ 0.04} - 6"
         ),
         interval="[-1, 2]",
+        summary=(
+            "A function, negative at both bounds, with 2 steep peaks and 1 simple root on each side of the peaks, "
+            'referred to in the source as "humps".'
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

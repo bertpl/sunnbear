@@ -29,11 +29,11 @@ class ChapraCanale2015Problem839(Formula):
     number = (1, 4, 6, 29)
     name = "Problem 8.39"
     params = (
-        FormulaParam("u", latex_symbol="u"),
-        FormulaParam("m0", latex_symbol="m_{0}"),
-        FormulaParam("q", latex_symbol="q"),
-        FormulaParam("g", latex_symbol="g"),
-        FormulaParam("v", latex_symbol="v"),
+        FormulaParam("u", latex_symbol="u", meaning="The exhaust velocity relative to the rocket, in m/s."),
+        FormulaParam("m0", latex_symbol="m_{0}", meaning="The rocket's initial mass, in kg."),
+        FormulaParam("q", latex_symbol="q", meaning="The rate of fuel consumption, in kg/s."),
+        FormulaParam("g", latex_symbol="g", meaning=r"The gravitational acceleration, in $\mathrm{m/s^2}$."),
+        FormulaParam("v", latex_symbol="v", meaning="The target velocity, in m/s."),
     )
     location_in_publication = "Prob. 8.39"
     presentation = FormulaPresentation(
@@ -43,6 +43,10 @@ class ChapraCanale2015Problem839(Formula):
             r"\right)} - \param{g} \tmp{t}\right)"
         ),
         interval="[10, 50]",
+        summary=(
+            "The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
+            "logarithmic singularity 9.7 s beyond the upper bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

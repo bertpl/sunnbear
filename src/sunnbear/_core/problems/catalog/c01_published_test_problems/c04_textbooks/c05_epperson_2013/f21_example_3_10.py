@@ -30,6 +30,10 @@ class Epperson2013Example310(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u}^{4} - \tmp{u} - 1",
         interval="[-2, 2]",
+        summary=(
+            "A convex quartic with both of its real roots on the interval, so that the function is positive at both "
+            "bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

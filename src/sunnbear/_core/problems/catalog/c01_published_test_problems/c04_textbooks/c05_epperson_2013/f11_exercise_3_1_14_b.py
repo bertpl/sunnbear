@@ -28,6 +28,9 @@ class Epperson2013Exercise3114B(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\frac{1}{\tmp{u} - 1}",
         interval="[0, 3]",
+        summary=(
+            r"A hyperbola that changes sign only at the pole, jumping from $-\infty$ to $+\infty$, and has no root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

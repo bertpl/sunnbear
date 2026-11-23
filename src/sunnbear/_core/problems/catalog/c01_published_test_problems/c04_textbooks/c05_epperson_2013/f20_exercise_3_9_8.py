@@ -30,6 +30,7 @@ class Epperson2013Exercise398(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \sin{\left(\pi \tmp{u} \right)} + \tmp{u}",
         interval="[1, 2]",
+        summary="A function with the same sign at both bounds and 2 simple roots between them, around 1 minimum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

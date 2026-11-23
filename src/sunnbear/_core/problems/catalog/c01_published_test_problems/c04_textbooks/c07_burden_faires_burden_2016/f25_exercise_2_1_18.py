@@ -28,6 +28,10 @@ class BurdenFairesBurden2016Exercise2118(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{3} + \tmp{u} - 4",
         interval="[1, 4]",
+        summary=(
+            "An increasing cubic with its 1 real root in the lower 13% of the interval, and values of $-2$ and 64 at "
+            "the bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

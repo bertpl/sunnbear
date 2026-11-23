@@ -39,6 +39,10 @@ class ChapraCanale2015Figure76(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \cos{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"An increasing function with 1 root, the fixed point of the cosine, and a slope of 0 at 3 values of $\x$ "
+            r"on the wider interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

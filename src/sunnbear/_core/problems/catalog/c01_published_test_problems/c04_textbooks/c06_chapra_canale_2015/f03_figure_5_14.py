@@ -40,6 +40,10 @@ class ChapraCanale2015Figure514(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{10} - 1",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"A function within $10^{-3}$ of $-1$ for $|\x| \le 0.5$ and steep beyond the 1 simple root of each "
+            "interval, reaching about $10^6$ on the widest interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

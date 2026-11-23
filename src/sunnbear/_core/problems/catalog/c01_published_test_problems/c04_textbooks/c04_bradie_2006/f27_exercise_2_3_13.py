@@ -30,6 +30,10 @@ class Bradie2006Exercise2313(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \frac{2 - e^{\tmp{u}} + \tmp{u}^{2}}{3}",
         interval="[0, 1]",
+        summary=(
+            r"A nearly straight function with an inflection point at $\x = \ln 2$ and 1 simple root in the lower third "
+            r"of the interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

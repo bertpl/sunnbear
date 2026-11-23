@@ -38,6 +38,10 @@ class ChapraCanale2015Example52(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\sin{\left(10 \tmp{u} \right)} + \cos{\left(3 \tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function with 15 roots on the widest interval, 6 on $[3, 5]$, and on the narrowest only 2, which lie "
+            "0.035 apart."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

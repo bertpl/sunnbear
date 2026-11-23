@@ -33,6 +33,10 @@ class BurdenFairesBurden2016Section24Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{\tmp{u}} - \tmp{u} - 1",
         interval="[-1, 1]",
+        summary=(
+            "A function with a double root, never negative in exact arithmetic but negative at many floats within "
+            r"$1.1 \cdot 10^{-8}$ of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

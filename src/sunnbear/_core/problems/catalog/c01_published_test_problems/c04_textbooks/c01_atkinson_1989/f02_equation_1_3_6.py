@@ -36,6 +36,10 @@ class Atkinson1989Equation136(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} + 3 \tmp{u} - 1",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"$(\x - 1)^3$ written out as a polynomial, whose sign within about $10^{-5}$ of the triple root comes from"
+            r" rounding errors."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

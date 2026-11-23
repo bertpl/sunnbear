@@ -34,6 +34,10 @@ class SuliMayers2003Equation133(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
         interval="[0, 1]",
+        summary=(
+            "A parabola whose roots, the fixed points of the logistic map, are the lower bound and "
+            r"$\x = 1 - 1/\param{a_}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

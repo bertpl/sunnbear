@@ -43,6 +43,10 @@ class Moler2004Section48(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"J_{0}\left(\tmp{u}\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            r"The Bessel function $J_0$, an oscillation of decaying amplitude, with 10 simple roots on $[0, 10\pi]$ and"
+            r" 1 on each of the other intervals."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

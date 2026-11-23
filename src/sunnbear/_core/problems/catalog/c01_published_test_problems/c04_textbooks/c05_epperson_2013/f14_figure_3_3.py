@@ -34,6 +34,10 @@ class Epperson2013Figure33(Formula):
             r"\frac{4 e^{2 - \frac{\tmp{u}}{2}} \left(1 + \frac{\ln{\left(\tmp{u} " r"\right)}}{\tmp{u}}\right)}{3}"
         ),
         interval="[0, 8]",
+        summary=(
+            r"A function that tends to $-\infty$ at the lower bound, rises through 1 simple root to a maximum, and then"
+            r" decays toward 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

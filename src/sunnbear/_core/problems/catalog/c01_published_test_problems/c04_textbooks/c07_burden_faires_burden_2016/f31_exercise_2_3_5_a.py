@@ -28,6 +28,7 @@ class BurdenFairesBurden2016Exercise235A(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{3} - 2 \tmp{u}^{2} - 5",
         interval="[1, 4]",
+        summary="A cubic with only 1 real root and a shallow local minimum near the lower bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

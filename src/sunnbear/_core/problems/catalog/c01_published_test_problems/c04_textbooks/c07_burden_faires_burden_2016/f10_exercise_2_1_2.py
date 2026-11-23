@@ -35,6 +35,10 @@ class BurdenFairesBurden2016Exercise212(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"3 \left(\tmp{u} + 1\right) \left(\tmp{u} - \frac{1}{2}\right) \left(\tmp{u} - 1\right)",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A cubic with all 3 of its roots on both intervals, the upper 2 roots on either side of a shallow minimum "
+            "of only $-0.33$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

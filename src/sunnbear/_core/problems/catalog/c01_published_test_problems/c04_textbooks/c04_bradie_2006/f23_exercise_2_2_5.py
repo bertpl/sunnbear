@@ -28,6 +28,10 @@ class Bradie2006Exercise225(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{7} - 3",
         interval="[1, 2]",
+        summary=(
+            "A convex function with 1 simple root in the lower 20% of the interval and values of $-2$ and 125 at the "
+            "bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

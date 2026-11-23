@@ -36,6 +36,9 @@ class BurdenFairesBurden2016Exercise236E(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\tmp{u}} - 3 \tmp{u}^{2}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A function with 3 real roots, 1 on each interval, and a slope that grows from 2 to 118 across $[3, 5]$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

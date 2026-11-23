@@ -28,6 +28,10 @@ class BurdenFairesBurden2016Section22Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"\tmp{u} - \left(\tmp{u}^{2} - 2\right)",
         interval="[-3, 3]",
+        summary=(
+            "A concave parabola with both its simple roots inside the interval, so that the parabola has the same sign "
+            "at both bounds."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

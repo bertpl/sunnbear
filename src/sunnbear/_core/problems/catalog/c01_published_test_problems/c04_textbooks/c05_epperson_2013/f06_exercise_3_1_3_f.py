@@ -30,6 +30,7 @@ class Epperson2013Exercise313F(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"1 - 2 \tmp{u} e^{- \frac{\tmp{u}}{2}}",
         interval="[0, 2]",
+        summary="A decreasing function with 1 simple root and a stationary minimum at the upper bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

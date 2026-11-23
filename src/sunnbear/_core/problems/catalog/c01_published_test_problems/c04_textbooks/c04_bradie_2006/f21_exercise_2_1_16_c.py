@@ -33,6 +33,10 @@ class Bradie2006Exercise2116C(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"1.05 - 1.04 \tmp{u} + \ln{\left(\tmp{u} \right)}",
         interval="[1, 2]",
+        summary=(
+            "A concave function with 1 simple root on the interval and a maximum of only 0.011 just below the lower "
+            "bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

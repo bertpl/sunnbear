@@ -44,6 +44,9 @@ class Epperson2013Example31(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"2 - e^{\tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A decreasing exponential whose slope grows in magnitude by a factor $e^{10}$ across the wide interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

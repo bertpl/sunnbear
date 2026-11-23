@@ -33,7 +33,13 @@ class ChapraCanale2015Equation814(Formula):
 
     number = (1, 4, 6, 6)
     name = "Equation (8.14)"
-    params = (FormulaParam("pCO2", latex_symbol=r"p_{\mathrm{CO_2}}"),)
+    params = (
+        FormulaParam(
+            "pCO2",
+            latex_symbol=r"p_{\mathrm{CO_2}}",
+            meaning="The partial pressure of carbon dioxide in the air, in ppm.",
+        ),
+    )
     location_in_publication = "§8.2, Eq. (8.14)"
     presentation = FormulaPresentation(
         definitions=(
@@ -50,6 +56,10 @@ class ChapraCanale2015Equation814(Formula):
             r"+ \frac{\tmp{K_w}}{\tmp{H}} - \tmp{H}"
         ),
         interval="[2, 12]",
+        summary=(
+            r"The charge balance of rainwater in terms of the pH, with 1 simple root and values below $10^{-4}$ in "
+            r"magnitude for $4 \le \x \le 7$ but above 500 at $\x = 12$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

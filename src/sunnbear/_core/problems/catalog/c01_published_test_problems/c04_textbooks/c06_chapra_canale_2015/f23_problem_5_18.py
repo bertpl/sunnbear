@@ -34,7 +34,16 @@ class ChapraCanale2015Problem518(Formula):
 
     number = (1, 4, 6, 23)
     name = "Problem 5.18"
-    params = (FormulaParam("osf", latex_symbol="o_{sf}"),)
+    params = (
+        FormulaParam(
+            "osf",
+            latex_symbol="o_{sf}",
+            meaning=(
+                r"The saturation concentration of dissolved oxygen, in mg/L; the larger $\param{osf}$, the closer the "
+                "root lies to the lower bound."
+            ),
+        ),
+    )
     location_in_publication = "Prob. 5.18"
     presentation = FormulaPresentation(
         definitions=(
@@ -47,6 +56,10 @@ class ChapraCanale2015Problem518(Formula):
             r"- \frac{8.621949 \cdot 10^{11}}{\tmp{T_a}^4}\right)"
         ),
         interval="[0, 40]",
+        summary=(
+            r"An increasing function of the temperature, with 1 simple root: the temperature at which freshwater's "
+            r"saturation concentration of dissolved oxygen is $\param{osf}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

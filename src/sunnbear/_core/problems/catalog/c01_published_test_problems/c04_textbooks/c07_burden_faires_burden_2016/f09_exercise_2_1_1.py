@@ -30,6 +30,7 @@ class BurdenFairesBurden2016Exercise211(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sqrt{\tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[0, 1]",
+        summary="An increasing function with an infinite slope at the lower bound and 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,6 +30,7 @@ class Moler2004Function5(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\frac{1}{\tmp{u} - \pi}",
         interval="[0, 5]",
+        summary="A hyperbola that has no root and changes sign only at its pole, where the function is undefined.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

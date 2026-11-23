@@ -30,6 +30,9 @@ class BurdenFairesBurden2016Exercise235D(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.57 \c"),),
         expression=r"\tmp{u} - 0.8 - 0.2 \sin{\left(\tmp{u} \right)}",
         interval=r"\left[0, \frac{\pi}{2}\right]",
+        summary=(
+            "Kepler's equation for an orbit of eccentricity 0.2, nearly linear on the interval, with 1 simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

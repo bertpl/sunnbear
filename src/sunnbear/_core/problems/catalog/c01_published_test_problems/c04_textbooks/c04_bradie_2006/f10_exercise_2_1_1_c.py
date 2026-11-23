@@ -46,6 +46,7 @@ class Bradie2006Exercise211C(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{- \tmp{u}} - \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
+        summary="A convex function with 1 root, the omega constant, on both intervals.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

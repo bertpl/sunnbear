@@ -28,6 +28,10 @@ class Atkinson1989Case3(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"-1 + \tmp{u} \left(3 + \tmp{u} \left(-3 + \tmp{u}\right)\right)",
         interval="[0, 3]",
+        summary=(
+            r"$(\x - 1)^3$ evaluated in Horner form, with computed values of 0 or of either sign within about $7 \cdot "
+            r"10^{-6}$ of the triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

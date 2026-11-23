@@ -31,6 +31,10 @@ class BurdenFairesBurden2016Exercise241C(Formula):
             r"\tmp{u}^{3} - 3 \tmp{u}^{2} \cdot 2^{- \tmp{u}} + 3 \tmp{u} \cdot 4^{- \tmp{u}} - 8^{- " r"\tmp{u}}"
         ),
         interval="[0, 1]",
+        summary=(
+            r"The cube of $\x - 2^{-\x}$ written out, with computed values of 0 or the wrong sign within about $5 \cdot"
+            r" 10^{-6}$ of the triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

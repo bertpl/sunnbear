@@ -31,6 +31,10 @@ class Atkinson1989Equation273(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.2 \c"),),
         expression=r"\tmp{u}^{4} - 5.4 \tmp{u}^{3} + 10.56 \tmp{u}^{2} - 8.954 \tmp{u} + 2.7951",
         interval="[1, 1.2]",
+        summary=(
+            r"$(\x - 1.1)^3 (\x - 2.1)$ written out as a polynomial, whose computed sign is wrong at some points within"
+            r" $1.5 \cdot 10^{-5}$ of the triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -37,6 +37,10 @@ class BurdenFairesBurden2016Exercise242C(Formula):
             r"\tmp{u}} \sin^{2}{\left(\tmp{u} \right)} - e^{- 3 \tmp{u}}"
         ),
         interval="[3, 4]",
+        summary=(
+            r"The cube of $\sin(\x) - e^{-\x}$ written out, below $10^{-3}$ in magnitude from the lower bound to 0.1 "
+            r"past the triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

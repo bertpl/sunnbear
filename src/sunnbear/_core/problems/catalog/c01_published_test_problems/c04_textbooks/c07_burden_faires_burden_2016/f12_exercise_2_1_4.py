@@ -35,6 +35,7 @@ class BurdenFairesBurden2016Exercise214(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{4} - 2 \tmp{u}^{3} - 4 \tmp{u}^{2} + 4 \tmp{u} + 4",
         interval=r"[\param{a}, \param{b}]",
+        summary=r"A quartic, the product of $\x^2 - 2$ and $\x^2 - 2\x - 2$, with 4 simple roots, 1 on each interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -29,6 +29,7 @@ class BurdenFairesBurden2016Exercise231(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 6",
         interval="[2, 3]",
+        summary="A parabola with only its positive root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,6 +30,7 @@ class Epperson2013Exercise313H(Formula):
         definitions=((r"\tmp{u}", r"\x - 3.14 \c"),),
         expression=r"\tmp{u}^{2} - \sin{\left(\tmp{u} \right)}",
         interval=r"[0, \pi]",
+        summary="A convex function with 2 simple roots, 1 of them at the lower bound itself.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

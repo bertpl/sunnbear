@@ -38,6 +38,10 @@ class BurdenFairesBurden2016Exercise2111(Formula):
             r"\left(\tmp{u} - 2\right)"
         ),
         interval=r"[\param{a}, \param{b}]",
+        summary=(
+            "A polynomial with 5 roots on the wide intervals and 3 on the narrow ones, among them a triple root, and "
+            "below 0.01 in magnitude within 0.11 of that triple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

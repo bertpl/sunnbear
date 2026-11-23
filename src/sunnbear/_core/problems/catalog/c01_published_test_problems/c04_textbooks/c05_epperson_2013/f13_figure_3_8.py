@@ -28,6 +28,7 @@ class Epperson2013Figure38(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\frac{\tmp{u}^{2}}{2} - \frac{1}{2}",
         interval="[0, 4]",
+        summary="A parabola with 1 simple root, 25% of the way into the interval, and a slope of 0 at the lower bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

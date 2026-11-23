@@ -31,6 +31,10 @@ class BurdenFairesBurden2016Exercise242A(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"1 - 4 \tmp{u} \cos{\left(\tmp{u} \right)} + 2 \tmp{u}^{2} + \cos{\left(2 \tmp{u} \right)}",
         interval="[0, 1]",
+        summary=(
+            r"Twice the square of $\x - \cos(\x)$ written out, with a double root and rounding errors that turn the "
+            r"function negative within about $10^{-8}$ of that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

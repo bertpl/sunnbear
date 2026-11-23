@@ -28,6 +28,7 @@ class ChapraCanale2015Figure78(Formula):
         definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=r"\tmp{u}^{3} - 10 \tmp{u} + 2",
         interval="[-4, 4]",
+        summary="A cubic with all 3 of its simple roots on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

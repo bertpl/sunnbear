@@ -30,6 +30,10 @@ class ChapraCanale2015Problem510(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\tmp{u}^{4} - 8 \tmp{u}^{3} - 35 \tmp{u}^{2} + 450 \tmp{u} - 1001",
         interval="[4.5, 6]",
+        summary=(
+            "A quartic with 1 simple root on the interval and, left of that root, a local maximum of $-1$ and a local "
+            "minimum only 0.12 lower."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -29,6 +29,10 @@ class ChapraCanale2015Problem57(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\frac{0.8 - 0.3 \tmp{u}}{\tmp{u}}",
         interval="[1, 3]",
+        summary=(
+            "A decreasing, convex hyperbola that stays below 0.034 in magnitude over the upper 30% of the interval, "
+            "which holds the hyperbola's 1 simple root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -28,6 +28,7 @@ class Atkinson1989Case2(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{2} - 1",
         interval="[0, 3]",
+        summary="A parabola with its vertex at the lower bound and 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
