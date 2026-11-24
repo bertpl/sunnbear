@@ -1,5 +1,5 @@
 """`FormulaRegistry.publication_of` finds a publication for each shipped formula of category 1, and each shipped
-publication declares its parts.
+publication holds a valid CSL-JSON item with a title and a year.
 
 In category 1, the published test problems, each category of a subcategory other than 1.99 holds the formulas of 1
 publication and declares that publication. The formulas of subcategory 1.99 modify published formulas, and come from the

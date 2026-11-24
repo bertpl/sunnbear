@@ -15,7 +15,7 @@ _CITATION_KEY_PATTERN = re.compile(r"[A-Z][A-Za-z]*(?P<year_digits>[0-9]{2})[a-z
 # ==================================================================================================
 @dataclass(frozen=True)
 class Publication:
-    """`Publication` holds a publication of formulas as 1 CSL-JSON item, from which a consumer renders its citation.
+    """`Publication` holds a publication as 1 CSL-JSON item, from which a citation processor renders its citation.
 
     A publication is any kind of source of formulas:
 
@@ -27,7 +27,7 @@ class Publication:
     with a ``type``, such as ``article-journal``, ``book`` or ``software``, and the fields of that type, such as
     ``container-title`` for a journal and ``publisher`` for a book's publisher.
 
-    sunnbear renders no citation; a consumer renders each item in a citation style of its choice.
+    sunnbear renders no citation; a citation processor renders each item in a citation style of its choice.
 
     Every field keeps the meaning that CSL gives it:
 
@@ -37,12 +37,13 @@ class Publication:
     - ``note`` holds a remark for a reader of the publication, such as where the authors' code is.
 
     A remark about 1 formula goes in the ``notes`` of that formula's presentation, and a remark for the maintainers of
-    the catalog goes in the ``notes`` of the publication's source file in ``data/literature_test_problems/sources/``.
+    the catalog goes in the ``notes`` of the publication's source file in the survey of published test problems.
 
-    The catalog's tests require every shipped item to be valid against the published CSL-JSON schema.
+    Building a publication does not check its item against the published CSL-JSON schema; the catalog's tests check
+    every shipped item against it.
 
     Attributes:
-        csl_item: The publication as 1 CSL-JSON item, a plain dict that `json.dumps` takes. Its ``id`` is the
+        csl_item: The publication as 1 CSL-JSON item, a plain dict that `json.dumps` can serialize. Its ``id`` is the
             publication's citation key: the first author's surname, or a project's name, and the year's last 2 digits,
             with a lowercase letter where 2 keys would collide, such as "Brent71" or "Ganchovski26a".
     """
@@ -50,15 +51,12 @@ class Publication:
     csl_item: dict[str, Any] = field(hash=False)
 
     def __post_init__(self) -> None:
-        """Check that the item's ``id`` is a citation key whose 2 digits are the last 2 digits of the item's year.
-
-        The year is that of ``issued``, or of ``accessed`` for an item without a date of issue, such as an unversioned
-        web page.
+        """Check that the item's ``id`` is a citation key whose 2 digits are the last 2 digits of the item's `year`.
 
         Raises:
             KeyError: If the item has no ``id``.
             ValueError: If the ``id`` is not a capitalized name, 2 digits and an optional lowercase letter, or if the
-                item has a year and the ``id``'s 2 digits are not its last 2 digits.
+                item has a year and the ``id``'s 2 digits are not the year's last 2 digits.
         """
         citation_key = self.citation_key
         match = _CITATION_KEY_PATTERN.fullmatch(citation_key)
