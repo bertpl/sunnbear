@@ -38,6 +38,21 @@ class FormulaPresentation:
             marker. Empty by default.
         summary: Briefly, what the formula is, or what makes it an interesting test problem, such as "Oscillatory
             function with many roots". None by default; the catalog's tests require it of every shipped formula.
+
+            A summary holds at every value of ``c`` that the benchmark samples, so it states nothing that depends on
+            how far ``c`` moves the function. The benchmark samples ``c`` only within each test problem's c-range,
+            which keeps the sign of ``f`` at both bounds; so no root and no pole of odd order crosses a bound, and a
+            summary may say how many roots lie on the interval, or that a pole lies just outside it. Beyond that:
+
+            - a part of the expression is written with the expression's own symbols, such as the ``\tmp{u}`` of its
+              definitions;
+            - a position is given relative to the root or another feature of the function, which ``c`` moves
+              together, such as "2 bands next to the root"; where an absolute position reads better, it is exact in
+              ``\x`` and ``\c``, such as "$\x = 20 \c$";
+            - a claim about the interval is qualitative, such as "a pole just below the lower bound". A summary
+              gives no distance to a bound and no value at a bound, and does not place a feature other than a root
+              or a pole of odd order inside or outside the interval, such as an extremum, because ``c`` can move it
+              across a bound.
         notes: Paragraphs for a reader, such as a note that gives the original expression as display math when the
             formula's code computes an equivalent form of it. Empty by default.
         param_conditions: The conditions on the formula's parameters that `Formula.is_param_tuple_valid` checks, 1
