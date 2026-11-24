@@ -31,7 +31,7 @@ class Bradie2006Exercise213(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)}",
         interval="[3, 4]",
-        summary=r"The sine on an interval around $\pi$, which is both a simple root and an inflection point.",
+        summary=r"The sine, with 1 simple root on the interval, at $\x = \pi + \c$, which is also an inflection point.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

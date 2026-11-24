@@ -51,7 +51,7 @@ class LegendrePolynomial(Formula):
         interval=interval_by_parity_latex(
             "[-1, 1]", r"\left[-\cos\left(\frac{2.5 \pi}{2 \param{n} + 1}\right), 1\right]"
         ),
-        summary="The Legendre polynomial, whose amplitude grows from the middle of its interval toward the bounds.",
+        summary=r"The Legendre polynomial, whose amplitude grows with the distance from $\x = \c / \param{n}^2$.",
         param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -29,8 +29,8 @@ class Sabharwal2019Figure4(Formula):
         expression=r"\left(1.5 - \tmp{u}\right)^{9} - 8",
         interval="[0, 1.5]",
         summary=(
-            "A function falling steeply through its 1 simple root in the lowest 20% of the interval, then nearly "
-            "constant at $-8$ over the upper half."
+            r"A function falling steeply through its 1 simple root, then nearly constant at $-8$ around $\x = 1.5 + 1.5"
+            r" \c$, 1.26 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -33,7 +33,7 @@ class AndersonBjorck1973Exercise6(Formula):
         interval="[0, 1]",
         summary=(
             r"An increasing function with 1 root, flatter around it as $\param{n}$ grows, and below $10^{-3}$ in "
-            r"magnitude over 38% of the interval at $\param{n} = 20$."
+            r"magnitude on a band 0.38 wide around that root at $\param{n} = 20$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

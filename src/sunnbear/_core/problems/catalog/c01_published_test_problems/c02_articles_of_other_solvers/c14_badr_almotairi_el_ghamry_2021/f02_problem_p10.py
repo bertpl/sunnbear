@@ -28,10 +28,7 @@ class BadrAlmotairiElGhamry2021ProblemP10(Formula):
         definitions=((r"\tmp{u}", r"\x - 6 \c"),),
         expression=r"\tmp{u} \cos{\left(\tmp{u} \right)} + 1",
         interval="[-2, 4]",
-        summary=(
-            "A function with 1 simple root and 3 local extrema, including a minimum below the root with a value of only"
-            " 0.44."
-        ),
+        summary="A function with 1 simple root and, 2.9 below that root, a local minimum of only 0.44.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

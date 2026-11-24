@@ -29,7 +29,7 @@ class Bradie2006Exercise211B(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{5} + 2 \tmp{u} - 1",
         interval="[0, 1]",
-        summary="A quintic whose only real root, a simple one, lies near the midpoint of the interval.",
+        summary="An increasing quintic whose only real root, a simple one, lies on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

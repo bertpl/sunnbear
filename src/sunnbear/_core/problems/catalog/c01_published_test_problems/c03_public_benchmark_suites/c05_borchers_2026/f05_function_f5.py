@@ -29,8 +29,8 @@ class Borchers2026FunctionF5(Formula):
         expression=r"\tmp{u}^{2} - \left(1 - \tmp{u}\right)^{9}",
         interval="[-1.4, 1]",
         summary=(
-            "A polynomial of degree 9 with 1 root, steep toward the lower bound and below 1 in magnitude over the upper"
-            " 40% of the interval."
+            "A polynomial of degree 9 with 1 root, steep toward the lower bound and below 1 in magnitude on a stretch 1"
+            " wide that holds the root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

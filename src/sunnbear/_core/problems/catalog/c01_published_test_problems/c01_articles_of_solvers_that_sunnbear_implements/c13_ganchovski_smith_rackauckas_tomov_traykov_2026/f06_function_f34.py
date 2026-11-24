@@ -29,8 +29,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF34(Formula):
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[-11, 9]",
         summary=(
-            "A decreasing function whose root is the fixed point of the cosine, with 3 inflections where its slope is "
-            "0."
+            r"A decreasing function whose root is the fixed point of the cosine, shifted by $20 \c$, with a slope of 0 "
+            r"at every second inflection, $2 \pi$ apart."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

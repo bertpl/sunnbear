@@ -35,8 +35,8 @@ class Bradie2006Example210(Formula):
         expression=r"\tmp{u} \left(1 - \cos{\left(\tmp{u} \right)}\right)",
         interval="[-2, 1]",
         summary=(
-            "An odd function with a triple root, around which the function is exactly 0 in floating point on a band "
-            r"about $2 \cdot 10^{-8}$ wide."
+            r"A function odd about its triple root and exactly 0 in floating point on a band about $2 \cdot 10^{-8}$ "
+            r"wide around that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

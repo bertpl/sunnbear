@@ -30,7 +30,7 @@ class KumarSrivastav2026FunctionF3(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\arctan{\left(\tmp{u} \right)} - 0.3",
         interval="[0, 1]",
-        summary="An increasing, concave function with 1 simple root in the lower third of the interval.",
+        summary="An increasing function with 1 simple root, 0.31 above the inflection where the slope is largest.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

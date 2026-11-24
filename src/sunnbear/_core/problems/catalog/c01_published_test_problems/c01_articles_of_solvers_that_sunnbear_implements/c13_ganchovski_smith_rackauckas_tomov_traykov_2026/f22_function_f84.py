@@ -31,8 +31,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF84(Formula):
         ),
         interval="[0.5, 5.5]",
         summary=(
-            "A quintic with 5 simple roots, each within 0.013 of an integer, and much flatter between its roots than "
-            "toward the bounds."
+            r"A quintic with 5 simple roots, each within 0.013 of an integer plus $5 \c$, and much flatter between its "
+            r"roots than outside them."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

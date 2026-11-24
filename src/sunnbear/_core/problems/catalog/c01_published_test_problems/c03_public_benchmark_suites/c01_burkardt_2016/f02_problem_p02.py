@@ -38,8 +38,8 @@ class Burkardt2016ProblemP02(Formula):
         expression=r"2.0 \tmp{u} - e^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A line plus an exponential term, with 1 root, nearly straight except toward the lower bound of the wide "
-            "interval, where the exponential term makes it steep."
+            "A line plus an exponential term, with 1 root, nearly straight above that root and, on the wide interval, "
+            "steep far below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

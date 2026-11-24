@@ -38,8 +38,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF29(Formula):
         expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function exactly 0 in floating point on a band 0.0012 wide around its root of multiplicity 5, and steep "
-            "toward the upper bound of the wide interval."
+            "A function exactly 0 in floating point on a band 0.0012 wide around its root of multiplicity 5, and "
+            "increasingly steep above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

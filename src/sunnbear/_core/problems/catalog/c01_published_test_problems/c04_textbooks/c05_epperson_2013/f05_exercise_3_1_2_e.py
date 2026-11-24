@@ -28,7 +28,10 @@ class Epperson2013Exercise312E(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"3 - 2^{\tmp{u}}",
         interval="[0, 2]",
-        summary="A decreasing exponential with 1 simple root in the upper 25% of the interval.",
+        summary=(
+            "A decreasing exponential with 1 simple root on the interval, across which the slope grows 4-fold in "
+            "magnitude."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

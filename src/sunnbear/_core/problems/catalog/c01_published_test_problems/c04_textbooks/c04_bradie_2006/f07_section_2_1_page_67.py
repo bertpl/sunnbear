@@ -55,7 +55,7 @@ class Bradie2006Section21Page67(Formula):
         interval="[0.01, 0.1]",
         summary=(
             "A savings balance minus a goal as a slightly convex function of the annual interest rate, with 1 simple "
-            "root in the lower half of the interval."
+            "root on the interval."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $r$, the annual interest rate.",),
     )

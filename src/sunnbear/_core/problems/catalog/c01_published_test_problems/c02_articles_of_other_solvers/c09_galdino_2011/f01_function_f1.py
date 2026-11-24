@@ -29,8 +29,8 @@ class Galdino2011FunctionF1(Formula):
         expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",
         interval="[2.5, 3.5]",
         summary=(
-            "A quintic whose 1 root on the interval is triple and at its midpoint, with values below 0.021 in "
-            "magnitude within 0.1 of that root."
+            "A quintic whose 1 root on the interval is triple, with values below 0.021 in magnitude within 0.1 of that "
+            "root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

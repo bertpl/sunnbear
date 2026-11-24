@@ -38,8 +38,8 @@ class Ford1997Function5(Formula):
         expression=r"e^{\frac{1}{\tmp{u}} - 25} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A decreasing function with 1 root, within $10^{-4}$ of $-1$ over 90% of the widest interval and steep "
-            "toward its lower bound."
+            r"A decreasing function with 1 root, steep toward the lower bound, and within $10^{-4}$ of $-1$ at every "
+            r"$\x$ more than 0.024 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

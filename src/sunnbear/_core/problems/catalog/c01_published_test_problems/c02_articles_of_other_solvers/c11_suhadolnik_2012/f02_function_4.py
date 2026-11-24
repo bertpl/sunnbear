@@ -27,8 +27,8 @@ class Suhadolnik2012Function4(Formula):
         expression=r"11 \tmp{u}^{11} - 1",
         interval="[0.5, 1]",
         summary=(
-            "An 11th power minus 1, with 1 root, nearly flat at $-1$ over the lower fifth of the interval and steep "
-            "toward the upper bound."
+            r"An 11th power minus 1, with 1 root, nearly flat at $-1$ around $\x = 0.5 \c$ and steep toward the upper "
+            r"bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

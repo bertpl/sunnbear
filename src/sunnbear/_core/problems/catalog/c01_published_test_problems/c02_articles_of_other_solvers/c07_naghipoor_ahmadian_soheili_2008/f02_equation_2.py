@@ -29,8 +29,8 @@ class NaghipoorAhmadianSoheili2008Equation2(Formula):
         expression=r"11 \tmp{u}^{11} - 1",
         interval="[0.1, 0.9]",
         summary=(
-            "An 11th power minus 1, with 1 root, within 0.01 of $-1$ over the lower half of the interval and steep "
-            "toward the upper bound."
+            "An 11th power minus 1, with 1 root, steep toward the upper bound and within 0.01 of $-1$ on the interval "
+            "more than 0.28 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

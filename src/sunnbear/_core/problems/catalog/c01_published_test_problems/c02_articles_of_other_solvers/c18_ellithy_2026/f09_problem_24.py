@@ -26,7 +26,7 @@ class Ellithy2026Problem24(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"1 - 0.61 \tmp{u}",
         interval="[1.5, 2]",
-        summary="A decreasing line, with its root in the lower third of the interval.",
+        summary="A decreasing line with its root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

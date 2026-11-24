@@ -46,7 +46,10 @@ class Bradie2006Exercise211C(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{- \tmp{u}} - \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A convex function with 1 root, the omega constant, on both intervals.",
+        summary=(
+            r"A convex function with 1 root on both intervals, at $\x = \Omega + \param{c_scale} \c$, the omega "
+            r"constant shifted by $\param{c_scale} \c$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -45,7 +45,9 @@ class Epperson2013Exercise311(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3} - \param{k}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A cubic with 1 simple root and an inflection point at the lower bound, where the slope is 0.",
+        summary=(
+            r"A cubic with 1 simple root and an inflection point at $\x = \param{c_scale} \c$, where the slope is 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

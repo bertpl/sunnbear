@@ -41,8 +41,8 @@ class LiZhouLangeTian2026Section71(Formula):
         expression=(r"\param{a3} \tmp{u}^{\param{m}} + \param{a2} \tmp{u}^2 + \param{a1} \tmp{u} + \param{a0}"),
         interval="[0, 2]",
         summary=(
-            r"A decreasing cubic with 1 simple root for both parameter sets, at the midpoint of the interval for "
-            r"$\param{a2} = 1$."
+            r"A cubic with 1 simple root on the interval for both parameter sets, at $\x = 1 + 2 \c$ for $\param{a2} = "
+            r"1$, where the cubic decreases everywhere."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $\theta$.",),
     )

@@ -60,8 +60,8 @@ class HyperbolicTangent(Formula):
         ),
         interval=r"[-\param{b}, \param{b}]",
         summary=(
-            "The hyperbolic tangent, close to a step on a wide interval, with its root in the step or far out in its "
-            "lower tail."
+            "The hyperbolic tangent, a smooth step much narrower than a wide interval, with the root in the step or far"
+            " out in the step's lower tail."
         ),
         notes=(
             r"Both cases equal $$1 + \tanh(\x - \c) - \param{d};$$ the first keeps full precision next to a root in "

@@ -31,7 +31,7 @@ class Bradie2006Exercise211A(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(1 + \tmp{u} \right)} - \cos{\left(\tmp{u} \right)}",
         interval="[0, 1]",
-        summary="An increasing function with 1 simple root in the upper 12% of the interval.",
+        summary="An increasing function with 1 simple root on the interval, where the slope stays between 1 and 1.5.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -33,10 +33,7 @@ class Bradie2006Exercise2116A(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} + \tmp{u}^{2} - \tmp{u} - 4",
         interval="[1, 2]",
-        summary=(
-            "A convex function with 2 roots, the lower one outside the interval and the upper one in the lower third of"
-            " the interval."
-        ),
+        summary="A convex function with 2 real roots, of which only the upper one lies on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

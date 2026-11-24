@@ -28,7 +28,7 @@ class Stage2013Section36(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"1 - \frac{3 \tmp{u}}{4}",
         interval="[-10, 10]",
-        summary="A straight line with 1 root, slightly above the middle of the interval.",
+        summary="A decreasing straight line with 1 root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

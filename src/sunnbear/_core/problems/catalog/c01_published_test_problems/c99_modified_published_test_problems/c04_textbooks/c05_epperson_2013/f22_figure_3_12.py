@@ -46,10 +46,7 @@ class ModifiedEpperson2013Figure312(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
         expression=r"\left(\tmp{u} - 0.5\right)^{5}",
         interval="[0.45, 0.55]",
-        summary=(
-            r"A 5th power whose magnitude stays below $4 \cdot 10^{-7}$ on the whole interval and at most about "
-            r"$10^{-10}$ on the interval's middle 20%."
-        ),
+        summary="A 5th power whose magnitude is at most $10^{-10}$ on a band 0.02 wide around its root.",
         notes=(
             (
                 r"The expression equals the published function, $$\tmp{u}^{5} - \frac{5 \tmp{u}^{4}}{2} + "

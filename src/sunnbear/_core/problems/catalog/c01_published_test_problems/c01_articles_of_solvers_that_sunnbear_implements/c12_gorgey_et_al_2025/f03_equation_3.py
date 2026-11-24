@@ -39,7 +39,10 @@ class GorgeyEtAl2025Equation3(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\sin{\left(\tmp{u} \right)} - \frac{\tmp{u}}{4}\right)^{3}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A function with a triple root, near which it is flat, and a local maximum on the wide interval only.",
+        summary=(
+            "A function with a triple root, near which it is flat, and a local extremum 1.32 to either side of that "
+            "root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

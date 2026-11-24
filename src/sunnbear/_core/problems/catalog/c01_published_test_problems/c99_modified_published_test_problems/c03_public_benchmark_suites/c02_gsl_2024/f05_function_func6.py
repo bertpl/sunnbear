@@ -42,7 +42,7 @@ class ModifiedGsl2024FunctionFunc6(Formula):
         expression=r"\tmp{u}^{7}",
         interval="[-0.0005, 0.0002]",
         summary=(
-            "A 7th power on an interval so narrow that the function stays below $10^{-23}$ in magnitude over the whole "
+            "A 7th power on an interval so narrow that the function stays below $10^{-22}$ in magnitude over the whole "
             "interval."
         ),
         notes=(

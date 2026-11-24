@@ -39,7 +39,10 @@ class BurdenFairesBurden2016Section21Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + 4 \tmp{u}^{2} - 10",
         interval="[1, 2]",
-        summary="An increasing, convex cubic with 1 simple root in the lower half of the interval.",
+        summary=(
+            "A cubic, increasing and convex on the interval, with only 1 real root, because the cubic's local maximum "
+            "is $-0.52$, just below 0."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

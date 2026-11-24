@@ -41,10 +41,7 @@ class RootsJl2026FunctionF5(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{2} - e^{\tmp{u}} - 3 \tmp{u} + 2",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            "A quadratic minus an exponential, decreasing everywhere, with 1 root, which lies near the lower bound of "
-            "the wide interval."
-        ),
+        summary="A quadratic minus an exponential, decreasing everywhere, with 1 root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

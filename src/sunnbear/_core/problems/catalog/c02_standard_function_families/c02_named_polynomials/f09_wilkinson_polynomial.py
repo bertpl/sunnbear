@@ -49,8 +49,8 @@ class WilkinsonPolynomial(Formula):
         expression=r"\prod_{k=1}^{\param{n}} \frac{\x - \c - k}{k}",
         interval=interval_by_parity_latex(r"[0, \param{n} + 1]", r"[1.5, \param{n} + 1]"),
         summary=(
-            "Wilkinson's polynomial, with equally spaced roots and an amplitude far larger next to the bounds than in "
-            "the middle."
+            r"Wilkinson's polynomial, with equally spaced roots and, for a large $\param{n}$, an amplitude far larger "
+            r"next to the bounds than in the middle."
         ),
         param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )

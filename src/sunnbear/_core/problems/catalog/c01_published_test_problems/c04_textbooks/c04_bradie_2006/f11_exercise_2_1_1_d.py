@@ -31,7 +31,7 @@ class Bradie2006Exercise211D(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[0, 1]",
-        summary="A decreasing function whose root is the fixed point of the cosine.",
+        summary=r"A decreasing function with 1 root, at $\c$ plus the fixed point of the cosine.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

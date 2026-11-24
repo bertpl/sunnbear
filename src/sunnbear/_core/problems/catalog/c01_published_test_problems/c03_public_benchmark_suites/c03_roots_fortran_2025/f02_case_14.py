@@ -28,7 +28,7 @@ class RootsFortran2025Case14(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"e^{- \tmp{u}} - \tmp{u} - \sin{\left(\tmp{u} \right)}",
         interval="[0, 2]",
-        summary="A decreasing convex function with 1 root in the lower fifth of the interval.",
+        summary="A decreasing function, convex on the interval, with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
