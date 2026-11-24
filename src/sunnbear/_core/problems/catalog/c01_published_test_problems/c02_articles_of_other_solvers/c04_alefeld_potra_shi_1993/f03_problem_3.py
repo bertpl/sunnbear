@@ -27,7 +27,7 @@ class AlefeldPotraShi1993Problem3(Formula):
     number = (1, 2, 4, 3)
     name = "Problem 3"
     params = (
-        FormulaParam("w", latex_symbol="w", meaning="The coefficient of the function."),
+        FormulaParam("w", latex_symbol="w", meaning=r"The factor that multiplies $\tmp{u} e^{\param{k} \tmp{u}}$."),
         FormulaParam("k", latex_symbol="k", meaning="The rate of the exponential factor."),
     )
     location_in_publication = "Table 5.1, problem 3"

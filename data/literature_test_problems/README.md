@@ -255,9 +255,9 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - declares its `location_in_publication`, which names the table, section or exercise set of each of the rows' keys, and which the module's author writes from those keys and the source's `where_in_source`, such as `Table I, problem 12` for the row keyed `12`;
 - declares each parameter with a LaTeX symbol:
   - a source's own parameter is a `FormulaParam` with the source's symbol for it; where that symbol is `u`, which the presentation uses for the shifted variable `\x - c_scale \c`, the parameter takes another symbol, such as `u_{\mathrm{ex}}` for an exhaust velocity;
-  - a source's own parameter that the source calls `a` or `b` takes another symbol that says what it is, such as `q` for the constant of `x^n - a`, and a note in the presentation's `notes` names the source's parameter, such as `$\param{q}$ is the source's parameter $a$.`; the word "parameter" keeps the source's symbol apart from sunnbear's own `a` and `b`;
+  - a source's own parameter that the source calls `a` or `b` takes another name and symbol, such as `q` for the constant of `x^n - a`, and a `meaning` that says what the parameter is; a note in the presentation's `notes` names the source's parameter, such as `$\param{q}$ is the source's parameter $a$.`, where the word "parameter" tells the reader that this $a$ is the source's, not the bound `a`;
   - a source's own parameter that the source names with a word, as in source code or a word problem, takes a conventional letter as its symbol, such as `P` for an initial investment, and a `meaning` that says what the parameter is; `src/sunnbear/_core/problems/catalog/PARAMETER_NAMES.md` gives the rule for symbols;
-  - the bounds of a formula with several intervals take `a` and `b`, the only parameters with these symbols, which a catalog test checks;
+  - the bounds of a formula with several intervals take `a` and `b`, and a catalog test checks that no other parameter has these symbols;
   - `c_scale` takes `s`, with no `meaning`: category 1 states the rule for `c_scale` once, in `PublishedTestProblems`;
 - declares a `presentation` with 3 parts:
   - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals:

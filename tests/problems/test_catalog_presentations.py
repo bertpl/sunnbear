@@ -128,10 +128,9 @@ def test_categories_declare_their_descriptions():
 
 
 def test_symbols_a_and_b_are_the_interval_bounds():
-    """A shipped formula's parameter named or shown as ``a`` or ``b`` is its interval's lower or upper bound.
+    """A shipped formula's parameter with the name or symbol ``a`` or ``b`` is its interval's lower or upper bound.
 
-    Such a parameter has the same name and symbol, and in each parameter tuple of the formula's recipes its value is
-    the bound that `interval_bounds` returns, so that a reader meets a and b as the bounds in every formula.
+    The symbols a and b then mean the interval's bounds in every formula that shows them.
     """
     # --- act --------------------------
     bound_index = {"a": 0, "b": 1}
