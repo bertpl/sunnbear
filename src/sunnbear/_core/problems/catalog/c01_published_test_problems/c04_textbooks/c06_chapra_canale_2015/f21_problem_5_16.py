@@ -37,8 +37,8 @@ class ChapraCanale2015Problem516(Formula):
         expression=r"1 - \frac{20^2}{9.81 \tmp{A_c}^3} \tmp{B}",
         interval="[0.5, 2.5]",
         summary=(
-            r"The critical-flow condition of a trapezoidal channel at depth $\x$, with 1 simple root and a pole at "
-            r"$\x = 0$ that makes the function steep near the lower bound."
+            "The critical-flow condition of a trapezoidal channel in terms of the depth, with 1 simple root and a pole "
+            "below the lower bound that makes the function steep near that bound."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $y$, the depth of the water in the channel, in m.",),
     )

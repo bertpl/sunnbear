@@ -29,8 +29,8 @@ class BurdenFairesBurden2016Exercise227(Formula):
         expression=r"\tmp{u}^{4} - 3 \tmp{u}^{2} - 3",
         interval="[1, 2]",
         summary=(
-            "A quartic that varies by only 0.25 over the lower 40% of the interval, with 1 simple root close to the "
-            "upper bound."
+            "A quartic with 1 simple root on the interval, a slope of 18 at that root, and a minimum of $-5.25$ only "
+            "0.72 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

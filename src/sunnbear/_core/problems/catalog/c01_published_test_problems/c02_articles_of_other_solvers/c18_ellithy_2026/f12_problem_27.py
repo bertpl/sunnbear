@@ -26,7 +26,7 @@ class Ellithy2026Problem27(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}^{4} - 2 \tmp{u}^{2} - 4",
         interval="[1, 3]",
-        summary="A convex quartic with 1 root and a local minimum at the lower bound, where the slope is 0.",
+        summary="A quartic with 1 root on the interval, 0.80 above the upper of the quartic's 2 minima of $-5$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

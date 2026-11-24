@@ -36,8 +36,8 @@ class BurdenFairesBurden2016Example2(Formula):
         expression=r"\tmp{u} - \frac{\tmp{u}^{2} - 1}{3}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A concave parabola, increasing through the lower root on $[-1, 1]$ and decreasing through the upper root "
-            "on $[3, 4]$."
+            "A concave parabola that rises through its lower root, the one on $[-1, 1]$, and falls through its upper "
+            "root, the one on $[3, 4]$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

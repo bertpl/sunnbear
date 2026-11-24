@@ -31,8 +31,8 @@ class NaghipoorAhmadianSoheili2008Equation4(Formula):
         expression=r"\frac{1}{\tmp{u}} - \sin{\left(\tmp{u} \right)} + 1",
         interval="[-1.3, -0.5]",
         summary=(
-            r"A decreasing function with 1 root, steepest at the upper bound, which lies 0.5 below the pole at $\x = "
-            r"0$."
+            "A decreasing function with a pole above the upper bound, 1 root 0.63 below that pole, and the steepest "
+            "slope at the upper bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -30,8 +30,7 @@ class Bradie2006Exercise2112(Formula):
         expression=r"\frac{1}{\tmp{u}} - 37",
         interval="[0.01, 0.1]",
         summary=(
-            r"A hyperbola with 1 simple root on an interval whose lower bound lies only 0.01 above the pole at $\x = "
-            r"0$."
+            r"A hyperbola with 1 simple root on the interval and a pole at $\x = 0.09 \c$, just below the lower bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

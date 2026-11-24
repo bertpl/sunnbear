@@ -33,8 +33,8 @@ class ParidaGupta2006Example4(Formula):
         ),
         interval="[10, 22]",
         summary=(
-            "The Laguerre polynomial of degree 6, scaled by 720, with only the polynomial's largest root on the "
-            "interval, and a minimum below that root 54 times the value at the lower bound."
+            r"The Laguerre polynomial of degree 6, scaled by 720, with only the largest root on the interval and a "
+            r"minimum 1.7 below that root, of about $-1.3 \cdot 10^{5}$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -34,8 +34,8 @@ class BusDekker1975Function5(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"A quartic whose maximum exceeds 40 for $\param{n} \geq 4$, and whose 1 root then lies within 0.011 of "
-            r"the lower bound."
+            r"A quartic whose 1 root on the interval lies less than 0.011 above $\x = \c$ for $\param{n} \geq 4$, with "
+            r"a slope above 90 at that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

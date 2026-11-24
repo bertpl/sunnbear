@@ -45,8 +45,8 @@ class Burkardt2016ProblemP15(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"An odd function with an infinite slope at its root, and below $2 \cdot 10^{-7}$ in magnitude beyond $|\x|"
-            r" = 4$ on the wide interval."
+            r"A function that is odd about its root, with an infinite slope there, and below $2 \cdot 10^{-7}$ in "
+            r"magnitude more than 4 from the root."
         ),
         notes=(
             (

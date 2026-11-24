@@ -29,8 +29,8 @@ class Ellithy2026Problem25(Formula):
         expression=r"\tmp{u}^{2} \left|{\sin{\left(\tmp{u} \right)}}\right| - 4.1",
         interval="[0, 4]",
         summary=(
-            r"A function that rises to a local maximum only 0.15 below 0, falls to a kink at $\x = \pi$, and then "
-            r"rises through 1 root."
+            r"A function that rises to a local maximum only 0.15 below 0, falls to a kink at $\x = \pi + 4 \c$, and "
+            r"then rises through 1 root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

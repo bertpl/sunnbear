@@ -31,7 +31,7 @@ class RootsFortran2025Case42(Formula):
         expression=r"e^{\tmp{u}} - 2.0 \tmp{u} - 1.0",
         interval="[-0.001, 1]",
         summary=(
-            "A convex function with 1 root 0.001 above the lower bound, and negative over the rest of the interval."
+            r"A convex function with 2 roots 1.26 apart, of which only the lower one, $\x = \c$, lies on the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

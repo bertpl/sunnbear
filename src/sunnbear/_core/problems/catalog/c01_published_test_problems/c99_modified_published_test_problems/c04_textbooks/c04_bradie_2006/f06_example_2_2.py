@@ -50,8 +50,8 @@ class ModifiedBradie2006Example22(Formula):
         expression=r"\tan{\left(\pi \tmp{u} \right)} - \tmp{u} - 6",
         interval="[0, 0.495]",
         summary=(
-            r"A function increasing through 1 simple root, and steep toward the upper bound, which lies 0.005 below a "
-            r"pole of $\tan(\pi \x)$."
+            r"A function increasing through 1 simple root, and steep toward the upper bound, which lies just below a "
+            r"pole of $\tan(\pi \tmp{u})$."
         ),
         notes=(
             (

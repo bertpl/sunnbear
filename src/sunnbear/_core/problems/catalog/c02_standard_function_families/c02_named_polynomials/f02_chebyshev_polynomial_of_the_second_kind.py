@@ -52,8 +52,8 @@ class ChebyshevSecondKindPolynomial(Formula):
             "[-1, 1]", r"\left[-\cos\left(\frac{1.5 \pi}{\param{n} + 1}\right), 1\right]"
         ),
         summary=(
-            "The Chebyshev polynomial of the second kind, whose amplitude grows from the middle of its interval toward "
-            "the bounds."
+            r"The Chebyshev polynomial of the second kind, whose amplitude grows with the distance from $\x = \c / "
+            r"\param{n}^2$."
         ),
         param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )

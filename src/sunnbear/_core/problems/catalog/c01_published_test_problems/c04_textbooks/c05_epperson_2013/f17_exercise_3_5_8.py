@@ -30,9 +30,7 @@ class Epperson2013Exercise358(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"7 \tmp{u} - \cos{\left(2 \pi \tmp{u} \right)}",
         interval="[0, 1]",
-        summary=(
-            "An increasing function whose slope varies between 0.72 and 13.3, with 1 simple root near the lower bound."
-        ),
+        summary="An increasing function whose slope varies between 0.72 and 13.3, with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

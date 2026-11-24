@@ -43,10 +43,7 @@ class BurdenFairesBurden2016Exercise215C(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"2 \tmp{u} \cos{\left(2 \tmp{u} \right)} - \left(\tmp{u} - \param{k}\right)^{2}",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            r"A function with 1 simple root on each interval and a slope of 0 at $\x = 0$, the upper bound of $[-1, "
-            r"0]$."
-        ),
+        summary=r"A function with 1 simple root on each interval and, for $\param{k} = -1$, a slope of 0 at $\x = \c$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -41,8 +41,8 @@ class ChapraCanale2015Figure514(Formula):
         expression=r"\tmp{u}^{10} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function within $10^{-3}$ of $-1$ for $|\x| \le 0.5$ and steep beyond the 1 simple root of each "
-            "interval, reaching about $10^6$ on the widest interval."
+            "A function within $10^{-3}$ of $-1$ over the middle half of the stretch between its 2 simple roots and "
+            "steep beyond them, with 1 root on each interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

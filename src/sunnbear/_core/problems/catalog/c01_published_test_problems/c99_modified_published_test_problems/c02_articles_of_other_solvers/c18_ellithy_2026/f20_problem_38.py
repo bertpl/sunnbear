@@ -36,8 +36,8 @@ class ModifiedEllithy2026Problem38(Formula):
         expression=r"\tmp{u}^{4} + 2 \tmp{u}^{3} - 13 \tmp{u}^{2} - 14 \tmp{u} + 24",
         interval="[-3, 0.96]",
         summary=(
-            r"The quartic $(\x + 4)(\x + 2)(\x - 1)(\x - 3)$ written out as a polynomial, with 1 root inside the "
-            "interval and another just above the upper bound."
+            r"The quartic $(\tmp{u} + 4)(\tmp{u} + 2)(\tmp{u} - 1)(\tmp{u} - 3)$ written out as a polynomial, with 1 of"
+            r" its 4 roots on the interval."
         ),
         notes=(
             (

@@ -37,8 +37,7 @@ class Chandrupatla1997Function1(Formula):
         expression=r"\tmp{u}^{3} - 2 \tmp{u} - 5",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A cubic with 1 real root and 2 local extrema, which are both below 0 and lie only in the 2 widest "
-            "intervals."
+            "A cubic with 1 real root and 2 local extrema, which lie below that root and both have negative values."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

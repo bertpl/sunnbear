@@ -41,8 +41,8 @@ class Ellithy2026Problem16(Formula):
         expression=r"\sin{\left(\param{k} \tmp{u} \right)} - \param{m} \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function that falls from a maximum near the lower bound through 1 root and, at $\param{k} = 20$, "
-            r"continues to a minimum near the upper bound."
+            r"A function that falls through 1 simple root with a slope of about $-\param{k}$, close to the steepest "
+            r"slope that the function reaches anywhere."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -37,8 +37,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF49(Formula):
         ),
         interval="[-1, 1]",
         summary=(
-            r"A cubic piece holding the 1 root, joined continuously at $\x = 0$ to a cube-root piece that starts with "
-            r"an infinite slope and stays below $-0.6$."
+            r"A cubic piece holding the 1 root, joined continuously at $\x = 2 \c$ to a cube-root piece that starts "
+            r"with an infinite slope and stays below $-0.6$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

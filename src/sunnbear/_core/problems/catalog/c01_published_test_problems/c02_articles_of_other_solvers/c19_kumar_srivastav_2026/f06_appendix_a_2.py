@@ -42,8 +42,8 @@ class KumarSrivastav2026AppendixA2(Formula):
         expression=r"\tmp{u} - e^{-\tmp{u}} + \param{sigma} Z(\tmp{u})",
         interval="[0, 1]",
         summary=(
-            "An increasing function whose root is the omega constant, plus pseudo-random noise that makes the sum "
-            "change sign many times close to that root."
+            r"An increasing function plus pseudo-random noise that makes the sum change sign many times close to the "
+            r"function's root, at $\x = \c + \Omega$ with $\Omega$ the omega constant."
         ),
         notes=(
             r"$Z(\tmp{u})$ is a pseudo-random value that depends only on $\tmp{u}$ and is distributed as a standard "

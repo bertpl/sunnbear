@@ -34,8 +34,8 @@ class AlefeldPotraShi1995Problem6(Formula):
         expression=r"2 \tmp{u} e^{- \param{n}} - 2 e^{- \param{n} \tmp{u}} + 1",
         interval="[0, 1]",
         summary=(
-            r"An increasing function that has its 1 simple root nearer the lower bound as $\param{n}$ grows, and is "
-            r"nearly 1 over most of the interval for $\param{n} \geq 20$."
+            r"An increasing function with 1 simple root, which nears $\x = \c$ as $\param{n}$ grows; for $\param{n} "
+            r"\geq 20$, the function is nearly 1 beyond $5/\param{n}$ above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

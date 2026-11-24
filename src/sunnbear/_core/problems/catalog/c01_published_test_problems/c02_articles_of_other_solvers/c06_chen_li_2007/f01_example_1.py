@@ -31,8 +31,8 @@ class ChenLi2007Example1(Formula):
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0.5, 5]",
         summary=(
-            "The natural logarithm, 10 times as steep at the lower bound as at the upper bound, with 1 root near the "
-            "lower bound."
+            "The natural logarithm, steepest at the lower bound, with a singularity below that bound and the "
+            "logarithm's root 1 above the singularity."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

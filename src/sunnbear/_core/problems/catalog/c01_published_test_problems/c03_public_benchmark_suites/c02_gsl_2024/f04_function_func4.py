@@ -31,8 +31,8 @@ class Gsl2024FunctionFunc4(Formula):
         expression=r"\tmp{u} e^{- \tmp{u}}",
         interval=r"\left[- \frac{1}{3}, 2\right]",
         summary=(
-            "A function with 1 root and a maximum inside the interval, past which it decreases and, beyond the upper "
-            "bound, tends to 0 without changing sign."
+            "A function with 1 root and a maximum that lies 1 above that root, past which the function decreases and "
+            "tends to 0 without changing sign."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

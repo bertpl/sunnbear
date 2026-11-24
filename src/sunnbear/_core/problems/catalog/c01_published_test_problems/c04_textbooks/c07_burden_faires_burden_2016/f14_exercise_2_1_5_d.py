@@ -38,8 +38,8 @@ class BurdenFairesBurden2016Exercise215D(Formula):
         expression=r"\tmp{u} \cos{\left(\tmp{u} \right)} - 2 \tmp{u}^{2} + 3 \tmp{u} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function positive between its 2 simple roots, 1 on each interval, the lower root only 0.0025 below the "
-            "upper bound of $[0.2, 0.3]$."
+            "A function positive between its 2 simple roots, 1 on each interval, with the lower root close to the upper"
+            " bound of $[0.2, 0.3]$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

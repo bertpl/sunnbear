@@ -33,8 +33,8 @@ class Stage2013Section37(Formula):
         ),
         interval="[-10, 10]",
         summary=(
-            r"The signed square root of $2/3 - \x$, lowered by 0.1, with an infinite slope at $\x = 2/3$ and its root "
-            r"at $\x = 2/3 - 0.01$."
+            r"The signed square root of $2/3 - \tmp{u}$, lowered by 0.1, with an infinite slope 0.01 above the "
+            r"function's root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -34,8 +34,8 @@ class Epperson2013Figure312(Formula):
         ),
         interval="[0.45, 0.55]",
         summary=(
-            r"$(\x - 1/2)^5$ written out as a polynomial, whose rounding errors decide the polynomial's sign within "
-            r"about $7 \cdot 10^{-4}$ of the root of multiplicity 5."
+            r"$(\tmp{u} - 1/2)^5$ written out as a polynomial, whose rounding errors decide the polynomial's sign "
+            r"within about $7 \cdot 10^{-4}$ of the root of multiplicity 5."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

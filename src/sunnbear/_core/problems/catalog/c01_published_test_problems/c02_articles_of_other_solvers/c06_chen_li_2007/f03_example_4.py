@@ -30,7 +30,9 @@ class ChenLi2007Example4(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{- \tmp{u}} - 0.1",
         interval="[0, 1]",
-        summary="A function with 1 root near the lower bound and a maximum at the upper bound, where the slope is 0.",
+        summary=(
+            "A function that rises through 1 simple root to a maximum of only 0.27, which lies 0.89 above that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

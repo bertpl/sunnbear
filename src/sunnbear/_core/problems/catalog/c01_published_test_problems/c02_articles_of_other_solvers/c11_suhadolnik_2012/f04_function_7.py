@@ -28,9 +28,7 @@ class Suhadolnik2012Function7(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\left(\tmp{u} - 1\right) e^{- \tmp{u}}",
         interval="[0, 1.5]",
-        summary=(
-            "A function with 1 simple root, steepest at the lower bound and below 0.12 in magnitude above that root."
-        ),
+        summary="A function with 1 simple root, steepest at the lower bound and below 0.14 above that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

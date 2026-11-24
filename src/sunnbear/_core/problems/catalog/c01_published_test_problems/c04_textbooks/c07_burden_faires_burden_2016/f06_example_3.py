@@ -49,7 +49,10 @@ class BurdenFairesBurden2016Example3(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \param{k}^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
-        summary=r"An increasing, concave function whose 1 root is the fixed point of $\param{k}^{-\x}$.",
+        summary=(
+            r"An increasing, concave function whose 1 root solves the fixed-point equation $\tmp{u} = "
+            r"\param{k}^{-\tmp{u}}$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

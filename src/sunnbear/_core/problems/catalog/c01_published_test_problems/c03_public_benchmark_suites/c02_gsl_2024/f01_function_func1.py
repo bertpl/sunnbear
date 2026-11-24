@@ -29,8 +29,8 @@ class Gsl2024FunctionFunc1(Formula):
         expression=r"\tmp{u}^{20} - 1",
         interval="[0.1, 2]",
         summary=(
-            "A polynomial of degree 20, nearly constant at $-1$ over the lower third of the interval and rising to "
-            "about $10^6$ at the upper bound."
+            "A polynomial of degree 20, nearly constant at $-1$ from 0.5 to 1.5 below its upper root and rising to "
+            "about $10^6$ at 1 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

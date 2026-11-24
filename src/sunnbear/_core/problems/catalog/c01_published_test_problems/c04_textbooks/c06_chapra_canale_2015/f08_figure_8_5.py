@@ -52,8 +52,8 @@ class ChapraCanale2015Figure85(Formula):
         ),
         interval="[0.008, 0.08]",
         summary=(
-            "The Colebrook equation for the friction factor, decreasing through 1 simple root and about 30 times as "
-            "steep at the lower bound as at the upper."
+            "The Colebrook equation for the friction factor, decreasing through 1 simple root and steepest at the lower"
+            " bound."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $f$, the friction factor.",),
     )

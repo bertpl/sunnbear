@@ -31,7 +31,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF86(Formula):
         interval="[-2, 2]",
         summary=(
             r"The exponential minus its Taylor polynomial of degree 2, lowered by 0.005, so that its 1 root lies 0.3 "
-            r"above a stationary inflection at $\x = 0$."
+            r"above a stationary inflection at $\x = 4 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

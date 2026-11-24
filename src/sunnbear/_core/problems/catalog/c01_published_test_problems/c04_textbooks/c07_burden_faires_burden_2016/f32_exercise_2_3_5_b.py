@@ -29,8 +29,8 @@ class BurdenFairesBurden2016Exercise235B(Formula):
         expression=r"\tmp{u}^{3} + 3 \tmp{u}^{2} - 1",
         interval="[-3, -2]",
         summary=(
-            "A cubic with a local maximum at the upper bound and the lowest of the cubic's 3 simple roots close to the "
-            "lower bound."
+            "A cubic whose only root on the interval is the lowest of its 3 simple roots and lies 0.88 below the "
+            "cubic's local maximum."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

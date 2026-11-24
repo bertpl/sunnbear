@@ -36,7 +36,10 @@ class OliveiraTakahashi2021IllBehavedFunction6(Formula):
             r"\end{cases}"
         ),
         interval="[-1, 1]",
-        summary="A hyperbola that changes sign only at its pole, where the formula sets the function to 0.",
+        summary=(
+            "A hyperbola that changes sign only at its pole, where the function is 0 only if the denominator is exactly"
+            " 0 in floating point."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

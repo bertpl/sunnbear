@@ -43,8 +43,8 @@ class SuliMayers2003Exercise12(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"A function between the lines $\x$ and $2\x$, with infinitely many local extrema near the lower bound, "
-            r"which is the function's only root."
+            r"A function between the lines $\tmp{u}$ and $2 \tmp{u}$, with infinitely many local extrema near the "
+            r"function's only root, at $\x = \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

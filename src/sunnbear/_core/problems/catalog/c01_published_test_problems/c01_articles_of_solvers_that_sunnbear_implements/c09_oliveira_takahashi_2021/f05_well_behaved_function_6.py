@@ -28,7 +28,7 @@ class OliveiraTakahashi2021WellBehavedFunction6(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\pi^{\tmp{u}} - e",
         interval="[-1, 1]",
-        summary=r"A convex, increasing exponential in base $\pi$ with 1 simple root close to the upper bound.",
+        summary=r"A convex, increasing exponential in base $\pi$ with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

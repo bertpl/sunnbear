@@ -30,7 +30,7 @@ class Atkinson1989Equation212(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{6} - \tmp{u} - 1",
         interval="[1, 2]",
-        summary="A sextic, steep toward the upper bound, with 1 simple root close to the lower bound.",
+        summary="A sextic with 1 simple root, increasingly steep toward the upper bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

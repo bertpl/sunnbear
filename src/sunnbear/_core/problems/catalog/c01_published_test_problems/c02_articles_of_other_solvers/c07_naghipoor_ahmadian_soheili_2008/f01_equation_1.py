@@ -31,8 +31,8 @@ class NaghipoorAhmadianSoheili2008Equation1(Formula):
         expression=r"\tmp{u} e^{\tmp{u}} - 1",
         interval="[-1, 1]",
         summary=(
-            "A function whose root is the omega constant $W(1)$ and whose minimum lies at the lower bound, where the "
-            "slope is 0."
+            r"A function with 1 root at $\x = W(1) + 2 \c$, $W(1)$ being the omega constant, and a minimum 1.57 below "
+            r"that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

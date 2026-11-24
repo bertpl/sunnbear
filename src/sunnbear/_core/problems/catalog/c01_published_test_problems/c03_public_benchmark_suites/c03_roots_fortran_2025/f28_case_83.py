@@ -27,8 +27,8 @@ class RootsFortran2025Case83(Formula):
         expression=r"\left(\tmp{u} - 1.0\right) \tmp{u}^{6} - 1.0",
         interval="[0, 3]",
         summary=(
-            "A polynomial of degree 7 that is nearly flat over the lower third of the interval and steep toward the "
-            "upper bound, with 1 simple root."
+            "A polynomial of degree 7 with 1 simple root, steep above that root and within 0.06 of $-1$ from 1.26 to "
+            "0.26 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

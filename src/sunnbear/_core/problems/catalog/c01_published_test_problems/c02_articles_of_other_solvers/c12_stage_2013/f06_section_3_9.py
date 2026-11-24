@@ -33,7 +33,7 @@ class Stage2013Section39(Formula):
         ),
         interval="[-10, 10]",
         summary=(
-            r"The signed 5th root of $2/3 - \x$, with an infinite slope at its root and a magnitude of 0.1 only "
+            r"The signed 5th root of $2/3 - \tmp{u}$, with an infinite slope at its root and a magnitude of 0.1 only "
             r"$10^{-5}$ from that root."
         ),
     )

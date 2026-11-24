@@ -28,8 +28,8 @@ class Ellithy2026Problem33(Formula):
         expression=r"\tmp{u}^{4} - 10 \tmp{u}^{3} + 35 \tmp{u}^{2} - 50 \tmp{u} + 24",
         interval="[0, 1.5]",
         summary=(
-            r"The quartic $(\x - 1)(\x - 2)(\x - 3)(\x - 4)$ multiplied out, with 1 root and, close to the upper bound,"
-            r" a minimum of $-1$."
+            r"The quartic $(\tmp{u} - 1)(\tmp{u} - 2)(\tmp{u} - 3)(\tmp{u} - 4)$ multiplied out, with 1 root on the "
+            r"interval and, 0.38 above that root, a minimum of $-1$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -37,10 +37,7 @@ class LiZhouLangeTian2026Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\cos{\left(0.5 \pi \tmp{u} \right)} - \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            "A function with 1 simple root and, on each interval, 2 local extrema whose values are all at least 0.78 "
-            "away from 0."
-        ),
+        summary="A function with 1 simple root and local extrema whose values are all at least 0.78 away from 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

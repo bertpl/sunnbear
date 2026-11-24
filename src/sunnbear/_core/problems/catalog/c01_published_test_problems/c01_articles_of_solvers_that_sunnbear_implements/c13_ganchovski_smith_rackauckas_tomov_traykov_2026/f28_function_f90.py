@@ -27,8 +27,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF90(Formula):
         expression=r"\tmp{u}^{3} - 2 \tmp{u}^{2} + \tmp{u} - 0.025",
         interval="[-1, 2]",
         summary=(
-            r"$\x (\x - 1)^2$ lowered by 0.025, which splits its double root into 2 simple roots 0.32 apart, with a "
-            r"third root near $\x = 0$."
+            r"$\tmp{u} (\tmp{u} - 1)^2$ lowered by 0.025, which splits its double root into 2 simple roots 0.32 apart, "
+            r"with a third root near $\x = 3 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

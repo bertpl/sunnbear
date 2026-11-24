@@ -38,8 +38,8 @@ class Ford1997Function3(Formula):
         expression=r"\frac{e^{\frac{21000}{\tmp{u}}}}{1.11 \cdot 10^{11} \tmp{u}^{2}} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A decreasing function with 1 root, about $8 \cdot 10^{9}$ at the lower bound of the widest interval and "
-            r"within $10^{-3}$ of $-1$ over its upper third."
+            r"A decreasing function with 1 root, above $6 \cdot 10^{9}$ at 200 below that root and within $10^{-3}$ of "
+            r"$-1$ from 115 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

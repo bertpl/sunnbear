@@ -33,8 +33,7 @@ class BurdenFairesBurden2016Exercise232(Formula):
         expression=r"- \tmp{u}^{3} - \cos{\left(\tmp{u} \right)}",
         interval="[-1, 0]",
         summary=(
-            "A decreasing function with 1 simple root in the lower 15% of the interval and a slope of 0 at the upper "
-            "bound."
+            "A function decreasing through its 1 simple root to a local minimum of $-1$ that lies 0.87 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

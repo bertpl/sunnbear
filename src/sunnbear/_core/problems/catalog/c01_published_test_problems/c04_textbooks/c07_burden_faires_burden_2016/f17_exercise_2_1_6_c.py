@@ -37,10 +37,7 @@ class BurdenFairesBurden2016Exercise216C(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{2} - 4 \tmp{u} + 4 - \ln{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            r"A convex function with 1 root on each interval, and with the minimum just above $\x = 2$, so that the "
-            r"function first falls on $[2, 4]$."
-        ),
+        summary="A convex function with 1 root on each interval and its minimum 0.83 below the upper of the 2 roots.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -40,8 +40,8 @@ class Burkardt2016ProblemP18(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"$(\x - 1)^7$ written out as a polynomial and scaled by $10^{14}$, whose rounding errors decide its sign "
-            r"over about 90% of the interval."
+            r"$(\tmp{u} - 1)^7$ written out as a polynomial and scaled by $10^{14}$, whose rounding errors decide its "
+            r"sign over about 90% of the interval."
         ),
         notes=(
             (

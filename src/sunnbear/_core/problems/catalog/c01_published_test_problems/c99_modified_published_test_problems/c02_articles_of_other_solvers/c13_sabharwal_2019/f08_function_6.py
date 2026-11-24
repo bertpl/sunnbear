@@ -35,10 +35,7 @@ class ModifiedSabharwal2019Function6(Formula):
         definitions=((r"\tmp{u}", r"\x - 5.1 \c"),),
         expression=r"\tmp{u}^{2} + 5 \tmp{u} + 2",
         interval="[-6, -0.9]",
-        summary=(
-            "A parabola with 1 of its 2 simple roots on the interval, and the parabola's minimum between that root and "
-            "the upper bound."
-        ),
+        summary="A parabola with only the lower of its 2 simple roots on the interval.",
         notes=(
             (
                 "The interval ends at $-0.9$, not at the published 0, so that it holds 1 of the published "

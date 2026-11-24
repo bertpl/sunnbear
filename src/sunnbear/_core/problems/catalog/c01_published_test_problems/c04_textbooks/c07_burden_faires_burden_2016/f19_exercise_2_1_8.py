@@ -32,8 +32,8 @@ class BurdenFairesBurden2016Exercise218(Formula):
         expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
         interval="[4, 5]",
         summary=(
-            r"A function positive at both bounds, with 1 simple root and, above that root, a pole at $\x = 3\pi/2$ "
-            r"where the function jumps from $-\infty$ to $+\infty$."
+            r"A function positive at both bounds, with 1 simple root and, above that root, a pole at $\x = 3\pi/2 + \c$"
+            r" where the function jumps from $-\infty$ to $+\infty$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

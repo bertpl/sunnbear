@@ -32,8 +32,8 @@ class RootsFortran2025Case43(Formula):
         ),
         interval="[0, 0.7]",
         summary=(
-            "An oscillation of growing amplitude around a rising line, with 4 local extrema below 0 and 1 root close "
-            "to the upper bound."
+            "An oscillation of growing amplitude around a rising line, with only negative local extrema below its 1 "
+            "root, which lies close to the upper bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

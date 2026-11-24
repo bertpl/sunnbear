@@ -35,8 +35,8 @@ class BusDekker1975Function3(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"A concave parabola with a maximum of about $\param{n}^2/4$ for $\param{n} \geq 5$, and 1 root that nears "
-            r"the lower bound as $\param{n}$ grows."
+            r"A concave parabola with 1 root on the interval, at about $\x = \c + 1/\param{n}^2$ for $\param{n} \geq "
+            r"5$, where the slope is about $\param{n}^2$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

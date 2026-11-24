@@ -30,8 +30,8 @@ class RootsFortran2025Case21(Formula):
         expression=r"\tmp{u}^{2} - \left(1.0 - \tmp{u}\right)^{\param{n}}",
         interval="[0, 1.01]",
         summary=(
-            r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, steeper at the lower bound, with "
-            r"its 1 root closer to that bound."
+            r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, steeper at $\x = 1.01 \c$, with "
+            r"its 1 root closer to that point."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

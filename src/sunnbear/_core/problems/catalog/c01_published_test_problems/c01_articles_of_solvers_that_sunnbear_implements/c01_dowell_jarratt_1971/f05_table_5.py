@@ -34,8 +34,8 @@ class DowellJarratt1971Table5(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"A quartic whose maximum exceeds $10^4$ for $\param{n} \ge 15$, and whose 1 root then lies within $3 "
-            r"\cdot 10^{-5}$ of the lower bound."
+            r"A quartic whose maximum exceeds $10^4$ for $\param{n} \ge 15$, and whose 1 root on the interval then lies"
+            r" within $3 \cdot 10^{-5}$ above $\x = \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

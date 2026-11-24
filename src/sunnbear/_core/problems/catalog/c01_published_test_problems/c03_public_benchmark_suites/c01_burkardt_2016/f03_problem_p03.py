@@ -37,7 +37,7 @@ class Burkardt2016ProblemP03(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} e^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A function with 1 root, positive but below $10^{-9}$ over most of the wide interval.",
+        summary="A function with 1 root, positive but below $10^{-9}$ more than 24 above that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

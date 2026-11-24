@@ -37,10 +37,7 @@ class ModifiedSabharwal2019Function8(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[-1, 2]",
-        summary=(
-            "An increasing function, below $-6$ over the lower half of the interval, with 1 simple root 0.48 below the "
-            "upper bound."
-        ),
+        summary=r"A function with 1 simple root, below $-6$ wherever $\x$ lies more than 0.96 below that root.",
         notes=(
             (
                 "The interval ends at 2, not at the published 1, so that it holds the function's root, "

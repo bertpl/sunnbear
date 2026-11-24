@@ -47,7 +47,8 @@ class ModifiedChandrupatla1997Function9(Formula):
         expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2.0 \cdot 10^{-6}}{\tmp{u}^{3}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function with 1 simple root and a narrow dip to about $-3.7 \cdot 10^{4}$ just above the lower bound."
+            r"A function with 1 simple root on the interval and, far below that root, a narrow dip to about $-3.7 \cdot"
+            r" 10^{4}$ next to a pole at $\x = 0$."
         ),
         notes=(
             (

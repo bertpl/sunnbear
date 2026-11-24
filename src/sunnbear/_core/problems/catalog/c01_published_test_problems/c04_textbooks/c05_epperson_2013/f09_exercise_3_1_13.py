@@ -30,10 +30,7 @@ class Epperson2013Exercise3113(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"e^{- 4 \tmp{u}} - \frac{1}{10}",
         interval="[0, 5]",
-        summary=(
-            "An exponential that levels off at $-0.1$ over the upper 75% of the interval, with 1 simple root near the "
-            "lower bound."
-        ),
+        summary="An exponential with 1 simple root, above which the function levels off at $-0.1$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

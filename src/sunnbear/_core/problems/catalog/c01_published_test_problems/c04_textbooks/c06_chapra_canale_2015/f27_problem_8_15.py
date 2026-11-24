@@ -38,7 +38,7 @@ class ChapraCanale2015Problem815(Formula):
         interval="[0, 2]",
         summary=(
             "A target concentration minus the oxygen sag curve downstream of a sewage discharge, increasing through 1 "
-            "simple root and flattening toward a maximum just beyond the upper bound."
+            "simple root to a maximum 1.8 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -38,8 +38,8 @@ class RootsFortran2025Case79(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A quartic symmetric about $\x = 5$, with 1 root on each interval and shallow minima close to the bounds "
-            r"$\x = 2$ and $\x = 8$."
+            "A quartic symmetric about its local maximum, with 1 root on each interval and a local minimum 2.92 on each"
+            " side of that maximum."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

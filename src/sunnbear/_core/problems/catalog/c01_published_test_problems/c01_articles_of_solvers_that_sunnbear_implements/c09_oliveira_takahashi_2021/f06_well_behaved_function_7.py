@@ -32,8 +32,8 @@ class OliveiraTakahashi2021WellBehavedFunction7(Formula):
         expression=r"\ln{\left(\left|{\tmp{u} - \frac{10}{9}}\right| \right)}",
         interval="[-1, 1]",
         summary=(
-            "A logarithm, decreasing with 1 simple root and steepest at the upper bound, which lies $1/9$ below the "
-            "logarithm's singularity."
+            r"A logarithm with 1 simple root, at a distance of 1 below the logarithm's singularity, where the function "
+            r"tends to $-\infty$ from both sides."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

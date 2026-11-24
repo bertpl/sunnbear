@@ -31,7 +31,9 @@ class BurdenFairesBurden2016Exercise2214A(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 + \sin{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[2, 3]",
-        summary=r"A decreasing function whose 1 simple root is the fixed point of $2 + \sin(\x)$.",
+        summary=(
+            r"A decreasing function whose 1 simple root solves the fixed-point equation $\tmp{u} = 2 + \sin(\tmp{u})$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

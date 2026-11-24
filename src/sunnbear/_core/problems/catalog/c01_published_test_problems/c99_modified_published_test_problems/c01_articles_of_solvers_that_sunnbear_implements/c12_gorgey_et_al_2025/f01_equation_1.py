@@ -38,10 +38,7 @@ class ModifiedGorgeyEtAl2025Equation1(Formula):
         definitions=((r"\tmp{u}", r"\x - 5.56 \c"),),
         expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",
         interval="[-2.5, 3.06]",
-        summary=(
-            "A quintic with 2 simple roots, a triple root just below the upper bound, and a value below 0.005 at the "
-            "upper bound."
-        ),
+        summary="A quintic with 2 simple roots and, above them, a triple root, around which the quintic is flat.",
         notes=(
             (
                 "The interval ends at 3.06, not at the published 3, which is the triple root, so that the "

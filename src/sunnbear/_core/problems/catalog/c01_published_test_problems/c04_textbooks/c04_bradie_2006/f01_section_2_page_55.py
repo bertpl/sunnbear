@@ -44,8 +44,8 @@ class Bradie2006Section2Page55(Formula):
         ),
         interval="[0, 10]",
         summary=(
-            "A decreasing cubic whose 1 simple root is the depth to which a floating sphere sinks, with a slope of 0 at"
-            " both bounds."
+            r"A cubic whose simple root on the interval, the depth to which a floating sphere sinks, lies between local"
+            r" extrema at $\x = 10 \c$ and $\x = 10 + 10 \c$."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $h$, the depth to which the sphere sinks, in cm.",),
     )

@@ -33,10 +33,7 @@ class AlefeldPotra1992Problem6(Formula):
             r"\left(1 + \left(1 - \param{n}\right)^{2}\right) \tmp{u}^{2} - \left(1 - \param{n} " r"\tmp{u}\right)^{2}"
         ),
         interval="[0, 1]",
-        summary=(
-            r"A concave parabola whose maximum grows about as $\param{n}/2$, with 1 root that nears the lower bound as "
-            r"$\param{n}$ grows."
-        ),
+        summary=r"A concave parabola whose 1 root on the interval lies at about $\x = \c + 1/(2 \param{n})$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

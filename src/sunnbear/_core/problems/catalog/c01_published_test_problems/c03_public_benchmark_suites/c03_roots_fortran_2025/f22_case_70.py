@@ -32,8 +32,8 @@ class RootsFortran2025Case70(Formula):
         expression=r"\tmp{u}^{2} - 1.0038273894 + \sin{\left(\frac{\tmp{u}}{10000.0} \right)}",
         interval="[0.0001, 10.0001]",
         summary=(
-            "A parabola plus a nearly linear sine term of at most about $10^{-3}$, flat at the lower bound, with 1 root"
-            " at a tenth of the interval."
+            r"A parabola plus a nearly linear sine term of at most about $10^{-3}$, flat at $\x = 10 \c$, with 1 root "
+            r"on the interval, 1.0 above that point."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

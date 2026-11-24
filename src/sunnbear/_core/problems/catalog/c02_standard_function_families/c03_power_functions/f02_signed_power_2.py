@@ -40,8 +40,8 @@ class SignedPower2(Formula):
         expression=r"\operatorname{sgn}(\x) \, |\x|^{\param{p}} + \c",
         interval="[-1, 1]",
         summary=(
-            r"A signed power, with an infinite slope at $\x = 0$ for $\param{p} < 1$ and a zero slope for "
-            r"$\param{p} > 1$, away from its root."
+            r"A signed power whose root lies $|\c|^{1/\param{p}}$ from $\x = 0$, where the slope is infinite for "
+            r"$\param{p} < 1$ and zero for $\param{p} > 1$."
         ),
         param_conditions=(r"$\param{p} > 0$",),
     )

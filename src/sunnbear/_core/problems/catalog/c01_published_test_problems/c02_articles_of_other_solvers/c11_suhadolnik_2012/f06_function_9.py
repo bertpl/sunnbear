@@ -26,10 +26,7 @@ class Suhadolnik2012Function9(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{3} - 1",
         interval="[1.5, 3]",
-        summary=(
-            "A cubic whose value at the upper bound is 8 times the magnitude of that at the lower bound, with 1 simple "
-            "root."
-        ),
+        summary="A cubic whose 1 simple root lies 1 above the cubic's inflection point, where the slope is 0.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

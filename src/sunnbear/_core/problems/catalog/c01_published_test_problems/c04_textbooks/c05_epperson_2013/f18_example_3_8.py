@@ -40,7 +40,9 @@ class Epperson2013Example38(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} - \frac{e^{- \tmp{u}}}{2}",
         interval=r"[\param{a}, \param{b}]",
-        summary=r"An increasing, concave function whose root is the fixed point of $e^{-\x}/2$.",
+        summary=(
+            r"An increasing, concave function whose root lies where $\tmp{u}$ is the fixed point of $e^{-\tmp{u}}/2$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -27,8 +27,7 @@ class RootsFortran2025Case65(Formula):
         expression=r"\left(\tmp{u} - 1.0\right)^{6} - 1.0",
         interval="[1, 2.1]",
         summary=(
-            "A 6th power minus 1, within 0.01 of $-1$ over the lower 40% of the interval, with 1 root near the upper "
-            "bound."
+            "A 6th power minus 1 that stays within 0.01 of $-1$ from 0.54 to 1.46 below its 1 root on the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

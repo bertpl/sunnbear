@@ -36,8 +36,8 @@ class Chandrupatla1997Function2(Formula):
         expression=r"1 - \frac{1}{\tmp{u}^{2}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"An increasing function with 1 root, steep near the lower bound because of a pole at $\x = 0$, and within "
-            r"0.01 of 1 above $\x = 10$."
+            "An increasing function with 1 root, steepest at the lower bound because of a pole below that bound, and "
+            "within 0.01 of 1 more than 10 above that pole."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

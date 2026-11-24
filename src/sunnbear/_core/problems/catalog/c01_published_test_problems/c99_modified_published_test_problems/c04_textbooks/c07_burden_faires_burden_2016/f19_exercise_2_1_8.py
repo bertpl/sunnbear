@@ -40,8 +40,8 @@ class ModifiedBurdenFairesBurden2016Exercise218(Formula):
         expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
         interval="[4, 4.6]",
         summary=(
-            r"A decreasing function with 1 simple root, steep next to the upper bound because of the pole at $\x = "
-            r"3\pi/2$."
+            r"A decreasing function with 1 simple root, steep next to the upper bound because of a pole of "
+            r"$\tan(\tmp{u})$ above that bound."
         ),
         notes=(
             (

@@ -26,7 +26,10 @@ class Ellithy2026Problem22(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 3 \tmp{u}^{2} - 4 \tmp{u} + 13",
         interval="[-3, -2]",
-        summary="A cubic whose 1 root lies within 0.05 of the upper bound.",
+        summary=(
+            "A cubic with 1 root on the interval and 2 more roots, 0.34 apart, around a local minimum that lies 4.6 "
+            "above the first root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

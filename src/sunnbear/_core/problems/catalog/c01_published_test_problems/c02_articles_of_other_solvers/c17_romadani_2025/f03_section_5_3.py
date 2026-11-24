@@ -39,8 +39,8 @@ class Romadani2025Section53(Formula):
         expression=r"e^{- \tmp{u}} - e^{- 2 \tmp{u}} - e^{- 3 \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function with 1 simple root, steep near $\x = -2$ on the 2 wider intervals, and positive but below "
-            r"$10^{-9}$ over most of the widest interval."
+            "A function with 1 simple root, steep at the lower bound on the 2 wider intervals, and positive but below "
+            "$10^{-9}$ at more than 21 above the root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

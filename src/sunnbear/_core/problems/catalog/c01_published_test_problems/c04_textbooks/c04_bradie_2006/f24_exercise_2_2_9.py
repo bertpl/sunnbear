@@ -36,8 +36,8 @@ class Bradie2006Exercise229(Formula):
         expression=r"\tmp{u}^{4} - 18 \tmp{u}^{2} + 45",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"An even quartic with 1 simple root on each interval, the lower root at an inflection point and the upper "
-            r"root right of a local minimum at $\x = 3$, the lower bound of $[3, 4]$."
+            "A quartic with 1 simple root on each interval, the lower root at an inflection point and the upper root "
+            "0.87 above a local minimum."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

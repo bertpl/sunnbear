@@ -41,8 +41,9 @@ class FormulaPresentation:
 
             A summary holds at every value of ``c`` that the benchmark samples, so it states nothing that depends on
             how far ``c`` moves the function. The benchmark samples ``c`` only within each test problem's c-range,
-            which keeps the sign of ``f`` at both bounds; so no root and no pole of odd order crosses a bound, and a
-            summary may say how many roots lie on the interval, or that a pole lies just outside it. Beyond that:
+            which keeps the sign of ``f`` at both bounds; so a root or a pole of odd order crosses a bound only
+            together with another one. A summary may say how many roots lie on the interval, or that a
+            pole lies just outside it, where no such pair crosses a bound. Beyond that:
 
             - a part of the expression is written with the expression's own symbols, such as the ``\tmp{u}`` of its
               definitions;

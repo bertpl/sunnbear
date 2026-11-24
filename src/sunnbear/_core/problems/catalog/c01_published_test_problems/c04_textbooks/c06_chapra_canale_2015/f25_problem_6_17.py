@@ -30,8 +30,7 @@ class ChapraCanale2015Problem617(Formula):
         expression=r"0.0074 \tmp{u}^{4} - 0.284 \tmp{u}^{3} + 3.355 \tmp{u}^{2} - 12.183 \tmp{u} + 5",
         interval="[15, 20]",
         summary=(
-            "A quartic with 4 real roots, on an interval that holds the largest one and a local minimum left of that "
-            "root."
+            "A quartic with 4 real roots and a local minimum 2.2 below the largest root, the only root on the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -38,7 +38,7 @@ class Moler2004Section47(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3} - 2 \tmp{u} - 5",
         interval=r"[\param{a}, \param{b}]",
-        summary="A cubic with 1 real root and, on the wide interval only, a local minimum below 0.",
+        summary="A cubic whose local maximum and local minimum both lie below 0, so that the cubic has 1 real root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

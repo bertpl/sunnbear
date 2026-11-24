@@ -32,8 +32,8 @@ class BurdenFairesBurden2016Exercise2314(Formula):
         expression=r"\tan{\left(\pi \tmp{u} \right)} - 6",
         interval="[0, 0.48]",
         summary=(
-            "An increasing tangent with 1 simple root close to the upper bound, steep there because the tangent's pole "
-            "lies only 0.02 above that bound."
+            "An increasing tangent with 1 simple root only 0.053 below the tangent's pole, which lies above the upper "
+            "bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

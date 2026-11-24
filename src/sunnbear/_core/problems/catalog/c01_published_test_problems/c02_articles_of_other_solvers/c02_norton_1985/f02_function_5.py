@@ -34,8 +34,8 @@ class Norton1985Function5(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"A quartic whose maximum exceeds 3000 for $\param{n} \geq 10$, and whose 1 root then lies within $2 \cdot "
-            r"10^{-4}$ of the lower bound."
+            r"A quartic whose 1 root on the interval lies less than $2 \cdot 10^{-4}$ above $\x = \c$ for $\param{n} "
+            r"\geq 10$, with a slope above 6000 at that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

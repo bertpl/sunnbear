@@ -35,10 +35,7 @@ class Chandrupatla1997Function3(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u} - 3\right)^{3}",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            "A cubic with a triple root and values of about $10^{30}$ in magnitude at the bounds of the widest "
-            "interval."
-        ),
+        summary="A cubic with a triple root, reaching at least $10^{30}$ in magnitude on the widest interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

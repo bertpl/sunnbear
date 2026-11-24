@@ -30,8 +30,8 @@ class Suhadolnik2012Function2(Formula):
         expression=r"\left(10 - \tmp{u}\right) e^{- 10 \tmp{u}} - \tmp{u}^{10} + 1",
         interval="[0.5, 8]",
         summary=(
-            r"A function with 1 root only $4 \cdot 10^{-5}$ above $\x = 1$ and a value of about $-10^{9}$ at the upper "
-            r"bound."
+            r"A decreasing function, steepest at the upper bound, with 1 root only $4 \cdot 10^{-5}$ above $\x = 1 + "
+            r"7.5 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

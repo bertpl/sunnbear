@@ -43,8 +43,8 @@ class ChapraCanale2015Problem517(Formula):
         expression=r"\param{V} - \frac{\pi \tmp{u}^{2} \left(3 \param{R} - \tmp{u}\right)}{3}",
         interval="[0, 3]",
         summary=(
-            "A cubic, flat at the lower bound, with 1 simple root: the depth at which a spherical tank holds a given "
-            "volume of water."
+            "A cubic with 1 simple root, the depth at which a spherical tank holds a given volume of water, and a local"
+            " maximum 2.03 below that root."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $h$, the depth of the water in the tank, in m.",),
     )

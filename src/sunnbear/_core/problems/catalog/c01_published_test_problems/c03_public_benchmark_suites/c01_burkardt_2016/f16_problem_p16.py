@@ -48,10 +48,7 @@ class Burkardt2016ProblemP16(Formula):
             r"\tmp{u}}{180.0} \right)}"
         ),
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest at $\x = 0$, which lies "
-            r"close to its root."
-        ),
+        summary=r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest 23 below the root.",
         notes=(
             (
                 "The source cites 2 books for this equation: Peter Colwell, Solving Kepler's Equation Over Three "

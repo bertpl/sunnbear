@@ -32,8 +32,8 @@ class OliveiraTakahashi2021WellBehavedFunction8(Formula):
         ),
         interval="[-1, 1]",
         summary=(
-            r"A signed cube root plus a cube, with an infinite slope at $\x = 0$ and 1 simple root 0.037 below $\x = "
-            r"0$."
+            r"A signed cube root plus a cube, with an infinite slope at $\x = 2 \c$ and 1 simple root 0.037 below that "
+            r"point."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

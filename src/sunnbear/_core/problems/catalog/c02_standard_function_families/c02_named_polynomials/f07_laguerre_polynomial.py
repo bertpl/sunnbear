@@ -55,10 +55,7 @@ class LaguerrePolynomial(Formula):
         interval=interval_by_parity_latex(
             r"[0, 4 \param{n} + 2]", r"\left[\frac{(1.25 \pi)^2}{4 \param{n} + 2}, 4 \param{n} + 2\right]"
         ),
-        summary=(
-            "The Laguerre polynomial, with roots close together next to the lower bound and far apart toward the "
-            "upper bound."
-        ),
+        summary="The Laguerre polynomial, whose lowest roots lie close together and whose highest roots lie far apart.",
         param_conditions=(r"$\param{n}$ is an integer from 1 to 256",),
     )
     effect_of_c = EffectOfC.SHIFTS_X

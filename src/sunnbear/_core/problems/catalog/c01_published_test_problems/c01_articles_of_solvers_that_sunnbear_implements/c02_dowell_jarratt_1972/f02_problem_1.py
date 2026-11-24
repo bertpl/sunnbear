@@ -32,8 +32,8 @@ class DowellJarratt1972Problem1(Formula):
         expression=r"\frac{\param{N} \tmp{u} - 1}{\left(\param{N} - 1\right) \tmp{u}}",
         interval="[0.01, 1]",
         summary=(
-            r"A hyperbola, steep at the lower bound because of a pole at $\x = 0$, with 1 root that nears that bound as"
-            r" $\param{N}$ grows."
+            r"A hyperbola, steep at the lower bound because of a pole below that bound, with 1 root that nears the pole"
+            r" as $\param{N}$ grows."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

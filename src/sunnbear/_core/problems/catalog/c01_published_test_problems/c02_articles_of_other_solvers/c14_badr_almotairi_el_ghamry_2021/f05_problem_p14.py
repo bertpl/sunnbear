@@ -28,7 +28,7 @@ class BadrAlmotairiElGhamry2021ProblemP14(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} - 3 \tmp{u} - 2",
         interval="[2, 3]",
-        summary="A convex function with 1 simple root only 0.13 above the lower bound.",
+        summary="A convex function with 1 simple root on the interval, 1.03 above the function's minimum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

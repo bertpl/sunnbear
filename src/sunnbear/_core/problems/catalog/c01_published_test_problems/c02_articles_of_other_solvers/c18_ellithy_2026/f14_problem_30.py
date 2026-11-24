@@ -42,7 +42,7 @@ class Ellithy2026Problem30(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "Wilkinson's polynomial, above $10^{15}$ in magnitude over most of each interval, with 1 root on the lower "
-            "interval and 2 on the upper, 1 of them at that interval's lower bound."
+            "interval and 2 on the upper."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

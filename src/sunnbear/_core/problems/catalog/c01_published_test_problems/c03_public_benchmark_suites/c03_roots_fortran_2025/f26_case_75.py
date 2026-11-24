@@ -36,8 +36,8 @@ class RootsFortran2025Case75(Formula):
         expression=r"\left(\left(\tmp{u} \tmp{u} - 27.0\right) \tmp{u} - 54.0\right) \tmp{u} - 10.0",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A quartic with 1 root on each of 4 adjacent intervals, 2 of which meet at $\x = -3$, where the quartic "
-            r"has a local minimum."
+            "A quartic with 4 real roots, 1 on each of 4 adjacent intervals, and a local minimum between the lowest 2 "
+            "roots."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

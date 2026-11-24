@@ -32,8 +32,8 @@ class BurdenFairesBurden2016Exercise242D(Formula):
         expression=r"e^{3 \tmp{u}} - 27 \tmp{u}^{6} + 27 \tmp{u}^{4} e^{\tmp{u}} - 9 \tmp{u}^{2} e^{2 \tmp{u}}",
         interval="[3, 5]",
         summary=(
-            r"The cube of $e^{\x} - 3 \x^2$ written out as 4 terms, whose rounding errors decide the cube's sign within"
-            r" $3 \cdot 10^{-5}$ of the triple root."
+            r"The cube of $e^{\tmp{u}} - 3 \tmp{u}^2$ written out as 4 terms, whose rounding errors decide the cube's "
+            r"sign within $3 \cdot 10^{-5}$ of the triple root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -27,8 +27,8 @@ class Ellithy2026Problem26(Formula):
         expression=r"\tmp{u}^{5} - 3 \tmp{u}^{4} + 25",
         interval="[-3, -1]",
         summary=(
-            "An increasing quintic with 1 root in the upper third of the interval, and a slope at the lower bound 10 "
-            "times that at the root."
+            "A quintic with 1 root and, 1.53 above that root, a local maximum of 25 at which the first 3 derivatives "
+            "vanish."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

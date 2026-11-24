@@ -38,8 +38,7 @@ class BurdenFairesBurden2016Exercise216D(Formula):
         expression=r"\tmp{u} + 1 - 2 \sin{\left(\pi \tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A convex function with 2 simple roots, 1 per interval, and a minimum of $-0.53$ just below $\x = 0.5$, "
-            "where the 2 intervals meet."
+            "A function with 1 simple root per interval and a minimum of $-0.53$ about midway between those 2 roots."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -38,8 +38,8 @@ class Ford1997Function2(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A polynomial of degree 21 with 1 real root, within 0.19 of 0 from $\x = -1$ up to that root, and growing "
-            r"steeply above it."
+            "A polynomial of degree 21 with 1 real root, within 0.19 of 0 from 2 below that root up to the root, and "
+            "growing steeply above it."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

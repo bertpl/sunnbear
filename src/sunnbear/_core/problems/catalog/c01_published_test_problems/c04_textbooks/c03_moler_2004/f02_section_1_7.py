@@ -36,8 +36,8 @@ class Moler2004Section17(Formula):
         ),
         interval="[0.988, 1.012]",
         summary=(
-            r"$(\x - 1)^7$ written out as a polynomial, whose rounding errors decide the polynomial's sign over about "
-            r"85% of the interval."
+            r"$(\tmp{u} - 1)^7$ written out as a polynomial, whose rounding errors decide the polynomial's sign over a "
+            r"band about 0.02 wide around the root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

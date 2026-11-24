@@ -26,9 +26,7 @@ class OliveiraTakahashi2021IllBehavedFunction1(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u} \cdot 10^{6} - 1\right)^{3}",
         interval="[-1, 1]",
-        summary=(
-            "A cube with a triple root near the middle of the interval, about $10^{18}$ in magnitude at both bounds."
-        ),
+        summary="A cube with a triple root and a magnitude of $10^{18}$ at a distance of 1 from that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
