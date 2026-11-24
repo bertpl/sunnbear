@@ -1,40 +1,40 @@
 {
   "archive": {
-    "sha256": "ca4faa85766e4c09fbdd0f9ddb625682fa74fa92106f586bdd94d9613c257ab0",
-    "size_bytes": 1802864,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-7472df24/benchmark_suites_build_details.tar.zst"
+    "sha256": "db58e704db7f01042083155f39f5c32a26c0d9ebf98b8b236f0c6bf4483a499a",
+    "size_bytes": 1802652,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-fda014dc/benchmark_suites_build_details.tar.zst"
   },
-  "build_date": "2026-11-19",
+  "build_date": "2026-11-24",
   "built_with": {
     "max-div": "0.21.8",
     "snuffled": "0.1.11",
-    "sunnbear": "0.4.5"
+    "sunnbear": "0.4.9+dev"
   },
-  "content_hash": "7472df24213bcbe0debf24d90113a789f9e367a62e2c3a1148cfc395d546fd45",
+  "content_hash": "fda014dca8fa378d8f56eaa80f22553a9e6780311905ed2869634d39e273eaeb",
   "files": [
     {
       "path": "c_ranges.parquet",
-      "sha256": "55274a00486154e58634c94365a6478327fb4c6e91de09458ea4979e9b209ef4",
-      "size_bytes": 29233
+      "sha256": "8150cd3a7555078984ed4a021d03db6b1482f7cb5394e535c2a013f910d8ead1",
+      "size_bytes": 29157
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "f36d69b3ec2be3adc935db8390f7d4994d1c1c888efec2b046ad09c9ceff1212",
-      "size_bytes": 20988
+      "sha256": "c462f5ca512f5a135ff00c754a2cddcc7e34ebfed8cf2bbfbd4611e30b84ff61",
+      "size_bytes": 20872
     },
     {
       "path": "difficulty_tiers.parquet",
-      "sha256": "fe2174db28079d8b49a33f9c32a50e9c98a2b314759b04783c9265e7ce17e710",
-      "size_bytes": 16366
+      "sha256": "6747a85a8ecb7862cc0bfb59c8cf05992192c7e6543a511a1bdf423ffb241d04",
+      "size_bytes": 16295
     },
     {
       "path": "interval_bounds.parquet",
-      "sha256": "5a8773f89194f661a2fcbcc3d7e9855c4d992865dd66ba144ade954ee80eaaac",
-      "size_bytes": 34798
+      "sha256": "d5b80566d4d35230a39763606a5bffc0670e6d523960d416eb722e8cb065994f",
+      "size_bytes": 34733
     },
     {
       "path": "nearest_kept_candidates.parquet",
-      "sha256": "9e7c23c87b0ee7900f59ba3550a3bf0bb9b98dafc197e34d05410d0c2dae69bc",
+      "sha256": "8a25cac11effb580101d971edb86d3c74e70193f90f5e28ef4e0d5730a0a4180",
       "size_bytes": 2081
     },
     {
@@ -44,18 +44,18 @@
     },
     {
       "path": "s3_coarse_characterization_raw_features.parquet",
-      "sha256": "c5c5571f0451fd83e58d6438d986f2b095c91ffdddc8a2e4270a7ed2f65ee4ab",
-      "size_bytes": 918067
+      "sha256": "a934709b2edd8a4fef38199e5eab4aa4fc3860947e95b309afd10ceafe8eb8dd",
+      "size_bytes": 918004
     },
     {
       "path": "s5_fine_characterization_raw_features.parquet",
-      "sha256": "32e299b54f70beffcc1c35228d197585d272bce15c3b8e8b7d1ef905d1e48c89",
-      "size_bytes": 929748
+      "sha256": "216029040a5432a62d2b2cc13bd1312a4d76154162ad59b38e017ba662fbcf59",
+      "size_bytes": 929653
     },
     {
       "path": "storage.json",
-      "sha256": "3de0be8c0c9d2df8209b20c2fb78e7cdfff9cf843b720f79d0b8a9511b2af795",
-      "size_bytes": 217463
+      "sha256": "666115fd6b193eef92a2e2eb0346695df63d66e917442943858e4c54322280af",
+      "size_bytes": 218162
     }
   ],
   "generated_by": {
