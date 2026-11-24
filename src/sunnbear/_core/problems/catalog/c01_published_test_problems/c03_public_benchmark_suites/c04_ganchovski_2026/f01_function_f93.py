@@ -39,8 +39,8 @@ class Ganchovski2026FunctionF93(Formula):
         expression=r"\tmp{u}^{\param{n}} - 0.001",
         interval="[-10, 10]",
         summary=(
-            r"An odd power minus 0.001, nearly flat on a band around $\x = 20 \c$ that ends at the root, and steep "
-            r"toward both bounds."
+            r"An odd power minus 0.001, nearly flat on a band around $\x = 20 \c$ that ends at the root, and steep more"
+            r" than 1 away from $\x = 20 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

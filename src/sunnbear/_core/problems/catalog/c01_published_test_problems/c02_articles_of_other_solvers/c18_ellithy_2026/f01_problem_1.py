@@ -28,7 +28,9 @@ class Ellithy2026Problem1(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[1, 2]",
-        summary=r"A function whose root is $W(7)$, the Lambert W function at 7, shifted by $\c$.",
+        summary=(
+            r"An increasing convex function with 1 simple root, at $\c$ plus the value of the Lambert W function at 7."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

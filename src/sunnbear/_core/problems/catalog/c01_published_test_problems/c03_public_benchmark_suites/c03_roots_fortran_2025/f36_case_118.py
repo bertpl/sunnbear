@@ -26,7 +26,10 @@ class RootsFortran2025Case118(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 2.0",
         interval="[1, 2]",
-        summary="A cubic with 1 simple root, increasing and convex on the interval.",
+        summary=(
+            "A cubic with 1 simple root, convex on the interval, and increasing from its local minimum 0.94 below that "
+            "root."
+        ),
         notes=(
             (
                 'The source takes this function from the example of the English Wikipedia article "ITP method", '

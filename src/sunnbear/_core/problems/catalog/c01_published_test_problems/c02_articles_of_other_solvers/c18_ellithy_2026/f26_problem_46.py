@@ -31,8 +31,8 @@ class Ellithy2026Problem46(Formula):
         expression=r"\tmp{u} e^{\frac{\tmp{u}}{2}} - 1.5",
         interval="[0, 1]",
         summary=(
-            r"An increasing convex function whose 1 root lies at $\x = \c + 2 W(0.75)$, with $W$ the Lambert W "
-            r"function."
+            r"An increasing convex function whose 1 root lies at $\c$ plus twice the value of the Lambert W function at"
+            r" 0.75."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

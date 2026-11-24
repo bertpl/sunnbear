@@ -43,8 +43,8 @@ class Chandrupatla1997Function8(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A decreasing function with 1 root and a pole just below the lower bound, leveling off toward $-1013$ as "
-            r"$\x$ grows."
+            r"A decreasing function with 1 root, 1.04 above a pole below the lower bound, leveling off toward $-1013$ "
+            r"as $\x$ grows."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

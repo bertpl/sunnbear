@@ -40,7 +40,7 @@ class RootsFortran2025Case84(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"$\tmp{u}^4 (\tmp{u} + 1)^3 (\tmp{u} - 3) - 1$ multiplied out, with 1 root on each interval, flat around "
-            r"$\x = 5 \c$ and steep at the intervals' outer bounds."
+            r"$\x = 5 \c$ and steep beyond both roots."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

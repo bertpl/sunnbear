@@ -31,8 +31,7 @@ class Epperson2013Exercise312B(Formula):
         expression=r"\ln{\left(\tmp{u} \right)} + \tmp{u}",
         interval="[0.1, 1]",
         summary=(
-            r"An increasing function, steepest at the lower bound, with 1 root, at $\x = \Omega + 0.9 \c$, the omega "
-            r"constant shifted by $0.9 \c$."
+            r"An increasing function, steepest at the lower bound, with 1 root, at $0.9 \c$ plus the omega constant."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

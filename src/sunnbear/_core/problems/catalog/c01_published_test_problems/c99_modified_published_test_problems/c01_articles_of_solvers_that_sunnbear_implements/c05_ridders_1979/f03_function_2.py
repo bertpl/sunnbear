@@ -40,8 +40,8 @@ class ModifiedRidders1979Function2(Formula):
         expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",
         interval="[0.02, 1.5]",
         summary=(
-            "A function near $-1000$ over most of the interval, rising steeply through 1 root toward a pole just past "
-            "the upper bound."
+            "A function within 1% of $-1000$ until 0.2 below its 1 root, then rising steeply through that root toward a"
+            " pole 0.22 above the root."
         ),
         notes=(
             (

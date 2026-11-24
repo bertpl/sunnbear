@@ -42,7 +42,7 @@ class BurdenFairesBurden2016Section23Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
-        summary=r"A decreasing function whose root is the fixed point of the cosine, shifted by $\param{c_scale} \c$.",
+        summary=r"A decreasing function with 1 root, at $\param{c_scale} \c$ plus the fixed point of the cosine.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

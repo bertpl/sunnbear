@@ -37,8 +37,7 @@ class Brent1973Row1(Formula):
         expression=r"\tmp{u}^{9}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A 9th power, below $10^{-9}$ in magnitude within 0.1 of its root, and above $10^4$ on part of the wide "
-            "interval."
+            "A 9th power, flat at its root of multiplicity 9 and below $10^{-4}$ in magnitude within 0.35 of that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -31,7 +31,7 @@ class Moler2004Section11(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\frac{1}{\tmp{u}} - \left(\tmp{u} - 1\right)",
         interval="[0, 4]",
-        summary=r"A decreasing function with a pole at $\x = 4 \c$ and 1 root, the golden ratio shifted by $4 \c$.",
+        summary=r"A decreasing function with a pole at $\x = 4 \c$ and 1 root, at $4 \c$ plus the golden ratio.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

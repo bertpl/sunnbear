@@ -37,8 +37,8 @@ class AlefeldPotraShi1993Problem13(Formula):
         ),
         interval=r"\left[-10^{4}, \frac{\pi}{2}\right]",
         summary=(
-            r"A continuous function, constant up to a kink at $\x = 10^{4} \c$, after which the function increases "
-            r"through 1 simple root."
+            r"A continuous function, constant up to a kink at $\x = 10^{4} \c$ and increasing from there through 1 "
+            r"simple root, 0.62 above the kink."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

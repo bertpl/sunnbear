@@ -29,7 +29,7 @@ class TomovGanchovski2026FunctionB(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.75 \c"),),
         expression=r"\tmp{u} - \frac{1}{4}",
         interval="[0.25, 1]",
-        summary="A line whose root is the lower bound of the interval.",
+        summary=r"A line, shifted so that its root lies at $\x = 0.75 \c + 1/4$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

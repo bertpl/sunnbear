@@ -29,8 +29,8 @@ class Stage2013Section35(Formula):
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[-10, 10]",
         summary=(
-            r"A decreasing function with a root at the fixed point of the cosine shifted by $20 \c$, and 3 or 4 "
-            r"inflection points where the slope is 0."
+            r"A decreasing function with 1 root, at $20 \c$ plus the fixed point of the cosine, and 3 or 4 inflection "
+            r"points where the slope is 0."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

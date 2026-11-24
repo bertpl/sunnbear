@@ -57,8 +57,8 @@ class ChapraCanale2015Problem518(Formula):
         ),
         interval="[0, 40]",
         summary=(
-            r"An increasing function of the temperature, with 1 simple root: the temperature at which freshwater's "
-            r"saturation concentration of dissolved oxygen is $\param{osf}$."
+            r"An increasing function of the temperature, with 1 simple root, where freshwater's saturation "
+            r"concentration of dissolved oxygen is $\param{osf}$."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $T$, the temperature, in °C.",),
     )

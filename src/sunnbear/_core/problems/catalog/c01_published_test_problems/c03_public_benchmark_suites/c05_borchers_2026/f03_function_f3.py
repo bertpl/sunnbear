@@ -29,8 +29,8 @@ class Borchers2026FunctionF3(Formula):
         expression=r"35 \tmp{u}^{35} - 1",
         interval="[-0.5, 1.9]",
         summary=(
-            r"A 35th power minus 1, with 1 root, steep toward the upper bound, and exactly $-1$ in floating point on a "
-            r"band 0.63 wide centered on $\x = 2.4 \c$."
+            r"A 35th power minus 1, with 1 root, steep above that root, and exactly $-1$ in floating point on a band "
+            r"0.63 wide centered on $\x = 2.4 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

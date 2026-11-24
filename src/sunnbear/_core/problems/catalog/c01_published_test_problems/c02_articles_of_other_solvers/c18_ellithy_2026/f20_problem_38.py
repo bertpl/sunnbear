@@ -29,7 +29,7 @@ class Ellithy2026Problem38(Formula):
         interval="[-3, 1]",
         summary=(
             r"The quartic $(\tmp{u} + 4)(\tmp{u} + 2)(\tmp{u} - 1)(\tmp{u} - 3)$ written out as a polynomial, with 1 "
-            r"root inside the interval and another at its upper bound."
+            r"root inside the interval and another at $\x = 1 + 4 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

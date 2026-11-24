@@ -30,7 +30,7 @@ class Bradie2006Exercise214(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"1 - \ln{\left(\tmp{u} \right)}",
         interval="[2, 3]",
-        summary=r"A decreasing, convex function with 1 root, at $\x = e + \c$, Euler's number shifted by $\c$.",
+        summary=r"A decreasing, convex function with 1 root, at $\c$ plus Euler's number.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

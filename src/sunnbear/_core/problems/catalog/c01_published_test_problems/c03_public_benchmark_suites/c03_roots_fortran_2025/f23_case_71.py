@@ -37,7 +37,10 @@ class RootsFortran2025Case71(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}",
         interval=r"[\param{a}, \param{b}]",
-        summary="The identity function, whose 1 root lies on each of its 3 intervals, from about 1 to 1001 wide.",
+        summary=(
+            r"The identity function, shifted so that its root lies at $\x = \param{c_scale} \c$, on each of its 3 "
+            r"intervals, from about 1 to 1001 wide."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

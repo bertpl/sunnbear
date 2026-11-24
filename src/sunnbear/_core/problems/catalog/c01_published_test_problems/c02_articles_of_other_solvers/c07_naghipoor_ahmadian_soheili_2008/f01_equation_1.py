@@ -30,10 +30,7 @@ class NaghipoorAhmadianSoheili2008Equation1(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 1",
         interval="[-1, 1]",
-        summary=(
-            r"A function with 1 root at $\x = W(1) + 2 \c$, $W(1)$ being the omega constant, and a minimum 1.57 below "
-            r"that root."
-        ),
+        summary=r"A function with 1 root, at $2 \c$ plus the omega constant, and a minimum 1.57 below that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

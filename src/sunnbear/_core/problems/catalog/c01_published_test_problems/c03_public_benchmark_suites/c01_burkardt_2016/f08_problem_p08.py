@@ -37,10 +37,7 @@ class Burkardt2016ProblemP08(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            r"A decreasing function with 1 root, at $\x = d + \param{c_scale} \c$, where $d$ is the fixed point of the "
-            r"cosine."
-        ),
+        summary=r"A decreasing function with 1 root, at $\param{c_scale} \c$ plus the fixed point of the cosine.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

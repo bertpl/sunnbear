@@ -50,8 +50,8 @@ class BurdenFairesBurden2016Example3(Formula):
         expression=r"\tmp{u} - \param{k}^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"An increasing, concave function whose 1 root solves the fixed-point equation $\tmp{u} = "
-            r"\param{k}^{-\tmp{u}}$."
+            r"An increasing, concave function with 1 root, at $\param{c_scale} \c$ plus the fixed point of "
+            r"$\param{k}^{-\tmp{u}}$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

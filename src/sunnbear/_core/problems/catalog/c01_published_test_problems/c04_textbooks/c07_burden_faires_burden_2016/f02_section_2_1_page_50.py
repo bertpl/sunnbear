@@ -35,10 +35,7 @@ class BurdenFairesBurden2016Section21Page50(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"2 \tmp{u}^{3} - \tmp{u}^{2} + \tmp{u} - 1",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            "An increasing cubic with 1 real root, several times steeper at both bounds of the wide interval than at "
-            "that root."
-        ),
+        summary="An increasing cubic with 1 real root, flattest 0.57 below that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

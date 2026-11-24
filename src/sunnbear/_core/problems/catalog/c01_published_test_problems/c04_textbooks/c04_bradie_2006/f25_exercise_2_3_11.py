@@ -32,8 +32,8 @@ class Bradie2006Exercise2311(Formula):
         expression=r"\tmp{u} - e^{- \tmp{u}^{2}}",
         interval="[0, 1]",
         summary=(
-            r"An increasing function whose 1 simple root, the fixed point of $e^{-\tmp{u}^2}$, lies just below the "
-            r"inflection point $\x = 1/\sqrt{2} + \c$, where the slope is steepest."
+            r"An increasing function whose 1 simple root, at $\c$ plus the fixed point of $e^{-\tmp{u}^2}$, lies just "
+            r"below the inflection point $\x = 1/\sqrt{2} + \c$, where the slope is steepest."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

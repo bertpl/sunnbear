@@ -49,7 +49,8 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF29(Formula):
         expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3\right)^{5}\right)",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function with a root of multiplicity 5 and a steep rise toward the upper bound of the wide interval."
+            "A function that stays below $10^{-4}$ in magnitude within 0.15 of its root of multiplicity 5 and grows "
+            "increasingly steep above that root."
         ),
         notes=(
             (

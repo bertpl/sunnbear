@@ -27,7 +27,10 @@ class Brent1973Row3(Formula):
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
         expression=r"\tmp{u}^{19}",
         interval="[-1, 4]",
-        summary=r"A 19th power, below $2 \cdot 10^{-6}$ in magnitude within 0.5 of its root.",
+        summary=(
+            "A 19th power, flat at its root of multiplicity 19 and below $10^{-4}$ in magnitude within 0.6 of that "
+            "root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

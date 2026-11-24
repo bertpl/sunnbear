@@ -43,8 +43,8 @@ class Brent1973Equation41(Formula):
         ),
         interval="[-1, 4]",
         summary=(
-            "A function odd about its root, where all derivatives are 0, so flat there that it is exactly 0 in floating"
-            " point on a band 0.073 wide."
+            "A function odd about its root, where all derivatives are 0, so flat there that the function is exactly 0 "
+            "in floating point on a band 0.073 wide."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -43,7 +43,7 @@ class KumarSrivastav2026AppendixA2(Formula):
         interval="[0, 1]",
         summary=(
             r"An increasing function plus pseudo-random noise that makes the sum change sign many times close to the "
-            r"function's root, at $\x = \c + \Omega$ with $\Omega$ the omega constant."
+            r"function's root, at $\c$ plus the omega constant."
         ),
         notes=(
             r"$Z(\tmp{u})$ is a pseudo-random value that depends only on $\tmp{u}$ and is distributed as a standard "

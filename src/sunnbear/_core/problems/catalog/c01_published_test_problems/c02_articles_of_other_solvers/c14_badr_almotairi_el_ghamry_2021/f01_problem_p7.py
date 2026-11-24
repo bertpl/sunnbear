@@ -29,8 +29,8 @@ class BadrAlmotairiElGhamry2021ProblemP7(Formula):
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[0, 2]",
         summary=(
-            r"An increasing convex function whose 1 simple root is $W(7)$, the Lambert W function at 7, shifted by $2 "
-            r"\c$."
+            r"An increasing convex function with 1 simple root, at $2 \c$ plus the value of the Lambert W function at "
+            r"7."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -29,8 +29,8 @@ class NaghipoorAhmadianSoheili2008Equation6(Formula):
         expression=r"\frac{1}{\tmp{u}} - 1",
         interval="[0.5, 1.5]",
         summary=(
-            "A hyperbola whose pole lies below the lower bound, with the hyperbola's root 1 above that pole and the "
-            "steepest slope at the lower bound."
+            "A hyperbola, steepest at the lower bound, with a pole below that bound and the hyperbola's root 1 above "
+            "the pole."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

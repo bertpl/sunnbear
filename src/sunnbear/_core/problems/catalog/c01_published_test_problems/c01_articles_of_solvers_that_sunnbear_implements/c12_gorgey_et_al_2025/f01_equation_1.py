@@ -35,7 +35,10 @@ class GorgeyEtAl2025Equation1(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A quintic with 2 simple roots below a triple root, which is the only root on the narrow interval.",
+        summary=(
+            "A quintic with 2 simple roots and, above them, a triple root, which is the only root on the narrow "
+            "interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -43,7 +43,7 @@ class RootsJl2026FunctionFunc2(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "An exponential minus a quartic, with 3 roots on the wide interval and 1 on the narrow one, rising steeply "
-            "toward the upper bound."
+            "above the highest root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -34,8 +34,8 @@ class DowellJarratt1971Table2(Formula):
         expression=r"2 \tmp{u} e^{- \param{n}} + 1 - 2 e^{- \param{n} \tmp{u}}",
         interval="[0, 1]",
         summary=(
-            r"An increasing concave function with 1 root, which nears $\x = \c$ as $\param{n}$ grows; for large "
-            r"$\param{n}$, the function is nearly 1 beyond $5/\param{n}$ above that root."
+            r"An increasing function with 1 simple root, which nears $\x = \c$ as $\param{n}$ grows; for $\param{n} "
+            r"\geq 20$, the function is nearly 1 beyond $5/\param{n}$ above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

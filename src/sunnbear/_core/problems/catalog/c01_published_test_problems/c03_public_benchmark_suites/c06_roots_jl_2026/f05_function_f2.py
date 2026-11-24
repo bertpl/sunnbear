@@ -29,8 +29,8 @@ class RootsJl2026FunctionF2(Formula):
         expression=r"\tmp{u}^{5} - \tmp{u} - 1",
         interval="[0.5, 5]",
         summary=(
-            "A quintic with 1 real root, nearly flat around a local minimum 0.5 below that root, and steep toward the "
-            "upper bound."
+            "A quintic with 1 real root, nearly flat around a local minimum 0.5 below that root, and steep above the "
+            "root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

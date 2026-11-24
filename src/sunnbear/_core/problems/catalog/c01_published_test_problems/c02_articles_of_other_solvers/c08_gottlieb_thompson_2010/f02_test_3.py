@@ -36,8 +36,8 @@ class GottliebThompson2010Test3(Formula):
         expression=r"11 \tmp{u}^{11} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "An 11th power minus 1, steepest at the upper bound and within 0.01 of $-1$ on any part of the interval "
-            "more than 0.28 below the root."
+            "An 11th power minus 1, with 1 root, steep toward the upper bound and within 0.01 of $-1$ on the interval "
+            "more than 0.28 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

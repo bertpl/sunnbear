@@ -55,7 +55,7 @@ class ChapraCanale2015EquationPt23(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A decreasing function with 1 simple root, the drag coefficient at which a falling parachutist reaches a "
+            r"A decreasing function of the drag coefficient with 1 simple root, where a falling parachutist reaches a "
             r"target velocity after $\param{t}$ seconds."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $c$, the drag coefficient, in kg/s.",),

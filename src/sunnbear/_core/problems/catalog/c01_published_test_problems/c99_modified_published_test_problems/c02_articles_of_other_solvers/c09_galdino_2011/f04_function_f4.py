@@ -42,8 +42,8 @@ class ModifiedGaldino2011FunctionF4(Formula):
         expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",
         interval="[1, 2]",
         summary=(
-            r"A function that changes sign at its root of multiplicity 4, with values below $2 \cdot 10^{-4}$ in "
-            r"magnitude within 0.12 of that root."
+            "A function that changes sign at a root of multiplicity 4 and is still only about $10^{-4}$ in magnitude at"
+            " 0.1 from that root."
         ),
         notes=(
             (

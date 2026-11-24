@@ -35,8 +35,8 @@ class Borchers2026FunctionF1(Formula):
         ),
         interval="[0, 1.2]",
         summary=(
-            "An increasing function with 1 root, flat 0.4 below that root, at a stationary inflection where the first 2"
-            " derivatives are 0."
+            r"An increasing function with 1 simple root, 0.4 above a stationary inflection at $\x = 1.2 \c$, around "
+            r"which the function is nearly flat."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

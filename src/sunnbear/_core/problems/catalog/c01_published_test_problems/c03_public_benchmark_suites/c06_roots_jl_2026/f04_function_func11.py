@@ -31,8 +31,8 @@ class RootsJl2026FunctionFunc11(Formula):
         expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 2]",
         summary=(
-            "An exponential minus a cosine, with 1 root on either side of a shallow minimum, and much larger values "
-            "toward the lower bound."
+            "An exponential minus a cosine, with 1 root on either side of a shallow minimum, and values that grow "
+            "exponentially below the lower root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

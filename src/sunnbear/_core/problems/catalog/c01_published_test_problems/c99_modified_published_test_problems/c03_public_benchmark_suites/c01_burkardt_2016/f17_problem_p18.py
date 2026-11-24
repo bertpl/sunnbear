@@ -56,8 +56,8 @@ class ModifiedBurkardt2016ProblemP18(Formula):
         expression=r"{10.0}^{14} \left(\tmp{u} - 1\right)^{7}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function so flat at its root of multiplicity 7 that the function stays below $10^{-4}$ in magnitude on "
-            "more than 20% of each interval."
+            "A function so flat at its root of multiplicity 7 that the function stays below $10^{-4}$ in magnitude on a"
+            " band 0.005 wide around that root."
         ),
         notes=(
             (
