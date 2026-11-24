@@ -28,7 +28,8 @@ class ModifiedBradie2006Section21Page67(Formula):
     20000`` and ``13000, 250, 20000``, and gives no interval: since ``13000 + 36*200 = 20200`` already exceeds 20000,
     the goal is met even at ``r = 0``, and both roots are negative, about -0.0041 and -0.0405.
 
-    At ``x = 0``, where the published function divides 0 by 0, the formula takes its limit, ``P + 36*d - A``.
+    The parameters ``P``, ``d`` and ``A`` are the initial investment, the monthly deposit and the goal. At ``x = 0``,
+    where the published function divides 0 by 0, the formula takes its limit, ``P + 36*d - A``.
 
     The formula computes the published function in the equivalent form ``expm1(36*log1p(x/12)) * (P + 12*d/x) - (A -
     P)``, on the published interval.
