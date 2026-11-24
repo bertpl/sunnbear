@@ -151,9 +151,9 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.2.3[alpha=0.5]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.2.3[alpha=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.2.3[alpha=2.0]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
-| `f1.4.2.5[a_=3.4]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[a_=3.4,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
-| `f1.4.2.5[a_=3.5]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[a_=3.5,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
-| `f1.4.2.5[a_=3.99]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[a_=3.99,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
+| `f1.4.2.5[mu=3.4]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[mu=3.4,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
+| `f1.4.2.5[mu=3.5]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[mu=3.5,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
+| `f1.4.2.5[mu=3.99]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.5[mu=3.99,a=0.01,b=1.0,c_scale=0.99]` | interval changed to `[0.01, 1]` |  |
 | `f1.4.2.6` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.3.1` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.3.1` | interval changed to `[0.04, 4]` |  |
 | `f1.4.3.2` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.3.2` | f in an equivalent form without cancellation; the modified test problem is rejected by `bisection_count_not_exact` | yes |

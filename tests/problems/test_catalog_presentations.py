@@ -127,6 +127,30 @@ def test_categories_declare_their_descriptions():
     assert failing == []
 
 
+def test_symbols_a_and_b_are_the_interval_bounds():
+    """A shipped formula's parameter named or shown as ``a`` or ``b`` is its interval's lower or upper bound.
+
+    Such a parameter has the same name and symbol, and in each parameter tuple of the formula's recipes its value is
+    the bound that `interval_bounds` returns, so that a reader meets a and b as the bounds in every formula.
+    """
+    # --- act --------------------------
+    bound_index = {"a": 0, "b": 1}
+    failing = []
+    for formula in _SHIPPED_FORMULAS:
+        for i_param, param in enumerate(formula.params):
+            if param.name in bound_index or param.latex_symbol in bound_index:
+                is_bound = param.name == param.latex_symbol and all(
+                    formula.interval_bounds(*param_values)[bound_index[param.name]] == param_values[i_param]
+                    for recipe in formula.recipes()
+                    for param_values in recipe.tuples()
+                )
+                if not is_bound:
+                    failing.append(f"{formula.label}: {param.name}")
+
+    # --- assert -----------------------
+    assert failing == []
+
+
 # ==================================================================================================
 #  How c applies
 # ==================================================================================================
