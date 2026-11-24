@@ -60,9 +60,9 @@ class ModifiedBradie2006Section21Page67(Formula):
     number = (1, 99, 4, 4, 7)
     name = "Section 2.1 (page 67)"
     params = (
-        FormulaParam("initial_investment", latex_symbol=r"\mathit{investment}"),
-        FormulaParam("monthly_deposit", latex_symbol=r"\mathit{monthly\ deposit}"),
-        FormulaParam("goal", latex_symbol=r"\mathit{goal}"),
+        FormulaParam("initial_investment", latex_symbol="P", meaning="The initial investment."),
+        FormulaParam("monthly_deposit", latex_symbol="d", meaning="The deposit at the end of each month."),
+        FormulaParam("goal", latex_symbol="A", meaning="The balance that the savings must reach after 3 years."),
     )
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
