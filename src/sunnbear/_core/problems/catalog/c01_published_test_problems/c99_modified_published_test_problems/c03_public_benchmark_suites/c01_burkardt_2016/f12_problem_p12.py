@@ -48,11 +48,11 @@ class ModifiedBurkardt2016ProblemP12(Formula):
     name = "Problem p12"
     params = (
         FormulaParam(
-            "factor",
+            "k",
             latex_symbol="k",
             meaning=(
                 r"The scale of $\fn{g}$: for $\x \neq 1$, "
-                r"$\fn{g}(\x) = \param{factor} (\x - 1) e^{-1/(\x - 1)^2}$."
+                r"$\fn{g}(\x) = \param{k} (\x - 1) e^{-1/(\x - 1)^2}$."
             ),
         ),
         FormulaParam("a", latex_symbol="a"),
@@ -66,9 +66,9 @@ class ModifiedBurkardt2016ProblemP12(Formula):
             (
                 r"\fn{g}(\x)",
                 (
-                    r"\begin{cases} -\exp\left(\ln(\param{factor}) + \ln\left(\left|\x - 1\right|\right) "
+                    r"\begin{cases} -\exp\left(\ln(\param{k}) + \ln\left(\left|\x - 1\right|\right) "
                     r"- \frac{1}{(\x - 1)^2}\right) & \text{if } \x < 1 \\ 0 & \text{if } \x = 1 \\ "
-                    r"\exp\left(\ln(\param{factor}) + \ln\left(\left|\x - 1\right|\right) "
+                    r"\exp\left(\ln(\param{k}) + \ln\left(\left|\x - 1\right|\right) "
                     r"- \frac{1}{(\x - 1)^2}\right) & \text{otherwise} \end{cases}"
                 ),
             ),
@@ -91,21 +91,21 @@ class ModifiedBurkardt2016ProblemP12(Formula):
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, factor: float, a: float, b: float, c_scale: float) -> float:
+    def parametrized_fun(x: float, c: float, k: float, a: float, b: float, c_scale: float) -> float:
         """Evaluate the published function at ``y = x - c_scale*c``, and add ``TINY_LINEAR_TERM_SLOPE*(y - 1)``.
 
         Category 1 states the rule for ``c_scale``.
         """
         x = x - c_scale * c
         if x < 1.0:
-            published_value = -math.exp(math.log(factor) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
+            published_value = -math.exp(math.log(k) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
         elif x == 1.0:
             published_value = 0.0
         else:
-            published_value = math.exp(math.log(factor) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
+            published_value = math.exp(math.log(k) + math.log(abs(x - 1.0)) - 1.0 / (x - 1.0) ** 2)
         return published_value + TINY_LINEAR_TERM_SLOPE * (x - 1.0)
 
-    def interval_bounds(self, factor: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
+    def interval_bounds(self, k: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -113,7 +113,7 @@ class ModifiedBurkardt2016ProblemP12(Formula):
         """Return the parameter values of the modified test problems."""
         return (
             ParamTable(
-                names=("factor", "a", "b", "c_scale"),
+                names=("k", "a", "b", "c_scale"),
                 rows=(
                     (1000.0, -4.0, 4.1, 8.1),
                     (1000.0, 0.5, 2.0, 1.5),
@@ -126,29 +126,27 @@ class ModifiedBurkardt2016ProblemP12(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, expected=(-4.0, 4.1)
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, expected=(-4.0, 4.1)
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.25, expected=-4382.445368656935
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.25, expected=-4382.445368656935
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1},
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1},
             x=1.0001,
             c=0.0,
             expected=4.512985939661577e-281,
             atol=0.0,
         ),
-        FormulaTestCase.interval_bounds(
-            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5}, expected=(0.5, 2.0)
-        ),
+        FormulaTestCase.interval_bounds(params={"k": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5}, expected=(0.5, 2.0)),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5},
+            params={"k": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5},
             x=1.0001,
             c=0.0,
             expected=4.512985939661577e-281,
             atol=0.0,
         ),
         FormulaTestCase.value(
-            params={"factor": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=1.0, c=0.0, expected=0.0, atol=0.0
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=1.0, c=0.0, expected=0.0, atol=0.0
         ),
     )

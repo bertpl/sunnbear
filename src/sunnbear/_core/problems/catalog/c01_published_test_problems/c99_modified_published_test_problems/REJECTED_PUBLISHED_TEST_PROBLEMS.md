@@ -114,8 +114,8 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.2.18.24` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.3.1.4[a=1e-05,b=20.0,c_scale=20.0]` | `calibration_c_range_too_narrow` | some parameter tuples modified | `f1.99.3.1.4` | `c` scales x |  |
 | `f1.3.1.6[a=1e-05,b=20.0,c_scale=20.0]` | `calibration_no_finite_sign_change_at_0` | some parameter tuples modified | `f1.99.3.1.6` | interval changed to `[0.08, 20]` |  |
-| `f1.3.1.12[factor=1000.0,a=-4.0,b=4.1,c_scale=8.1]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.12[factor=1000.0,a=-4.0,b=4.1,c_scale=8.1]` | a tiny linear term added to f | yes |
-| `f1.3.1.12[factor=1000.0,a=0.5,b=2.0,c_scale=1.5]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.12[factor=1000.0,a=0.5,b=2.0,c_scale=1.5]` | a tiny linear term added to f | yes |
+| `f1.3.1.12[k=1000.0,a=-4.0,b=4.1,c_scale=8.1]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.12[k=1000.0,a=-4.0,b=4.1,c_scale=8.1]` | a tiny linear term added to f | yes |
+| `f1.3.1.12[k=1000.0,a=0.5,b=2.0,c_scale=1.5]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.12[k=1000.0,a=0.5,b=2.0,c_scale=1.5]` | a tiny linear term added to f | yes |
 | `f1.3.1.17[a=0.988,b=1.012,c_scale=0.024]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.3.1.17[a=0.988,b=1.012,c_scale=0.024]` | f in an equivalent form without cancellation; the modified test problem is rejected by `bisection_count_not_exact` | yes |
 | `f1.3.1.17[a=0.99,b=1.013,c_scale=0.023]` | `calibration_fails_at_benchmark_c_values` | all parameter tuples modified | `f1.99.3.1.17[a=0.99,b=1.013,c_scale=0.023]` | f in an equivalent form without cancellation | yes |
 | `f1.3.2.3` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.3.2.3` | `c` added to f | yes |
@@ -165,8 +165,8 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.4.2[a=2.14159265359,b=3.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
 | `f1.4.4.2[a=3.14159265359,b=4.14159265359,c_scale=1.0]` | `calibration_no_finite_sign_change_at_0` | no action | | the roots lie too close to `pi` for float64: f has the same sign at both bounds | |
 | `f1.4.4.6[a=0.0,b=0.5,c_scale=0.5]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.4.4.6` | interval changed to `[0, 0.495]` |  |
-| `f1.4.4.7[initial_investment=13500.0,monthly_deposit=250.0,goal=25000.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.7[initial_investment=13500.0,monthly_deposit=250.0,goal=25000.0]` | f in an equivalent form with less cancellation |  |
-| `f1.4.4.7[initial_investment=12500.0,monthly_deposit=300.0,goal=25000.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.7[initial_investment=12500.0,monthly_deposit=300.0,goal=25000.0]` | f in an equivalent form with less cancellation |  |
+| `f1.4.4.7[P=13500.0,d=250.0,A=25000.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.7[P=13500.0,d=250.0,A=25000.0]` | f in an equivalent form with less cancellation |  |
+| `f1.4.4.7[P=12500.0,d=300.0,A=25000.0]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.7[P=12500.0,d=300.0,A=25000.0]` | f in an equivalent form with less cancellation |  |
 | `f1.4.4.28` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.4.4.28` | f in an equivalent form without cancellation |  |
 | `f1.4.5.8` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.5.8` | interval changed to `[0.03, 3.141592653589793]` |  |
 | `f1.4.5.10` | `calibration_no_finite_sign_change_at_0` | no action | | f has no real root | |

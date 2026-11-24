@@ -28,11 +28,10 @@ class ModifiedBradie2006Section21Page67(Formula):
     20000`` and ``13000, 250, 20000``, and gives no interval: since ``13000 + 36*200 = 20200`` already exceeds 20000,
     the goal is met even at ``r = 0``, and both roots are negative, about -0.0041 and -0.0405.
 
-    At ``x = 0``, where the published function divides 0 by 0, the formula takes its limit, ``initial_investment +
-    36*monthly_deposit - goal``.
+    At ``x = 0``, where the published function divides 0 by 0, the formula takes its limit, ``P + 36*d - A``.
 
-    The formula computes the published function in the equivalent form ``expm1(36*log1p(x/12)) * (initial_investment +
-    12*monthly_deposit/x) - (goal - initial_investment)``, on the published interval.
+    The formula computes the published function in the equivalent form ``expm1(36*log1p(x/12)) * (P + 12*d/x) - (A -
+    P)``, on the published interval.
 
     ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the published interval.
 
@@ -45,12 +44,12 @@ class ModifiedBradie2006Section21Page67(Formula):
     root.
 
     ``expm1(36*log1p(x/12))`` computes ``(1 + x/12)**36 - 1`` without rounding ``1 + x/12`` and without the subtraction
-    of 1; the form still subtracts ``goal - initial_investment``, because f is by definition the savings after 3 years
-    minus the goal, and the form moves the ``initial_investment`` term of the savings into that subtraction.
+    of 1; the form still subtracts ``A - P``, because f is by definition the savings after 3 years minus the goal, and
+    the form moves the ``P`` term of the savings into that subtraction.
 
-    The subtraction of ``goal - initial_investment`` still leaves f exactly 0 at 3 to 10 x-values, all within about
-    1e-16 of the root, so that bisection can still stop early for some values of ``c``, but for none of the values of
-    ``c`` of the shipped Monte Carlo tuple set.
+    The subtraction of ``A - P`` still leaves f exactly 0 at 3 to 10 x-values, all within about 1e-16 of the root, so
+    that bisection can still stop early for some values of ``c``, but for none of the values of ``c`` of the shipped
+    Monte Carlo tuple set.
 
     Whether bisection lands on an x-value where f is exactly 0 depends on the parameter tuple and on the sampled values
     of ``c``, so the parameter tuples that the validation stage rejects can change with the sampled values; the formula
@@ -60,19 +59,19 @@ class ModifiedBradie2006Section21Page67(Formula):
     number = (1, 99, 4, 4, 7)
     name = "Section 2.1 (page 67)"
     params = (
-        FormulaParam("initial_investment", latex_symbol="P", meaning="The initial investment."),
-        FormulaParam("monthly_deposit", latex_symbol="d", meaning="The deposit at the end of each month."),
-        FormulaParam("goal", latex_symbol="A", meaning="The target balance after 3 years."),
+        FormulaParam("P", latex_symbol="P", meaning="The initial investment."),
+        FormulaParam("d", latex_symbol="d", meaning="The deposit at the end of each month."),
+        FormulaParam("A", latex_symbol="A", meaning="The target balance after 3 years."),
     )
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.09 \c"),),
         expression=(
-            r"\begin{cases} \param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & "
+            r"\begin{cases} \param{P} + 36 \param{d} - \param{A} & "
             r"\text{if } \tmp{u} = 0 \\ \operatorname{expm1}\left(36 "
             r"\operatorname{log1p}\left(\frac{\tmp{u}}{12}\right)\right) "
-            r"\left(\param{initial_investment} + \frac{12 \param{monthly_deposit}}{\tmp{u}}\right) - "
-            r"\left(\param{goal} - \param{initial_investment}\right) & \text{otherwise} \end{cases}"
+            r"\left(\param{P} + \frac{12 \param{d}}{\tmp{u}}\right) - "
+            r"\left(\param{A} - \param{P}\right) & \text{otherwise} \end{cases}"
         ),
         interval="[0.01, 0.1]",
         summary=(
@@ -82,9 +81,9 @@ class ModifiedBradie2006Section21Page67(Formula):
         notes=(
             r"$\tmp{u}$ is the source's variable $r$, the annual interest rate.",
             (
-                r"The expression equals the published function, $$\param{initial_investment} \left(1 + "
-                r"\frac{\tmp{u}}{12}\right)^{36} + \param{monthly_deposit} \frac{\left(1 + "
-                r"\tmp{u}/12\right)^{36} - 1}{\tmp{u}/12} - \param{goal},$$ without rounding $1 + "
+                r"The expression equals the published function, $$\param{P} \left(1 + "
+                r"\frac{\tmp{u}}{12}\right)^{36} + \param{d} \frac{\left(1 + "
+                r"\tmp{u}/12\right)^{36} - 1}{\tmp{u}/12} - \param{A},$$ without rounding $1 + "
                 r"\tmp{u}/12$ to float64 and without subtracting 1, which makes the published function "
                 "exactly 0 at many x-values next to the root."
             ),
@@ -97,7 +96,7 @@ class ModifiedBradie2006Section21Page67(Formula):
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, initial_investment: float, monthly_deposit: float, goal: float) -> float:
+    def parametrized_fun(x: float, c: float, P: float, d: float, A: float) -> float:
         """Evaluate the published function at ``y = x - c_scale*c``, in an equivalent form with ``expm1`` and ``log1p``.
 
         Category 1 states the rule for ``c_scale``.
@@ -105,14 +104,12 @@ class ModifiedBradie2006Section21Page67(Formula):
         x = x - 0.09 * c
         if x == 0.0:
             # at x = 0, the factor ((1 + x/12)^36 - 1)/(x/12) takes its limit 36
-            return initial_investment + 36.0 * monthly_deposit - goal
+            return P + 36.0 * d - A
         else:
             growth_factor_minus_1 = math.expm1(36.0 * math.log1p(x / 12.0))
-            return growth_factor_minus_1 * (initial_investment + 12.0 * monthly_deposit / x) - (
-                goal - initial_investment
-            )
+            return growth_factor_minus_1 * (P + 12.0 * d / x) - (A - P)
 
-    def interval_bounds(self, initial_investment: float, monthly_deposit: float, goal: float) -> tuple[float, float]:
+    def interval_bounds(self, P: float, d: float, A: float) -> tuple[float, float]:
         """Return the formula's interval."""
         return (0.01, 0.1)
 
@@ -120,36 +117,34 @@ class ModifiedBradie2006Section21Page67(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("initial_investment", "monthly_deposit", "goal"),
+                names=("P", "d", "A"),
                 rows=((13500.0, 250.0, 25000.0), (14000.0, 250.0, 25000.0), (12500.0, 300.0, 25000.0)),
                 summary="The published parameter values.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.interval_bounds(
-            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0}, expected=(0.01, 0.1)
-        ),
+        FormulaTestCase.interval_bounds(params={"P": 14000.0, "d": 250.0, "A": 25000.0}, expected=(0.01, 0.1)),
         FormulaTestCase.value(
-            params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 13500.0, "d": 250.0, "A": 25000.0},
             x=0.037,
             c=0.25,
             expected=-1707.2154378902246,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 14000.0, "d": 250.0, "A": 25000.0},
             x=0.037,
             c=0.25,
             expected=-1184.9991543651379,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 12500.0, "monthly_deposit": 300.0, "goal": 25000.0},
+            params={"P": 12500.0, "d": 300.0, "A": 25000.0},
             x=0.037,
             c=0.25,
             expected=-913.0590235539113,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 14000.0, "d": 250.0, "A": 25000.0},
             x=0.0,
             c=0.0,
             expected=-2000.0,
