@@ -255,6 +255,7 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - declares its `location_in_publication`, which names the table, section or exercise set of each of the rows' keys, and which the module's author writes from those keys and the source's `where_in_source`, such as `Table I, problem 12` for the row keyed `12`;
 - declares each parameter with a LaTeX symbol:
   - a source's own parameter is a `FormulaParam` with the source's symbol for it; where that symbol is `u`, which the presentation uses for the shifted variable `\x - c_scale \c`, the parameter takes another symbol, such as `u_{\mathrm{ex}}` for an exhaust velocity;
+  - a source's own parameter that the source names with a word, as in source code or a word problem, takes a conventional letter as its symbol, such as `P` for an initial investment, and a `meaning` that says what the parameter is; `src/sunnbear/_core/problems/catalog/PARAMETER_NAMES.md` gives the rule for symbols;
   - the bounds of a formula with several intervals take `a` and `b`, or `x_{\min}` and `x_{\max}` where the source has its own parameter named `a` or `b`;
   - `c_scale` takes `s`, with no `meaning`: category 1 states the rule for `c_scale` once, in `PublishedTestProblems`;
 - declares a `presentation` with 3 parts:

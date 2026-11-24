@@ -28,7 +28,7 @@ class Burkardt2016ProblemP13(Formula):
     number = (1, 3, 1, 13)
     name = "Problem p13"
     params = (
-        FormulaParam("slope", latex_symbol=r"\mathit{slope}"),
+        FormulaParam("slope", latex_symbol="m", meaning="The line's slope."),
         FormulaParam("a", latex_symbol="a"),
         FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),

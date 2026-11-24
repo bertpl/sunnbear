@@ -49,7 +49,7 @@ class ModifiedBurkardt2016ProblemP12(Formula):
     params = (
         FormulaParam(
             "factor",
-            latex_symbol=r"\mathit{factor}",
+            latex_symbol="k",
             meaning=(
                 r"The scale of $\fn{g}$: for $\x \neq 1$, "
                 r"$\fn{g}(\x) = \param{factor} (\x - 1) e^{-1/(\x - 1)^2}$."
