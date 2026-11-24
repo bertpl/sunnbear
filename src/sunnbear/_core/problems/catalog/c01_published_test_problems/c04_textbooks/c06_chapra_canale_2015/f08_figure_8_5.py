@@ -55,6 +55,7 @@ class ChapraCanale2015Figure85(Formula):
             "The Colebrook equation for the friction factor, decreasing through 1 simple root and about 30 times as "
             "steep at the lower bound as at the upper."
         ),
+        notes=(r"$\tmp{u}$ is the source's $f$, the friction factor.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

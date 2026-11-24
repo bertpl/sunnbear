@@ -47,6 +47,7 @@ class ChapraCanale2015Figure86(Formula):
             "The fixed-point form of the Colebrook equation for the friction factor, increasing and concave, with 1 "
             "simple root."
         ),
+        notes=(r"$\tmp{u}$ is the source's $f$, the friction factor.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
