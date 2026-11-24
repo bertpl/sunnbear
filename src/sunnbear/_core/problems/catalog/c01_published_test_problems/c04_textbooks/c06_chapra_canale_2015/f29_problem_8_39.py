@@ -25,8 +25,8 @@ class ChapraCanale2015Problem839(Formula):
     Unknown `t`, the time at which the velocity is 1000 m/s, to within 1%; the book's hint gives the interval. The book
     prints `ln`.
 
-    The parameter ``u`` takes the symbol ``u_ex``, because ``u`` is the symbol of the shifted variable in every formula
-    of category 1.
+    The parameter ``u`` does not take the source's symbol, because ``u`` is the symbol of the shifted variable in every
+    formula of category 1.
     """
 
     number = (1, 4, 6, 29)
