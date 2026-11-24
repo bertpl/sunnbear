@@ -17,16 +17,27 @@ _CITATION_KEY_PATTERN = re.compile(r"[A-Z][A-Za-z]*(?P<year_digits>[0-9]{2})[a-z
 class Publication:
     """`Publication` holds a publication of formulas as 1 CSL-JSON item, from which a consumer renders its citation.
 
-    A publication is any kind of source of formulas: an article, a book, a web page, a code repository or a data set.
+    A publication is any kind of source of formulas:
+
+    - an article or a book;
+    - a web page;
+    - a code repository or a data set.
+
     CSL-JSON is the data model of the Citation Style Language, which Zotero and Pandoc use: an item is a JSON object
     with a ``type``, such as ``article-journal``, ``book`` or ``software``, and the fields of that type, such as
-    ``container-title`` for a journal and ``publisher`` for a book's publisher. sunnbear renders no citation; a
-    consumer, such as the website, renders each item in a style of its choice.
+    ``container-title`` for a journal and ``publisher`` for a book's publisher.
 
-    Every field keeps the meaning that CSL gives it: ``issued`` is the date of issue, which is an article's issue, a
-    book's edition or a code source's release or commit, and an earlier online date is ``available-date``. ``note``
-    holds a remark for a reader of the publication, such as where the authors' code is; a remark for the maintainers
-    of the catalog goes in the ``notes`` of the publication's file in the survey of published test problems.
+    sunnbear renders no citation; a consumer renders each item in a citation style of its choice.
+
+    Every field keeps the meaning that CSL gives it:
+
+    - ``issued`` is the date of issue: that of an article's issue, a book's edition, or a code repository's release
+      or commit;
+    - ``available-date`` is an earlier online date;
+    - ``note`` holds a remark for a reader of the publication, such as where the authors' code is.
+
+    A remark about 1 formula goes in the ``notes`` of that formula's presentation, and a remark for the maintainers of
+    the catalog goes in the ``notes`` of the publication's source file in ``data/literature_test_problems/sources/``.
 
     The catalog's tests require every shipped item to be valid against the published CSL-JSON schema.
 
@@ -39,14 +50,15 @@ class Publication:
     csl_item: dict[str, Any] = field(hash=False)
 
     def __post_init__(self) -> None:
-        """Check that the item's ``id`` is a citation key whose 2 digits are those of the item's year.
+        """Check that the item's ``id`` is a citation key whose 2 digits are the last 2 digits of the item's year.
 
         The year is that of ``issued``, or of ``accessed`` for an item without a date of issue, such as an unversioned
         web page.
 
         Raises:
-            ValueError: If the ``id`` is not a capitalized name, 2 digits and an optional lowercase letter, or if its 2
-                digits are not the last 2 digits of the year.
+            KeyError: If the item has no ``id``.
+            ValueError: If the ``id`` is not a capitalized name, 2 digits and an optional lowercase letter, or if the
+                item has a year and the ``id``'s 2 digits are not its last 2 digits.
         """
         citation_key = self.citation_key
         match = _CITATION_KEY_PATTERN.fullmatch(citation_key)
@@ -83,6 +95,6 @@ class Publication:
     # --------------------------------------------------------------------------
     @classmethod
     def from_csl_json_file(cls, path: Path) -> "Publication":
-        """Return the publication whose CSL-JSON item the file at `path` holds, as a JSON object."""
+        """Return the publication of the CSL-JSON item that the file at `path` holds as 1 JSON object."""
         csl_item = json.loads(path.read_text(encoding="utf-8"))
         return cls(csl_item=csl_item)

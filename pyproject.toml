@@ -218,7 +218,8 @@ invalid-method-override = "ignore"
 # "intoto": the in-toto attestation format (provenance.intoto.jsonl).
 # "ned" is the first name of Ned Ganchovski, whose code THIRD_PARTY_NOTICES.md covers.
 # "trough" is a water trough in a textbook exercise of data/literature_test_problems/.
-# "annote" is a field of CSL-JSON, the data model of the publications' items and of the schema that the tests copy.
+# "annote" is a field of CSL-JSON, the data model of the publications' items; it appears in the copy of the CSL-JSON
+# schema in tests/problems/csl_schema/.
 ignore-words-list = "annote,intoto,ned,trough"
 
 [tool.pytest.ini_options]

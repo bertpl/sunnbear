@@ -79,10 +79,7 @@ def test_citation_keys_are_unique():
 
 
 def test_publications_declare_their_title_and_year():
-    """A shipped publication's item has a title and a year, and its category's name ends in that year.
-
-    A category's name ends in its publication's year, such as "Brent (1973)".
-    """
+    """A shipped publication's item has a title and a year, and its category's name ends in that year."""
     # --- act --------------------------
     failing = []
     for category in _SINGLE_PUBLICATION_CATEGORIES:
@@ -99,8 +96,8 @@ def test_publications_declare_their_title_and_year():
 def test_publications_are_valid_csl_json_items():
     """Every shipped publication's item is valid against the published CSL-JSON schema.
 
-    A consumer that renders a citation ignores a field that it does not know, so a misspelled field would make a part
-    of the citation vanish with no error; the schema allows no field that it does not define.
+    A consumer that renders a citation ignores a field that it does not know, so a misspelled field would leave a part
+    of the citation out without an error; the schema allows no field that it does not define.
     """
     # --- arrange ----------------------
     schema = json.loads(_CSL_DATA_SCHEMA_PATH.read_text(encoding="utf-8"))

@@ -60,7 +60,7 @@ def test_citation_key_that_does_not_end_in_the_year_is_rejected():
 
 
 def test_publication_is_built_from_its_csl_json_file(tmp_path):
-    """`Publication.from_csl_json_file` builds the publication whose item a JSON file holds."""
+    """`Publication.from_csl_json_file` builds a publication from the CSL-JSON item in a JSON file."""
     # --- arrange ----------------------
     path = tmp_path / "publication.csl.json"
     path.write_text(json.dumps(_ITEM), encoding="utf-8")
