@@ -47,8 +47,8 @@ class ChapraCanale2015Problem518(Formula):
     location_in_publication = "Prob. 5.18"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{T}", r"\x - 40 \c"),
-            (r"\tmp{T_a}", r"\tmp{T} + 273.15"),
+            (r"\tmp{u}", r"\x - 40 \c"),
+            (r"\tmp{T_a}", r"\tmp{u} + 273.15"),
         ),
         expression=(
             r"\ln(\param{osf}) - \left(-139.34411 + \frac{1.575701 \cdot 10^{5}}{\tmp{T_a}} "
@@ -60,6 +60,7 @@ class ChapraCanale2015Problem518(Formula):
             r"An increasing function of the temperature, with 1 simple root: the temperature at which freshwater's "
             r"saturation concentration of dissolved oxygen is $\param{osf}$."
         ),
+        notes=(r"$\tmp{u}$ is the source's variable $T$, the temperature, in °C.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

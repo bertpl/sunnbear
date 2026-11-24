@@ -73,6 +73,7 @@ class ModifiedChapraCanale2015EquationPt23(Formula):
             r"reaches a target velocity after $\param{t}$ seconds."
         ),
         notes=(
+            r"$\tmp{u}$ is the source's variable $c$, the drag coefficient, in kg/s.",
             (
                 r"The expression equals the published function, $$\frac{\param{g} \param{m}}{\tmp{u}} "
                 r"\left(1 - e^{- \frac{\tmp{u}}{\param{m}} \param{t}}\right) - \param{v},$$ without the "

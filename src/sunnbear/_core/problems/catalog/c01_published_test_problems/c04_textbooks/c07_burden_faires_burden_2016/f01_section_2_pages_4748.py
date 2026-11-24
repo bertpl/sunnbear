@@ -35,11 +35,11 @@ class BurdenFairesBurden2016Section2Pages4748(Formula):
     params = ()
     location_in_publication = "§2 (pp. 47–48); Exercise 2.3-22"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{\lambda}", r"\x - \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} "
-            r"1564000 - (1000000 + 435000) & \text{if } \tmp{\lambda} = 0 \\ "
-            r"1564000 - \left(1000000 e^{\tmp{\lambda}} + \frac{435000}{\tmp{\lambda}} (e^{\tmp{\lambda}} - 1)\right) "
+            r"1564000 - (1000000 + 435000) & \text{if } \tmp{u} = 0 \\ "
+            r"1564000 - \left(1000000 e^{\tmp{u}} + \frac{435000}{\tmp{u}} (e^{\tmp{u}} - 1)\right) "
             r"& \text{otherwise} "
             r"\end{cases}"
         ),
@@ -48,6 +48,7 @@ class BurdenFairesBurden2016Section2Pages4748(Formula):
             r"A decreasing function with 1 root, and with rounding in $e^\x - 1$ making the function negative on 2 "
             r"bands within $3.5 \cdot 10^{-16}$ of the lower bound."
         ),
+        notes=(r"$\tmp{u}$ is the source's variable $\lambda$, the birthrate of the population.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

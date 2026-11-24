@@ -36,9 +36,9 @@ class ChapraCanale2015Problem515(Formula):
     )
     location_in_publication = "Prob. 5.15"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{H}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=(
-            r"\param{v} - \sqrt{2 \param{g} \tmp{H}} \tanh{\left(\frac{\sqrt{2 \param{g} \tmp{H}}}{2 "
+            r"\param{v} - \sqrt{2 \param{g} \tmp{u}} \tanh{\left(\frac{\sqrt{2 \param{g} \tmp{u}}}{2 "
             r"\param{L}} \param{t} \right)}"
         ),
         interval="[0, 2]",
@@ -46,6 +46,7 @@ class ChapraCanale2015Problem515(Formula):
             "A target velocity minus the outflow velocity of a tank drained through a long pipe, as a decreasing "
             "function of the tank's initial head with 1 simple root."
         ),
+        notes=(r"$\tmp{u}$ is the source's variable $H$, the tank's initial head, in m.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

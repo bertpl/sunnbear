@@ -29,16 +29,17 @@ class Bradie2006Exercise2117(Formula):
     params = ()
     location_in_publication = "Exercise 2.1-17"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{\zeta}", r"\x - 0.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=(
-            r"\cos{\left(4 \tmp{\zeta} \sqrt{1 - \tmp{\zeta}^{2}} \right)} - \left(-1 + 8 "
-            r"\tmp{\zeta}^{2} - 8 \tmp{\zeta}^{4}\right)"
+            r"\cos{\left(4 \tmp{u} \sqrt{1 - \tmp{u}^{2}} \right)} - \left(-1 + 8 "
+            r"\tmp{u}^{2} - 8 \tmp{u}^{4}\right)"
         ),
         interval="[0, 0.5]",
         summary=(
             r"An even function, decreasing from a maximum at the lower bound $\x = 0$ to 1 simple root in the upper 20%"
             r" of the interval."
         ),
+        notes=(r"$\tmp{u}$ is the source's variable $\zeta$, the nondimensional damping coefficient.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

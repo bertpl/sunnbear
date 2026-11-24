@@ -7,6 +7,7 @@ A parameter's name is part of a test problem's id, as in `f2.1.2[p=4.0,w=10^0.3]
 ## Reserved names
 
 - **`x` and `c`** are arguments of every formula: the point of evaluation, and the parameter that a benchmark varies per sample.
+- **`f`** names the function itself, as in the display `f(x, c) = …` of every formula's presentation.
 - **`a`, `b` and `c_scale`** are parameters of the formulas of category 1: the bounds of a formula's interval and the scale of its shift along x. The class docstring of `PublishedTestProblems` states their rules.
 - **`a` and `b` also name the bounds of the interval when a formula outside category 1 takes its interval as a parameter**, as in `BernoulliPolynomial`. The class docstring of such a formula states which values `a` and `b` may take.
 - **A reserved name or a Python keyword gets a trailing underscore**, as in `a_` and `lambda_`.
