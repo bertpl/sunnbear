@@ -45,7 +45,7 @@ class Ellithy2026Problem17(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"Kepler's equation for the eccentric anomaly, at eccentricities $\param{e}$ from 0.5 to 0.99, with 1 "
-            r"simple root on each interval."
+            r"simple root on each published interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

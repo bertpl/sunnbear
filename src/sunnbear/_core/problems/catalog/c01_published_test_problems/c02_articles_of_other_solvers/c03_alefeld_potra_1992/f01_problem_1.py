@@ -38,7 +38,8 @@ class AlefeldPotra1992Problem1(Formula):
         expression=r"\tmp{u}^{3} - \param{k}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A cubic with 1 simple root on each interval, and a slope that falls to 0 at $\x = \param{c_scale} \c$."
+            r"A cubic with 1 simple root on each published interval, and a slope that falls to 0 at $\x = "
+            r"\param{c_scale} \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

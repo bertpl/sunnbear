@@ -33,7 +33,7 @@ class ScimlbenchmarksJl2026FunctionG(Formula):
         interval="[-100, 0]",
         summary=(
             "An exponential minus $10^{-15}$, with 1 root, at most $10^{-15}$ in magnitude below that root, and "
-            "constant in floating point from 37 below that root downward."
+            "constant in floating point at every point more than 37 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -35,7 +35,9 @@ class RootsFortran2025Case155(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u}^{2} - \tmp{u} - 6.0\right) \left(\tmp{u}^{2} - 3.0 \tmp{u} + 2.0\right)",
         interval=r"[\param{a}, \param{b}]",
-        summary="A quartic with 4 simple roots, the upper 3 of them 1 apart, and 1 of those 3 on each interval.",
+        summary=(
+            "A quartic with 4 simple roots, the upper 3 of them 1 apart, and 1 of those 3 on each published interval."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

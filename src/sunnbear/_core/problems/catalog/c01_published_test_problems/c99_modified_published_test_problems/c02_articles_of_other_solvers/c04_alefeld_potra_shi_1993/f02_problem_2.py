@@ -47,7 +47,10 @@ class ModifiedAlefeldPotraShi1993Problem2(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"- 2 \sum_{i=1}^{20} \frac{\left(2 i - 5\right)^{2}}{\left(\tmp{u} - i^{2}\right)^{3}}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A sum of poles of order 3, with 1 simple root on each interval and a pole just outside each bound.",
+        summary=(
+            "A sum of poles of order 3, with 1 simple root on each published interval and a pole just outside each "
+            "bound."
+        ),
         notes=(
             (
                 "Each bound lies 1% of the published interval's width from its pole, rounded to 1 "

@@ -36,7 +36,8 @@ class AlefeldPotraShi1993Problem2(Formula):
         expression=r"- 2 \sum_{i=1}^{20} \frac{\left(2 i - 5\right)^{2}}{\left(\tmp{u} - i^{2}\right)^{3}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A sum of poles of order 3, with 1 simple root on each interval, which has a pole just outside each bound."
+            "A sum of poles of order 3, with 1 simple root on each published interval, which has a pole just outside "
+            "each bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

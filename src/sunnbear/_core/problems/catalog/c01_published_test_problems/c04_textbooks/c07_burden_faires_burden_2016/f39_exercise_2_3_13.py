@@ -36,7 +36,9 @@ class BurdenFairesBurden2016Exercise2313(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"230 \tmp{u}^{4} + 18 \tmp{u}^{3} + 9 \tmp{u}^{2} - 221 \tmp{u} - 9",
         interval=r"[\param{a}, \param{b}]",
-        summary="A quartic with 2 real roots, 1 on each interval, and slopes of $-222$ and 666 at those roots.",
+        summary=(
+            "A quartic with 2 real roots, 1 on each published interval, and slopes of $-222$ and 666 at those roots."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

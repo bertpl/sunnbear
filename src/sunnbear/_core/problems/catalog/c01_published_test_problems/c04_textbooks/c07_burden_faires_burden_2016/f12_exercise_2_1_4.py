@@ -37,7 +37,7 @@ class BurdenFairesBurden2016Exercise214(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A quartic, the product of $\tmp{u}^2 - 2$ and $\tmp{u}^2 - 2\tmp{u} - 2$, with 4 simple roots, 1 on each "
-            r"interval."
+            r"published interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

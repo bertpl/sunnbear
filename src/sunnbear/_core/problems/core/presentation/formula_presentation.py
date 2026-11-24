@@ -40,20 +40,27 @@ class FormulaPresentation:
             function with many roots". None by default; the catalog's tests require it of every shipped formula.
 
             A summary holds at every value of ``c`` that the benchmark samples, so it states nothing that depends on
-            how far ``c`` moves the function. The benchmark samples ``c`` only within each test problem's c-range,
-            which keeps the sign of ``f`` at both bounds; so a root or a pole of odd order crosses a bound only
-            together with another one. A summary may say how many roots lie on the interval, or that a
-            pole lies just outside it, where no such pair crosses a bound. Beyond that:
+            how far ``c`` moves the function.
+
+            The benchmark samples ``c`` only within each test problem's c-range, over which ``f`` keeps its sign at
+            both bounds. An odd-order root or pole changes the sign of ``f``, so it can cross a bound only while a
+            second one crosses the same bound.
+
+            A summary may say how many roots lie on the interval, or that an odd-order pole lies just outside it, as
+            long as no 2 odd-order roots or poles cross a bound together. Beyond that:
 
             - a part of the expression is written with the expression's own symbols, such as the ``\tmp{u}`` of its
               definitions;
-            - a position is given relative to the root or another feature of the function, which ``c`` moves
-              together, such as "2 bands next to the root"; where an absolute position reads better, it is exact in
-              ``\x`` and ``\c``, such as "$\x = 20 \c$";
+            - a position is given relative to the root or another feature of the function, because ``c`` moves the
+              root and that feature together, such as "2 bands next to the root"; where an absolute position reads
+              better, it is exact in ``\x`` and ``\c``, such as "$\x = 20 \c$";
             - a claim about the interval is qualitative, such as "a pole just below the lower bound". A summary
-              gives no distance to a bound and no value at a bound, and does not place a feature other than a root
-              or a pole of odd order inside or outside the interval, such as an extremum, because ``c`` can move it
-              across a bound.
+              gives:
+
+              - no distance to a bound;
+              - no value at a bound;
+              - no position inside or outside the interval for a feature other than an odd-order root or pole, such
+                as an extremum, because ``c`` can move that feature across a bound.
         notes: Paragraphs for a reader, such as a note that gives the original expression as display math when the
             formula's code computes an equivalent form of it. Empty by default.
         param_conditions: The conditions on the formula's parameters that `Formula.is_param_tuple_valid` checks, 1

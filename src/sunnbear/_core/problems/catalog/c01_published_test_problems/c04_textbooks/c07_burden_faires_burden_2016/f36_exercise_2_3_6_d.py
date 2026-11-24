@@ -38,7 +38,10 @@ class BurdenFairesBurden2016Exercise236D(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\left(\tmp{u} - 2\right)^{2} - \ln{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A convex function with 1 simple root on each interval and a minimum of $-0.75$ between those 2 roots.",
+        summary=(
+            "A convex function with 1 simple root on each published interval and a minimum of $-0.75$ between those 2 "
+            "roots."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

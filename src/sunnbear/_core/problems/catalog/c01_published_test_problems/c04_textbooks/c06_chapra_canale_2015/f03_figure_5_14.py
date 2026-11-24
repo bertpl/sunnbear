@@ -42,7 +42,7 @@ class ChapraCanale2015Figure514(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A function within $10^{-3}$ of $-1$ over the middle half of the stretch between its 2 simple roots and "
-            "steep beyond them, with 1 root on each interval."
+            "steep beyond them, with 1 root on each published interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
