@@ -62,7 +62,7 @@ class ModifiedBradie2006Section21Page67(Formula):
     params = (
         FormulaParam("initial_investment", latex_symbol="P", meaning="The initial investment."),
         FormulaParam("monthly_deposit", latex_symbol="d", meaning="The deposit at the end of each month."),
-        FormulaParam("goal", latex_symbol="A", meaning="The balance that the savings must reach after 3 years."),
+        FormulaParam("goal", latex_symbol="A", meaning="The target balance after 3 years."),
     )
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(

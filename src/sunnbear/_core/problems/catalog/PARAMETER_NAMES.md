@@ -35,7 +35,8 @@ The first rule that applies gives the names:
 
 - **A second parameter of the same kind gets a number:** `s1` and `s2`, `w1` and `w2`.
 - **Where no name of the table fits, use a short word** that says what the parameter is, such as `steepness`. A numbered placeholder such as `p1` for "the first parameter" says nothing.
-- **A parameter's LaTeX symbol is 1 letter, Latin or Greek, with an optional subscript,** even where its name is a word: a word as a symbol reads as a product of letters in a formula's display. A parameter whose symbol does not say what the parameter is gets a `meaning` in its `FormulaParam`, as the parameter `slope` with the symbol `m` does.
+- **A parameter's LaTeX symbol is 1 letter, Latin or Greek, with an optional subscript,** even where its name is a word: a word as a symbol reads as a product of letters in a formula's display.
+- **A parameter whose symbol does not say what the parameter is gets a `meaning`** in its `FormulaParam`, as the parameter `slope` with the symbol `m` does.
 - **A coefficient is `w`, never `c1` or `c2`.** Beside `c` and `c_scale`, such a name reads as a value of `c`.
 - **A power is `p`, never `e`.** In a formula's text, `e` reads as Euler's number.
 - **Counts and powers come first in `params`**, then the other parameters, so that an id starts with the parameter that changes the formula's structure.
