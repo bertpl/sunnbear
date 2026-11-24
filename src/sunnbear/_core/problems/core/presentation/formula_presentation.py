@@ -46,14 +46,15 @@ class FormulaPresentation:
             both bounds. An odd-order root or pole changes the sign of ``f``, so it can cross a bound only while a
             second one crosses the same bound.
 
-            A summary may say how many roots lie on the interval, or that an odd-order pole lies just outside it, as
-            long as no 2 odd-order roots or poles cross a bound together. Beyond that:
+            A summary may say how many odd-order roots lie on the interval, or that an odd-order pole lies just
+            outside it, as long as no 2 odd-order roots or poles cross a bound together. Beyond that:
 
             - a part of the expression is written with the expression's own symbols, such as the ``\tmp{u}`` of its
-              definitions;
+              definitions, which holds the shift by ``\c``;
             - a position is given relative to the root or another feature of the function, because ``c`` moves the
               root and that feature together, such as "2 bands next to the root"; where an absolute position reads
-              better, it is exact in ``\x`` and ``\c``, such as "$\x = 20 \c$";
+              better, it is an exact equation in ``\x`` and ``\c``, such as "$\x = 20 \c$", never in a symbol of the
+              definitions such as ``\tmp{u}``;
             - a claim about the interval is qualitative, such as "a pole just below the lower bound". A summary
               gives:
 

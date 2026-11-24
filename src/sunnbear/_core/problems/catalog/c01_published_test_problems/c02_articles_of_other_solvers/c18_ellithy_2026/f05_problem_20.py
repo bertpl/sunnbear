@@ -41,7 +41,7 @@ class Ellithy2026Problem20(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A function negative between its 2 roots, which lie $\param{k}$ apart, with only the upper one on the "
-            r"narrow interval."
+            r"narrower of the 2 published intervals."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

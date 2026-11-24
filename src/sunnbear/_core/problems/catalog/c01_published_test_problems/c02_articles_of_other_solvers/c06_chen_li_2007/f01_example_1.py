@@ -32,7 +32,7 @@ class ChenLi2007Example1(Formula):
         interval="[0.5, 5]",
         summary=(
             "The natural logarithm, steepest at the lower bound, with a singularity below that bound and the "
-            "logarithm's root 1 above the singularity."
+            "logarithm's root at a distance of 1 above the singularity."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

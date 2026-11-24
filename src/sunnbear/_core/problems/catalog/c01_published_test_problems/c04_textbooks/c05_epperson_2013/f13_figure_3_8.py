@@ -28,7 +28,7 @@ class Epperson2013Figure38(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\frac{\tmp{u}^{2}}{2} - \frac{1}{2}",
         interval="[0, 4]",
-        summary="A parabola whose 1 simple root on the interval lies 1 above the parabola's vertex.",
+        summary="A parabola whose 1 simple root on the interval lies at a distance of 1 above the parabola's vertex.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

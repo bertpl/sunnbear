@@ -39,8 +39,8 @@ class Norton1985Function9(Formula):
         expression=r"\tmp{u}^{\param{n}} + \param{a_} \tmp{u} + \param{b_}",
         interval="[-0.7, 1]",
         summary=(
-            r"A function with 1 simple root, below $2 \cdot 10^{-4}$ in magnitude from just below that root to 1.23 "
-            r"above it at $\param{n} = 19$."
+            r"A function with 1 simple root that, at $\param{n} = 19$, stays below $2 \cdot 10^{-4}$ in magnitude from "
+            r"just below that root to 1.23 above it."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

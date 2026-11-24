@@ -33,8 +33,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF35(Formula):
         ),
         interval="[-11, 9]",
         summary=(
-            r"The signed square root of $2/3 - \tmp{u}$, lowered by 0.1, with its root 0.01 below an infinite slope at "
-            r"$\x = 20 \c + 2/3$."
+            r"The signed square root of $2/3 - \tmp{u}$, lowered by 0.1, with its root 0.01 below the point of infinite"
+            r" slope at $\x = 20 \c + 2/3$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
