@@ -17,7 +17,7 @@ from sunnbear._core.problems.core import (
 
 
 class ChapraCanale2015Problem839(Formula):
-    """This formula comes from Chapra, Canale (2015).
+    r"""This formula comes from Chapra, Canale (2015).
 
     The survey writes the source's function as ``v = u*log(m0/(m0 - q*t)) - g*t``, with the parameters `u = 2200` m/s,
     `m0 = 160000` kg, `q = 2680` kg/s, `g = 9.81` m/s^2, `v = 1000` m/s; the formula's interval is ``[10, 50]``.
@@ -25,8 +25,8 @@ class ChapraCanale2015Problem839(Formula):
     Unknown `t`, the time at which the velocity is 1000 m/s, to within 1%; the book's hint gives the interval. The book
     prints `ln`.
 
-    The parameter ``u`` does not take the source's symbol, because ``u`` is the symbol of the shifted variable in every
-    formula of category 1.
+    The parameter ``u`` takes the symbol ``u_{\mathrm{ex}}``, not the source's ``u``, because ``u`` is the symbol of the
+    shifted variable in every formula of category 1.
     """
 
     number = (1, 4, 6, 29)
