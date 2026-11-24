@@ -47,7 +47,7 @@ class Bradie2006Section2Page55(Formula):
             "A decreasing cubic whose 1 simple root is the depth to which a floating sphere sinks, with a slope of 0 at"
             " both bounds."
         ),
-        notes=(r"$\tmp{u}$ is the source's $h$, the depth to which the sphere sinks, in cm.",),
+        notes=(r"$\tmp{u}$ is the source's variable $h$, the depth to which the sphere sinks, in cm.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -40,7 +40,7 @@ class ChapraCanale2015Problem516(Formula):
             r"The critical-flow condition of a trapezoidal channel at depth $\x$, with 1 simple root and a pole at "
             r"$\x = 0$ that makes the function steep near the lower bound."
         ),
-        notes=(r"$\tmp{u}$ is the source's $y$, the depth of the water in the channel, in m.",),
+        notes=(r"$\tmp{u}$ is the source's variable $y$, the depth of the water in the channel, in m.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

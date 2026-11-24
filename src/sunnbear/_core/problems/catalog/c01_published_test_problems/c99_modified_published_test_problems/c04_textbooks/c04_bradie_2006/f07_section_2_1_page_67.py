@@ -80,7 +80,7 @@ class ModifiedBradie2006Section21Page67(Formula):
             "root in the lower half of the interval."
         ),
         notes=(
-            r"$\tmp{u}$ is the source's $r$, the annual interest rate.",
+            r"$\tmp{u}$ is the source's variable $r$, the annual interest rate.",
             (
                 r"The expression equals the published function, $$\param{initial_investment} \left(1 + "
                 r"\frac{\tmp{u}}{12}\right)^{36} + \param{monthly_deposit} \frac{\left(1 + "

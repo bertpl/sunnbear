@@ -46,7 +46,7 @@ class ChapraCanale2015Problem833(Formula):
             "The impedance equation of a parallel RLC circuit in terms of the angular frequency, with 1 simple root, "
             "right of which the function stays between 0 and 0.009."
         ),
-        notes=(r"$\tmp{u}$ is the source's $\omega$, the angular frequency, in rad/s.",),
+        notes=(r"$\tmp{u}$ is the source's variable $\omega$, the angular frequency, in rad/s.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

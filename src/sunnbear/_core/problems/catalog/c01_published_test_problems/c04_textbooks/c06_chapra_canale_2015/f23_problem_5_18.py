@@ -60,7 +60,7 @@ class ChapraCanale2015Problem518(Formula):
             r"An increasing function of the temperature, with 1 simple root: the temperature at which freshwater's "
             r"saturation concentration of dissolved oxygen is $\param{osf}$."
         ),
-        notes=(r"$\tmp{u}$ is the source's $T$, the temperature, in °C.",),
+        notes=(r"$\tmp{u}$ is the source's variable $T$, the temperature, in °C.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -46,7 +46,7 @@ class ChapraCanale2015Problem517(Formula):
             "A cubic, flat at the lower bound, with 1 simple root: the depth at which a spherical tank holds a given "
             "volume of water."
         ),
-        notes=(r"$\tmp{u}$ is the source's $h$, the depth of the water in the tank, in m.",),
+        notes=(r"$\tmp{u}$ is the source's variable $h$, the depth of the water in the tank, in m.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -39,7 +39,7 @@ class Bradie2006Exercise2117(Formula):
             r"An even function, decreasing from a maximum at the lower bound $\x = 0$ to 1 simple root in the upper 20%"
             r" of the interval."
         ),
-        notes=(r"$\tmp{u}$ is the source's $\zeta$, the nondimensional damping coefficient.",),
+        notes=(r"$\tmp{u}$ is the source's variable $\zeta$, the nondimensional damping coefficient.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

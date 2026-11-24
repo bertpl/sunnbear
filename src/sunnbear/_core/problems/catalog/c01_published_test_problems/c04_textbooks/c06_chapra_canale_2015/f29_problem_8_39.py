@@ -52,7 +52,7 @@ class ChapraCanale2015Problem839(Formula):
             "The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
             "logarithmic singularity 9.7 s beyond the upper bound."
         ),
-        notes=(r"$\tmp{u}$ is the source's $t$, the time, in s.",),
+        notes=(r"$\tmp{u}$ is the source's variable $t$, the time, in s.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

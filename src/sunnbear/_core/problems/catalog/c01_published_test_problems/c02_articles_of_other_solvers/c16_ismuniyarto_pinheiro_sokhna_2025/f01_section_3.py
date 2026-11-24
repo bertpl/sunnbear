@@ -45,7 +45,7 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
             r"A break-even equation in the year $\x$, with 1 root, steepest at the lower bound, which lies 2 above a "
             r"pole at $\x = 0$."
         ),
-        notes=(r"$\tmp{u}$ is the source's $n$, the year.",),
+        notes=(r"$\tmp{u}$ is the source's variable $n$, the year.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

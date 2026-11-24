@@ -46,7 +46,7 @@ class ChapraCanale2015Problem515(Formula):
             "A target velocity minus the outflow velocity of a tank drained through a long pipe, as a decreasing "
             "function of the tank's initial head with 1 simple root."
         ),
-        notes=(r"$\tmp{u}$ is the source's $H$, the tank's initial head, in m.",),
+        notes=(r"$\tmp{u}$ is the source's variable $H$, the tank's initial head, in m.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

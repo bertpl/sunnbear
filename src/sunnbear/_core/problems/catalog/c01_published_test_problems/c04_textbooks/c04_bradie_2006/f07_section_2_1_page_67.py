@@ -57,7 +57,7 @@ class Bradie2006Section21Page67(Formula):
             "A savings balance minus a goal as a slightly convex function of the annual interest rate, with 1 simple "
             "root in the lower half of the interval."
         ),
-        notes=(r"$\tmp{u}$ is the source's $r$, the annual interest rate.",),
+        notes=(r"$\tmp{u}$ is the source's variable $r$, the annual interest rate.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

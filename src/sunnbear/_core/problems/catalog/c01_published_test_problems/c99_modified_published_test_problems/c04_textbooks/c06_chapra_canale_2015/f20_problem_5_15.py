@@ -52,7 +52,7 @@ class ModifiedChapraCanale2015Problem515(Formula):
             "function of the tank's initial water height with 1 simple root."
         ),
         notes=(
-            r"$\x$ is the source's $H$, the tank's initial head, in m.",
+            r"$\x$ is the source's variable $H$, the tank's initial head, in m.",
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "
                 r"problem, because a shift along x by any $\c > 0$ evaluates $\sqrt{2 \param{g} \x}$ left "

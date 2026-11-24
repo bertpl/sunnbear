@@ -44,7 +44,7 @@ class LiZhouLangeTian2026Section71(Formula):
             r"A decreasing cubic with 1 simple root for both parameter sets, at the midpoint of the interval for "
             r"$\param{a2} = 1$."
         ),
-        notes=(r"$\tmp{u}$ is the source's $\theta$.",),
+        notes=(r"$\tmp{u}$ is the source's variable $\theta$.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -58,7 +58,7 @@ class ChapraCanale2015EquationPt23(Formula):
             r"A decreasing function with 1 simple root, the drag coefficient at which a falling parachutist reaches a "
             r"target velocity after $\param{t}$ seconds."
         ),
-        notes=(r"$\tmp{u}$ is the source's $c$, the drag coefficient, in kg/s.",),
+        notes=(r"$\tmp{u}$ is the source's variable $c$, the drag coefficient, in kg/s.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

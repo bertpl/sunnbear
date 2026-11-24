@@ -45,7 +45,7 @@ class ChapraCanale2015Figure84(Formula):
             "The relative charge left on an RLC circuit's capacitor after 0.05 s, minus a target of 1%, as an "
             "increasing function of the resistance with 1 simple root."
         ),
-        notes=(r"$\tmp{u}$ is the source's $R$, the resistance, in ohms.",),
+        notes=(r"$\tmp{u}$ is the source's variable $R$, the resistance, in ohms.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

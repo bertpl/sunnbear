@@ -48,7 +48,7 @@ class BurdenFairesBurden2016Section2Pages4748(Formula):
             r"A decreasing function with 1 root, and with rounding in $e^\x - 1$ making the function negative on 2 "
             r"bands within $3.5 \cdot 10^{-16}$ of the lower bound."
         ),
-        notes=(r"$\tmp{u}$ is the source's $\lambda$, the birthrate of the population.",),
+        notes=(r"$\tmp{u}$ is the source's variable $\lambda$, the birthrate of the population.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
