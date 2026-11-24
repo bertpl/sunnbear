@@ -26,17 +26,17 @@ class Bradie2006Section21Page67(Formula):
     20000`` and ``13000, 250, 20000``, and gives no interval: since ``13000 + 36*200 = 20200`` already exceeds 20000,
     the goal is met even at ``r = 0``, and both roots are negative, about -0.0041 and -0.0405.
 
-    The parameters ``initial_investment``, ``monthly_deposit`` and ``goal`` are the initial investment, the monthly
-    deposit and the goal, and each set of them pairs with the row's only interval. At ``x = 0``, where the source's
-    function divides 0 by 0, the formula takes its limit, ``initial_investment + 36*monthly_deposit - goal``.
+    The parameters ``P``, ``d`` and ``A`` are the initial investment, the monthly deposit and the goal, and each set of
+    them pairs with the row's only interval. At ``x = 0``, where the source's function divides 0 by 0, the formula takes
+    its limit, ``P + 36*d - A``.
     """
 
     number = (1, 4, 4, 7)
     name = "Section 2.1 (page 67)"
     params = (
-        FormulaParam("initial_investment", latex_symbol="P", meaning="The initial investment."),
-        FormulaParam("monthly_deposit", latex_symbol="d", meaning="The deposit at the end of each month."),
-        FormulaParam("goal", latex_symbol="A", meaning="The target balance after 3 years."),
+        FormulaParam("P", latex_symbol="P", meaning="The initial investment."),
+        FormulaParam("d", latex_symbol="d", meaning="The deposit at the end of each month."),
+        FormulaParam("A", latex_symbol="A", meaning="The target balance after 3 years."),
     )
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
@@ -46,9 +46,9 @@ class Bradie2006Section21Page67(Formula):
         ),
         expression=(
             r"\begin{cases} "
-            r"\param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & \text{if } \tmp{u} = 0 \\ "
-            r"\param{initial_investment} \tmp{g} + \param{monthly_deposit} \frac{\tmp{g} - 1}{\tmp{u}/12} "
-            r"- \param{goal} "
+            r"\param{P} + 36 \param{d} - \param{A} & \text{if } \tmp{u} = 0 \\ "
+            r"\param{P} \tmp{g} + \param{d} \frac{\tmp{g} - 1}{\tmp{u}/12} "
+            r"- \param{A} "
             r"& \text{otherwise} "
             r"\end{cases}"
         ),
@@ -62,17 +62,17 @@ class Bradie2006Section21Page67(Formula):
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, initial_investment: float, monthly_deposit: float, goal: float) -> float:
+    def parametrized_fun(x: float, c: float, P: float, d: float, A: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - 0.09 * c
         if x == 0.0:
             # at x = 0, the factor ((1 + x/12)^36 - 1)/(x/12) takes its limit 36
-            return initial_investment + 36.0 * monthly_deposit - goal
+            return P + 36.0 * d - A
         else:
             growth_factor = (1.0 + x / 12.0) ** 36
-            return initial_investment * growth_factor + monthly_deposit * (growth_factor - 1.0) / (x / 12.0) - goal
+            return P * growth_factor + d * (growth_factor - 1.0) / (x / 12.0) - A
 
-    def interval_bounds(self, initial_investment: float, monthly_deposit: float, goal: float) -> tuple[float, float]:
+    def interval_bounds(self, P: float, d: float, A: float) -> tuple[float, float]:
         """Return the formula's interval."""
         return (0.01, 0.1)
 
@@ -80,7 +80,7 @@ class Bradie2006Section21Page67(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("initial_investment", "monthly_deposit", "goal"),
+                names=("P", "d", "A"),
                 rows=(
                     (
                         13500.0,
@@ -106,37 +106,35 @@ class Bradie2006Section21Page67(Formula):
     # default tolerance, because the function is ill-conditioned there or its terms cancel
     test_cases = (
         FormulaTestCase.value(
-            params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 13500.0, "d": 250.0, "A": 25000.0},
             x=0.037,
             c=0.0,
             expected=-414.7094119089419,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 13500.0, "d": 250.0, "A": 25000.0},
             x=0.037,
             c=0.25,
             expected=-1707.2154378902246,
             atol=2e-09,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 14000.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 14000.0, "d": 250.0, "A": 25000.0},
             x=0.0865,
             c=0.0,
             expected=3364.9016342370865,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 12500.0, "monthly_deposit": 300.0, "goal": 25000.0},
+            params={"P": 12500.0, "d": 300.0, "A": 25000.0},
             x=0.037,
             c=0.0,
             expected=368.69353168164696,
         ),
         FormulaTestCase.value(
-            params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0},
+            params={"P": 13500.0, "d": 250.0, "A": 25000.0},
             x=0.0,
             c=0.0,
             expected=-2500.0,
         ),
-        FormulaTestCase.interval_bounds(
-            params={"initial_investment": 13500.0, "monthly_deposit": 250.0, "goal": 25000.0}, expected=(0.01, 0.1)
-        ),
+        FormulaTestCase.interval_bounds(params={"P": 13500.0, "d": 250.0, "A": 25000.0}, expected=(0.01, 0.1)),
     )

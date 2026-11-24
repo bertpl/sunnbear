@@ -10,14 +10,18 @@ A parameter's name is part of a test problem's id, as in `f2.1.2[p=4.0,w=10^0.3]
 - **`f`** names the function itself, as in the display `f(x, c) = …` of every formula's presentation.
 - **`a`, `b` and `c_scale`** are parameters of the formulas of category 1: the bounds of a formula's interval and the scale of its shift along x. The class docstring of `PublishedTestProblems` states their rules.
 - **`a` and `b` also name the bounds of the interval when a formula outside category 1 takes its interval as a parameter**, as in `BernoulliPolynomial`. The class docstring of such a formula states which values `a` and `b` may take.
-- **A reserved name or a Python keyword gets a trailing underscore**, as in `c_` and `lambda_`.
-- **The symbols $a$ and $b$ name only the bounds of an interval**, in every category; a catalog test checks that every parameter with these symbols is a bound. So a source's parameter that the source calls `a` or `b` takes another name and symbol, not `a_` or `b_`, such as `q` for the constant of `x^n - a`: the one exception to rule 1 of the next section.
+- **A Python keyword gets a trailing underscore**, as in `lambda_`.
+- **The symbols $a$ and $b$ name only the bounds of an interval**, in every category; a catalog test checks that every parameter with these symbols is a bound.
+- **A source's parameter whose symbol is $a$, $b$, $c$ or $u$ takes another symbol, and the name that spells that symbol**, such as `q` for the constant $a$ of `x^n - a`, `Ct` for a target concentration that the source calls $c$, and `uex` for an exhaust velocity that the source calls $u$; $u$ is the shifted variable of every formula of category 1. This rule is the one exception to rule 1 of the next section.
 
 ## Which names a formula uses
 
 The first rule that applies gives the names:
 
-1. **A published formula keeps the parameter names of its source.** The formulas of category 1 follow this rule.
+1. **A published formula keeps the symbols of its source, and each parameter's name spells its symbol in ASCII.** The formulas of category 1 follow this rule:
+   - a Greek letter is spelled by its name or a common short form, as `mu` for $\mu$ and `eps` for $\varepsilon$;
+   - a subscript follows a Latin letter with no underscore, as `x1` for $x_1$ and `pCO2` for $p_{\mathrm{CO_2}}$, and the name of a Greek letter with one, as `rho_f` for $\rho_f$;
+   - a superscript written as a word follows an underscore, as `x_star` for $x^*$.
 2. **A named function keeps the parameter names of its reference**, written in ASCII, such as `mu` and `sigma` for a normal distribution, or `nu` for degrees of freedom.
 3. **Any other parameter takes its name from the table below.**
 
@@ -37,7 +41,7 @@ The first rule that applies gives the names:
 - **A second parameter of the same kind gets a number:** `s1` and `s2`, `w1` and `w2`.
 - **Where no name of the table fits, use a short word** that says what the parameter is, such as `steepness`. A numbered placeholder such as `p1` for "the first parameter" says nothing.
 - **A parameter's LaTeX symbol is 1 letter, Latin or Greek, with an optional subscript,** even where its name is a word: a word as a symbol reads as a product of letters in a formula's display.
-- **A parameter whose symbol does not say what the parameter is gets a `meaning`** in its `FormulaParam`, as the parameter `slope` with the symbol `m` does.
+- **A parameter whose symbol does not say what the parameter is gets a `meaning`** in its `FormulaParam`, as a line's slope `m` does.
 - **A coefficient is `w`, never `c1` or `c2`.** Beside `c` and `c_scale`, such a name reads as a value of `c`.
 - **A power is `p`, never `e`.** In a formula's text, `e` reads as Euler's number.
 - **Counts and powers come first in `params`**, then the other parameters, so that an id starts with the parameter that changes the formula's structure.
