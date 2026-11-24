@@ -32,8 +32,8 @@ class DowellJarratt1971Table4(Formula):
         expression=r"\tmp{u}^{2} - \left(1 - \tmp{u}\right)^{\param{n}}",
         interval="[0, 1]",
         summary=(
-            r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, becomes steeper at the lower "
-            r"bound and has its 1 root closer to that bound."
+            r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, becomes steeper below $\x = \c$ "
+            r"and has its 1 root closer to that point."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

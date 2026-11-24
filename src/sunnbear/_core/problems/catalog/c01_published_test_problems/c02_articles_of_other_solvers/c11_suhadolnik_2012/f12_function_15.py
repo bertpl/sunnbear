@@ -29,7 +29,7 @@ class Suhadolnik2012Function15(Formula):
         expression=r"\tmp{u}^{2} - \sin^{2}{\left(\tmp{u} \right)} - 1",
         interval="[-1, 2]",
         summary=(
-            r"An even function with 1 root on the interval and a flat minimum at $\x = 0$, where the first 3 "
+            r"A function with 1 root on the interval, symmetric about a flat minimum at $\x = 3 \c$, where the first 3 "
             r"derivatives are 0."
         ),
     )

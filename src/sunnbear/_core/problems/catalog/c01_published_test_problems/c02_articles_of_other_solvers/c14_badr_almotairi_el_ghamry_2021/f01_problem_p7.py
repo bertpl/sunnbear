@@ -28,7 +28,10 @@ class BadrAlmotairiElGhamry2021ProblemP7(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[0, 2]",
-        summary="An increasing convex function with 1 simple root in the upper quarter of the interval.",
+        summary=(
+            r"An increasing convex function with 1 simple root, at $2 \c$ plus the value of the Lambert W function at "
+            r"7."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,7 +30,10 @@ class Ellithy2026Problem46(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{\frac{\tmp{u}}{2}} - 1.5",
         interval="[0, 1]",
-        summary="An increasing convex function with 1 root 0.06 below the upper bound.",
+        summary=(
+            r"An increasing convex function whose 1 root lies at $\c$ plus twice the value of the Lambert W function at"
+            r" 0.75."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

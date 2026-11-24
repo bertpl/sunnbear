@@ -30,7 +30,7 @@ class BurdenFairesBurden2016Exercise236A(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} + 2^{- \tmp{u}} + 2 \cos{\left(\tmp{u} \right)} - 6",
         interval="[1, 2]",
-        summary="A convex, increasing function with 1 simple root in the upper 20% of the interval.",
+        summary="A convex, increasing function with 1 simple root, steep above that root and much flatter below it.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

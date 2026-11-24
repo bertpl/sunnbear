@@ -40,8 +40,8 @@ class Ellithy2026Problem20(Formula):
         expression=r"e^{\tmp{u}^{2}} - e^{\param{k} \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function negative between its roots $\x = 0$ and $\x = \param{k}$, the first of which is the lower "
-            r"bound of the wide interval."
+            r"A function negative between its 2 roots, which lie $\param{k}$ apart, with only the upper one on the "
+            r"narrower of the 2 published intervals."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

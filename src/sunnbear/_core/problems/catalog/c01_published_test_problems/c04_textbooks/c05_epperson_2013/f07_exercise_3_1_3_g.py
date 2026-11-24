@@ -28,7 +28,7 @@ class Epperson2013Exercise313G(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.15 \c"),),
         expression=r"5 - \frac{1}{\tmp{u}}",
         interval="[0.1, 0.25]",
-        summary="A hyperbola, about 6 times as steep at the lower bound as at the upper bound, with 1 simple root.",
+        summary="A hyperbola with 1 simple root, steepest at the lower bound because of a pole below that bound.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

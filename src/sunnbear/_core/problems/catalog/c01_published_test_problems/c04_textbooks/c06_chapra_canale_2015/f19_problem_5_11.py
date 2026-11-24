@@ -29,10 +29,7 @@ class ChapraCanale2015Problem511(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\tmp{u}^{3.5} - 80",
         interval="[2, 5]",
-        summary=(
-            "An increasing power function, about 10 times as steep at the upper bound as at the lower, with 1 simple "
-            "root."
-        ),
+        summary="An increasing power function, convex and so steepest at the upper bound, with 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

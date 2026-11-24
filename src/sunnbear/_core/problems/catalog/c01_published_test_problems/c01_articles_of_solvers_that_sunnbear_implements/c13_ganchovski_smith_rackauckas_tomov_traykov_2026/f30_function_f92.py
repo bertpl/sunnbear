@@ -31,10 +31,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF92(Formula):
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=r"\tmp{u}^{3} - 0.001",
         interval="[-10, 10]",
-        summary=(
-            r"A cube minus 0.001, nearly flat on a band around $\x = 0$ that ends at its root, and of magnitude 1000 "
-            "at the bounds."
-        ),
+        summary=r"A cube minus 0.001, nearly flat on a band around $\x = 20 \c$ that ends at the root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -29,8 +29,8 @@ class Sabharwal2019Figure2(Formula):
         expression=r"4 - \left(3 - \tmp{u}\right)^{3}",
         interval="[0.2, 3.5]",
         summary=(
-            "An increasing cubic with 1 simple root, steep at the lower bound and nearly flat around a stationary "
-            "inflection point near the upper bound."
+            "An increasing cubic with 1 simple root, nearly flat around a stationary inflection point 1.59 above that "
+            "root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

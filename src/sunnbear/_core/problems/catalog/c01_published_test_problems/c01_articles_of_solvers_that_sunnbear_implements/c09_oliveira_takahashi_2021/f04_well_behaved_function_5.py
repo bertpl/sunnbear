@@ -26,7 +26,10 @@ class OliveiraTakahashi2021WellBehavedFunction5(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u} + \tmp{u}^{10} - 1",
         interval="[-1, 1]",
-        summary="A line plus a 10th power that matters only near the bounds, with 1 simple root near the upper bound.",
+        summary=(
+            r"A line plus a 10th power that matters only near and beyond $\x = 2 \c \pm 1$, with 1 simple root 0.16 "
+            r"below $\x = 2 \c + 1$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

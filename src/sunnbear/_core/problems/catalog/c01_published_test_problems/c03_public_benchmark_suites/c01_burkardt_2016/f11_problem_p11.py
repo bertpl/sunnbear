@@ -37,8 +37,8 @@ class Burkardt2016ProblemP11(Formula):
         expression=r"\frac{16.0 - \tmp{u}^{4}}{16.0 \tmp{u}^{4} + \param{epsilon}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A rational function with 1 root and a narrow peak of $1.6 \cdot 10^{6}$ at $\x = 0$, referred to in the "
-            r'source as "The Pinhead".'
+            r"A rational function with 1 root and a narrow peak of $1.6 \cdot 10^{6}$ that lies 2 below the root, "
+            r'referred to in the source as "The Pinhead".'
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

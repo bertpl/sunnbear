@@ -26,9 +26,7 @@ class RootsFortran2025Case63(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
         expression=r"\tmp{u}^{3} + 4.0 \tmp{u}^{2} - 10.0",
         interval="[0, 1.5]",
-        summary=(
-            "An increasing cubic with a slope of 0 at the lower bound and 1 root in the upper tenth of the interval."
-        ),
+        summary=r"A cubic with a local minimum at $\x = 1.5 \c$ and 1 root 1.37 above that minimum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

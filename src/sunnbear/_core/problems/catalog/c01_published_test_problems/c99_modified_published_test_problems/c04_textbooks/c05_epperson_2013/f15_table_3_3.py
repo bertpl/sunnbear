@@ -40,8 +40,8 @@ class ModifiedEpperson2013Table33(Formula):
         expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
         interval="[0.01, 0.2]",
         summary=(
-            r"An increasing hyperbola with 1 simple root, steep next to the lower bound because of the pole at $\x = "
-            r"0$."
+            "An increasing hyperbola with 1 simple root, steep next to the lower bound because of the hyperbola's pole "
+            "below that bound."
         ),
         notes=(
             (

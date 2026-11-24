@@ -37,8 +37,8 @@ class Exponential(Formula):
         expression=r"e^{\x - \c} - 1",
         interval=r"[-\param{b}, \param{b}]",
         summary=(
-            "The exponential function, nearly flat over the lower half of a wide interval and steep toward its upper "
-            "bound."
+            "The exponential function, nearly flat far below its root and steep toward the upper bound of a wide "
+            "interval."
         ),
         param_conditions=(r"$\param{b} > 0$",),
     )

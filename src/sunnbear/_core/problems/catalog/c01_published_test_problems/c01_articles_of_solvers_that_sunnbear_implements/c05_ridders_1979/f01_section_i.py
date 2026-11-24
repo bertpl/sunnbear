@@ -29,8 +29,7 @@ class Ridders1979SectionI(Formula):
         expression=r"\tmp{u}^{3} - \tmp{u} - 5",
         interval="[-1, 3]",
         summary=(
-            "A cubic with a local maximum and a local minimum in the lower half of the interval, both below $-4$, and 1"
-            " root in the upper half."
+            "A cubic with 1 root, and below that root a local maximum and a local minimum, both with values below $-4$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

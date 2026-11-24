@@ -30,7 +30,10 @@ class NaghipoorAhmadianSoheili2008Equation3(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.3 \c"),),
         expression=r"e^{\tmp{u}^{2} + 7 \tmp{u} - 30} - 1",
         interval="[2.8, 3.1]",
-        summary="An exponential minus 1, 50 times as steep at the upper bound as at the lower bound, with 1 root.",
+        summary=(
+            "An exponential minus 1, with a slope that grows 50-fold from 0.2 below the function's 1 root to 0.1 above "
+            "that root."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

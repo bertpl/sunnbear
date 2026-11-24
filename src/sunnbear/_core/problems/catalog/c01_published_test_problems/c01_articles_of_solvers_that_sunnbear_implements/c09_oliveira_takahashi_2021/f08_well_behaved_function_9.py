@@ -36,7 +36,7 @@ class OliveiraTakahashi2021WellBehavedFunction9(Formula):
         interval="[-1, 1]",
         summary=(
             r"A sum of 10 sines of rapidly rising frequency, with about 500 local extrema but only 1 simple root, near "
-            r'$\x = 0$, referred to in the source as "Weierstrass".'
+            r'$\x = 2 \c$, referred to in the source as "Weierstrass".'
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

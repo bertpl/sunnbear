@@ -29,7 +29,8 @@ class BadrAlmotairiElGhamry2021ProblemP12(Formula):
         expression=r"\tmp{u}^{2} + e^{\frac{\tmp{u}}{2}} - 5",
         interval="[1, 2]",
         summary=(
-            "A function whose slope nearly doubles across the interval, with 1 simple root past the interval's middle."
+            "A convex function with 2 simple roots 3.8 apart, increasing on the interval, which holds only the upper "
+            "root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

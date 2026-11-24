@@ -42,8 +42,8 @@ class Bradie2006Section2Page58(Formula):
         expression=r"3 \tmp{u}^{2} + \frac{\ln{\left(\left(\pi - \tmp{u}\right)^{2} \right)}}{\pi^{4}} + 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function with 2 roots within $10^{-647}$ of $\x = \pi$ on the lower interval, positive at every float "
-            r"except the one nearest $\pi$, where the evaluation gives $-\infty$."
+            r"A function with 2 roots within $10^{-647}$ of the logarithm's singularity, positive at every float except"
+            r" the one nearest that singularity, where the evaluation gives $-\infty$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

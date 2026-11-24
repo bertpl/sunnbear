@@ -45,8 +45,8 @@ class ModifiedBurkardt2016ProblemP06(Formula):
         ),
         interval="[0.08, 20]",
         summary=(
-            r"An increasing function with 1 simple root in the lower 4% of the interval, and values up to about $5 "
-            r"\cdot 10^8$ at the upper bound."
+            r"A function with a simple root and, below that root, a narrow dip to about $-3.7 \cdot 10^{4}$, a second "
+            r"root, and a pole of order 3 at $\x = 19.9 \c$."
         ),
         notes=(
             (

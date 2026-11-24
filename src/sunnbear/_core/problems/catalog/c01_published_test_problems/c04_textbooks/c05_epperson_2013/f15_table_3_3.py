@@ -38,8 +38,7 @@ class Epperson2013Table33(Formula):
         expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A hyperbola with 1 simple root, and on $[-0.2, 0.2]$ also a pole at $\x = 0$, where the function changes "
-            r"sign as well."
+            "A hyperbola with 1 simple root, and on $[-0.2, 0.2]$ also a pole, where the function changes sign as well."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

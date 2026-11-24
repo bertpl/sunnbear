@@ -33,8 +33,8 @@ class AlefeldPotra1992Problem2(Formula):
         ),
         interval="[0.1, 1]",
         summary=(
-            "A function with 1 simple root, nearly flat at the lower bound, where the slope is about 1% of that at the "
-            "upper bound."
+            r"A function with 1 simple root, 0.4 above a stationary inflection at $\x = 0.9 \c$, around which the "
+            r"function is nearly flat."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

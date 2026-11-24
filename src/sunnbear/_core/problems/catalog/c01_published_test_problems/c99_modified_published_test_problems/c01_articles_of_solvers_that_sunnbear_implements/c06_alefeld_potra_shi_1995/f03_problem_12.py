@@ -51,8 +51,8 @@ class ModifiedAlefeldPotraShi1995Problem12(Formula):
         ),
         interval="[1, 100]",
         summary=(
-            r"An increasing, concave function with 1 simple root, flatter for larger $\param{n}$, and within 0.12 of 0 "
-            r"over the whole interval at $\param{n} = 33$."
+            r"An increasing, concave function with 1 simple root, at which the function is flatter for larger "
+            r"$\param{n}$."
         ),
         notes=(
             (

@@ -32,8 +32,8 @@ class AlefeldPotraShi1995Problem12(Formula):
         expression=r"\tmp{u}^{\frac{1}{\param{n}}} - \param{n}^{\frac{1}{\param{n}}}",
         interval="[1, 100]",
         summary=(
-            r"An increasing, concave function with 1 simple root, flatter for larger $\param{n}$, and within 0.12 of 0 "
-            r"over the whole interval at $\param{n} = 33$."
+            r"An increasing, concave function with 1 simple root, flatter for larger $\param{n}$, down to a slope of "
+            r"$10^{-3}$ at that root for $\param{n} = 33$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

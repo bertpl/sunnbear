@@ -29,7 +29,7 @@ class BurdenFairesBurden2016Exercise2117(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - \tmp{u} - 1",
         interval="[1, 2]",
-        summary="A cubic whose only real root is the plastic number.",
+        summary=r"A cubic whose only real root lies at $\c$ plus the plastic number.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

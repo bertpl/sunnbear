@@ -33,8 +33,8 @@ class OliveiraTakahashi2021WellBehavedFunction11(Formula):
         expression=r"\Phi{\left(\tmp{u} - 1 \right)} - \frac{\sqrt{2}}{4}",
         interval="[-1, 1]",
         summary=(
-            "The normal cumulative distribution function minus a constant, convex with 1 simple root, and steepest at "
-            "its inflection point, the upper bound."
+            "The normal cumulative distribution function minus a constant, with 1 simple root 0.38 below the inflection"
+            " point, where the slope is largest."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

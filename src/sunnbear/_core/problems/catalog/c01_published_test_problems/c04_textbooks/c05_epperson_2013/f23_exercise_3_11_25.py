@@ -30,7 +30,7 @@ class Epperson2013Exercise31125(Formula):
         expression=r"\left(\tmp{u} - 1\right)^{5}",
         interval="[0.998, 1.002]",
         summary=(
-            r"A 5th power that stays below $4 \cdot 10^{-14}$ in magnitude on the whole interval and yet has the "
+            r"A 5th power that stays below $4 \cdot 10^{-14}$ in magnitude within 0.002 of its root, and yet has the "
             r"correct computed sign everywhere."
         ),
     )

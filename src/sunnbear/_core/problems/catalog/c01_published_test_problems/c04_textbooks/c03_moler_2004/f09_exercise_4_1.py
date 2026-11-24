@@ -28,9 +28,7 @@ class Moler2004Exercise41(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)}",
         interval="[1, 4]",
-        summary=(
-            "The sine, which rises to a maximum in the lower 20% of the interval and then falls through 1 simple root."
-        ),
+        summary=r"The sine, falling through 1 simple root on the interval, at $\x = \pi + 3 \c$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

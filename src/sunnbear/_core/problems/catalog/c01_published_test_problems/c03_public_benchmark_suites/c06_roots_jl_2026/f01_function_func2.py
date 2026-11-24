@@ -42,8 +42,8 @@ class RootsJl2026FunctionFunc2(Formula):
         expression=r"e^{\tmp{u}} - \tmp{u}^{4}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"An exponential minus a quartic, with 3 roots on the wide interval and 1 on the narrow one, rising to $5 "
-            r"\cdot 10^{8}$ at the upper bound."
+            "An exponential minus a quartic, with 3 roots on the wide interval and 1 on the narrow one, rising steeply "
+            "above the highest root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

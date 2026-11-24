@@ -31,8 +31,8 @@ class RootsFortran2025Case99(Formula):
         expression=r"\cos{\left(\tmp{u} \right)} + \tmp{u}",
         interval="[-10, 10]",
         summary=(
-            "An increasing function whose root is the negative of the fixed point of the cosine, with 3 inflections "
-            "where its slope is 0."
+            r"An increasing function with 3 or 4 inflections of slope 0 on the interval and 1 root, at $20 \c$ minus "
+            r"the fixed point of the cosine."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

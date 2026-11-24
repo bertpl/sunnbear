@@ -36,7 +36,7 @@ class Epperson2013Figure32(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{2} - \frac{1}{2}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A parabola with its vertex at the lower bound of both intervals and 1 simple root.",
+        summary="A parabola whose vertex lies 0.71 below its 1 simple root on each published interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

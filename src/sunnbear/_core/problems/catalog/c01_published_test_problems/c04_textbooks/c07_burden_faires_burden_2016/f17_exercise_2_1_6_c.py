@@ -38,8 +38,8 @@ class BurdenFairesBurden2016Exercise216C(Formula):
         expression=r"\tmp{u}^{2} - 4 \tmp{u} + 4 - \ln{\left(\tmp{u} \right)}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A convex function with 1 root on each interval, and with the minimum just above $\x = 2$, so that the "
-            r"function first falls on $[2, 4]$."
+            "A convex function with 1 simple root on each published interval and a minimum of $-0.75$ between those 2 "
+            "roots."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

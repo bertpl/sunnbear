@@ -52,8 +52,8 @@ class FooTan2025Section431(Formula):
             r"\frac{170141183460469231731687303715884105726}{170141183460469231731687303715884105727}\right]"
         ),
         summary=(
-            r"The $\param{q}$-ary entropy function minus $\param{y}$, at most 0.008 above the line $\x - \param{y}$, "
-            r"with 1 root just below $\param{y}$."
+            r"The $\param{q}$-ary entropy function minus $\param{y}$, at most 0.008 above the line $\tmp{u} - "
+            r"\param{y}$, with 1 root just below that line's root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

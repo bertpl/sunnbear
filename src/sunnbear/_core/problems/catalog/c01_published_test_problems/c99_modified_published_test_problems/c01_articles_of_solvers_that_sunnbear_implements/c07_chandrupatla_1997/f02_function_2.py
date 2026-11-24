@@ -60,7 +60,7 @@ class ModifiedChandrupatla1997Function2(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"An increasing function with 1 root, steep near the lower bound because of a pole at $\x = 0$, and within "
-            r"0.01 of 1 above $\x = 10$."
+            r"0.01 of 1 above 10 times that root."
         ),
         notes=(
             (

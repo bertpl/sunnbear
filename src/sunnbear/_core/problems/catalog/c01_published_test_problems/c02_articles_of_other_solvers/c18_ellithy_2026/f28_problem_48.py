@@ -30,8 +30,8 @@ class Ellithy2026Problem48(Formula):
         expression=r"0.05 - \frac{\tmp{u}^{3}}{\left(1 - \tmp{u}\right) \left(0.8 - 2 \tmp{u}\right)^{2}}",
         interval="[0.01, 0.3]",
         summary=(
-            "An equilibrium equation for a reaction's extent, nearly flat near the lower bound and steep near the upper"
-            " bound, which lies 0.1 below a pole."
+            r"An equilibrium equation for a reaction's extent, nearly flat around $\x = 0.29 \c$ and falling steeply "
+            r"toward a double pole 0.21 above the root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

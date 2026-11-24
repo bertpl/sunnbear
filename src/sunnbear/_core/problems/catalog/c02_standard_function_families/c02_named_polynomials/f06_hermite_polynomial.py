@@ -60,8 +60,8 @@ class HermitePolynomial(Formula):
             r"\sqrt{2 \param{n} + 1}\right]",
         ),
         summary=(
-            r"The Hermite polynomial, whose amplitude grows about as $e^{\x^2/2}$ from the middle of its interval to "
-            "its bounds."
+            r"The Hermite polynomial, whose amplitude grows about as $e^{(\x - \c)^2/2}$ with the distance from $\x = "
+            r"\c$."
         ),
         notes=(r"$H_{\param{n}}$ is the physicists' Hermite polynomial, orthogonal under the weight $e^{-\x^2}$.",),
         param_conditions=(r"$\param{n}$ is an integer from 1 to 512",),

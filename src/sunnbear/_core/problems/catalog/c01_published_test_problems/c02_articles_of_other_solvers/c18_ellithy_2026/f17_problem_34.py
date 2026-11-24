@@ -29,8 +29,8 @@ class Ellithy2026Problem34(Formula):
         expression=r"4 \sin{\left(\tmp{u} \right)} - \tmp{u} + 1",
         interval="[-1, 0]",
         summary=(
-            "An increasing function whose slope rises from 1.2 at the lower bound to 3 at the upper, with 1 simple "
-            "root."
+            r"A function with 1 simple root, at which the slope is 2.8, close to the slope's largest value of 3, "
+            r"reached at $\x = \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

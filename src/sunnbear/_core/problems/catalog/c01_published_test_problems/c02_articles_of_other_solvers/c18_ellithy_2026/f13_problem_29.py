@@ -29,8 +29,7 @@ class Ellithy2026Problem29(Formula):
         expression=r"e^{- \tmp{u}} - \cos{\left(3 \tmp{u} \right)} - 0.5",
         interval="[0, 1]",
         summary=(
-            "A function with 1 root, flat at a shallow minimum just above the lower bound and nearly flat again at the "
-            "upper bound."
+            "A function with 1 root between a shallow minimum 0.38 below that root and a maximum 0.52 above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

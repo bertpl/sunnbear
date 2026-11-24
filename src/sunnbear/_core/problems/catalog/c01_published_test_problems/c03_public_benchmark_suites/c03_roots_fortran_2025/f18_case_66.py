@@ -30,7 +30,8 @@ class RootsFortran2025Case66(Formula):
         expression=r"\sin{\left(\tmp{u} \right)} e^{\tmp{u}} + \ln{\left(\tmp{u}^{2} + 1.0 \right)}",
         interval="[-0.9, -0.1]",
         summary=(
-            "A function with 1 root, after which it falls to a local minimum and rises again toward the upper bound."
+            "A function with a local minimum between 2 roots 0.6 apart, of which only the lower one lies on the "
+            "interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

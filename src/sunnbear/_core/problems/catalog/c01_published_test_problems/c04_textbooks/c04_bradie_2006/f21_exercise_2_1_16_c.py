@@ -34,8 +34,7 @@ class Bradie2006Exercise2116C(Formula):
         expression=r"1.05 - 1.04 \tmp{u} + \ln{\left(\tmp{u} \right)}",
         interval="[1, 2]",
         summary=(
-            "A concave function with 1 simple root on the interval and a maximum of only 0.011 just below the lower "
-            "bound."
+            "A concave function with 1 simple root on the interval, 0.15 above the function's maximum of only 0.011."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

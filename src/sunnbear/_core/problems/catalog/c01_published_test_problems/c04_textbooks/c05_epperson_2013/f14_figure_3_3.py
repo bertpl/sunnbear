@@ -35,8 +35,8 @@ class Epperson2013Figure33(Formula):
         ),
         interval="[0, 8]",
         summary=(
-            r"A function that tends to $-\infty$ at the lower bound, rises through 1 simple root to a maximum, and then"
-            r" decays toward 0."
+            r"A function that tends to $-\infty$ as $\x$ decreases to $8 \c$, rises through 1 simple root to a maximum,"
+            r" and then decays toward 0."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

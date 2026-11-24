@@ -33,8 +33,8 @@ class Bradie2006Exercise212(Formula):
         expression=r"\tmp{u}^{3} + \tmp{u}^{2} - 3 \tmp{u} - 3",
         interval="[1, 2]",
         summary=(
-            r"The cubic $(\x + 1)(\x^2 - 3)$ written out as a polynomial, with $\sqrt{3}$ as its only root on the "
-            "interval."
+            r"The cubic $(\tmp{u} + 1)(\tmp{u}^2 - 3)$ written out as a polynomial, with $\x = \sqrt{3} + \c$ as its "
+            r"only root on the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

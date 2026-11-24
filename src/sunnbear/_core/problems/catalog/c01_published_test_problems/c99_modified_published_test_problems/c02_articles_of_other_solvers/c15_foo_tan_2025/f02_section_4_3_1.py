@@ -55,8 +55,8 @@ class ModifiedFooTan2025Section431(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"The $\param{q}$-ary entropy function minus $\param{y}$, at most 0.008 above the line $\x - \param{y}$, "
-            r"with 1 root just below $\param{y}$."
+            r"The $\param{q}$-ary entropy function minus $\param{y}$, at most 0.008 above the line $\x - \param{y} + "
+            r"\c$, with 1 root just below $\param{y} - \c$."
         ),
         notes=(
             (

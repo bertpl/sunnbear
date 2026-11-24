@@ -40,10 +40,7 @@ class ModifiedGsl2024FunctionFunc3(Formula):
     presentation = FormulaPresentation(
         expression=r"\x^{2} - 1.0 \cdot 10^{-8} + \c",
         interval="[0, 1]",
-        summary=(
-            "A parabola that is negative only within $10^{-4}$ of the lower bound, where the parabola has its minimum, "
-            "$-10^{-8}$."
-        ),
+        summary="A parabola with its minimum at the lower bound and 1 root on the interval.",
         notes=(
             (
                 r"$\c$ shifts the function along the y-axis, not along x as for the published test "

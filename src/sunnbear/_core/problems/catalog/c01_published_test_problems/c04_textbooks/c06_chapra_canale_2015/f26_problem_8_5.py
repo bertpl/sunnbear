@@ -45,8 +45,8 @@ class ChapraCanale2015Problem85(Formula):
         ),
         interval="[0, 20]",
         summary=(
-            "A chemical-equilibrium condition, nearly constant over the lower half of the interval, then falling "
-            "through 1 simple root toward a double pole just beyond the upper bound."
+            "A chemical-equilibrium condition, nearly constant up to 6 below its 1 simple root, then falling through "
+            "that root toward a double pole 4.9 above it."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

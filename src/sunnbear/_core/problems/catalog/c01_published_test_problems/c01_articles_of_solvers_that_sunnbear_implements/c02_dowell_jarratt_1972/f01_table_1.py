@@ -30,7 +30,7 @@ class DowellJarratt1972Table1(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\tmp{u}^{3} + 1",
         interval="[-2, 0]",
-        summary="A cubic with 1 simple root, whose slope falls to 0 at the upper bound.",
+        summary=r"A cubic whose slope falls to 0 at $\x = 2 \c$, a distance of 1 above the cubic's 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

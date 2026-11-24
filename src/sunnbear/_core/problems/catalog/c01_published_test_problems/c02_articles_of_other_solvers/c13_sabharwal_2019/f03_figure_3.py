@@ -29,8 +29,8 @@ class Sabharwal2019Figure3(Formula):
         expression=r"\tmp{u}^{9} - 8",
         interval="[0, 1.5]",
         summary=(
-            "A function nearly constant at $-8$ over the lower half of the interval, rising steeply through its 1 "
-            "simple root in the upper 20%."
+            r"A function nearly constant at $-8$ around $\x = 1.5 \c$, 1.26 below the function's 1 simple root, then "
+            r"rising steeply through that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

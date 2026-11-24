@@ -30,7 +30,7 @@ class Bradie2006Exercise2312(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \frac{\cos{\left(\tmp{u} \right)}}{2}",
         interval="[0, 1]",
-        summary="An increasing, slightly convex function with 1 simple root just below the midpoint of the interval.",
+        summary="An increasing, slightly convex function with 1 simple root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -30,8 +30,8 @@ class Sabharwal2019Function4(Formula):
         expression=r"\tmp{u}^{2} - \tmp{u} - 2",
         interval="[1, 4]",
         summary=(
-            r"A quadratic that factors as $(\x - 2)(\x + 1)$, increasing on the interval, which holds only the "
-            r"quadratic's upper root."
+            r"A quadratic that factors as $(\tmp{u} - 2)(\tmp{u} + 1)$, with only the quadratic's upper root on the "
+            r"interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

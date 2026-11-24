@@ -32,8 +32,8 @@ class BurdenFairesBurden2016Exercise242B(Formula):
         expression=r"\tmp{u}^{6} + 6 \tmp{u}^{5} + 9 \tmp{u}^{4} - 2 \tmp{u}^{3} - 6 \tmp{u}^{2} + 1",
         interval="[-3, -2]",
         summary=(
-            r"The square of $\x^3 + 3\x^2 - 1$ written out, with a double root and rounding errors that turn the "
-            r"function negative within $8 \cdot 10^{-8}$ of that root."
+            r"The square of $\tmp{u}^3 + 3\tmp{u}^2 - 1$ written out, with a double root and rounding errors that turn "
+            r"the function negative within $8 \cdot 10^{-8}$ of that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -29,8 +29,8 @@ class BadrAlmotairiElGhamry2021ProblemP13(Formula):
         expression=r"\sin{\left(\tmp{u} \right)} \sinh{\left(\tmp{u} \right)} + 1",
         interval="[3, 4]",
         summary=(
-            "A decreasing function that falls to about $-20$ at the upper bound, with 1 simple root in the lowest "
-            "quarter of the interval."
+            "A function concave on the interval and steepest at the upper bound, with 1 simple root 0.86 above a "
+            "maximum."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

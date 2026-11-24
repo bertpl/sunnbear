@@ -28,10 +28,7 @@ class Bradie2006Exercise215(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{6} - 3",
         interval="[1, 2]",
-        summary=(
-            "A convex function whose slope grows 32-fold across the interval, with 1 simple root in the lower 25% of "
-            "that interval."
-        ),
+        summary="A convex, increasing function, steepest at the upper bound, with 1 simple root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

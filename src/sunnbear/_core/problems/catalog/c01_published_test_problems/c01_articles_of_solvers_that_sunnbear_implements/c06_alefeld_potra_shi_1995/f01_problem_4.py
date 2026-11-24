@@ -41,8 +41,8 @@ class AlefeldPotraShi1995Problem4(Formula):
         expression=r"\tmp{u}^{\param{n}} - \param{a_}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"An even power, flatter around $\x = 0$ and steeper toward the upper bound for larger $\param{n}$, with 1 "
-            r"simple root."
+            r"An even power, flatter around its minimum and steeper toward the upper bound for larger $\param{n}$, with"
+            r" 1 simple root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

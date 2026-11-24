@@ -38,8 +38,8 @@ class Ridders1979Function2(Formula):
         expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function near $-1000$ over the lower 80% of the wide interval, rising steeply through its 1 root toward "
-            "a pole just past that interval's upper bound."
+            "A function within 1% of $-1000$ until 0.2 below its 1 root, then rising steeply through that root toward a"
+            " pole 0.22 above the root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

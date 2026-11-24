@@ -34,8 +34,8 @@ class BurdenFairesBurden2016Exercise245(Formula):
         expression=r"e^{6 \tmp{u}} + 1.441 e^{2 \tmp{u}} - 2.079 e^{4 \tmp{u}} - 0.333",
         interval="[-1, 0]",
         summary=(
-            r"The cube $(e^{2\x} - \ln(2))^3$ written out with coefficients rounded to 4 digits, so that the triple "
-            r"root becomes 1 simple root with a slope of 0.002."
+            r"The cube $(e^{2\tmp{u}} - \ln(2))^3$ written out with coefficients rounded to 4 digits, so that the "
+            r"triple root becomes 1 simple root with a slope of 0.002."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

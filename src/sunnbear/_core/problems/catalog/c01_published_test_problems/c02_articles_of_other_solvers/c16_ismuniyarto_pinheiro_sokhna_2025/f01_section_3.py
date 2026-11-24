@@ -42,8 +42,8 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
         ),
         interval="[2, 10]",
         summary=(
-            r"A break-even equation in the year $\x$, with 1 root, steepest at the lower bound, which lies 2 above a "
-            r"pole at $\x = 0$."
+            r"A break-even equation in the year $\tmp{u}$, with 1 root, steepest at the lower bound, below which lies a"
+            r" pole at $\x = 8 \c$."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $n$, the year.",),
     )

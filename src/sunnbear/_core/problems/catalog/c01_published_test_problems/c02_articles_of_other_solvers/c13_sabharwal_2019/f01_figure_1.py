@@ -28,10 +28,7 @@ class Sabharwal2019Figure1(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"4 - \left(\tmp{u} - 1\right)^{3}",
         interval="[1, 4]",
-        summary=(
-            "A cubic with a stationary inflection point at the lower bound, decreasing and concave on the interval, "
-            "with 1 simple root."
-        ),
+        summary="A decreasing cubic with 1 simple root and a stationary inflection point 1.59 below that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

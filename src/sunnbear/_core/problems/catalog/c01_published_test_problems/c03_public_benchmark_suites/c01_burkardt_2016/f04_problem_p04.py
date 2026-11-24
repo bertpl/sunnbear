@@ -37,7 +37,10 @@ class Burkardt2016ProblemP04(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"e^{\tmp{u}} - \frac{1.0}{100.0 \tmp{u} \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
-        summary=r"An increasing function with 1 root, steep next to the lower bound because of a pole at $\x = 0$.",
+        summary=(
+            "A function with 1 root, increasing above a pole of order 2 that lies 0.095 below the root, and steep next "
+            "to the pole."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

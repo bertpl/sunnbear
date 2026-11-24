@@ -42,7 +42,7 @@ class ModifiedEpperson2013Exercise31125(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.004 \c"),),
         expression=r"\tmp{u}^{5}",
         interval="[-0.002, 0.002]",
-        summary=r"A 5th power that stays below $4 \cdot 10^{-14}$ in magnitude on the whole interval.",
+        summary="A 5th power that is at most $10^{-15}$ in magnitude within 0.001 of its root.",
         notes=(
             (
                 r"The expression is the published function, $(\x - 1)^5$, evaluated at $\x + 1$, on the "

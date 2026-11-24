@@ -36,8 +36,8 @@ class BurdenFairesBurden2016Exercise213(Formula):
         expression=r"\tmp{u}^{3} - 7 \tmp{u}^{2} + 14 \tmp{u} - 6",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A cubic with 1 root on each interval and, between the upper 2 roots, a shallow minimum of $-0.11$ next to "
-            "the lower bound of $[3.2, 4]$."
+            "A cubic with 1 root on each published interval and, between the upper 2 roots, a shallow minimum of "
+            "$-0.11$ that lies 0.2 below the uppermost root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

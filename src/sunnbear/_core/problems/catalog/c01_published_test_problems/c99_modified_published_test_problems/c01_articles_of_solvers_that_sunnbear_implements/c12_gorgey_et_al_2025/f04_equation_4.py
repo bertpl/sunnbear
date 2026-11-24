@@ -40,7 +40,7 @@ class ModifiedGorgeyEtAl2025Equation4(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3\right)^{5}\right)",
         interval="[2, 4]",
-        summary=r"A function with a root of multiplicity 5 and values of only about $10^{-5}$ at 0.1 from that root.",
+        summary="A function that stays below $10^{-4}$ in magnitude within 0.15 of its root of multiplicity 5.",
         notes=(
             (
                 r"$\operatorname{expm1}(z)$ is $e^z - 1$, computed without the cancellation that makes the "

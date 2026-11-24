@@ -30,7 +30,10 @@ class KumarSrivastav2026FunctionF5(Formula):
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(1 + \tmp{u} \right)} - 0.4",
         interval="[0, 1]",
-        summary="An increasing function whose slope halves across the interval, with 1 simple root near the midpoint.",
+        summary=(
+            r"An increasing, concave function with 1 simple root, 1.49 above a logarithmic singularity where the "
+            r"function tends to $-\infty$."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

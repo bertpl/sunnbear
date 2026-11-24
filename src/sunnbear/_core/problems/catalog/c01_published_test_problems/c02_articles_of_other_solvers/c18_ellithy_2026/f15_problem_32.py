@@ -26,7 +26,7 @@ class Ellithy2026Problem32(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"\tmp{u}^{4} + 2 \tmp{u}^{2} - \tmp{u} - 1",
         interval="[-0.5, 0]",
-        summary="A decreasing quartic with 1 root only 0.018 above the lower bound.",
+        summary="A quartic that decreases over the interval, with 1 root that lies 0.72 below the quartic's minimum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

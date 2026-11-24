@@ -41,8 +41,8 @@ class Ellithy2026Problem30(Formula):
         expression=r"\prod_{i=1}^{20} (\tmp{u} - i)",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "Wilkinson's polynomial, above $10^{15}$ in magnitude over most of each interval, with 1 root on the lower "
-            "interval and 2 on the upper, 1 of them at that interval's lower bound."
+            r"Wilkinson's polynomial, above $10^{15}$ in magnitude over most of each interval, with 1 root inside each "
+            r"interval and another at $\x = 19 + 2 \c$ for the upper interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

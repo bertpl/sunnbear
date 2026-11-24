@@ -36,8 +36,8 @@ class GorgeyEtAl2025Equation1(Formula):
         expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A quintic with 2 simple roots and a triple root, which is the upper bound of the wide interval and the "
-            "only root on the narrow one."
+            "A quintic with 2 simple roots and, above them, a triple root, which is the only root on the narrow "
+            "interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -29,8 +29,8 @@ class NaghipoorAhmadianSoheili2008Equation6(Formula):
         expression=r"\frac{1}{\tmp{u}} - 1",
         interval="[0.5, 1.5]",
         summary=(
-            "A hyperbola, 9 times as steep at the lower bound as at the upper bound, with its root at the midpoint of "
-            "the interval."
+            "A hyperbola, steepest at the lower bound, with a pole below that bound and the hyperbola's root 1 above "
+            "the pole."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

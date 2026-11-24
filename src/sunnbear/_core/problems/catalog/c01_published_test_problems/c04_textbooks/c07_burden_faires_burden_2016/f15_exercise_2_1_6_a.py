@@ -31,8 +31,8 @@ class BurdenFairesBurden2016Exercise216A(Formula):
         expression=r"3 \tmp{u} - e^{\tmp{u}}",
         interval="[1, 2]",
         summary=(
-            r"A concave function with 1 simple root and a nearly flat maximum at $\x = \ln(3)$, just above the lower "
-            r"bound."
+            r"A concave function with 1 simple root on the interval and a nearly flat maximum 0.41 below that root, at "
+            r"$\x = \ln(3) + \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

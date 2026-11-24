@@ -37,10 +37,7 @@ class BurdenFairesBurden2016Exercise215D(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u} \cos{\left(\tmp{u} \right)} - 2 \tmp{u}^{2} + 3 \tmp{u} - 1",
         interval=r"[\param{a}, \param{b}]",
-        summary=(
-            "A function positive between its 2 simple roots, 1 on each interval, the lower root only 0.0025 below the "
-            "upper bound of $[0.2, 0.3]$."
-        ),
+        summary="A function positive between its 2 simple roots, with 1 root on each published interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

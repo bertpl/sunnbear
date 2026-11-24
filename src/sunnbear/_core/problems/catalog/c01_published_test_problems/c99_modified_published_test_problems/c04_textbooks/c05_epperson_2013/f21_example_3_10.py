@@ -38,8 +38,8 @@ class ModifiedEpperson2013Example310(Formula):
         expression=r"\tmp{u}^{4} - \tmp{u} - 1",
         interval="[-2, 1]",
         summary=(
-            "A convex quartic that falls steeply from the lower bound through 1 simple root to a minimum near "
-            "the upper bound."
+            "A convex quartic that falls steeply from the lower bound through 1 simple root, with the quartic's minimum"
+            " 1.35 to the right of that root."
         ),
         notes=(
             (

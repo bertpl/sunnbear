@@ -38,8 +38,8 @@ class Stage2013Section34(Formula):
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}^{3}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function with 1 root and a zero slope at $\x = 0$, which is the lower bound of the narrow interval and "
-            r"a shallow local maximum on the wide one."
+            "A function with 1 root, decreasing except for a rise of only 0.018 that ends at a local maximum 0.87 below"
+            " that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

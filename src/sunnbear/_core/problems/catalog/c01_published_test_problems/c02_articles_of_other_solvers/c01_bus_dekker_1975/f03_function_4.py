@@ -33,7 +33,7 @@ class BusDekker1975Function4(Formula):
         interval="[0, 1]",
         summary=(
             r"An increasing polynomial with 1 simple root, convex at $\param{n} = 1$, and for larger $\param{n}$ "
-            r"concave below an inflection point and convex above it."
+            r"concave below an inflection point that lies above the root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

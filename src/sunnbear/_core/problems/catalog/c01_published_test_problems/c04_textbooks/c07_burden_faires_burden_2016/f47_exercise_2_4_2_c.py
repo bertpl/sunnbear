@@ -38,8 +38,8 @@ class BurdenFairesBurden2016Exercise242C(Formula):
         ),
         interval="[3, 4]",
         summary=(
-            r"The cube of $\sin(\x) - e^{-\x}$ written out, below $10^{-3}$ in magnitude from the lower bound to 0.1 "
-            r"past the triple root."
+            r"The cube of $\sin(\tmp{u}) - e^{-\tmp{u}}$ written out, below $10^{-3}$ in magnitude within 0.1 of the "
+            r"triple root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

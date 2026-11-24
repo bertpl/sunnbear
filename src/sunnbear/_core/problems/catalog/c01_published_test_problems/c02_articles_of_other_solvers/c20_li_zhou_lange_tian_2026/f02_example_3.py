@@ -54,8 +54,8 @@ class LiZhouLangeTian2026Example3(Formula):
         ),
         interval="[-2.5, -0.5]",
         summary=(
-            "A decreasing function whose only root is the 5% quantile of a normal distribution, nearly flat at the "
-            "lower bound."
+            r"A decreasing function, flattening below its only root, which is the 5% quantile of a normal distribution "
+            r"shifted by $2 \c$."
         ),
         notes=(
             r"The expression equals $$\param{p} - \Phi\left(\frac{\tmp{u} - \param{mu}}{\param{sigma}}\right),$$ with "

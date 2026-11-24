@@ -29,8 +29,8 @@ class Suhadolnik2012Function10(Formula):
         expression=r"e^{\tmp{u}^{2} + 7 \tmp{u} - 30} - 1",
         interval="[2.6, 3.5]",
         summary=(
-            "A function that never falls below $-1$ but grows steeply above its 1 root, to about 850 at the upper "
-            "bound."
+            "A function that never falls below $-1$ but grows steeply above its 1 root, reaching about 50 at only 0.3 "
+            "above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -30,10 +30,7 @@ class ChapraCanale2015Problem55(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \tmp{u}^{2}",
         interval="[0.5, 1]",
-        summary=(
-            "A concave function with a maximum just below the lower bound and 2 roots, of which only the nonzero one "
-            "lies on the interval."
-        ),
+        summary="A concave function with 2 roots, a maximum between them, and only the upper root on the interval.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

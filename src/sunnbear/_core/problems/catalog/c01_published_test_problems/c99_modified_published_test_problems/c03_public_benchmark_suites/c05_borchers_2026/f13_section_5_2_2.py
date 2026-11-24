@@ -42,7 +42,7 @@ class ModifiedBorchers2026Section522(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u} \sin{\left(\pi \tmp{u} \right)}",
         interval="[-2.04, 1.96]",
-        summary=r"An even function with 3 simple roots on the interval and a double root at $\x = 0$.",
+        summary=r"A function symmetric about its double root at $\x = 4 \c$, with 3 simple roots on the interval.",
         notes=(
             (
                 "The interval is the published $[-2, 2]$ moved left by 0.04, so that neither bound is a "

@@ -31,8 +31,8 @@ class ChenLi2007Example2(Formula):
         expression=r"\tmp{u} - e^{\sin{\left(\tmp{u} \right)}} + 1",
         interval="[1, 4]",
         summary=(
-            "A function within 0.025 of its minimum over the lower 10% of the interval, then increasing through 1 "
-            "simple root in the lower quarter."
+            "A function that stays within 0.025 of a minimum over a stretch 0.33 wide, with a double root 1.16 below "
+            "that minimum and a simple root 0.54 above it."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

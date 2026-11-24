@@ -31,8 +31,8 @@ class BurdenFairesBurden2016Exercise2110(Formula):
         expression=r"\tmp{u}^{2} - 1 - e^{1 - \tmp{u}^{2}}",
         interval="[-2, 0]",
         summary=(
-            "An even function, decreasing on the interval through 1 simple root to the function's minimum at the "
-            "upper bound."
+            r"A function symmetric about its minimum at $\x = 2 \c$ and decreasing through 1 simple root on the "
+            r"interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

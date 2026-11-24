@@ -41,7 +41,8 @@ class ModifiedMoler2004Section410(Formula):
         ),
         interval="[-1, 1]",
         summary=(
-            'A function with 2 steep peaks and 1 simple root left of the peaks, referred to in the source as "humps".'
+            "A function with 1 simple root on the interval and 2 steep peaks to the right of that root, referred to in "
+            'the source as "humps".'
         ),
         notes=(
             (

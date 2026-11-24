@@ -33,8 +33,8 @@ class Ridders1979Function3(Formula):
         expression=r"\sin{\left(\frac{\pi \tmp{u}}{180} \right)}",
         interval="[10, 280]",
         summary=(
-            "The sine of an angle given in degrees, with 1 simple root between a maximum and a minimum that both lie "
-            "inside the interval."
+            "The sine of an angle given in degrees, with 1 simple root, which lies 90 above a maximum and 90 below a "
+            "minimum."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

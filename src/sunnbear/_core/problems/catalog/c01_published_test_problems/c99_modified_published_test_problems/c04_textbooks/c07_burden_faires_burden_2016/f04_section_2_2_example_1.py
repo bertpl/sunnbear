@@ -35,10 +35,7 @@ class ModifiedBurdenFairesBurden2016Section22Example1(Formula):
         definitions=((r"\tmp{u}", r"\x - 4 \c"),),
         expression=r"\tmp{u} - \left(\tmp{u}^{2} - 2\right)",
         interval="[-3, 1]",
-        summary=(
-            "A concave parabola with 1 simple root on the interval and the vertex between that root and the upper "
-            "bound."
-        ),
+        summary="A concave parabola with 1 simple root on the interval and the vertex 1.5 to the right of that root.",
         notes=(
             (
                 "The interval ends at 1, not at the published 3, so that it holds 1 of the published "

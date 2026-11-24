@@ -32,8 +32,7 @@ class Epperson2013Exercise394(Formula):
         expression=r"\tmp{u} - \left(1 + e^{- \tmp{u}}\right)",
         interval="[1, 2]",
         summary=(
-            "An increasing function with 1 simple root and a slope that falls by less than 20% from the lower bound to "
-            "the upper bound."
+            "An increasing function with 1 simple root and a slope above 1 that falls slowly toward the upper bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

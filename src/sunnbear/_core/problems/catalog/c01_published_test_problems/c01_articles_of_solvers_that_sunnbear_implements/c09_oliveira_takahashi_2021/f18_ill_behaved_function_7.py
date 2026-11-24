@@ -31,8 +31,8 @@ class OliveiraTakahashi2021IllBehavedFunction7(Formula):
         ),
         interval="[-1, 1]",
         summary=(
-            r"A parabola plus a unit step, with no root: its only sign change is a jump from $-1/2$ to $1/2$ at $\x = "
-            r"0$."
+            r"A parabola plus a unit step, with no root: its only sign change is a jump from $-1/2$ to $1/2$ at $\x = 2"
+            r" \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

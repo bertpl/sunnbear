@@ -53,8 +53,8 @@ class ModifiedChandrupatla1997Function8(Formula):
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A decreasing function with 1 root and a pole just below the lower bound, leveling off toward $-1013$ on "
-            "the 2 widest intervals."
+            "A decreasing function with 1 root and a pole just below the lower bound, leveling off toward $-1013$ far "
+            "above that root."
         ),
         notes=(
             (

@@ -30,8 +30,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
         ),
         interval="[-11, 9]",
         summary=(
-            r"A hyperbola that changes sign only at its pole, where it is undefined, with its value set to 0 at $\x = "
-            r"0$."
+            r"A hyperbola that changes sign only at its pole, where the function is undefined, with the value set to 0 "
+            r"at $\x = 20 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

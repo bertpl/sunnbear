@@ -47,8 +47,8 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF81(Formula):
         ),
         interval="[-1.02, 1]",
         summary=(
-            r"A function negative only up to $\x = -1$ and, above that point, oscillating ever faster as $\x$ "
-            r'approaches $-1$ and touching 0 infinitely often, referred to in the source as "Warsaw".'
+            r"A function negative only up to $\x = 2.02 \c - 1$ and, above that point, oscillating ever faster toward "
+            r'it and touching 0 infinitely often, referred to in the source as "Warsaw".'
         ),
         notes=(
             (

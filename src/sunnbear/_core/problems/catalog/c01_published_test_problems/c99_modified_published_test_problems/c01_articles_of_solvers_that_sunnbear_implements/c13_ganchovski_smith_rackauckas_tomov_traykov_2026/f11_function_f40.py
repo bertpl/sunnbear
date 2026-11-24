@@ -36,7 +36,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
             r"\frac{1}{\tmp{u} - \frac{2}{3}} & \text{otherwise} \end{cases}"
         ),
         interval="[-11, 9]",
-        summary=r"A hyperbola that changes sign only at its pole, with the value set to 0 at $\x = 0$.",
+        summary=r"A hyperbola that changes sign only at its pole, with the function's value set to 0 at $\x = 20 \c$.",
         notes=(
             (
                 r"The expression is 0 at the pole, $\tmp{u} = 2/3$ in float64, where the published "

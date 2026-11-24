@@ -42,8 +42,8 @@ class AlefeldPotraShi1993Problem4(Formula):
         expression=r"\tmp{u}^{\param{n}} - \param{a_}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "An even power, steep toward the upper bound, with 1 simple root in the lowest 20% of each interval, only "
-            "0.05 above the lower bound of the narrower interval."
+            "An even power, steep toward the upper bound and nearly flat below its 1 simple root on each published "
+            "interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

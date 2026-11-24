@@ -35,8 +35,8 @@ class HyperbolicSine(Formula):
         expression=r"\sinh(\x - \c)",
         interval=r"[-\param{b}, \param{b}]",
         summary=(
-            "The hyperbolic sine, from nearly a line on a narrow interval to exponential growth toward both bounds on "
-            "a wide one."
+            "The hyperbolic sine, from nearly a line on a narrow interval to exponential growth away from the root on a"
+            " wide one."
         ),
         param_conditions=(r"$\param{b} > 0$",),
     )

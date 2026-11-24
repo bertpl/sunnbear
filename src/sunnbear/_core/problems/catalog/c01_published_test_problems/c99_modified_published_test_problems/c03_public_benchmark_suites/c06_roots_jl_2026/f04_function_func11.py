@@ -41,8 +41,8 @@ class ModifiedRootsJl2026FunctionFunc11(Formula):
         expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 1]",
         summary=(
-            "An exponential minus a cosine, steep toward the lower bound, with 1 root and a shallow minimum between "
-            "that root and the upper bound."
+            "An exponential minus a cosine, steep toward the lower bound, with 1 root and a shallow minimum 0.59 above "
+            "that root."
         ),
         notes=(
             (

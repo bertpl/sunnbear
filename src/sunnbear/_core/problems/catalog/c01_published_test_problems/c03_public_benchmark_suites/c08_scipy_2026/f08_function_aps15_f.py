@@ -44,7 +44,7 @@ class Scipy2026FunctionAps15F(Formula):
         ),
         interval=r"[-1000, 10^{-4}]",
         summary=(
-            r"A continuous function, flat outside a band within $10^{-4}$ of the upper bound, across which it rises "
+            r"A continuous function, flat outside a band under $10^{-4}$ wide, across which the function rises "
             r"exponentially through 1 simple root, more steeply for larger $\param{n}$."
         ),
     )

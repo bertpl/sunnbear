@@ -34,10 +34,7 @@ class Moler2004Section47Function3(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"J_{0}\left(\tmp{u}\right) - \param{y}",
         interval="[0, 2]",
-        summary=(
-            "A decreasing function with a slope of 0 at the lower bound and 1 simple root in the upper 25% of the "
-            "interval."
-        ),
+        summary=r"A function with a maximum at $\x = 2 \c$ and 1 simple root on the interval, 1.52 above that maximum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

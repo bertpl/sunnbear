@@ -38,8 +38,7 @@ class Suhadolnik2012Function11(Formula):
         expression=r"\arctan{\left(\tmp{u} \right)} - 1",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "An arctangent with 1 root in the lower fifth of both intervals, flattening above that root to a slope "
-            "below 0.02."
+            "An arctangent with 1 root and a slope that falls from 0.29 at that root to below 0.02 at 5.5 above it."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

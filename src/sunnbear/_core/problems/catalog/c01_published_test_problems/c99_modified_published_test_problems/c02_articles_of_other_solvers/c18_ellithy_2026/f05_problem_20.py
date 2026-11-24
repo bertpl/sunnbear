@@ -44,8 +44,8 @@ class ModifiedEllithy2026Problem20(Formula):
         expression=r"e^{\tmp{u}^{2}} - e^{\param{k} \tmp{u}}",
         interval="[0.02, 2]",
         summary=(
-            r"A function negative between its roots $\x = 0$ and $\x = \param{k}$, with the second root on the "
-            "interval and the first just below the lower bound."
+            r"A function negative between its roots $\x = 1.98 \c$ and $\x = 1.98 \c + \param{k}$, with only the second"
+            r" root on the interval."
         ),
         notes=(
             (

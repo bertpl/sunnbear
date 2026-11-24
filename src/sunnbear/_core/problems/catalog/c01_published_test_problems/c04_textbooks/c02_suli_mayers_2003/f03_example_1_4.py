@@ -58,8 +58,8 @@ class SuliMayers2003Example14(Formula):
         ),
         interval="[0, 1]",
         summary=(
-            r"A function with its only root at the lower bound, where the slope is 0 for $\param{alpha} = 1/2$, $1/2$ "
-            r"for $\param{alpha} = 1$ and 1 for $\param{alpha} = 2$."
+            r"A function with its only root at $\x = \c$, where the slope is 0 for $\param{alpha} = 1/2$, $1/2$ for "
+            r"$\param{alpha} = 1$ and 1 for $\param{alpha} = 2$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

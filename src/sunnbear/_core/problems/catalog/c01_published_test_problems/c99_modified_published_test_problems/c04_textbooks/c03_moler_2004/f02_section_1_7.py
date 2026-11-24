@@ -45,7 +45,7 @@ class ModifiedMoler2004Section17(Formula):
         definitions=((r"\tmp{u}", r"\x - 0.024 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{7}",
         interval="[0.988, 1.012]",
-        summary=r"A 7th power, below $4 \cdot 10^{-14}$ in magnitude over the whole interval.",
+        summary=r"A 7th power, below $5 \cdot 10^{-12}$ in magnitude over the whole interval.",
         notes=(
             (
                 r"The expression equals the published function, $$\tmp{u}^{7} - 7 \tmp{u}^{6} + 21 "

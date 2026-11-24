@@ -38,8 +38,8 @@ class BurdenFairesBurden2016Exercise236F(Formula):
         expression=r"\sin{\left(\tmp{u} \right)} - e^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function with 1 simple root on each interval, among infinitely many roots that approach the multiples "
-            r"of $\pi$ as $\x$ grows."
+            r"A function with 1 simple root on each published interval, among infinitely many roots that approach the "
+            r"roots of $\sin(\tmp{u})$ as $\x$ grows."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

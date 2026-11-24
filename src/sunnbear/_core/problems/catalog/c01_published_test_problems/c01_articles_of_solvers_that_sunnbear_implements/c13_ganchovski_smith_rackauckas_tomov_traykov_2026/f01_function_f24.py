@@ -27,7 +27,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF24(Formula):
         expression=r"\left(\tmp{u} + 2\right) \left(\tmp{u} + 1\right) \left(\tmp{u} - 3\right)^{3}",
         interval="[2.6, 4.6]",
         summary=(
-            "A quintic whose 1 root on the interval is triple, flat around that root and steep toward the upper bound."
+            "A quintic whose 1 root on the interval is triple, flat around that root and increasingly steep above it."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

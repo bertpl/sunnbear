@@ -30,10 +30,7 @@ class OliveiraTakahashi2021IllBehavedFunction5(Formula):
             r" \\0 & \text{otherwise} \end{cases} - 1"
         ),
         interval="[-1, 1]",
-        summary=(
-            "A step function with no root, which jumps from $-1$ to about $10^{-6}$ at only $10^{-6}$ above the lower "
-            "bound."
-        ),
+        summary="A step function with no root: its only sign change is a jump from $-1$ to about $10^{-6}$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

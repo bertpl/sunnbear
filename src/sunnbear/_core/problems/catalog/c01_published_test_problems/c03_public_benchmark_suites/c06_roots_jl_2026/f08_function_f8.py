@@ -31,7 +31,7 @@ class RootsJl2026FunctionF8(Formula):
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=r"e^{- \tmp{u}^{2} + \tmp{u} + 2} - \cos{\left(\tmp{u} \right)} + \tmp{u}^{3} + 1",
         interval="[-2, 1]",
-        summary="A Gaussian peak plus a cubic, minus a cosine, with 1 root and a maximum near the upper bound.",
+        summary="A Gaussian peak plus a cubic, minus a cosine, with 1 root and a local maximum 1.7 above that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

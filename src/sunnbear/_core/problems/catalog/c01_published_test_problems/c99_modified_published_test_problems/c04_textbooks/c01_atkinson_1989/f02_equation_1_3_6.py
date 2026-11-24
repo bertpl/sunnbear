@@ -59,7 +59,7 @@ class ModifiedAtkinson1989Equation136(Formula):
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=r"\tmp{u}^{3}",
         interval=r"[\param{a}, \param{b}]",
-        summary="A cube, which stays below $10^{-8}$ in magnitude across the narrow interval.",
+        summary="A cube, which stays below $10^{-7}$ in magnitude across the narrow interval.",
         notes=(
             (
                 r"The expression is the published function, $\x^3 - 3 \x^2 + 3 \x - 1$, evaluated at $\x + "

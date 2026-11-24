@@ -48,8 +48,8 @@ class ModifiedSuliMayers2003Equation133(Formula):
         expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A parabola whose roots, the fixed points of the logistic map, are $\x = 1 - 1/\param{a_}$ and $\x = 0$, "
-            r"the second just below the lower bound."
+            r"A parabola whose roots, $\param{c_scale} \c$ plus the fixed points of the logistic map, lie $1 - "
+            r"1/\param{a_}$ apart, with only the upper root on the interval."
         ),
         notes=(
             (

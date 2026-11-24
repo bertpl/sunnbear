@@ -26,10 +26,7 @@ class Ellithy2026Problem21(Formula):
         definitions=((r"\tmp{u}", r"\x - 2 \c"),),
         expression=r"\left(\tmp{u}^{2} - 4\right) \left(\tmp{u} + 1.5\right) \left(\tmp{u} - 0.5\right)",
         interval="[0, 2]",
-        summary=(
-            "A quartic that dips below 0 between a simple root inside the interval and a second root at the upper "
-            "bound."
-        ),
+        summary="A quartic that dips below 0 between a simple root and a second simple root 1.5 above it.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

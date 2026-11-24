@@ -44,8 +44,8 @@ class HyperbolicCosine(Formula):
         expression=r"2 \sinh\left(\frac{\tmp{u} + \tmp{v}}{2}\right) \, \sinh\left(\frac{\tmp{u} - \tmp{v}}{2}\right)",
         interval=r"[0, \param{b}]",
         summary=(
-            "The hyperbolic cosine, with its minimum next to the lower bound and its root in the middle of the "
-            "interval."
+            r"The hyperbolic cosine, with its minimum at $\x = \c$ and 1 root on the interval, half the interval's "
+            r"width above that minimum."
         ),
         notes=(
             r"The expression equals $$\cosh(\x - \c) - \cosh\left(\frac{\param{b}}{2}\right),$$ in a form that "

@@ -28,7 +28,7 @@ class Suhadolnik2012Function8(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.7 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[0, 1.7]",
-        summary="A decreasing function whose root is the fixed point of the cosine.",
+        summary=r"A decreasing function with 1 root, at $1.7 \c$ plus the fixed point of the cosine.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

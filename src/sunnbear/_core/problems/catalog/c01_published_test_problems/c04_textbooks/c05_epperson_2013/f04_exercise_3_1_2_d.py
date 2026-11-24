@@ -35,8 +35,8 @@ class Epperson2013Exercise312D(Formula):
         expression=r"\tmp{u}^{6} - \tmp{u} - 1",
         interval="[0, 2]",
         summary=(
-            "A polynomial that stays between $-1.6$ and $-1$ over the lower half of the interval, then rises steeply "
-            "through 1 simple root."
+            "A polynomial that rises steeply through 1 simple root after staying between $-1.6$ and $-1$ from 1.13 to "
+            "0.14 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

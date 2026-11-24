@@ -26,7 +26,7 @@ class Suhadolnik2012Function14(Formula):
         definitions=((r"\tmp{u}", r"\x - 1.4 \c"),),
         expression=r"\tmp{u}^{3} - 1",
         interval="[0.1, 1.5]",
-        summary="A cubic with 1 simple root and a slope of only 0.03 at the lower bound.",
+        summary="A cubic with 1 simple root and a slope that falls to 0 at the inflection point, 1 below that root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

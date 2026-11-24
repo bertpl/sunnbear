@@ -34,7 +34,10 @@ class GorgeyEtAl2025Equation5(Formula):
             r"\cos{\left(\tmp{u} \right)}"
         ),
         interval="[-1, 1]",
-        summary="A decreasing function with 1 simple root, in the upper tenth of the interval, where it is steepest.",
+        summary=(
+            "A decreasing function with 1 simple root, increasingly steep above that root and steepest at the upper "
+            "bound."
+        ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

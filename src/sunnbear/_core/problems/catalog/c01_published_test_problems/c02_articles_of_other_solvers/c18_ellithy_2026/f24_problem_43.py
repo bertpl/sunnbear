@@ -38,8 +38,7 @@ class Ellithy2026Problem43(Formula):
         ),
         interval="[0.008, 0.03]",
         summary=(
-            "The Colebrook–White equation for the friction factor of turbulent pipe flow, with 1 root in the lower "
-            "fifth of the interval."
+            "The Colebrook–White equation for the friction factor of turbulent pipe flow, with 1 root on the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

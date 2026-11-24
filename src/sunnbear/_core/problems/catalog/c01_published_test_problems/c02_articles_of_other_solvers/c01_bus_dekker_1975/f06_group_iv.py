@@ -37,8 +37,8 @@ class BusDekker1975GroupIv(Formula):
         ),
         interval="[-1, 4]",
         summary=(
-            "An odd function with all derivatives 0 at its root, so flat there that the function is exactly 0 in "
-            "floating point on a band 0.073 wide."
+            "A function odd about its root, where all derivatives are 0, so flat there that the function is exactly 0 "
+            "in floating point on a band 0.073 wide."
         ),
         notes=(
             r"The expression is 0 for $|\tmp{u}| < 10^{-100}$, where float64 rounds $\tmp{u} e^{-\tmp{u}^{-2}}$ to 0 "

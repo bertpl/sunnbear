@@ -29,8 +29,8 @@ class OliveiraTakahashi2021WellBehavedFunction2(Formula):
         expression=r"\tan{\left(\tmp{u} - \frac{1}{10} \right)}",
         interval="[-1, 1]",
         summary=(
-            "An increasing tangent with 1 simple root, steepest at the lower bound, which lies nearer a pole than the "
-            "upper bound does."
+            "An increasing tangent with 1 simple root midway between 2 poles, one below the lower bound and one above "
+            "the upper bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

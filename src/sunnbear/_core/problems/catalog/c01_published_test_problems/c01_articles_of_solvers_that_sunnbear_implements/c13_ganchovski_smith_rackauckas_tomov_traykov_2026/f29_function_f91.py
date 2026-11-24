@@ -29,8 +29,8 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF91(Formula):
         expression=r"\tmp{u} \sin{\left(\frac{1}{\tmp{u}} \right)} - 0.1 - 0.01",
         interval="[0.01, 1]",
         summary=(
-            "An oscillation that speeds up and shrinks toward the lower bound, with 3 roots, the lower 2 only 0.018 "
-            "apart."
+            r"An oscillation that speeds up and shrinks toward $\x = 0.99 \c$, with 3 roots, the lower 2 only 0.018 "
+            r"apart."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -41,8 +41,8 @@ class Scipy2026FunctionAps14F(Formula):
         ),
         interval=r"\left[-1000, \frac{\pi}{2}\right]",
         summary=(
-            r"A continuous function, constant over nearly all of the interval and increasing after a kink at $\x = 0$, "
-            r"through 1 simple root."
+            r"A continuous function, constant up to a kink at $\x = 1000 \c$, then oscillating around a rising line, "
+            r"with 1 simple root 0.62 above the kink."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

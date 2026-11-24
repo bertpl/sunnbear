@@ -38,8 +38,8 @@ class Ford1997Function1(Formula):
         expression=r"\sin{\left(\frac{0.01}{\tmp{u}} \right)} - 0.01",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            "A function with 1 root, where its slope is about $-0.01$, and a maximum of 0.99 near the lower bound of "
-            "the widest interval."
+            r"A function with 1 root, where the slope is about $-0.01$; the maximum nearest that root is 0.99, at $\x ="
+            r" 0.02/\pi + \param{c_scale} \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -27,8 +27,8 @@ class AlefeldPotra1992Problem3(Formula):
         expression=r"11 \tmp{u}^{11} - 1",
         interval="[0.1, 1]",
         summary=(
-            r"An increasing function, within 0.01 of $-1$ over the lower 47% of the interval, with 1 simple root in "
-            r"the upper quarter."
+            "An 11th power minus 1, with 1 root, steep toward the upper bound and within 0.01 of $-1$ at every point of"
+            " the interval that lies more than 0.28 below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

@@ -31,8 +31,8 @@ class ChapraCanale2015Problem56(Formula):
         expression=r"\ln{\left(\tmp{u}^{2} \right)} - 0.7",
         interval="[0.5, 2]",
         summary=(
-            r"An even function with a logarithmic singularity at $\x = 0$, increasing and concave on the interval, "
-            r"which holds the positive one of the function's 2 roots."
+            "A function symmetric about a logarithmic singularity, with 2 roots 1.42 from it, of which only the larger "
+            "lies on the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

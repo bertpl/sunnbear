@@ -38,7 +38,8 @@ class Romadani2025Section54(Formula):
         expression=r"\cos^{3}{\left(e^{\frac{\tmp{u}}{2}} \right)} - \tmp{u}^{3}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A decreasing function, more than 8 times steeper at $\x = \pm 1$ than near $\x = 0$, with 1 simple root."
+            r"A decreasing function, more than 8 times steeper at $\x = \param{c_scale} \c \pm 1$ than near $\x = "
+            r"\param{c_scale} \c$, with 1 simple root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

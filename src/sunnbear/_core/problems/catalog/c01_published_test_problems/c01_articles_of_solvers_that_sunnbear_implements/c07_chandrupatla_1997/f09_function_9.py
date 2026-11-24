@@ -38,8 +38,8 @@ class Chandrupatla1997Function9(Formula):
         expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2.0 \cdot 10^{-6}}{\tmp{u}^{3}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
-            r"A function with 1 simple root and a narrow dip to about $-3.7 \cdot 10^{4}$ just above the lower bound, "
-            r"the point where 2 terms with poles at $\x = 0$ cancel."
+            r"A function with 1 simple root on the interval and, just above a pole below the lower bound, a second root"
+            r" and a narrow dip to about $-3.7 \cdot 10^{4}$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

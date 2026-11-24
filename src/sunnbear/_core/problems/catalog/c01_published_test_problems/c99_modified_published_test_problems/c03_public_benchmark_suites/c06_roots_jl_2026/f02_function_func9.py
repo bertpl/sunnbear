@@ -48,8 +48,8 @@ class ModifiedRootsJl2026FunctionFunc9(Formula):
         expression=r"\tanh{\left(\tmp{u} \right)} - \tan{\left(\tmp{u} \right)}",
         interval="[5, 7.7]",
         summary=(
-            "A hyperbolic tangent minus a tangent, decreasing through 1 root, and steep toward both bounds, which lie "
-            "near poles of the tangent."
+            "A hyperbolic tangent minus a tangent, decreasing through 1 root, and steep toward the tangent's 2 poles, "
+            "which lie on either side of the interval."
         ),
         notes=(
             (

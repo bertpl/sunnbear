@@ -44,8 +44,8 @@ class ChapraCanale2015Figure86(Formula):
         ),
         interval="[0.008, 0.08]",
         summary=(
-            "The fixed-point form of the Colebrook equation for the friction factor, increasing and concave, with 1 "
-            "simple root."
+            "The fixed-point form of the Colebrook equation for the friction factor, increasing and concave above a "
+            "double pole, with 1 simple root above that pole."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $f$, the friction factor.",),
     )

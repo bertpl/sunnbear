@@ -30,8 +30,8 @@ class BurdenFairesBurden2016Exercise267(Formula):
         expression=r"600 \tmp{u}^{4} - 550 \tmp{u}^{3} + 200 \tmp{u}^{2} - 20 \tmp{u} - 1",
         interval="[0.1, 1]",
         summary=(
-            "A convex quartic with 1 simple root near the lower bound and a slope 80 times larger at the upper bound "
-            "than at that root."
+            "A convex quartic with 2 real roots 0.27 apart, of which only the upper one, with a slope of 14, lies on "
+            "the interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

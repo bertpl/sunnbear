@@ -30,8 +30,8 @@ class RootsFortran2025Case67(Formula):
         expression=r"e^{\tmp{u}^{2} + 7.0 \tmp{u} - 30.0} - 1.0",
         interval="[1, 3.1]",
         summary=(
-            "An exponential minus 1, within $10^{-3}$ of $-1$ over the lower 65% of the interval and steep at its 1 "
-            "root near the upper bound."
+            "An exponential minus 1, steep at its 1 root on the interval and already within $10^{-3}$ of $-1$ at 0.56 "
+            "below that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X

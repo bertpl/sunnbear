@@ -49,8 +49,8 @@ class ChapraCanale2015Problem839(Formula):
         ),
         interval="[10, 50]",
         summary=(
-            "The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
-            "logarithmic singularity 9.7 s beyond the upper bound."
+            r"The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
+            r"logarithmic singularity at $\x = \param{m0}/\param{q} + 40 \c$."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $t$, the time, in s.",),
     )

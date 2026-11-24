@@ -57,8 +57,8 @@ class ChapraCanale2015Equation814(Formula):
         ),
         interval="[2, 12]",
         summary=(
-            r"The charge balance of rainwater in terms of the pH, with 1 simple root and values below $10^{-4}$ in "
-            r"magnitude for $4 \le \x \le 7$ but above 500 at $\x = 12$."
+            "The charge balance of rainwater in terms of the pH, below $10^{-4}$ in magnitude within 1.5 of its 1 "
+            "simple root but above 500 at 6.4 above that root."
         ),
         notes=(r"$\tmp{u}$ is the pH of the rainwater.",),
     )
