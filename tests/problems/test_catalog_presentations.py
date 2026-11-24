@@ -127,8 +127,8 @@ def test_categories_declare_their_descriptions():
     assert failing == []
 
 
-def test_symbols_a_and_b_are_the_interval_bounds():
-    """A shipped formula's parameter with the name or symbol ``a`` or ``b`` is its interval's lower or upper bound.
+def test_names_and_symbols_a_and_b_are_the_interval_bounds():
+    """A parameter with the name or symbol ``a`` or ``b`` has both, and is its formula's lower or upper interval bound.
 
     The symbols a and b then mean the interval's bounds in every formula that shows them.
     """

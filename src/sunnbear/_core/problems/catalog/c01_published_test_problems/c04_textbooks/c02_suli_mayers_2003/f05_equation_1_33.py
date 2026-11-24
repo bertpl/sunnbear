@@ -32,7 +32,7 @@ class SuliMayers2003Equation133(Formula):
             latex_symbol=r"\mu",
             meaning=(
                 r"The parameter of the logistic map $\param{mu} \tmp{u} (1 - \tmp{u})$, whose fixed points are the "
-                "roots."
+                "formula's roots."
             ),
         ),
     )
