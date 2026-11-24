@@ -12,13 +12,13 @@ A parameter's name is part of a test problem's id, as in `f2.1.2[p=4.0,w=10^0.3]
 - **`a` and `b` also name the bounds of the interval when a formula outside category 1 takes its interval as a parameter**, as in `BernoulliPolynomial`. The class docstring of such a formula states which values `a` and `b` may take.
 - **A Python keyword gets a trailing underscore**, as in `lambda_`.
 - **The symbols $a$ and $b$ name only the bounds of an interval**, in every category; a catalog test checks that every parameter with these symbols is a bound.
-- **A source's parameter whose symbol is reserved takes another symbol, and the name that spells it**, such as `q` for the constant $a$ of `x^n - a`, and `Ct` for a target concentration that the source calls $c$: the one exception to rule 1 of the next section.
+- **A source's parameter whose symbol is $a$, $b$, $c$ or $u$ takes another symbol, and the name that spells that symbol**, such as `q` for the constant $a$ of `x^n - a`, `Ct` for a target concentration that the source calls $c$, and `uex` for an exhaust velocity that the source calls $u$, the shifted variable of every formula of category 1. This is the one exception to rule 1 of the next section.
 
 ## Which names a formula uses
 
 The first rule that applies gives the names:
 
-1. **A published formula keeps the symbols of its source, and each parameter's name spells its symbol in ASCII**, such as `mu` for $\mu$, `x1` for $x_1$, `pCO2` for $p_{\mathrm{CO_2}}$ and `x_star` for $x^*$: a subscript follows the letter with no underscore. The formulas of category 1 follow this rule.
+1. **A published formula keeps the symbols of its source, and each parameter's name spells its symbol in ASCII**, such as `mu` for $\mu$, `x1` for $x_1$, `pCO2` for $p_{\mathrm{CO_2}}$ and `x_star` for $x^*$: a subscript follows the letter with no underscore, and a superscript written as a word, such as `star`, follows an underscore. The formulas of category 1 follow this rule.
 2. **A named function keeps the parameter names of its reference**, written in ASCII, such as `mu` and `sigma` for a normal distribution, or `nu` for degrees of freedom.
 3. **Any other parameter takes its name from the table below.**
 
