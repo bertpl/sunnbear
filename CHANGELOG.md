@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Reserve the symbols a and b of the test problems' formulas for the interval's bounds, and name each parameter after its symbol, which changes the ids of 16 formulas' test problems
+
 ### Deprecated
 
 ### Removed
