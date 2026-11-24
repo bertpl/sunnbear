@@ -1,0 +1,24 @@
+{
+  "id": "Ridders79",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Ridders",
+      "given": "C. J. F."
+    }
+  ],
+  "title": "A new algorithm for computing a single root of a real continuous function",
+  "container-title": "IEEE Transactions on Circuits and Systems",
+  "issued": {
+    "date-parts": [
+      [
+        1979,
+        11
+      ]
+    ]
+  },
+  "volume": "26",
+  "issue": "11",
+  "page": "979-980",
+  "DOI": "10.1109/TCS.1979.1084580"
+}

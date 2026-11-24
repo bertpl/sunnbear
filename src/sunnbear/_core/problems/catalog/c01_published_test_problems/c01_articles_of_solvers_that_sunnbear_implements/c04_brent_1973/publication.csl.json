@@ -1,0 +1,23 @@
+{
+  "id": "Brent73",
+  "type": "book",
+  "author": [
+    {
+      "family": "Brent",
+      "given": "R. P."
+    }
+  ],
+  "title": "Algorithms for Minimization without Derivatives",
+  "issued": {
+    "date-parts": [
+      [
+        1973
+      ]
+    ]
+  },
+  "URL": "https://maths-people.anu.edu.au/~brent/pub/pub011.html",
+  "publisher": "Prentice-Hall",
+  "publisher-place": "Englewood Cliffs, NJ",
+  "ISBN": "0-13-022335-2",
+  "note": "The URL is the author's scan of the book. Erratum: Brent, R. P. (1975). Table Errata 520. Mathematics of Computation 29(132), 1166. https://doi.org/10.1090/s0025-5718-1975-0371062-9."
+}

@@ -1,0 +1,25 @@
+{
+  "id": "Sabharwal19",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Sabharwal",
+      "given": "C. L."
+    }
+  ],
+  "title": "Blended Root Finding Algorithm Outperforms Bisection and Regula Falsi Algorithms",
+  "container-title": "Mathematics",
+  "issued": {
+    "date-parts": [
+      [
+        2019,
+        11,
+        16
+      ]
+    ]
+  },
+  "volume": "7",
+  "issue": "11",
+  "number": "1118",
+  "DOI": "10.3390/math7111118"
+}

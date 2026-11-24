@@ -1,5 +1,7 @@
 """This category holds the formulas of Burkardt (2016)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -33,14 +35,4 @@ class Burkardt2016(FormulaCategory):
         "The test problems come from TEST_ZERO, John Burkardt's collection of functions for testing"
         " root finders, in its Python version."
     )
-    publication = Publication(
-        citation=(
-            "John Burkardt, TEST_ZERO, Python version (2016), file `test_zero.py`, "
-            "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py, MIT license."
-        ),
-        citation_key="TestZero16",
-        authors=("John Burkardt",),
-        year=2016,
-        title="TEST_ZERO",
-        url="https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

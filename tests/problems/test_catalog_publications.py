@@ -1,5 +1,5 @@
 """`FormulaRegistry.publication_of` finds a publication for each shipped formula of category 1, and each shipped
-publication declares its parts.
+publication holds a valid CSL-JSON item with a title and a year.
 
 In category 1, the published test problems, each category of a subcategory other than 1.99 holds the formulas of 1
 publication and declares that publication. The formulas of subcategory 1.99 modify published formulas, and come from the
@@ -9,8 +9,12 @@ Each test checks every shipped formula or category in 1 test, and lists the ones
 test item per formula or category would only add items.
 """
 
+import json
 import re
 from collections import Counter, defaultdict
+from pathlib import Path
+
+import jsonschema
 
 import sunnbear._core.problems.catalog as catalog
 from sunnbear._core.problems.core import FormulaRegistry
@@ -22,6 +26,8 @@ _SHIPPED_FORMULAS = [
 _SHIPPED_CATEGORIES = [
     category for category in FormulaRegistry.categories() if type(category).__module__.startswith(_CATALOG_PREFIX)
 ]
+# The published JSON schema of CSL-JSON; csl_schema/README.md names its source.
+_CSL_DATA_SCHEMA_PATH = Path(__file__).parent / "csl_schema" / "csl-data.json"
 _SINGLE_PUBLICATION_CATEGORIES = [
     category
     for category in _SHIPPED_CATEGORIES
@@ -72,26 +78,37 @@ def test_citation_keys_are_unique():
     assert [key for key, count in counts.items() if count > 1] == []
 
 
-def test_publications_declare_their_parts():
-    """A shipped publication declares its citation key, its title, a DOI or URL, and the year in its category's name.
-
-    A category's name ends in its publication's year, such as "Brent (1973)". Only a publication whose citation holds a
-    link has a DOI or URL to declare; a book cited by its ISBN has neither. The test does not require the authors or
-    where the publication appeared, because some citations name neither, such as that of a code repository.
-    """
+def test_publications_declare_their_title_and_year():
+    """A shipped publication's item has a title and a year, and its category's name ends in that year."""
     # --- act --------------------------
     failing = []
     for category in _SINGLE_PUBLICATION_CATEGORIES:
         publication = category.publication
-        has_key_and_title = publication.citation_key is not None and publication.title is not None
+        has_title = bool(publication.csl_item.get("title"))
         is_category_named_with_its_year = category.name.endswith(f"({publication.year})")
-        has_link = re.search(r"https?://", publication.citation) is not None
-        has_doi_or_url = publication.doi is not None or publication.url is not None
-        if not has_key_and_title or not is_category_named_with_its_year or (has_link and not has_doi_or_url):
+        if not has_title or not is_category_named_with_its_year:
             failing.append(category.label)
 
     # --- assert -----------------------
     assert failing == []
+
+
+def test_publications_are_valid_csl_json_items():
+    """Every shipped publication's item is valid against the published CSL-JSON schema.
+
+    A consumer that renders a citation ignores a field that it does not know, so a misspelled field would leave a part
+    of the citation out without an error; the schema allows no field that it does not define.
+    """
+    # --- arrange ----------------------
+    schema = json.loads(_CSL_DATA_SCHEMA_PATH.read_text(encoding="utf-8"))
+    validator = jsonschema.Draft7Validator(schema)
+
+    # --- act --------------------------
+    items = [category.publication.csl_item for category in _SINGLE_PUBLICATION_CATEGORIES]
+    errors = [f"{error.path}: {error.message}" for error in validator.iter_errors(items)]
+
+    # --- assert -----------------------
+    assert errors == []
 
 
 def test_formula_names_are_readable_and_unique_within_each_single_publication_category():

@@ -1,5 +1,7 @@
 """This category holds the formulas of Roots.jl (2026)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -21,13 +23,4 @@ class RootsJl2026(FormulaCategory):
     number = (1, 3, 6)
     name = "Roots.jl (2026)"
     description = "The test problems come from the tests of Roots.jl, a Julia package of root finders, version 3.0.11."
-    publication = Publication(
-        citation=(
-            "Roots.jl v3.0.11 (2026), the test folder https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test, MIT "
-            "license."
-        ),
-        citation_key="RootsJl26",
-        year=2026,
-        title="Roots.jl",
-        url="https://github.com/JuliaMath/Roots.jl/tree/v3.0.11/test",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

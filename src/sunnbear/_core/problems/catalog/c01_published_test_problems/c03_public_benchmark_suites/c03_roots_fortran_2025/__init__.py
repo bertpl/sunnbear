@@ -1,5 +1,7 @@
 """This category holds the formulas of roots-fortran (2025)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -56,17 +58,4 @@ class RootsFortran2025(FormulaCategory):
     number = (1, 3, 3)
     name = "roots-fortran (2025)"
     description = "The test problems come from the test program of roots-fortran, a Fortran library of root finders."
-    publication = Publication(
-        citation=(
-            "Williams, J., roots-fortran, file `test/root_tests.f90` at commit `390e7ea` (2025-01-25), "
-            "https://github.com/jacobwilliams/roots-"
-            "fortran/blob/390e7ea30751fe2ab23ddb876a3563e07bef1b76/test/root_tests.f90, BSD-3-Clause license."
-        ),
-        citation_key="RootsFortran25",
-        authors=("Williams, J.",),
-        year=2025,
-        title="roots-fortran",
-        url=(
-            "https://github.com/jacobwilliams/roots-fortran/blob/390e7ea30751fe2ab23ddb876a3563e07bef1b76/test/root_tests.f90"
-        ),
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

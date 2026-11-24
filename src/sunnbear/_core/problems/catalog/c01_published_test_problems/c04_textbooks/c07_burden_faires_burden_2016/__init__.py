@@ -1,5 +1,7 @@
 """This category holds the formulas of Burden, Faires, Burden (2016)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -64,15 +66,4 @@ class BurdenFairesBurden2016(FormulaCategory):
     description = (
         "The test problems come from chapter 2, on equations in 1 variable, of the textbook Numerical Analysis."
     )
-    publication = Publication(
-        citation=(
-            "Burden, R. L., Faires, J. D., Burden, A. M. (2016). Numerical Analysis, 10th edition. Cengage"
-            " Learning, Boston, MA. ISBN 978-1-305-25366-7. The copyright page gives © 2016 and the print year"
-            " 2014."
-        ),
-        citation_key="Burden16",
-        authors=("Burden, R. L.", "Faires, J. D.", "Burden, A. M."),
-        year=2016,
-        title="Numerical Analysis",
-        published_in="Cengage Learning",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

@@ -1,0 +1,23 @@
+{
+  "id": "Gao26",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Gao",
+      "given": "F."
+    }
+  ],
+  "title": "Fast and stable root-finding using clipped power interpolations",
+  "container-title": "Applied Mathematics Letters",
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        7
+      ]
+    ]
+  },
+  "volume": "178",
+  "number": "109928",
+  "DOI": "10.1016/j.aml.2026.109928"
+}

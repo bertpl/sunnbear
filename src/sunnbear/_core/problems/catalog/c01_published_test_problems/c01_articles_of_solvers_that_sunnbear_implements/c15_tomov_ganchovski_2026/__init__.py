@@ -1,5 +1,7 @@
 """This category holds the formulas of Tomov, Ganchovski (2026)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import f01_equation_25, f02_function_b, f03_function_c
@@ -14,19 +16,4 @@ class TomovGanchovski2026(FormulaCategory):
         "The test problems come from a preprint on the global convergence and the stopping rule of "
         "a safeguarded modified Anderson–Björck method."
     )
-    publication = Publication(
-        citation=(
-            "Tomov, L., Ganchovski, N. (2026). Global convergence and reliable stopping in a safeguarded modified"
-            " Anderson–Björck method. arXiv preprint 2610.14193. https://doi.org/10.48550/arxiv.2610.14193"
-            " (https://arxiv.org/abs/2610.14193). The authors' C# code and benchmark definitions are in"
-            " https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 pins commit"
-            " `9111cdcc6912401eb684a7b771df3a469795d5b8` (the preprint's reference [16]), and Section 7.4 pins"
-            " commit `51a6d1b421fa6b5422b974b61c88acb3ae1945bb` (reference [17])."
-        ),
-        citation_key="Tomov26",
-        authors=("Tomov, L.", "Ganchovski, N."),
-        year=2026,
-        title="Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method",
-        published_in="arXiv",
-        doi="10.48550/arxiv.2610.14193",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

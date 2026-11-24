@@ -1,0 +1,37 @@
+{
+  "id": "Gorgey25",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Gorgey",
+      "given": "A."
+    },
+    {
+      "family": "Azim",
+      "given": "F. A."
+    },
+    {
+      "family": "Zulkifly",
+      "given": "Z. H."
+    },
+    {
+      "family": "Hassim",
+      "given": "H."
+    }
+  ],
+  "title": "Efficiency of Ridders' method in solving nonlinear equations using Scilab programming",
+  "container-title": "Data Analytics and Applied Mathematics",
+  "issued": {
+    "date-parts": [
+      [
+        2025,
+        3,
+        31
+      ]
+    ]
+  },
+  "volume": "6",
+  "issue": "1",
+  "page": "23-35",
+  "DOI": "10.15282/daam.v6i1.11307"
+}

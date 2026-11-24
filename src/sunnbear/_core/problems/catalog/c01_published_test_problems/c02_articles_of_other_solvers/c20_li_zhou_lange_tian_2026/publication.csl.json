@@ -1,0 +1,37 @@
+{
+  "id": "Li26",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Li",
+      "given": "X.-J."
+    },
+    {
+      "family": "Zhou",
+      "given": "H."
+    },
+    {
+      "family": "Lange",
+      "given": "K."
+    },
+    {
+      "family": "Tian",
+      "given": "G.-L."
+    }
+  ],
+  "title": "The upper–crossing/solution (US) algorithm with strongly stable convergence and an acceleration technique for root–finding problems",
+  "container-title": "Statistics and Computing",
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        8
+      ]
+    ]
+  },
+  "volume": "36",
+  "issue": "4",
+  "number": "197",
+  "DOI": "10.1007/s11222-026-10902-z",
+  "note": "Preprint: arXiv 2212.00797v2 (8 November 2025), https://arxiv.org/abs/2212.00797v2. The authors' R code: https://github.com/Xunjian-Li/US-algorithm."
+}

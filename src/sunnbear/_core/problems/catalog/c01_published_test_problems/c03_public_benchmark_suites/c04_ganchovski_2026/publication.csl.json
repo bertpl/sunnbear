@@ -1,0 +1,20 @@
+{
+  "id": "Ganchovski26b",
+  "type": "document",
+  "author": [
+    {
+      "family": "Ganchovski",
+      "given": "N."
+    }
+  ],
+  "title": "Root-finding Test Functions",
+  "issued": {
+    "date-parts": [
+      [
+        2026
+      ]
+    ]
+  },
+  "URL": "https://raw.githubusercontent.com/Proektsoft-EOOD/ModAB-Root-Finding/b3309e9a5177d6305ac84deba6537adb9b878c5e/Test%20functions.pdf",
+  "note": "The file Test functions.pdf in the repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding, at commit b3309e9a5177d6305ac84deba6537adb9b878c5e."
+}

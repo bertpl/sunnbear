@@ -1,5 +1,7 @@
 """This category holds the formulas of Parida, Gupta (2006)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import f01_example_1, f02_example_2, f03_example_4
@@ -11,18 +13,4 @@ class ParidaGupta2006(FormulaCategory):
     number = (1, 2, 5)
     name = "Parida, Gupta (2006)"
     description = "The test problems come from the article that introduces an improved regula falsi method."
-    publication = Publication(
-        citation=(
-            "Parida, P. K., Gupta, D. K. (2006). An improved regula-falsi method for enclosing simple zeros of"
-            " nonlinear equations. Applied Mathematics and Computation 177(2), 769–776."
-            " https://doi.org/10.1016/j.amc.2005.11.034. The article prints the volume and the year 2006 but no"
-            " issue number; the issue number is Crossref's. The survey lists the article under 2005, the year of"
-            ' its copyright line ("© 2005 Elsevier Inc.") and of its DOI; the article prints no online date.'
-        ),
-        citation_key="Parida06",
-        authors=("Parida, P. K.", "Gupta, D. K."),
-        year=2006,
-        title="An improved regula-falsi method for enclosing simple zeros of nonlinear equations",
-        published_in="Applied Mathematics and Computation",
-        doi="10.1016/j.amc.2005.11.034",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

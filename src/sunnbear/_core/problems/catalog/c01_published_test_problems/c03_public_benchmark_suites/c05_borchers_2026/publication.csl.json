@@ -1,0 +1,23 @@
+{
+  "id": "Borchers26",
+  "type": "webpage",
+  "author": [
+    {
+      "family": "Borchers",
+      "given": "H. W."
+    }
+  ],
+  "title": "Root Finding",
+  "container-title": "pracma Handbook",
+  "URL": "https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html",
+  "accessed": {
+    "date-parts": [
+      [
+        2026,
+        10,
+        18
+      ]
+    ]
+  },
+  "note": "Chapter 5. The page is unversioned and gives no author or date; it is on the website of Hans W. Borchers, the author of the R package pracma. The chapter cites no source for its test problems."
+}

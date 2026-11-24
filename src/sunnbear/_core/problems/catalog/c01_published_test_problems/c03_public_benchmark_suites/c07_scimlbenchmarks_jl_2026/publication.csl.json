@@ -1,0 +1,22 @@
+{
+  "id": "SciMLBenchmarks26",
+  "type": "software",
+  "author": [
+    {
+      "family": "Gittins",
+      "given": "Fabian"
+    }
+  ],
+  "title": "Interval Rootfinding Test Suite",
+  "container-title": "SciMLBenchmarks.jl",
+  "issued": {
+    "date-parts": [
+      [
+        2026
+      ]
+    ]
+  },
+  "URL": "https://github.com/SciML/SciMLBenchmarks.jl/blob/8a67931f726eeb53604926a6dd6bfc750316b4c4/benchmarks/IntervalNonlinearProblem/suite.jmd",
+  "version": "8a67931f726eeb53604926a6dd6bfc750316b4c4",
+  "note": "The file benchmarks/IntervalNonlinearProblem/suite.jmd, whose front matter names its author. MIT license. The file names no source for its functions; it calls them “a selection of challenging test functions from the literature”."
+}

@@ -1,0 +1,20 @@
+{
+  "id": "TestZero16",
+  "type": "software",
+  "author": [
+    {
+      "family": "Burkardt",
+      "given": "John"
+    }
+  ],
+  "title": "TEST_ZERO",
+  "issued": {
+    "date-parts": [
+      [
+        2016
+      ]
+    ]
+  },
+  "URL": "https://people.sc.fsu.edu/~jburkardt/py_src/test_zero/test_zero.py",
+  "note": "The Python version, file test_zero.py. MIT license."
+}

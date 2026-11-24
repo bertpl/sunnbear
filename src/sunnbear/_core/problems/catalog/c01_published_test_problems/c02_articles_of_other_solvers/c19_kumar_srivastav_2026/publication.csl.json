@@ -1,0 +1,27 @@
+{
+  "id": "Kumar26",
+  "type": "article",
+  "author": [
+    {
+      "family": "Kumar",
+      "given": "D."
+    },
+    {
+      "family": "Srivastav",
+      "given": "S. K."
+    }
+  ],
+  "title": "A randomized bracketing method for derivative-free root finding with uniform spacing contraction",
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        7,
+        1
+      ]
+    ]
+  },
+  "DOI": "10.21203/rs.3.rs-10070193/v1",
+  "publisher": "Research Square",
+  "note": "The article's Data Availability statement offers the authors' scripts on request."
+}

@@ -1,0 +1,23 @@
+{
+  "id": "Zhang11",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Zhang",
+      "given": "Z."
+    }
+  ],
+  "title": "An Improvement to the Brent's Method",
+  "container-title": "International Journal of Experimental Algorithms",
+  "issued": {
+    "date-parts": [
+      [
+        2011
+      ]
+    ]
+  },
+  "URL": "https://www.cscjournals.org/library/manuscriptinfo.php?mc=IJEA-7",
+  "volume": "2",
+  "issue": "1",
+  "page": "21-26"
+}

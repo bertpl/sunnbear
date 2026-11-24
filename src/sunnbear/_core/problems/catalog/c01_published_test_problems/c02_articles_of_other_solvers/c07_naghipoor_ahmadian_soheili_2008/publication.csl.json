@@ -1,0 +1,31 @@
+{
+  "id": "Naghipoor08",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Naghipoor",
+      "given": "J."
+    },
+    {
+      "family": "Ahmadian",
+      "given": "S. A."
+    },
+    {
+      "family": "Soheili",
+      "given": "A. R."
+    }
+  ],
+  "title": "An Improved Regula Falsi Method for Finding Simple Zeros of Nonlinear Equations",
+  "container-title": "Applied Mathematical Sciences",
+  "issued": {
+    "date-parts": [
+      [
+        2008
+      ]
+    ]
+  },
+  "URL": "https://www.m-hikari.com/ams/ams-password-2008/ams-password5-8-2008/soheiliAMS5-8-2008.pdf",
+  "volume": "2",
+  "issue": "8",
+  "page": "381-386"
+}

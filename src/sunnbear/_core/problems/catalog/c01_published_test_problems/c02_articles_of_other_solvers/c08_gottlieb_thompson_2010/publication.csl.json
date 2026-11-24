@@ -1,0 +1,27 @@
+{
+  "id": "Gottlieb10",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Gottlieb",
+      "given": "R. G."
+    },
+    {
+      "family": "Thompson",
+      "given": "B. F."
+    }
+  ],
+  "title": "Bisected direct quadratic regula falsi",
+  "container-title": "Applied Mathematical Sciences",
+  "issued": {
+    "date-parts": [
+      [
+        2010
+      ]
+    ]
+  },
+  "URL": "http://www.m-hikari.com/ams/ams-2010/ams-13-16-2010/gottliebAMS13-16-2010.pdf",
+  "volume": "4",
+  "issue": "15",
+  "page": "709-718"
+}

@@ -1,5 +1,7 @@
 """This category holds the formulas of Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -42,18 +44,4 @@ class GanchovskiSmithRackauckasTomovTraykov2026(FormulaCategory):
     number = (1, 1, 13)
     name = "Ganchovski, Smith, Rackauckas, Tomov, Traykov (2026)"
     description = "The test problems come from the article that improves the modified Anderson–Björck method."
-    publication = Publication(
-        citation=(
-            "Ganchovski, N., Smith, O., Rackauckas, C., Tomov, L., Traykov, A. (2026). Improvements to the"
-            " modified Anderson–Björck (modAB) root-finding algorithm. Algorithms 19(5), 332."
-            " https://doi.org/10.3390/a19050332. Supplementary materials:"
-            " https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder `MDPI-Algorithms-Data` of the"
-            " authors' repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
-        ),
-        citation_key="Ganchovski26a",
-        authors=("Ganchovski, N.", "Smith, O.", "Rackauckas, C.", "Tomov, L.", "Traykov, A."),
-        year=2026,
-        title="Improvements to the modified Anderson–Björck (modAB) root-finding algorithm",
-        published_in="Algorithms",
-        doi="10.3390/a19050332",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

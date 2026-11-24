@@ -1,0 +1,28 @@
+{
+  "id": "Dowell72",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Dowell",
+      "given": "M."
+    },
+    {
+      "family": "Jarratt",
+      "given": "P."
+    }
+  ],
+  "title": "The \"Pegasus\" method for computing the root of an equation",
+  "container-title": "BIT",
+  "issued": {
+    "date-parts": [
+      [
+        1972,
+        12
+      ]
+    ]
+  },
+  "volume": "12",
+  "issue": "4",
+  "page": "503-508",
+  "DOI": "10.1007/BF01932959"
+}

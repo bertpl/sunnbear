@@ -1,0 +1,37 @@
+{
+  "id": "Steffen25",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Steffen",
+      "given": "V."
+    },
+    {
+      "family": "Della Pasqua",
+      "given": "C. C."
+    },
+    {
+      "family": "Oliveira",
+      "given": "M. S.",
+      "non-dropping-particle": "de"
+    },
+    {
+      "family": "Silva",
+      "given": "E. A.",
+      "non-dropping-particle": "da"
+    }
+  ],
+  "title": "Halving interval guaranteed for Dekker and Brent root finding methods",
+  "container-title": "Examples and Counterexamples",
+  "issued": {
+    "date-parts": [
+      [
+        2025,
+        6
+      ]
+    ]
+  },
+  "volume": "7",
+  "number": "100173",
+  "DOI": "10.1016/j.exco.2024.100173"
+}

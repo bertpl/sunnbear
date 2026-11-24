@@ -1,0 +1,26 @@
+{
+  "id": "Foo25",
+  "type": "article",
+  "author": [
+    {
+      "family": "Foo",
+      "given": "W. G."
+    },
+    {
+      "family": "Tan",
+      "given": "C. H."
+    }
+  ],
+  "title": "Higher-Order Root-Finding Algorithm and its Applications",
+  "issued": {
+    "date-parts": [
+      [
+        2025
+      ]
+    ]
+  },
+  "DOI": "10.48550/arxiv.2509.20897",
+  "publisher": "arXiv",
+  "number": "2509.20897v1",
+  "URL": "https://arxiv.org/abs/2509.20897v1"
+}

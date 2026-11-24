@@ -1,5 +1,7 @@
 """This category holds the formulas of GSL (2024)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -21,16 +23,4 @@ class Gsl2024(FormulaCategory):
     description = (
         "The test problems come from the tests of the root finders of the GNU Scientific Library, release 2.8."
     )
-    publication = Publication(
-        citation=(
-            "GNU Scientific Library (GSL), release 2.8 (2024), files `roots/test_funcs.c` and `roots/test.c`"
-            " (copyright Reid Priedhorsky, Brian Gough),"
-            " https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8. The files cite no source"
-            " for their functions."
-        ),
-        citation_key="GSL24",
-        authors=("Reid Priedhorsky", "Brian Gough"),
-        year=2024,
-        title="GNU Scientific Library (GSL)",
-        url="https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

@@ -1,5 +1,7 @@
 """This category holds the formulas of Borchers (2026)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -28,17 +30,4 @@ class Borchers2026(FormulaCategory):
         "The test problems come from the chapter on root finding of the pracma Handbook, which "
         "documents the R package pracma."
     )
-    publication = Publication(
-        citation=(
-            'Borchers, H. W. *pracma Handbook*, chapter 5, "Root Finding".'
-            " https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html, accessed 2026-10-18. The page is"
-            " unversioned and gives no author or date; it is on the website of Hans W. Borchers, the author of"
-            " the R package pracma. The chapter cites no source for its test problems."
-        ),
-        citation_key="Borchers26",
-        authors=("Borchers, H. W.",),
-        year=2026,
-        title="Root Finding",
-        published_in="pracma Handbook",
-        url="https://hwborchers.lima-city.de/pracmaHandbook/rootfinding.html",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

@@ -1,0 +1,31 @@
+{
+  "id": "Alefeld93",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Alefeld",
+      "given": "G."
+    },
+    {
+      "family": "Potra",
+      "given": "F. A."
+    },
+    {
+      "family": "Shi",
+      "given": "Y."
+    }
+  ],
+  "title": "On enclosing simple roots of nonlinear equations",
+  "container-title": "Mathematics of Computation",
+  "issued": {
+    "date-parts": [
+      [
+        1993
+      ]
+    ]
+  },
+  "volume": "61",
+  "issue": "204",
+  "page": "733-744",
+  "DOI": "10.1090/s0025-5718-1993-1192965-2"
+}

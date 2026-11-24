@@ -1,0 +1,22 @@
+{
+  "id": "Epperson13",
+  "type": "book",
+  "author": [
+    {
+      "family": "Epperson",
+      "given": "J. F."
+    }
+  ],
+  "title": "An Introduction to Numerical Methods and Analysis",
+  "issued": {
+    "date-parts": [
+      [
+        2013
+      ]
+    ]
+  },
+  "edition": "2",
+  "publisher": "John Wiley & Sons",
+  "publisher-place": "Hoboken, NJ",
+  "ISBN": "978-1-118-36759-9"
+}

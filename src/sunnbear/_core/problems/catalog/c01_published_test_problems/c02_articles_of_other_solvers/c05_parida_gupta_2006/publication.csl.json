@@ -1,0 +1,28 @@
+{
+  "id": "Parida06",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Parida",
+      "given": "P. K."
+    },
+    {
+      "family": "Gupta",
+      "given": "D. K."
+    }
+  ],
+  "title": "An improved regula-falsi method for enclosing simple zeros of nonlinear equations",
+  "container-title": "Applied Mathematics and Computation",
+  "issued": {
+    "date-parts": [
+      [
+        2006,
+        6
+      ]
+    ]
+  },
+  "volume": "177",
+  "issue": "2",
+  "page": "769-776",
+  "DOI": "10.1016/j.amc.2005.11.034"
+}
