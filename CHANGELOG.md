@@ -5,21 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.4.9 (2026-11-24)
 
 ### Changed
 
 - Correct the formula summaries of the test problems so that each holds for every value of `c`, unify the symbols of the formulas' shifted variable and parameters, and hold each publication of the published test problems as a CSL-JSON item
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.4.8 (2026-11-23)
 
