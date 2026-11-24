@@ -251,12 +251,14 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - takes as x the variable of the formula's `variable_change`, where `formulas.csv` gives one: for `` the pH, as `f(10^-pH)` on `[2, 12]` ``, x is the pH, and the module evaluates `f(10^-x)` on `[2, 12]`;
 - evaluates that function at `x - c_scale*c`, so that the formula's `c` shifts the function along x. `c_scale` is the rounded width of the formula's interval; the class docstring of `PublishedTestProblems`, the class of category 1, states the rule and its reasons;
 - lists the formula's published test problems in a `ParamTable`: 1 tuple per combination of parameter values and interval that the rows give, and a formula with several intervals takes their bounds and `c_scale` as 3 more parameters, `a`, `b` and `c_scale`;
-- renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
+- gives a source's own parameter named `a`, `b` or `c_scale` another name and symbol in every formula, so that these 3 names, and the symbols $a$, $b$ and $s$, always mean the bounds of the interval and the scale of the shift;
 - declares its `location_in_publication`, which names the table, section or exercise set of each of the rows' keys, and which the module's author writes from those keys and the source's `where_in_source`, such as `Table I, problem 12` for the row keyed `12`;
 - declares each parameter with a LaTeX symbol:
   - a source's own parameter is a `FormulaParam` with the source's symbol for it; where that symbol is `u`, which the presentation uses for the shifted variable `\x - c_scale \c`, the parameter takes another symbol, such as `u_{\mathrm{ex}}` for an exhaust velocity;
+  - a source's own parameter that the source calls `a` or `b` gets, with its new name and symbol, a `meaning` that says what the parameter is, as `q` does for the constant of `x^n - a`;
+  - a note in the presentation's `notes` then names the source's parameter, as in `$\param{q}$ is the source's parameter $a$.`; the word "parameter" tells the reader that this $a$ is the source's parameter, not the bound `a`;
   - a source's own parameter that the source names with a word, as in source code or a word problem, takes a conventional letter as its symbol, such as `P` for an initial investment, and a `meaning` that says what the parameter is; `src/sunnbear/_core/problems/catalog/PARAMETER_NAMES.md` gives the rule for symbols;
-  - the bounds of a formula with several intervals take `a` and `b`, or `x_{\min}` and `x_{\max}` where the source has its own parameter named `a` or `b`;
+  - the bounds of a formula with several intervals take `a` and `b`, and a catalog test checks that no other parameter has these symbols;
   - `c_scale` takes `s`, with no `meaning`: category 1 states the rule for `c_scale` once, in `PublishedTestProblems`;
 - declares a `presentation` with 3 parts:
   - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals:

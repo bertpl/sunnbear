@@ -10,7 +10,8 @@ A parameter's name is part of a test problem's id, as in `f2.1.2[p=4.0,w=10^0.3]
 - **`f`** names the function itself, as in the display `f(x, c) = …` of every formula's presentation.
 - **`a`, `b` and `c_scale`** are parameters of the formulas of category 1: the bounds of a formula's interval and the scale of its shift along x. The class docstring of `PublishedTestProblems` states their rules.
 - **`a` and `b` also name the bounds of the interval when a formula outside category 1 takes its interval as a parameter**, as in `BernoulliPolynomial`. The class docstring of such a formula states which values `a` and `b` may take.
-- **A reserved name or a Python keyword gets a trailing underscore**, as in `a_` and `lambda_`.
+- **A reserved name or a Python keyword gets a trailing underscore**, as in `c_` and `lambda_`.
+- **The symbols $a$ and $b$ name only the bounds of an interval**, in every category; a catalog test checks that every parameter with these symbols is a bound. So a source's parameter that the source calls `a` or `b` takes another name and symbol, not `a_` or `b_`, such as `q` for the constant of `x^n - a`: the one exception to rule 1 of the next section.
 
 ## Which names a formula uses
 

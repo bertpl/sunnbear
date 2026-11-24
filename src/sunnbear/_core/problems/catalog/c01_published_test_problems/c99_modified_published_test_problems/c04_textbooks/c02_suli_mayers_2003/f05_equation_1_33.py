@@ -20,8 +20,6 @@ class ModifiedSuliMayers2003Equation133(Formula):
     The survey writes the source's function as ``x = a*x*(1 - x)``, with the parameters `0 < a <= 4`; `a = 3.4, 3.5,
     3.99`; the published interval is ``[0, 1]``.
 
-    The formula's parameter ``a_`` is the source's ``a``, renamed because ``[a, b]`` names the formula's interval.
-
     Fixed points 0 and `1 - 1/a`. For `a = 3.4` the iterates approach a 2-cycle, 0.45 and 0.84, the 2 stable fixed
     points of `g(g(x))` (eq. (1.34)); for `a = 3.5` a 4-cycle; for `a = 3.99`, from `x0 = 0.75`, no regular pattern.
 
@@ -37,21 +35,29 @@ class ModifiedSuliMayers2003Equation133(Formula):
     number = (1, 99, 4, 2, 5)
     name = "Equation (1.33)"
     params = (
-        FormulaParam("a_", latex_symbol="a"),
-        FormulaParam("a", latex_symbol=r"x_{\min}"),
-        FormulaParam("b", latex_symbol=r"x_{\max}"),
+        FormulaParam(
+            "mu",
+            latex_symbol=r"\mu",
+            meaning=(
+                r"The parameter of the logistic map $\param{mu} \tmp{u} (1 - \tmp{u})$, whose fixed points are the "
+                "formula's roots."
+            ),
+        ),
+        FormulaParam("a", latex_symbol="a"),
+        FormulaParam("b", latex_symbol="b"),
         FormulaParam("c_scale", latex_symbol="s"),
     )
     location_in_publication = "Eq. (1.33)"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\tmp{u} - \param{a_} \tmp{u} \left(1 - \tmp{u}\right)",
+        expression=r"\tmp{u} - \param{mu} \tmp{u} \left(1 - \tmp{u}\right)",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A parabola whose roots, $\param{c_scale} \c$ plus the fixed points of the logistic map, lie $1 - "
-            r"1/\param{a_}$ apart, with only the upper root on the interval."
+            r"1/\param{mu}$ apart, with only the upper root on the interval."
         ),
         notes=(
+            r"$\param{mu}$ is the source's parameter $a$.",
             (
                 "The interval starts at 0.01, not at the published 0, which is a root, so that the "
                 "function is not 0 there."
@@ -61,12 +67,12 @@ class ModifiedSuliMayers2003Equation133(Formula):
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
-    def parametrized_fun(x: float, c: float, a_: float, a: float, b: float, c_scale: float) -> float:
+    def parametrized_fun(x: float, c: float, mu: float, a: float, b: float, c_scale: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
         x = x - c_scale * c
-        return (x) - (a_ * x * (1 - x))
+        return (x) - (mu * x * (1 - x))
 
-    def interval_bounds(self, a_: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
+    def interval_bounds(self, mu: float, a: float, b: float, c_scale: float) -> tuple[float, float]:
         """Return the interval of the tuple, its parameters ``a`` and ``b``."""
         return (a, b)
 
@@ -74,7 +80,7 @@ class ModifiedSuliMayers2003Equation133(Formula):
         """Return the parameter values of the modified test problems."""
         return (
             ParamTable(
-                names=("a_", "a", "b", "c_scale"),
+                names=("mu", "a", "b", "c_scale"),
                 rows=(
                     (3.4, 0.01, 1.0, 0.99),
                     (3.5, 0.01, 1.0, 0.99),
@@ -86,17 +92,17 @@ class ModifiedSuliMayers2003Equation133(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a_": 3.4, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.13076315
+            params={"mu": 3.4, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.13076315
         ),
         FormulaTestCase.value(
-            params={"a_": 3.5, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.136359125
+            params={"mu": 3.5, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.136359125
         ),
         FormulaTestCase.value(
-            params={"a_": 3.99, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.1637794025
+            params={"mu": 3.99, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.1637794025
         ),
-        FormulaTestCase.interval_bounds(params={"a_": 3.4, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a_": 3.5, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
+        FormulaTestCase.interval_bounds(params={"mu": 3.4, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
+        FormulaTestCase.interval_bounds(params={"mu": 3.5, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
         FormulaTestCase.interval_bounds(
-            params={"a_": 3.99, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)
+            params={"mu": 3.99, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)
         ),
     )
