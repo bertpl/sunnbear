@@ -43,8 +43,8 @@ class ChapraCanale2015Equation814(Formula):
     location_in_publication = "§8.2, Eq. (8.14)"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{\mathrm{pH}}", r"\x - 10 \c"),
-            (r"\tmp{H}", r"10^{-\tmp{\mathrm{pH}}}"),
+            (r"\tmp{u}", r"\x - 10 \c"),
+            (r"\tmp{H}", r"10^{-\tmp{u}}"),
             (r"\tmp{K_H}", r"10^{-1.46}"),
             (r"\tmp{K_1}", r"10^{-6.3}"),
             (r"\tmp{K_2}", r"10^{-10.3}"),
@@ -60,6 +60,7 @@ class ChapraCanale2015Equation814(Formula):
             r"The charge balance of rainwater in terms of the pH, with 1 simple root and values below $10^{-4}$ in "
             r"magnitude for $4 \le \x \le 7$ but above 500 at $\x = 12$."
         ),
+        notes=(r"$\tmp{u}$ is the pH of the rainwater.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

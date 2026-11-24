@@ -254,11 +254,11 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
 - renames a source's own parameters `a`, `b` and `c_scale` to `a_`, `b_` and `c_scale_` in every formula, so that these 3 names always mean the bounds of the interval and the scale of the shift;
 - declares its `location_in_publication`, which names the table, section or exercise set of each of the rows' keys, and which the module's author writes from those keys and the source's `where_in_source`, such as `Table I, problem 12` for the row keyed `12`;
 - declares each parameter with a LaTeX symbol:
-  - a source's own parameter is a `FormulaParam` with the source's symbol for it;
+  - a source's own parameter is a `FormulaParam` with the source's symbol for it, except a parameter whose symbol is `u`, the shifted variable's, which takes another symbol, such as `u_{\mathrm{ex}}` for an exhaust velocity;
   - the bounds of a formula with several intervals take `a` and `b`, or `x_{\min}` and `x_{\max}` where the source has its own parameter named `a` or `b`;
   - `c_scale` takes `s`, with no `meaning`: category 1 states the rule for `c_scale` once, in `PublishedTestProblems`;
 - declares a `presentation` with 3 parts:
-  - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals. The shifted variable is `\tmp{u}`, unless the source names the function's variable other than `x` or `c`, which `\x` and `\c` stand for; it then takes that name, such as `\tmp{h}` for a function of `h`;
+  - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals. The shifted variable is `\tmp{u}` in every formula, so that a reader meets the same symbol everywhere. Where the source names the function's variable other than `x`, a note of the presentation says what `\tmp{u}` stands for, such as `$\tmp{u}$ is the source's $h$, the depth of the water in the tank, in m.`;
   - the expression: the function of the shifted variable, with the source's own numbers and order of terms;
   - the interval;
 - declares `effect_of_c = EffectOfC.SHIFTS_X`;

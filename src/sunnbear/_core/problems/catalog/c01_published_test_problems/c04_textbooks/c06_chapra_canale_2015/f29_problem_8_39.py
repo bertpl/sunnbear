@@ -24,12 +24,17 @@ class ChapraCanale2015Problem839(Formula):
 
     Unknown `t`, the time at which the velocity is 1000 m/s, to within 1%; the book's hint gives the interval. The book
     prints `ln`.
+
+    The parameter ``u`` takes the symbol ``u_ex``, because ``u`` is the symbol of the shifted variable in every formula
+    of category 1.
     """
 
     number = (1, 4, 6, 29)
     name = "Problem 8.39"
     params = (
-        FormulaParam("u", latex_symbol="u", meaning="The exhaust velocity relative to the rocket, in m/s."),
+        FormulaParam(
+            "u", latex_symbol=r"u_{\mathrm{ex}}", meaning="The exhaust velocity relative to the rocket, in m/s."
+        ),
         FormulaParam("m0", latex_symbol="m_{0}", meaning="The rocket's initial mass, in kg."),
         FormulaParam("q", latex_symbol="q", meaning="The rate of fuel consumption, in kg/s."),
         FormulaParam("g", latex_symbol="g", meaning=r"The gravitational acceleration, in $\mathrm{m/s^2}$."),
@@ -37,16 +42,17 @@ class ChapraCanale2015Problem839(Formula):
     )
     location_in_publication = "Prob. 8.39"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{t}", r"\x - 40 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 40 \c"),),
         expression=(
-            r"\param{v} - \left(\param{u} \ln{\left(\frac{\param{m0}}{\param{m0} - \param{q} \tmp{t}} "
-            r"\right)} - \param{g} \tmp{t}\right)"
+            r"\param{v} - \left(\param{u} \ln{\left(\frac{\param{m0}}{\param{m0} - \param{q} \tmp{u}} "
+            r"\right)} - \param{g} \tmp{u}\right)"
         ),
         interval="[10, 50]",
         summary=(
             "The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
             "logarithmic singularity 9.7 s beyond the upper bound."
         ),
+        notes=(r"$\tmp{u}$ is the source's $t$, the time, in s.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

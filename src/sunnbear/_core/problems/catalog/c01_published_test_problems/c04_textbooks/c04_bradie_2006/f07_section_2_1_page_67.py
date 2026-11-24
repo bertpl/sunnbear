@@ -41,13 +41,13 @@ class Bradie2006Section21Page67(Formula):
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{r}", r"\x - 0.09 \c"),
-            (r"\tmp{g}", r"\left(1 + \frac{\tmp{r}}{12}\right)^{36}"),
+            (r"\tmp{u}", r"\x - 0.09 \c"),
+            (r"\tmp{g}", r"\left(1 + \frac{\tmp{u}}{12}\right)^{36}"),
         ),
         expression=(
             r"\begin{cases} "
-            r"\param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & \text{if } \tmp{r} = 0 \\ "
-            r"\param{initial_investment} \tmp{g} + \param{monthly_deposit} \frac{\tmp{g} - 1}{\tmp{r}/12} "
+            r"\param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & \text{if } \tmp{u} = 0 \\ "
+            r"\param{initial_investment} \tmp{g} + \param{monthly_deposit} \frac{\tmp{g} - 1}{\tmp{u}/12} "
             r"- \param{goal} "
             r"& \text{otherwise} "
             r"\end{cases}"
@@ -57,6 +57,7 @@ class Bradie2006Section21Page67(Formula):
             "A savings balance minus a goal as a slightly convex function of the annual interest rate, with 1 simple "
             "root in the lower half of the interval."
         ),
+        notes=(r"$\tmp{u}$ is the source's $r$, the annual interest rate.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

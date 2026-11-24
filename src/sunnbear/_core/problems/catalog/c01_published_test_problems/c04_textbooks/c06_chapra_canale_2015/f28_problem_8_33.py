@@ -36,16 +36,17 @@ class ChapraCanale2015Problem833(Formula):
     )
     location_in_publication = "Prob. 8.33"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{\omega}", r"\x - 999 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 999 \c"),),
         expression=(
-            r"\frac{1}{\param{Z}} - \sqrt{\frac{1}{\param{R}^{2}} + \left(\tmp{\omega} \param{C} - "
-            r"\frac{1}{\tmp{\omega} \param{L}}\right)^{2}}"
+            r"\frac{1}{\param{Z}} - \sqrt{\frac{1}{\param{R}^{2}} + \left(\tmp{u} \param{C} - "
+            r"\frac{1}{\tmp{u} \param{L}}\right)^{2}}"
         ),
         interval="[1, 1000]",
         summary=(
             "The impedance equation of a parallel RLC circuit in terms of the angular frequency, with 1 simple root, "
             "right of which the function stays between 0 and 0.009."
         ),
+        notes=(r"$\tmp{u}$ is the source's $\omega$, the angular frequency, in rad/s.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

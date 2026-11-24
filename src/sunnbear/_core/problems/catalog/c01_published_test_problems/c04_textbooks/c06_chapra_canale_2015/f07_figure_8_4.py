@@ -33,18 +33,19 @@ class ChapraCanale2015Figure84(Formula):
     location_in_publication = "§8.3, Eqs. (8.19), (8.20), Fig. 8.4"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{R}", r"\x - 400 \c"),
+            (r"\tmp{u}", r"\x - 400 \c"),
             (r"\tmp{L}", "5"),
             (r"\tmp{C}", r"10^{-4}"),
             (r"\tmp{t}", "0.05"),
-            (r"\tmp{\omega}", r"\sqrt{\frac{1}{\tmp{L} \tmp{C}} - \left(\frac{\tmp{R}}{2 \tmp{L}}\right)^2}"),
+            (r"\tmp{\omega}", r"\sqrt{\frac{1}{\tmp{L} \tmp{C}} - \left(\frac{\tmp{u}}{2 \tmp{L}}\right)^2}"),
         ),
-        expression=r"e^{-\tmp{R} \tmp{t} / (2 \tmp{L})} \cos(\tmp{\omega} \tmp{t}) - 0.01",
+        expression=r"e^{-\tmp{u} \tmp{t} / (2 \tmp{L})} \cos(\tmp{\omega} \tmp{t}) - 0.01",
         interval="[0, 400]",
         summary=(
             "The relative charge left on an RLC circuit's capacitor after 0.05 s, minus a target of 1%, as an "
             "increasing function of the resistance with 1 simple root."
         ),
+        notes=(r"$\tmp{u}$ is the source's $R$, the resistance, in ohms.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

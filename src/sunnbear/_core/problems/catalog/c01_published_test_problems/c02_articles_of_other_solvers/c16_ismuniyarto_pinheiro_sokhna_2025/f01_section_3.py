@@ -34,17 +34,18 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
     params = ()
     location_in_publication = "§3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{n}", r"\x - 8 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
         expression=(
-            r"- \frac{2000 {1.2}^{\tmp{n}}}{{1.2}^{\tmp{n}} - 1} + \frac{50 \tmp{n}}{{1.2}^{\tmp{n}} - "
-            r"1} + 3750 - \left(- \frac{600 \left(1 + 0.2\right)^{\tmp{n}}}{{1.2}^{\tmp{n}} - 1} + "
-            r"\frac{200 \tmp{n}}{{1.2}^{\tmp{n}} - 1}\right)"
+            r"- \frac{2000 {1.2}^{\tmp{u}}}{{1.2}^{\tmp{u}} - 1} + \frac{50 \tmp{u}}{{1.2}^{\tmp{u}} - "
+            r"1} + 3750 - \left(- \frac{600 \left(1 + 0.2\right)^{\tmp{u}}}{{1.2}^{\tmp{u}} - 1} + "
+            r"\frac{200 \tmp{u}}{{1.2}^{\tmp{u}} - 1}\right)"
         ),
         interval="[2, 10]",
         summary=(
             r"A break-even equation in the year $\x$, with 1 root, steepest at the lower bound, which lies 2 above a "
             r"pole at $\x = 0$."
         ),
+        notes=(r"$\tmp{u}$ is the source's $n$, the year.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

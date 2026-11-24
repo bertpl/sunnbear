@@ -37,9 +37,9 @@ class Bradie2006Section2Page55(Formula):
     )
     location_in_publication = "§2 (p. 55); §2.2 (p. 78); Exercise 2.2-15"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{h}", r"\x - 10 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
-            r"\frac{\param{rho_f}}{3} \tmp{h}^{3} - \param{R} \param{rho_f} \tmp{h}^{2} + \frac{4 "
+            r"\frac{\param{rho_f}}{3} \tmp{u}^{3} - \param{R} \param{rho_f} \tmp{u}^{2} + \frac{4 "
             r"\param{R}^{3} \param{rho_o}}{3}"
         ),
         interval="[0, 10]",
@@ -47,6 +47,7 @@ class Bradie2006Section2Page55(Formula):
             "A decreasing cubic whose 1 simple root is the depth to which a floating sphere sinks, with a slope of 0 at"
             " both bounds."
         ),
+        notes=(r"$\tmp{u}$ is the source's $h$, the depth to which the sphere sinks, in cm.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

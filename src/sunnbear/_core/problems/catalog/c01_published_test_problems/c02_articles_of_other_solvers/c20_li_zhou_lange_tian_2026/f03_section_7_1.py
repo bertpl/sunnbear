@@ -37,15 +37,14 @@ class LiZhouLangeTian2026Section71(Formula):
     )
     location_in_publication = "Section 7.1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{\theta}", r"\x - 2 \c"),),
-        expression=(
-            r"\param{a3} \tmp{\theta}^{\param{m}} + \param{a2} \tmp{\theta}^2 + \param{a1} \tmp{\theta} + \param{a0}"
-        ),
+        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        expression=(r"\param{a3} \tmp{u}^{\param{m}} + \param{a2} \tmp{u}^2 + \param{a1} \tmp{u} + \param{a0}"),
         interval="[0, 2]",
         summary=(
             r"A decreasing cubic with 1 simple root for both parameter sets, at the midpoint of the interval for "
             r"$\param{a2} = 1$."
         ),
+        notes=(r"$\tmp{u}$ is the source's $\theta$.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 

@@ -66,12 +66,12 @@ class ModifiedBradie2006Section21Page67(Formula):
     )
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{r}", r"\x - 0.09 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.09 \c"),),
         expression=(
             r"\begin{cases} \param{initial_investment} + 36 \param{monthly_deposit} - \param{goal} & "
-            r"\text{if } \tmp{r} = 0 \\ \operatorname{expm1}\left(36 "
-            r"\operatorname{log1p}\left(\frac{\tmp{r}}{12}\right)\right) "
-            r"\left(\param{initial_investment} + \frac{12 \param{monthly_deposit}}{\tmp{r}}\right) - "
+            r"\text{if } \tmp{u} = 0 \\ \operatorname{expm1}\left(36 "
+            r"\operatorname{log1p}\left(\frac{\tmp{u}}{12}\right)\right) "
+            r"\left(\param{initial_investment} + \frac{12 \param{monthly_deposit}}{\tmp{u}}\right) - "
             r"\left(\param{goal} - \param{initial_investment}\right) & \text{otherwise} \end{cases}"
         ),
         interval="[0.01, 0.1]",
@@ -80,11 +80,12 @@ class ModifiedBradie2006Section21Page67(Formula):
             "root in the lower half of the interval."
         ),
         notes=(
+            r"$\tmp{u}$ is the source's $r$, the annual interest rate.",
             (
                 r"The expression equals the published function, $$\param{initial_investment} \left(1 + "
-                r"\frac{\tmp{r}}{12}\right)^{36} + \param{monthly_deposit} \frac{\left(1 + "
-                r"\tmp{r}/12\right)^{36} - 1}{\tmp{r}/12} - \param{goal},$$ without rounding $1 + "
-                r"\tmp{r}/12$ to float64 and without subtracting 1, which makes the published function "
+                r"\frac{\tmp{u}}{12}\right)^{36} + \param{monthly_deposit} \frac{\left(1 + "
+                r"\tmp{u}/12\right)^{36} - 1}{\tmp{u}/12} - \param{goal},$$ without rounding $1 + "
+                r"\tmp{u}/12$ to float64 and without subtracting 1, which makes the published function "
                 "exactly 0 at many x-values next to the root."
             ),
             (

@@ -30,9 +30,9 @@ class ChapraCanale2015Problem516(Formula):
     location_in_publication = "Prob. 5.16"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{y}", r"\x - 2 \c"),
-            (r"\tmp{B}", r"3 + \tmp{y}"),
-            (r"\tmp{A_c}", r"3 \tmp{y} + \frac{\tmp{y}^2}{2}"),
+            (r"\tmp{u}", r"\x - 2 \c"),
+            (r"\tmp{B}", r"3 + \tmp{u}"),
+            (r"\tmp{A_c}", r"3 \tmp{u} + \frac{\tmp{u}^2}{2}"),
         ),
         expression=r"1 - \frac{20^2}{9.81 \tmp{A_c}^3} \tmp{B}",
         interval="[0.5, 2.5]",
@@ -40,6 +40,7 @@ class ChapraCanale2015Problem516(Formula):
             r"The critical-flow condition of a trapezoidal channel at depth $\x$, with 1 simple root and a pole at "
             r"$\x = 0$ that makes the function steep near the lower bound."
         ),
+        notes=(r"$\tmp{u}$ is the source's $y$, the depth of the water in the channel, in m.",),
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
