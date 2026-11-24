@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Correct the formula summaries of the test problems so that each holds for every value of `c`, unify the symbols of the formulas' shifted variable and parameters, and hold each publication of the published test problems as a CSL-JSON item
+
 ### Deprecated
 
 ### Removed
