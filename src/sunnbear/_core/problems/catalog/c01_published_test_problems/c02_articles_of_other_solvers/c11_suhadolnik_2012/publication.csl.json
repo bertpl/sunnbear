@@ -1,0 +1,24 @@
+{
+  "id": "Suhadolnik12",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Suhadolnik",
+      "given": "A."
+    }
+  ],
+  "title": "Combined bracketing methods for solving nonlinear equations",
+  "container-title": "Applied Mathematics Letters",
+  "issued": {
+    "date-parts": [
+      [
+        2012,
+        11
+      ]
+    ]
+  },
+  "volume": "25",
+  "issue": "11",
+  "page": "1755-1760",
+  "DOI": "10.1016/j.aml.2012.02.006"
+}

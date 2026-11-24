@@ -245,7 +245,7 @@ def test_timeline_template_counts_every_status(script_modules):
 # ==================================================================================================
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
 def test_published_formula_matches_the_survey(formula, sources, committed_formulas_table):
-    """A published formula has an active line in `formulas.csv`, and its category's name and citation match its source.
+    """A published formula has an active line in `formulas.csv`, and its category's name matches its source.
 
     The test does not check the location, because the module's author writes it as prose from the formula's rows' keys
     and the source's `where_in_source`.
@@ -258,7 +258,6 @@ def test_published_formula_matches_the_survey(formula, sources, committed_formul
     # --- assert -----------------------
     assert not line.is_retired
     assert category.name == source.short_title
-    assert FormulaRegistry.publication_of(formula).citation == source.reference
 
 
 def test_published_sources_in_the_catalog_are_complete(committed_formulas_table):

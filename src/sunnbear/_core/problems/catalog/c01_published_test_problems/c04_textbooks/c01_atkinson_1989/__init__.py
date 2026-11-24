@@ -1,5 +1,7 @@
 """This category holds the formulas of Atkinson (1989)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -22,14 +24,4 @@ class Atkinson1989(FormulaCategory):
     description = (
         "The test problems come from chapter 2, on rootfinding, of the textbook An Introduction to Numerical Analysis."
     )
-    publication = Publication(
-        citation=(
-            "Atkinson, K. E. (1989). An Introduction to Numerical Analysis, 2nd edition. John Wiley & Sons, New"
-            " York. ISBN 0-471-62489-6."
-        ),
-        citation_key="Atkinson89",
-        authors=("Atkinson, K. E.",),
-        year=1989,
-        title="An Introduction to Numerical Analysis",
-        published_in="John Wiley & Sons",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

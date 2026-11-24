@@ -1,0 +1,29 @@
+{
+  "id": "Ganchovski23",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Ganchovski",
+      "given": "N."
+    },
+    {
+      "family": "Traykov",
+      "given": "A."
+    }
+  ],
+  "title": "Modified Anderson-Bjork's method for solving non-linear equations in structural mechanics",
+  "container-title": "IOP Conference Series: Materials Science and Engineering",
+  "issued": {
+    "date-parts": [
+      [
+        2023,
+        2,
+        1
+      ]
+    ]
+  },
+  "volume": "1276",
+  "issue": "1",
+  "number": "012010",
+  "DOI": "10.1088/1757-899X/1276/1/012010"
+}

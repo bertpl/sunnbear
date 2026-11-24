@@ -1,0 +1,28 @@
+{
+  "id": "Alefeld92",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Alefeld",
+      "given": "G. E."
+    },
+    {
+      "family": "Potra",
+      "given": "F. A."
+    }
+  ],
+  "title": "Some efficient methods for enclosing simple zeros of nonlinear equations",
+  "container-title": "BIT",
+  "issued": {
+    "date-parts": [
+      [
+        1992,
+        6
+      ]
+    ]
+  },
+  "volume": "32",
+  "issue": "2",
+  "page": "334-344",
+  "DOI": "10.1007/bf01994885"
+}

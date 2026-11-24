@@ -302,7 +302,7 @@ The class docstring of `ModifiedPublishedTestProblems` describes subcategory 1.9
 4. Add a line to `formula_decisions.csv` for each set of the source's `new` rows that are obviously 1 function, with `f` and `parameters` where each row gives its own values of a parameter, and for each row whose formula takes another variable (§ Formulas). Restore `formulas.csv` from git, because the regenerations above already appended the source's formulas without these decisions, then regenerate.
 5. Write the source's package and its formula modules (§ Formula modules), and import the package in its subcategory's `__init__.py`. The package's `FormulaCategory` subclass gives:
    - a `description` that says what the source is, such as "The test problems come from the article that introduces Ridders' method.";
-   - a `publication`, a `Publication` whose `citation` is the source's `reference`, and whose other fields hold the parts of that citation, apart from its citation key and its year; the `Publication` docstring describes each field. The `Publication`'s `year` is the year at the end of the source's package name, which can differ from the source's `year`.
+   - a `publication`, built with `Publication.from_csl_json_file` from the package's `publication.csl.json`, which holds the source as 1 CSL-JSON item; the `Publication` docstring describes the item. The item's year is the year at the end of the source's package name, which can differ from the source's `year`. Where the source has a DOI, the item starts from the CSL-JSON that the DOI service returns, reviewed field by field.
 6. Commit the source file, `decisions.csv`, `formula_decisions.csv`, the generated files and the formula modules together.
 
 ## Regenerating
@@ -328,7 +328,7 @@ CI does not regenerate `rows.csv`, because another sympy version could change a 
 - every source file has its fields;
 - `summary.md` and `timeline.html` equal what the script builds from `rows.csv` and the source files;
 - the active formulas of `formulas.csv` hold every `new` row exactly once and no other row, the rows of each formula come from its own source, and the file equals what the script builds from `rows.csv`, `formula_decisions.csv` and the file's own ids;
-- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source, and the category's `publication` holds the source's reference as its citation;
+- each formula of category 1 in sunnbear's catalog has an active line in `formulas.csv`; its category is named after its source;
 - every active formula of a source that has a formula in the catalog is in the catalog too.
 
 A change to the parsing or matching in `scripts/literature_test_problems/`, or to the sympy version, is what the test does not check: whoever makes it regenerates `rows.csv`.

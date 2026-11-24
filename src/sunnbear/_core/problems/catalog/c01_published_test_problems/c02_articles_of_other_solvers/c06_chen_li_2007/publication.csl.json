@@ -1,0 +1,37 @@
+{
+  "id": "Chen07",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Chen",
+      "given": "J."
+    },
+    {
+      "family": "Li",
+      "given": "W."
+    }
+  ],
+  "title": "An improved exponential regula falsi methods with quadratic convergence of both diameter and point for solving nonlinear equations",
+  "container-title": "Applied Numerical Mathematics",
+  "issued": {
+    "date-parts": [
+      [
+        2007,
+        1
+      ]
+    ]
+  },
+  "volume": "57",
+  "issue": "1",
+  "page": "80-88",
+  "DOI": "10.1016/j.apnum.2006.01.001",
+  "available-date": {
+    "date-parts": [
+      [
+        2006,
+        2,
+        14
+      ]
+    ]
+  }
+}

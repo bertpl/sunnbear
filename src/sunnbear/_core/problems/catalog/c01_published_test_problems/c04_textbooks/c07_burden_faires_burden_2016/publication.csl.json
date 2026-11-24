@@ -1,0 +1,30 @@
+{
+  "id": "Burden16",
+  "type": "book",
+  "author": [
+    {
+      "family": "Burden",
+      "given": "R. L."
+    },
+    {
+      "family": "Faires",
+      "given": "J. D."
+    },
+    {
+      "family": "Burden",
+      "given": "A. M."
+    }
+  ],
+  "title": "Numerical Analysis",
+  "issued": {
+    "date-parts": [
+      [
+        2016
+      ]
+    ]
+  },
+  "edition": "10",
+  "publisher": "Cengage Learning",
+  "publisher-place": "Boston, MA",
+  "ISBN": "978-1-305-25366-7"
+}

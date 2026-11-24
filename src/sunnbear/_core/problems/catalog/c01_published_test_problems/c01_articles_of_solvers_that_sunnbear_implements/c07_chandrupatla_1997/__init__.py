@@ -1,5 +1,7 @@
 """This category holds the formulas of Chandrupatla (1997)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -24,19 +26,4 @@ class Chandrupatla1997(FormulaCategory):
         "The test problems come from the article that introduces Chandrupatla's method, a hybrid of"
         " quadratic interpolation and bisection."
     )
-    publication = Publication(
-        citation=(
-            "Chandrupatla, T. R. (1997). A new hybrid quadratic/bisection algorithm for finding the zero of a"
-            " nonlinear function without using derivatives. Advances in Engineering Software 28(3), 145–149."
-            " https://doi.org/10.1016/S0965-9978(96)00051-8."
-        ),
-        citation_key="Chandrupatla97",
-        authors=("Chandrupatla, T. R.",),
-        year=1997,
-        title=(
-            "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without "
-            "using derivatives"
-        ),
-        published_in="Advances in Engineering Software",
-        doi="10.1016/S0965-9978(96)00051-8",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

@@ -1,0 +1,24 @@
+{
+  "id": "Ford97",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Ford",
+      "given": "J. A."
+    }
+  ],
+  "title": "Improved Illinois-type methods for the solution of nonlinear equations",
+  "container-title": "Scientia Iranica",
+  "issued": {
+    "date-parts": [
+      [
+        1997
+      ]
+    ]
+  },
+  "URL": "https://scientiairanica.sharif.edu/article_21758.html",
+  "volume": "4",
+  "issue": "1&2",
+  "page": "28-34",
+  "note": "The journal's page lists the DOI 10.24200/sci.2020.21758, which doi.org does not resolve. An earlier version is the University of Essex technical report CSM-257 (1995)."
+}

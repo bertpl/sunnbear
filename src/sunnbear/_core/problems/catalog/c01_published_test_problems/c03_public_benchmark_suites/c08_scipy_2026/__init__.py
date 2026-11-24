@@ -1,5 +1,7 @@
 """This category holds the formulas of SciPy (2026)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -20,13 +22,4 @@ class Scipy2026(FormulaCategory):
     number = (1, 3, 8)
     name = "SciPy (2026)"
     description = "The test problems come from the module of test problems for SciPy's root finders, release 1.18.1."
-    publication = Publication(
-        citation=(
-            "SciPy 1.18.1 (2026), module `scipy/optimize/_tstutils.py`, "
-            "https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py."
-        ),
-        citation_key="SciPy26",
-        year=2026,
-        title="SciPy",
-        url="https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

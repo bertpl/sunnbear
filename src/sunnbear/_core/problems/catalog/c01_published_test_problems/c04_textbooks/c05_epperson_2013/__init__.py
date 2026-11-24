@@ -1,5 +1,7 @@
 """This category holds the formulas of Epperson (2013)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -38,14 +40,4 @@ class Epperson2013(FormulaCategory):
         "The test problems come from chapter 3, on root-finding, of the textbook An Introduction to"
         " Numerical Methods and Analysis."
     )
-    publication = Publication(
-        citation=(
-            "Epperson, J. F. (2013). An Introduction to Numerical Methods and Analysis, 2nd edition. John Wiley &"
-            " Sons, Hoboken, NJ. ISBN 978-1-118-36759-9."
-        ),
-        citation_key="Epperson13",
-        authors=("Epperson, J. F.",),
-        year=2013,
-        title="An Introduction to Numerical Methods and Analysis",
-        published_in="John Wiley & Sons",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

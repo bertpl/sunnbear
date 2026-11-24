@@ -1,0 +1,39 @@
+{
+  "id": "Oliveira21",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Oliveira",
+      "given": "I. F. D."
+    },
+    {
+      "family": "Takahashi",
+      "given": "R. H. C."
+    }
+  ],
+  "title": "An enhancement of the bisection method average performance preserving minmax optimality",
+  "container-title": "ACM Transactions on Mathematical Software",
+  "issued": {
+    "date-parts": [
+      [
+        2021,
+        3,
+        31
+      ]
+    ]
+  },
+  "volume": "47",
+  "issue": "1",
+  "page": "1-24",
+  "available-date": {
+    "date-parts": [
+      [
+        2020,
+        12,
+        8
+      ]
+    ]
+  },
+  "DOI": "10.1145/3423597",
+  "number": "5"
+}

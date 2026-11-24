@@ -1,5 +1,7 @@
 """This category holds the formulas of Ridders (1979)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import f01_section_i, f02_function_1, f03_function_2, f04_function_3
@@ -11,16 +13,4 @@ class Ridders1979(FormulaCategory):
     number = (1, 1, 5)
     name = "Ridders (1979)"
     description = "The test problems come from the article that introduces Ridders' method."
-    publication = Publication(
-        citation=(
-            "Ridders, C. J. F. (1979). A new algorithm for computing a single root of a real continuous function."
-            " IEEE Transactions on Circuits and Systems 26(11), 979–980."
-            " https://doi.org/10.1109/TCS.1979.1084580."
-        ),
-        citation_key="Ridders79",
-        authors=("Ridders, C. J. F.",),
-        year=1979,
-        title="A new algorithm for computing a single root of a real continuous function",
-        published_in="IEEE Transactions on Circuits and Systems",
-        doi="10.1109/TCS.1979.1084580",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

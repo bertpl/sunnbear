@@ -1,0 +1,26 @@
+{
+  "id": "Ellithy26",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Ellithy",
+      "given": "A."
+    }
+  ],
+  "title": "Four new multi-phase hybrid bracketing algorithms for numerical root finding",
+  "container-title": "Journal of the Egyptian Mathematical Society",
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        12,
+        1
+      ]
+    ]
+  },
+  "volume": "34",
+  "issue": "1",
+  "page": "91-115",
+  "DOI": "10.21608/joems.2026.440115.1078",
+  "note": "Code and data: the author's repository https://github.com/Abdelrhman-Ellithy/hybridroots, at commit 7f22131ef4e1def3e3928dc6558f46f756d0a5ea."
+}

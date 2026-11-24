@@ -1,0 +1,27 @@
+{
+  "id": "Tomov26",
+  "type": "article",
+  "author": [
+    {
+      "family": "Tomov",
+      "given": "L."
+    },
+    {
+      "family": "Ganchovski",
+      "given": "N."
+    }
+  ],
+  "title": "Global convergence and reliable stopping in a safeguarded modified Anderson–Björck method",
+  "issued": {
+    "date-parts": [
+      [
+        2026
+      ]
+    ]
+  },
+  "DOI": "10.48550/arxiv.2610.14193",
+  "publisher": "arXiv",
+  "number": "2610.14193",
+  "URL": "https://arxiv.org/abs/2610.14193",
+  "note": "The authors' C# code and benchmark definitions are in https://github.com/Proektsoft-EOOD/ModAB-Root-Finding; Section 7.3 of the preprint uses commit 9111cdcc6912401eb684a7b771df3a469795d5b8, and Section 7.4 commit 51a6d1b421fa6b5422b974b61c88acb3ae1945bb."
+}

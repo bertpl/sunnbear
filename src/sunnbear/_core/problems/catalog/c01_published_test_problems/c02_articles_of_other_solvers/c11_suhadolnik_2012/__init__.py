@@ -1,5 +1,7 @@
 """This category holds the formulas of Suhadolnik (2012)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -26,15 +28,4 @@ class Suhadolnik2012(FormulaCategory):
     number = (1, 2, 11)
     name = "Suhadolnik (2012)"
     description = "The test problems come from the article that introduces combined bracketing methods."
-    publication = Publication(
-        citation=(
-            "Suhadolnik, A. (2012). Combined bracketing methods for solving nonlinear equations. Applied"
-            " Mathematics Letters 25(11), 1755–1760. https://doi.org/10.1016/j.aml.2012.02.006."
-        ),
-        citation_key="Suhadolnik12",
-        authors=("Suhadolnik, A.",),
-        year=2012,
-        title="Combined bracketing methods for solving nonlinear equations",
-        published_in="Applied Mathematics Letters",
-        doi="10.1016/j.aml.2012.02.006",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

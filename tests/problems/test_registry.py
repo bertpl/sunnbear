@@ -478,7 +478,7 @@ def test_publication_of_finds_the_publication_of_the_category_or_of_the_modified
     A formula whose category declares no publication, and that modifies no formula, has none.
     """
     # --- arrange ----------------------
-    publication = Publication(citation="Author, A. (2000). A title.")
+    publication = Publication(csl_item={"id": "Author00", "type": "book", "title": "A title"})
     define_category_cls((99, 1), publication=publication)
     define_category_cls((99, 2), original_category_number=(99, 1))
     define_category_cls((99, 3))

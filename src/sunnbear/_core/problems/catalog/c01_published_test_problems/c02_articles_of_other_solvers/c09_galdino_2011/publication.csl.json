@@ -1,0 +1,24 @@
+{
+  "id": "Galdino11",
+  "type": "paper-conference",
+  "author": [
+    {
+      "family": "Galdino",
+      "given": "S."
+    }
+  ],
+  "title": "A family of regula falsi root-finding methods",
+  "container-title": "Proceedings of the 2011 World Congress on Engineering and Technology",
+  "issued": {
+    "date-parts": [
+      [
+        2011
+      ]
+    ]
+  },
+  "URL": "http://sergiogaldino.pbworks.com/w/file/fetch/66011429/0130-1943543",
+  "publisher": "IEEE Press",
+  "publisher-place": "Shanghai",
+  "page": "514-517",
+  "ISBN": "978-1-61284-365-0"
+}

@@ -1,0 +1,25 @@
+{
+  "id": "Norton85",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Norton",
+      "given": "V."
+    }
+  ],
+  "title": "Algorithm 631: Finding a bracketed zero by Larkin's method of rational interpolation",
+  "container-title": "ACM Transactions on Mathematical Software",
+  "issued": {
+    "date-parts": [
+      [
+        1985,
+        6
+      ]
+    ]
+  },
+  "volume": "11",
+  "issue": "2",
+  "page": "120-134",
+  "DOI": "10.1145/214392.214396",
+  "note": "The author's Fortran code is Algorithm 631 of the Collected Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
+}

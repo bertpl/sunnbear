@@ -1,5 +1,7 @@
 """This category holds the formulas of Stage (2013)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -24,16 +26,4 @@ class Stage2013(FormulaCategory):
         "The test problems come from an article that comments on an improvement to Brent's method "
         "and compares 7 methods."
     )
-    publication = Publication(
-        citation=(
-            "Stage, S. A. (2013). Comments on An Improvement to the Brent's Method. International Journal of"
-            " Experimental Algorithms 4(1), 1–16. No DOI; the publisher's PDF:"
-            " https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf."
-        ),
-        citation_key="Stage13",
-        authors=("Stage, S. A.",),
-        year=2013,
-        title="Comments on An Improvement to the Brent's Method",
-        published_in="International Journal of Experimental Algorithms",
-        url="https://www.cscjournals.org/manuscript/Journals/IJEA/Volume4/Issue1/IJEA-33.pdf",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

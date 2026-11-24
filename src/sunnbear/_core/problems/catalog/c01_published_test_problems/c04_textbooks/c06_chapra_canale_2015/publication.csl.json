@@ -1,0 +1,27 @@
+{
+  "id": "Chapra15",
+  "type": "book",
+  "author": [
+    {
+      "family": "Chapra",
+      "given": "S. C."
+    },
+    {
+      "family": "Canale",
+      "given": "R. P."
+    }
+  ],
+  "title": "Numerical Methods for Engineers",
+  "issued": {
+    "date-parts": [
+      [
+        2015
+      ]
+    ]
+  },
+  "edition": "7",
+  "publisher": "McGraw-Hill Education",
+  "publisher-place": "New York, NY",
+  "ISBN": "978-0-07-339792-4",
+  "note": "The 8th edition appeared in 2021."
+}

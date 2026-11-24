@@ -1,0 +1,24 @@
+{
+  "id": "Chandrupatla97",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Chandrupatla",
+      "given": "T. R."
+    }
+  ],
+  "title": "A new hybrid quadratic/bisection algorithm for finding the zero of a nonlinear function without using derivatives",
+  "container-title": "Advances in Engineering Software",
+  "issued": {
+    "date-parts": [
+      [
+        1997,
+        4
+      ]
+    ]
+  },
+  "volume": "28",
+  "issue": "3",
+  "page": "145-149",
+  "DOI": "10.1016/S0965-9978(96)00051-8"
+}

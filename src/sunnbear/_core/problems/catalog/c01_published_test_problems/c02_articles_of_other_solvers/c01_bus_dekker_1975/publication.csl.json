@@ -1,0 +1,28 @@
+{
+  "id": "Bus75",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Bus",
+      "given": "J. C. P."
+    },
+    {
+      "family": "Dekker",
+      "given": "T. J."
+    }
+  ],
+  "title": "Two efficient algorithms with guaranteed convergence for finding a zero of a function",
+  "container-title": "ACM Transactions on Mathematical Software",
+  "issued": {
+    "date-parts": [
+      [
+        1975,
+        12
+      ]
+    ]
+  },
+  "volume": "1",
+  "issue": "4",
+  "page": "330-345",
+  "DOI": "10.1145/355656.355659"
+}

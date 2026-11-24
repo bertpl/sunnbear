@@ -1,0 +1,25 @@
+{
+  "id": "Romadani25",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Romadani",
+      "given": "M. N. H."
+    }
+  ],
+  "title": "From Theory to Code: Transforming Classical Root-Finding Methods into Efficient Python Implementations",
+  "container-title": "ICCK Journal of Applied Mathematics",
+  "issued": {
+    "date-parts": [
+      [
+        2025,
+        12,
+        14
+      ]
+    ]
+  },
+  "volume": "1",
+  "issue": "3",
+  "page": "154-189",
+  "DOI": "10.62762/jam.2025.840767"
+}

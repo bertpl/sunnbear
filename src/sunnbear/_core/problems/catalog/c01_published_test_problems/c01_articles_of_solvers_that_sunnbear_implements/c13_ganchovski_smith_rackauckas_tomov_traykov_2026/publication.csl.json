@@ -1,0 +1,42 @@
+{
+  "id": "Ganchovski26a",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Ganchovski",
+      "given": "N."
+    },
+    {
+      "family": "Smith",
+      "given": "O."
+    },
+    {
+      "family": "Rackauckas",
+      "given": "C."
+    },
+    {
+      "family": "Tomov",
+      "given": "L."
+    },
+    {
+      "family": "Traykov",
+      "given": "A."
+    }
+  ],
+  "title": "Improvements to the modified Anderson–Björck (modAB) root-finding algorithm",
+  "container-title": "Algorithms",
+  "issued": {
+    "date-parts": [
+      [
+        2026,
+        4,
+        24
+      ]
+    ]
+  },
+  "volume": "19",
+  "issue": "5",
+  "number": "332",
+  "DOI": "10.3390/a19050332",
+  "note": "Supplementary materials: https://www.mdpi.com/article/10.3390/a19050332/s1, also in the folder MDPI-Algorithms-Data of the authors' repository https://github.com/Proektsoft-EOOD/ModAB-Root-Finding."
+}

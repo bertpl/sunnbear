@@ -1,5 +1,7 @@
 """This category holds the formulas of Ganchovski, Traykov (2023)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import f01_section_3
@@ -14,16 +16,4 @@ class GanchovskiTraykov2023(FormulaCategory):
         "The test problems come from the article that introduces the modified Anderson–Björck "
         "method, for nonlinear equations in structural mechanics."
     )
-    publication = Publication(
-        citation=(
-            "Ganchovski, N., Traykov, A. (2023). Modified Anderson-Bjork's method for solving non-linear"
-            " equations in structural mechanics. IOP Conf. Series: Materials Science and Engineering 1276,"
-            " 012010. https://doi.org/10.1088/1757-899X/1276/1/012010."
-        ),
-        citation_key="Ganchovski23",
-        authors=("Ganchovski, N.", "Traykov, A."),
-        year=2023,
-        title="Modified Anderson-Bjork's method for solving non-linear equations in structural mechanics",
-        published_in="IOP Conf. Series: Materials Science and Engineering",
-        doi="10.1088/1757-899X/1276/1/012010",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

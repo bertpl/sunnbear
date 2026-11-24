@@ -1,0 +1,33 @@
+{
+  "id": "Alefeld95",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Alefeld",
+      "given": "G. E."
+    },
+    {
+      "family": "Potra",
+      "given": "F. A."
+    },
+    {
+      "family": "Shi",
+      "given": "Y."
+    }
+  ],
+  "title": "Algorithm 748: enclosing zeros of continuous functions",
+  "container-title": "ACM Transactions on Mathematical Software",
+  "issued": {
+    "date-parts": [
+      [
+        1995,
+        9
+      ]
+    ]
+  },
+  "volume": "21",
+  "issue": "3",
+  "page": "327-344",
+  "DOI": "10.1145/210089.210111",
+  "note": "The authors' code is CALGO 748: https://www.netlib.org/toms/748."
+}

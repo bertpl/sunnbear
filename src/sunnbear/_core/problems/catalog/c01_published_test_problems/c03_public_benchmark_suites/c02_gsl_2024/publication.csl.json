@@ -1,0 +1,25 @@
+{
+  "id": "GSL24",
+  "type": "software",
+  "author": [
+    {
+      "family": "Priedhorsky",
+      "given": "Reid"
+    },
+    {
+      "family": "Gough",
+      "given": "Brian"
+    }
+  ],
+  "title": "GNU Scientific Library (GSL)",
+  "issued": {
+    "date-parts": [
+      [
+        2024
+      ]
+    ]
+  },
+  "URL": "https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/roots/?h=release-2-8",
+  "version": "2.8",
+  "note": "The files roots/test_funcs.c and roots/test.c, copyright Reid Priedhorsky and Brian Gough. The files cite no source for their functions."
+}

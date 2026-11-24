@@ -1,5 +1,7 @@
 """This category holds the formulas of Ellithy (2026)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -43,18 +45,4 @@ class Ellithy2026(FormulaCategory):
         "The test problems come from the data set of the article that introduces 4 multi-phase "
         "hybrid bracketing methods."
     )
-    publication = Publication(
-        citation=(
-            "Ellithy, A. (2026). Four new multi-phase hybrid bracketing algorithms for numerical root finding."
-            " Journal of the Egyptian Mathematical Society 34(1), 91–115."
-            " https://doi.org/10.21608/joems.2026.440115.1078. Code and data: the author's repository"
-            " https://github.com/Abdelrhman-Ellithy/hybridroots, at commit"
-            " `7f22131ef4e1def3e3928dc6558f46f756d0a5ea`."
-        ),
-        citation_key="Ellithy26",
-        authors=("Ellithy, A.",),
-        year=2026,
-        title="Four new multi-phase hybrid bracketing algorithms for numerical root finding",
-        published_in="Journal of the Egyptian Mathematical Society",
-        doi="10.21608/joems.2026.440115.1078",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

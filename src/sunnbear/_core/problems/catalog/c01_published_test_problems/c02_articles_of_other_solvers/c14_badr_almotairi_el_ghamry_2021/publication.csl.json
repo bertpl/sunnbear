@@ -1,0 +1,33 @@
+{
+  "id": "Badr21",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Badr",
+      "given": "E."
+    },
+    {
+      "family": "Almotairi",
+      "given": "S."
+    },
+    {
+      "family": "El Ghamry",
+      "given": "A."
+    }
+  ],
+  "title": "A comparative study among new hybrid root finding algorithms and traditional methods",
+  "container-title": "Mathematics",
+  "issued": {
+    "date-parts": [
+      [
+        2021,
+        6,
+        7
+      ]
+    ]
+  },
+  "volume": "9",
+  "issue": "11",
+  "number": "1306",
+  "DOI": "10.3390/math9111306"
+}

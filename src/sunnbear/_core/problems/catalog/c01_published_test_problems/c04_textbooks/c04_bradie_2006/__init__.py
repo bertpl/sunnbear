@@ -1,5 +1,7 @@
 """This category holds the formulas of Bradie (2006)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -43,14 +45,4 @@ class Bradie2006(FormulaCategory):
         "The test problems come from chapter 2, on rootfinding, of the textbook A Friendly "
         "Introduction to Numerical Analysis."
     )
-    publication = Publication(
-        citation=(
-            "Bradie, B. (2006). A Friendly Introduction to Numerical Analysis. Pearson Prentice Hall, Upper"
-            " Saddle River, NJ. ISBN 0-13-013054-0."
-        ),
-        citation_key="Bradie06",
-        authors=("Bradie, B.",),
-        year=2006,
-        title="A Friendly Introduction to Numerical Analysis",
-        published_in="Pearson Prentice Hall",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

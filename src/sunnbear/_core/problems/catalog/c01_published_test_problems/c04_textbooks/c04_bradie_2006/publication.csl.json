@@ -1,0 +1,21 @@
+{
+  "id": "Bradie06",
+  "type": "book",
+  "author": [
+    {
+      "family": "Bradie",
+      "given": "B."
+    }
+  ],
+  "title": "A Friendly Introduction to Numerical Analysis",
+  "issued": {
+    "date-parts": [
+      [
+        2006
+      ]
+    ]
+  },
+  "publisher": "Pearson Prentice Hall",
+  "publisher-place": "Upper Saddle River, NJ",
+  "ISBN": "0-13-013054-0"
+}

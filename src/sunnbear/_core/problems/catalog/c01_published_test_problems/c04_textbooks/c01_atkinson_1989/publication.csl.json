@@ -1,0 +1,22 @@
+{
+  "id": "Atkinson89",
+  "type": "book",
+  "author": [
+    {
+      "family": "Atkinson",
+      "given": "K. E."
+    }
+  ],
+  "title": "An Introduction to Numerical Analysis",
+  "issued": {
+    "date-parts": [
+      [
+        1989
+      ]
+    ]
+  },
+  "edition": "2",
+  "publisher": "John Wiley & Sons",
+  "publisher-place": "New York",
+  "ISBN": "0-471-62489-6"
+}

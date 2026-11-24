@@ -1,0 +1,15 @@
+{
+  "id": "SciPy26",
+  "type": "software",
+  "title": "SciPy",
+  "issued": {
+    "date-parts": [
+      [
+        2026
+      ]
+    ]
+  },
+  "URL": "https://github.com/scipy/scipy/blob/v1.18.1/scipy/optimize/_tstutils.py",
+  "version": "1.18.1",
+  "note": "The module scipy/optimize/_tstutils.py."
+}

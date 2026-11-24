@@ -1,5 +1,7 @@
 """This category holds the formulas of Norton (1985)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -22,17 +24,4 @@ class Norton1985(FormulaCategory):
         "The test problems come from the article that introduces Algorithm 631, which finds a "
         "bracketed zero by Larkin's method of rational interpolation."
     )
-    publication = Publication(
-        citation=(
-            "Norton, V. (1985). Algorithm 631: Finding a bracketed zero by Larkin's method of rational"
-            " interpolation. ACM Transactions on Mathematical Software 11(2), 120–134."
-            " https://doi.org/10.1145/214392.214396. The author's Fortran code is Algorithm 631 of the Collected"
-            " Algorithms of the ACM (CALGO), https://www.netlib.org/toms/631."
-        ),
-        citation_key="Norton85",
-        authors=("Norton, V.",),
-        year=1985,
-        title="Algorithm 631: Finding a bracketed zero by Larkin's method of rational interpolation",
-        published_in="ACM Transactions on Mathematical Software",
-        doi="10.1145/214392.214396",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

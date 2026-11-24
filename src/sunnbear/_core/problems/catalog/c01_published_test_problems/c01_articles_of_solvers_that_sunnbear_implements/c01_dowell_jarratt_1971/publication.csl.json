@@ -1,0 +1,28 @@
+{
+  "id": "Dowell71",
+  "type": "article-journal",
+  "author": [
+    {
+      "family": "Dowell",
+      "given": "M."
+    },
+    {
+      "family": "Jarratt",
+      "given": "P."
+    }
+  ],
+  "title": "A modified regula falsi method for computing the root of an equation",
+  "container-title": "BIT",
+  "issued": {
+    "date-parts": [
+      [
+        1971,
+        6
+      ]
+    ]
+  },
+  "volume": "11",
+  "issue": "2",
+  "page": "168-174",
+  "DOI": "10.1007/BF01934364"
+}

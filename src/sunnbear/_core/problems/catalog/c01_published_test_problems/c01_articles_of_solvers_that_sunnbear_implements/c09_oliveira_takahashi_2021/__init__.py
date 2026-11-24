@@ -1,5 +1,7 @@
 """This category holds the formulas of Oliveira, Takahashi (2021)."""
 
+from pathlib import Path
+
 from sunnbear._core.problems.core import FormulaCategory, Publication
 
 from . import (
@@ -39,16 +41,4 @@ class OliveiraTakahashi2021(FormulaCategory):
         "The test problems come from the article that introduces the ITP method, which improves the"
         " average performance of bisection and keeps bisection's worst-case number of iterations."
     )
-    publication = Publication(
-        citation=(
-            "Oliveira, I. F. D., Takahashi, R. H. C. (2021). An enhancement of the bisection method average"
-            " performance preserving minmax optimality. ACM Transactions on Mathematical Software 47(1), Article"
-            " 5. https://doi.org/10.1145/3423597. The article itself is dated December 2020."
-        ),
-        citation_key="Oliveira21",
-        authors=("Oliveira, I. F. D.", "Takahashi, R. H. C."),
-        year=2021,
-        title="An enhancement of the bisection method average performance preserving minmax optimality",
-        published_in="ACM Transactions on Mathematical Software",
-        doi="10.1145/3423597",
-    )
+    publication = Publication.from_csl_json_file(Path(__file__).parent / "publication.csl.json")

@@ -1,0 +1,23 @@
+{
+  "id": "Moler04",
+  "type": "book",
+  "author": [
+    {
+      "family": "Moler",
+      "given": "C. B."
+    }
+  ],
+  "title": "Numerical Computing with MATLAB",
+  "issued": {
+    "date-parts": [
+      [
+        2004
+      ]
+    ]
+  },
+  "URL": "https://www.mathworks.com/moler/chapters.html",
+  "publisher": "SIAM",
+  "publisher-place": "Philadelphia",
+  "ISBN": "0-89871-560-1",
+  "note": "The MathWorks, Natick, MA, publishes the electronic edition. The URL is the author's web edition, 1 PDF per chapter; chapter 4: https://www.mathworks.com/content/dam/mathworks/mathworks-dot-com/moler/zeros.pdf."
+}
