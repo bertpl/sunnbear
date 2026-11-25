@@ -77,7 +77,16 @@ class ParamNotation(StrEnum):
 
     A tie in length goes to the notation declared first below, so the decimal wins every tie.
 
-    Every notation writes a whole-number argument without ``.0``, as in the spellings ``4`` and ``10^-5``.
+    Every notation writes its argument by the shorter of 2 spellings: Python's ``repr`` without the ``.0`` of a
+    whole number, and e-notation in Python's form. A tie goes to ``repr``, as these values show:
+
+    - ``4`` spells as ``4``;
+    - ``2000000`` spells as ``2e+06``, and ``0.0002`` as ``2e-04``;
+    - ``20000`` stays ``20000``, which ties with ``2e+04``.
+
+    Plus or minus a power of 10, such as ``1e+10`` or ``-1e-04``, is not offered in e-notation: ``1e+10`` would tie
+    with ``10^10`` and win the tie as a decimal, so ``10^10`` stays the canonical spelling. ``repr`` itself writes
+    values below ``0.0001`` in e-notation, so ``1e-05`` keeps its ``repr`` spelling and wins its tie with ``10^-5``.
 
     Power spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
     rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
@@ -170,7 +179,7 @@ class ParamNotation(StrEnum):
 
         - a power puts its exponent in braces: ``10^0.3`` gives ``10^{0.3}``;
         - an exponent in e-notation becomes a power of 10, and a mantissa of 1 is left out: ``2.5e-05`` gives
-          ``2.5 \cdot 10^{-5}``, and ``1e-05`` gives ``10^{-5}``;
+          ``2.5 \cdot 10^{-5}``, ``2e+06`` gives ``2 \cdot 10^{6}``, and ``1e-05`` gives ``10^{-5}``;
         - a negative value goes in parentheses, as in ``(-0.125)``, so that no 2 minus signs stand side by side.
 
         Raises:
@@ -249,14 +258,33 @@ class ParamNotation(StrEnum):
                 raise ValueError(f"{self._spell_rounded_argument(argument)} overflows to a non-finite value.") from exc
 
     def _spell_rounded_argument(self, argument: float) -> str:
-        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2``, ``-10^0.3`` or ``10^-5``."""
+        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2e+06``, ``2^1.2`` or ``-10^0.3``."""
         argument_text = repr(argument).removesuffix(".0")
+        e_notation_text = self._spell_argument_in_e_notation(argument)
+        if e_notation_text is not None and len(e_notation_text) < len(argument_text):
+            argument_text = e_notation_text
         if self is ParamNotation.DECIMAL:
             return argument_text
         elif self._power_sign > 0.0:
             return f"{self._power_base}^{argument_text}"
         else:
             return f"-{self._power_base}^{argument_text}"
+
+    @staticmethod
+    def _spell_argument_in_e_notation(argument: float) -> str | None:
+        """Write an already rounded `argument` in e-notation in Python's form, such as ``2e+06`` or ``2.5e-05``.
+
+        Return None for plus or minus a power of 10, such as ``1e+10``; the class docstring gives the reason.
+
+        The mantissa keeps `CANONICAL_DIGITS` significant digits, all that a rounded argument has, and then drops
+        the mantissa's trailing zeros, so the spelling parses back to exactly `argument`.
+        """
+        mantissa, exponent = f"{argument:.{CANONICAL_DIGITS - 1}e}".split("e")
+        mantissa = mantissa.rstrip("0").removesuffix(".")
+        if mantissa in ("1", "-1"):
+            return None
+        else:
+            return f"{mantissa}e{exponent}"
 
     @property
     def _power_base(self) -> int:

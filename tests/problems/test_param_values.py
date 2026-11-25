@@ -93,6 +93,16 @@ def test_parse_value_rejects_bad_tokens(token, match):
         (2.0**2.0, "4"),  # authored as 2^2: the decimal is shorter
         (2.0**1.23, "2^1.23"),
         (10.0**-5.0, "1e-05"),
+        (2e6, "2e+06"),  # shorter than the decimal 2000000
+        (2e-4, "2e-04"),  # shorter than the decimal 0.0002
+        (-2e-4, "-2e-04"),
+        (2.5e7, "2.5e+07"),
+        (20000.0, "20000"),  # tie in length with 2e+04: repr's spelling wins
+        (0.001, "0.001"),  # tie in length with 10^-3: the decimal wins
+        (160000.0, "160000"),  # shorter than 1.6e+05
+        (1e10, "10^10"),  # 1e+10 would tie with 10^10 and win as a decimal, so a power of 10 gets no e-notation
+        (1e-4, "10^-4"),
+        (-1e-4, "-10^-4"),
         (2.0**10.0, "1024"),  # tie in length: the decimal wins
         (1.0, "1"),
         (2.0**-20.0, "2^-20"),
@@ -215,6 +225,8 @@ def test_deduplicate_keeps_distinct_tuples():
         (2**0.5, "2^{0.5}"),
         (2.5e-5, r"2.5 \cdot 10^{-5}"),  # e-notation becomes a power of 10
         (1e-5, "10^{-5}"),  # a mantissa of 1 is left out
+        (2e6, r"2 \cdot 10^{6}"),
+        (2e-4, r"2 \cdot 10^{-4}"),
         (-0.3, "(-0.3)"),  # a negative value goes in parentheses
         (-(10**0.3), "(-10^{0.3})"),
         (-1.0, "(-1)"),
