@@ -94,7 +94,7 @@ def test_a_run_with_other_package_versions_may_not_resume(run_info):
     [
         (["regula_falsi"], ["f99.801[p1=0.2]"]),
         (["bisection"], ["f99.801[p1=0.4]"]),
-        (["bisection", "regula_falsi"], ["f99.801[p1=0.4]", "f99.802[p1=3.0]"]),
+        (["bisection", "regula_falsi"], ["f99.801[p1=0.4]", "f99.802[p1=3]"]),
     ],
 )
 def test_runs_of_other_solvers_or_on_other_problems_are_combinable(run_info, solver_ids, problem_ids):

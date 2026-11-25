@@ -44,10 +44,10 @@ def test_axis_decimal_values_are_grid_rounded():
 @pytest.mark.parametrize(
     "notation, start, stop, values, spellings",
     [
-        (ParamNotation.POW2, 0.0, 2.0, (1.0, 2.0, 4.0), ["1.0", "2.0", "4.0"]),
-        (ParamNotation.POW10, -1.0, 1.0, (0.1, 1.0, 10.0), ["0.1", "1.0", "10.0"]),
-        (ParamNotation.NEG_POW2, 0.0, 2.0, (-1.0, -2.0, -4.0), ["-1.0", "-2.0", "-4.0"]),
-        (ParamNotation.NEG_POW10, -1.0, 1.0, (-0.1, -1.0, -10.0), ["-0.1", "-1.0", "-10.0"]),
+        (ParamNotation.POW2, 0.0, 2.0, (1.0, 2.0, 4.0), ["1", "2", "4"]),
+        (ParamNotation.POW10, -1.0, 1.0, (0.1, 1.0, 10.0), ["0.1", "1", "10"]),
+        (ParamNotation.NEG_POW2, 0.0, 2.0, (-1.0, -2.0, -4.0), ["-1", "-2", "-4"]),
+        (ParamNotation.NEG_POW10, -1.0, 1.0, (-0.1, -1.0, -10.0), ["-0.1", "-1", "-10"]),
     ],
 )
 def test_axis_power_values(notation, start, stop, values, spellings):
@@ -416,7 +416,7 @@ def test_grid_single_axis_convenience():
     assert grid.param_names() == ("p1",)
     # arguments are rounded to 12 significant digits, so compare at that resolution
     assert [p[0] for p in tuples] == pytest.approx([1.0, 2**0.5, 2.0], rel=1e-9)
-    assert [ParamNotation.spell_value_canonically(p[0]) for p in tuples] == ["1.0", "2^0.5", "2.0"]
+    assert [ParamNotation.spell_value_canonically(p[0]) for p in tuples] == ["1", "2^0.5", "2"]
 
 
 # ==================================================================================================

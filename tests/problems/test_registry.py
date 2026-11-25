@@ -174,7 +174,7 @@ def test_candidates_deduplicates_across_notations():
     ids = [c.id for c in CrossNotation().build_all_candidates()]
 
     # --- assert -----------------------
-    assert [str(problem_id) for problem_id in ids] == ["f99.995[p1=4.0]"]
+    assert [str(problem_id) for problem_id in ids] == ["f99.995[p1=4]"]
 
 
 # ==================================================================================================
@@ -433,7 +433,7 @@ def test_candidate_from_id_and_string():
 def test_build_x_fun():
     """`build_x_fun` fixes `c` and returns the test problem's function as a function of `x` alone."""
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f99.801[p1=0.0]").calibrated(-5.0, 5.0)
+    problem = FormulaRegistry.candidate_from_id("f99.801[p1=0]").calibrated(-5.0, 5.0)
 
     # --- act --------------------------
     f = problem.build_x_fun(c=1.0)
@@ -538,7 +538,7 @@ def test_candidate_from_id_rejects_param_names_that_differ_from_the_formula(text
 
 def test_catalog_brackets_change_sign_within_c_range():
     # --- arrange ----------------------
-    problem = FormulaRegistry.candidate_from_id("f99.802[p1=5.0]").calibrated(-1.0, 1.0)
+    problem = FormulaRegistry.candidate_from_id("f99.802[p1=5]").calibrated(-1.0, 1.0)
 
     # --- act / assert -----------------
     for c in (-1.0, 0.0, 1.0):

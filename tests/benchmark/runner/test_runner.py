@@ -26,7 +26,7 @@ _EXTERNAL_SOLVER_CONFIG_MODULE_NAME = f"{__name__.rpartition('.')[0]}.external_s
 # ==================================================================================================
 # The test problems of the 2 formulas alternate in the list, so the tests check that the run groups them by
 # formula: both test problems of f99.801 run first.
-_PROBLEM_IDS = ("f99.801[p1=0.2]", "f99.802[p1=3.0]", "f99.801[p1=0.4]")
+_PROBLEM_IDS = ("f99.801[p1=0.2]", "f99.802[p1=3]", "f99.801[p1=0.4]")
 _SOLVER_IDS = ("bisection", "regula_falsi")
 
 
@@ -79,7 +79,7 @@ def test_a_run_writes_1_results_file_per_formula_and_loads_every_solve(finished_
     assert results["problem_id"].unique(maintain_order=True).to_list() == [
         "f99.801[p1=0.2]",
         "f99.801[p1=0.4]",
-        "f99.802[p1=3.0]",
+        "f99.802[p1=3]",
     ]
 
 
@@ -154,7 +154,7 @@ def test_a_crashed_run_resumes_with_only_its_unfinished_tasks(finished_run_dir, 
 
     # --- assert -----------------------
     # The 1st task's results were staged before the crash, so only the crashed task and the next one run.
-    assert problem_ids_run == ["f99.801[p1=0.4]", "f99.802[p1=3.0]"]
+    assert problem_ids_run == ["f99.801[p1=0.4]", "f99.802[p1=3]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 
@@ -188,7 +188,7 @@ def test_a_run_that_stopped_before_writing_a_results_file_writes_it_from_the_sta
 
     # --- assert -----------------------
     # The results of both test problems of f99.801 were staged before the crash, so only f99.802's task runs.
-    assert problem_ids_run == ["f99.802[p1=3.0]"]
+    assert problem_ids_run == ["f99.802[p1=3]"]
     assert _results_without_wall_time(tmp_path).equals(_results_without_wall_time(finished_run_dir))
 
 

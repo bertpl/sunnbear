@@ -2,7 +2,7 @@
 
 This guide gives the same name to the same kind of parameter across the catalog's formulas. It is indicative, not binding: a formula takes another name where that name reads better, and its docstring then says what the parameter is.
 
-A parameter's name is part of a test problem's id, as in `f2.1.2[p=4.0,w=10^0.3]`. Renaming a parameter therefore changes the ids of its formula's test problems.
+A parameter's name is part of a test problem's id, as in `f2.1.2[p=4,w=10^0.3]`. Renaming a parameter therefore changes the ids of its formula's test problems.
 
 ## Reserved names
 
