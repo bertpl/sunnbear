@@ -75,7 +75,7 @@ class ParamNotation(StrEnum):
     can spell it under the validity rule and returns the shortest spelling, so the spelling depends
     on the float alone, not on how it was authored: ``2^2`` and ``4`` both spell as ``4``.
 
-    A spelling writes a whole-number argument without ``.0``, such as ``4`` or ``10^-5``, in every notation.
+    A spelling writes a whole-number argument without ``.0`` in every notation, as in the spellings ``4`` and ``10^-5``.
 
     A tie in length goes to the notation declared first below, so the decimal wins every tie.
 
