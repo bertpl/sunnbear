@@ -78,9 +78,15 @@ class ParamNotation(StrEnum):
     A tie in length goes to the notation declared first below, so the decimal wins every tie.
 
     Every notation writes its argument by the shorter of 2 spellings: Python's ``repr`` without the ``.0`` of a
-    whole number, and e-notation in Python's form. A tie goes to ``repr``. The value ``4`` spells as ``4``,
-    ``2000000`` as ``2e+06``, ``0.0002`` as ``2e-04``, and ``20000`` stays ``20000``, which ties with ``2e+04``.
-    A power of 10 is not offered in e-notation, so ``10^10`` keeps its spelling, though ``1e+10`` is as short.
+    whole number, and e-notation in Python's form. A tie goes to ``repr``, as these values show:
+
+    - ``4`` spells as ``4``;
+    - ``2000000`` spells as ``2e+06``, and ``0.0002`` as ``2e-04``;
+    - ``20000`` stays ``20000``, which ties with ``2e+04``.
+
+    A power of 10 or its negative is not offered in e-notation: ``1e+10`` would tie with ``10^10`` and win the tie
+    as a decimal, so ``10^10`` stays the canonical spelling. ``repr`` itself still writes ``1e-05``, which wins its
+    tie with ``10^-5``.
 
     Power spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
     rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
@@ -268,11 +274,10 @@ class ParamNotation(StrEnum):
     def _spell_in_e_notation(argument: float) -> str | None:
         """Write an already rounded `argument` in e-notation in Python's form, such as ``2e+06`` or ``2.5e-05``.
 
-        Return None for a power of 10 or its negative, such as ``1e+10``: the power notations spell it already, and
-        an e-notation of the same length would take its place, because the decimal wins every tie.
+        Return None for a power of 10 or its negative, such as ``1e+10``; the class docstring gives the reason.
 
-        The mantissa keeps `CANONICAL_DIGITS` significant digits, all that a rounded argument has, so the spelling
-        parses back to exactly `argument`; its trailing zeros are dropped.
+        The mantissa keeps `CANONICAL_DIGITS` significant digits, all that a rounded argument has, and then drops
+        its trailing zeros, so the spelling parses back to exactly `argument`.
         """
         mantissa, exponent = f"{argument:.{CANONICAL_DIGITS - 1}e}".split("e")
         mantissa = mantissa.rstrip("0").removesuffix(".")
