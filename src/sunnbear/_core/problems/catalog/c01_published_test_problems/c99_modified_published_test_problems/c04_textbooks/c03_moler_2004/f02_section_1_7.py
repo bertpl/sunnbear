@@ -42,7 +42,7 @@ class ModifiedMoler2004Section17(Formula):
     params = ()
     location_in_publication = "§1.7"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.024 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.01 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{7}",
         interval="[0.988, 1.012]",
         summary=r"A 7th power, below $5 \cdot 10^{-12}$ in magnitude over the whole interval.",
@@ -67,7 +67,7 @@ class ModifiedMoler2004Section17(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 0.024 * c
+        x = x - 0.01 * c
         return (x - 1) ** 7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -84,5 +84,5 @@ class ModifiedMoler2004Section17(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(0.988, 1.012)),
-        FormulaTestCase.value(params={}, x=0.9952, c=0.25, expected=-1.7138242687795553e-14, atol=0.0),
+        FormulaTestCase.value(params={}, x=0.9952, c=0.6, expected=-1.7138242687795553e-14, atol=0.0),
     )

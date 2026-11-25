@@ -27,11 +27,11 @@ class Borchers2026FunctionF9(Formula):
     params = ()
     location_in_publication = "§5.6, f9"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2.4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tan{\left(\tmp{u} \right)} - \tmp{u} - 0.0463025",
         interval="[-0.9, 1.5]",
         summary=(
-            r"A tangent minus a line, with 1 root, nearly constant around $\x = 2.4 \c$ and steep next to the tangent's"
+            r"A tangent minus a line, with 1 root, nearly constant around $\x = \c$ and steep next to the tangent's"
             r" poles on either side of the interval."
         ),
     )
@@ -40,7 +40,7 @@ class Borchers2026FunctionF9(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.4 * c
+        x = x - 1.0 * c
         return math.tan(x) - x - 0.0463025
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class Borchers2026FunctionF9(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.18, c=0.0, expected=-0.048272029040198484),
-        FormulaTestCase.value(params={}, x=-0.18, c=0.25, expected=-0.25556403687660495),
+        FormulaTestCase.value(params={}, x=-0.18, c=0.6, expected=-0.25556403687660495),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.9, 1.5)),
     )

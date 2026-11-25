@@ -25,11 +25,11 @@ class OliveiraTakahashi2021WellBehavedFunction12(Formula):
     params = ()
     location_in_publication = "Table 1, well-behaved function 12"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\phi{\left(\tmp{u} - 1 \right)} - \frac{\sqrt{2}}{4}",
         interval="[-1, 1]",
         summary=(
-            r"The normal density minus a constant, with 1 simple root 0.49 below the density's peak at $\x = 1 + 2 \c$."
+            r"The normal density minus a constant, with 1 simple root 0.49 below the density's peak at $\x = 1 + \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -37,7 +37,7 @@ class OliveiraTakahashi2021WellBehavedFunction12(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (math.exp(-((x - 1) ** 2) / 2) / math.sqrt(2 * math.pi)) - math.sqrt(2) / 4
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class OliveiraTakahashi2021WellBehavedFunction12(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.2038259249575289),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.2879375758185972),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.2879375758185972),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

@@ -58,7 +58,7 @@ class Chandrupatla1997Function2(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=(
-                    (0.5, 1.51, 1.01),
+                    (0.5, 1.51, 1.0),
                     (0.0001, 10000.0, 10000.0),
                     (1e-06, 1000000.0, 1000000.0),
                     (1e-10, 10000000000.0, 10000000000.0),
@@ -70,10 +70,10 @@ class Chandrupatla1997Function2(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.5, "b": 1.51, "c_scale": 1.01}, x=0.803, c=0.0, expected=-0.5508468399169365
+            params={"a": 0.5, "b": 1.51, "c_scale": 1.0}, x=0.803, c=0.0, expected=-0.5508468399169365
         ),
         FormulaTestCase.value(
-            params={"a": 0.5, "b": 1.51, "c_scale": 1.01}, x=0.803, c=0.25, expected=-2.29978279179773
+            params={"a": 0.5, "b": 1.51, "c_scale": 1.0}, x=0.803, c=0.2525, expected=-2.29978279179773
         ),
         FormulaTestCase.value(
             params={"a": 0.0001, "b": 10000.0, "c_scale": 10000.0}, x=3000.0, c=0.0, expected=0.9999998888888889
@@ -87,7 +87,7 @@ class Chandrupatla1997Function2(Formula):
         FormulaTestCase.value(
             params={"a": 1e-12, "b": 1000000000000.0, "c_scale": 1000000000000.0}, x=300000000000.0, c=0.0, expected=1.0
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 1.51, "c_scale": 1.01}, expected=(0.5, 1.51)),
+        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 1.51, "c_scale": 1.0}, expected=(0.5, 1.51)),
         FormulaTestCase.interval_bounds(
             params={"a": 0.0001, "b": 10000.0, "c_scale": 10000.0}, expected=(0.0001, 10000.0)
         ),

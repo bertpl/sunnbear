@@ -29,7 +29,7 @@ class ChapraCanale2015Problem613(Formula):
     params = ()
     location_in_publication = "Prob. 6.13"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{0.5 \tmp{u}} - \left(5 - 5 \tmp{u}\right)",
         interval="[0, 2]",
         summary="An increasing convex function with a slope between 5 and 7 on the whole interval, and 1 simple root.",
@@ -39,7 +39,7 @@ class ChapraCanale2015Problem613(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (math.exp(0.5 * x)) - (5 - 5 * x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class ChapraCanale2015Problem613(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=-0.650141192423997),
-        FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=-3.448728903623976),
+        FormulaTestCase.value(params={}, x=0.6, c=0.5, expected=-3.448728903623976),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),
     )

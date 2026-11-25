@@ -44,7 +44,7 @@ class ModifiedRootsJl2026FunctionFunc9(Formula):
     params = ()
     location_in_publication = "test_derivative_free.jl, func9; runbenchmarks.jl, f7"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2.7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tanh{\left(\tmp{u} \right)} - \tan{\left(\tmp{u} \right)}",
         interval="[5, 7.7]",
         summary=(
@@ -69,7 +69,7 @@ class ModifiedRootsJl2026FunctionFunc9(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.7 * c
+        x = x - 1.0 * c
         return math.tanh(x) - math.tan(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -81,6 +81,6 @@ class ModifiedRootsJl2026FunctionFunc9(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=5.81, c=0.25, expected=3.22359613381936),
+        FormulaTestCase.value(params={}, x=5.81, c=0.675, expected=3.22359613381936),
         FormulaTestCase.interval_bounds(params={}, expected=(5.0, 7.7)),
     )

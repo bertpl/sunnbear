@@ -27,7 +27,7 @@ class BurdenFairesBurden2016Exercise236B(Formula):
     params = ()
     location_in_publication = "Exercise 2.3-6(b)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(\tmp{u} - 1 \right)} + \cos{\left(\tmp{u} - 1 \right)}",
         interval="[1.3, 2]",
         summary=(
@@ -40,7 +40,7 @@ class BurdenFairesBurden2016Exercise236B(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.7 * c
+        x = x - 1.0 * c
         return math.log(x - 1) + math.cos(x - 1)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class BurdenFairesBurden2016Exercise236B(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.51, c=0.0, expected=0.19939995438198568),
-        FormulaTestCase.value(params={}, x=1.51, c=0.25, expected=-0.1492144375244277),
+        FormulaTestCase.value(params={}, x=1.51, c=0.175, expected=-0.1492144375244277),
         FormulaTestCase.interval_bounds(params={}, expected=(1.3, 2.0)),
     )

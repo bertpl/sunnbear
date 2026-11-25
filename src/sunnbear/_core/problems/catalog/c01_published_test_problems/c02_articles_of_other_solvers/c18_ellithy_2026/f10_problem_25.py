@@ -25,11 +25,11 @@ class Ellithy2026Problem25(Formula):
     params = ()
     location_in_publication = "dataset.json, problem 25"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{2} \left|{\sin{\left(\tmp{u} \right)}}\right| - 4.1",
         interval="[0, 4]",
         summary=(
-            r"A function that rises to a local maximum only 0.15 below 0, falls to a kink at $\x = \pi + 4 \c$, and "
+            r"A function that rises to a local maximum only 0.15 below 0, falls to a kink at $\x = \pi + 10 \c$, and "
             r"then rises through 1 root."
         ),
     )
@@ -38,7 +38,7 @@ class Ellithy2026Problem25(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         return x**2 * abs(math.sin(x)) - 4.1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Ellithy2026Problem25(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.2, c=0.0, expected=-2.7578637162071944),
-        FormulaTestCase.value(params={}, x=1.2, c=0.25, expected=-4.092053226768198),
+        FormulaTestCase.value(params={}, x=1.2, c=0.1, expected=-4.092053226768198),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 4.0)),
     )

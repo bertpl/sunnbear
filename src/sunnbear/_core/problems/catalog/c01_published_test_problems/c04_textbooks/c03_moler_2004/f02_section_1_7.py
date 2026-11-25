@@ -29,7 +29,7 @@ class Moler2004Section17(Formula):
     params = ()
     location_in_publication = "§1.7"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.024 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.01 \c"),),
         expression=(
             r"\tmp{u}^{7} - 7 \tmp{u}^{6} + 21 \tmp{u}^{5} - 35 \tmp{u}^{4} + 35 \tmp{u}^{3} - 21 "
             r"\tmp{u}^{2} + 7 \tmp{u} - 1"
@@ -45,7 +45,7 @@ class Moler2004Section17(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.024 * c
+        x = x - 0.01 * c
         return x**7 - 7 * x**6 + 21 * x**5 - 35 * x**4 + 35 * x**3 - 21 * x**2 + 7 * x - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -60,6 +60,6 @@ class Moler2004Section17(Formula):
     # default tolerance, because the function is ill-conditioned there or its terms cancel
     test_cases = (
         FormulaTestCase.value(params={}, x=0.9952, c=0.0, expected=-5.870683422720226e-17, atol=4e-13),
-        FormulaTestCase.value(params={}, x=0.9952, c=0.25, expected=-1.7138242687795553e-14, atol=4e-13),
+        FormulaTestCase.value(params={}, x=0.9952, c=0.6, expected=-1.7138242687795553e-14, atol=4e-13),
         FormulaTestCase.interval_bounds(params={}, expected=(0.988, 1.012)),
     )

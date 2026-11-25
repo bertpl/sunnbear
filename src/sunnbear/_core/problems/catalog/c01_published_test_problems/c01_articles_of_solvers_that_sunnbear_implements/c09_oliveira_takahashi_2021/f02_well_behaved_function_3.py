@@ -25,7 +25,7 @@ class OliveiraTakahashi2021WellBehavedFunction3(Formula):
     params = ()
     location_in_publication = "Table 1, well-behaved function 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} + \frac{1}{2}",
         interval="[-1, 1]",
         summary=(
@@ -37,7 +37,7 @@ class OliveiraTakahashi2021WellBehavedFunction3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return math.sin(x) + 1 / 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class OliveiraTakahashi2021WellBehavedFunction3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=0.11058165769134949),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.2833269096274834),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.2833269096274834),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

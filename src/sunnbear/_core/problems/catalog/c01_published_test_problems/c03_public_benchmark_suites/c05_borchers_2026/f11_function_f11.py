@@ -25,7 +25,7 @@ class Borchers2026FunctionF11(Formula):
     params = ()
     location_in_publication = "§5.6, f11"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{9} + 0.0001",
         interval="[-1.2, 0]",
         summary=(
@@ -38,7 +38,7 @@ class Borchers2026FunctionF11(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.2 * c
+        x = x - 1.0 * c
         return x**9 + 0.0001
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Borchers2026FunctionF11(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.84, c=0.0, expected=-0.2081157485309296),
-        FormulaTestCase.value(params={}, x=-0.84, c=0.25, expected=-3.2518485211566346),
+        FormulaTestCase.value(params={}, x=-0.84, c=0.3, expected=-3.2518485211566346),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.2, 0.0)),
     )

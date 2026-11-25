@@ -60,7 +60,7 @@ class Romadani2025Section53(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 1.0, 1.0), (-2.0, 2.0, 4.0), (-2.0, 60.0, 62.0)),
+                rows=((0.0, 1.0, 1.0), (-2.0, 2.0, 10.0), (-2.0, 60.0, 100.0)),
                 summary="The published intervals.",
             ),
         )
@@ -68,11 +68,13 @@ class Romadani2025Section53(Formula):
     test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=-0.2145630751529077),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.25, expected=-0.8143159699603034),
-        FormulaTestCase.value(params={"a": -2.0, "b": 2.0, "c_scale": 4.0}, x=-0.8, c=0.0, expected=-13.75066787654425),
         FormulaTestCase.value(
-            params={"a": -2.0, "b": 60.0, "c_scale": 62.0}, x=16.6, c=0.0, expected=6.176060954143003e-08
+            params={"a": -2.0, "b": 2.0, "c_scale": 10.0}, x=-0.8, c=0.0, expected=-13.75066787654425
+        ),
+        FormulaTestCase.value(
+            params={"a": -2.0, "b": 60.0, "c_scale": 100.0}, x=16.6, c=0.0, expected=6.176060954143003e-08
         ),
         FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, expected=(0.0, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 2.0, "c_scale": 4.0}, expected=(-2.0, 2.0)),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 60.0, "c_scale": 62.0}, expected=(-2.0, 60.0)),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 2.0, "c_scale": 10.0}, expected=(-2.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 60.0, "c_scale": 100.0}, expected=(-2.0, 60.0)),
     )

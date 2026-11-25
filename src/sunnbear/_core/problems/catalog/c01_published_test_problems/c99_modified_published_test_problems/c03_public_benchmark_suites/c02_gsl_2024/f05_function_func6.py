@@ -38,7 +38,7 @@ class ModifiedGsl2024FunctionFunc6(Formula):
     params = ()
     location_in_publication = "test_funcs.c, func6"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.0007 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.001 \c"),),
         expression=r"\tmp{u}^{7}",
         interval="[-0.0005, 0.0002]",
         summary=(
@@ -62,7 +62,7 @@ class ModifiedGsl2024FunctionFunc6(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 0.0007 * c
+        x = x - 0.001 * c
         return x**7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -77,5 +77,5 @@ class ModifiedGsl2024FunctionFunc6(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(-0.0005, 0.0002)),
-        FormulaTestCase.value(params={}, x=-0.00029, c=0.25, expected=-4.700788051621643e-24, atol=0.0),
+        FormulaTestCase.value(params={}, x=-0.00029, c=0.175, expected=-4.700788051621643e-24, atol=0.0),
     )

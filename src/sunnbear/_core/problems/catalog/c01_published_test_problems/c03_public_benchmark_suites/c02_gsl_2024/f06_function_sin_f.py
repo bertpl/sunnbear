@@ -58,7 +58,7 @@ class Gsl2024FunctionSinF(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((3.0, 4.0, 1.0), (-4.0, -3.0, 1.0), (-0.333333333333, 1.0, 1.33)),
+                rows=((3.0, 4.0, 1.0), (-4.0, -3.0, 1.0), (-0.333333333333, 1.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
@@ -70,11 +70,11 @@ class Gsl2024FunctionSinF(Formula):
             params={"a": -4.0, "b": -3.0, "c_scale": 1.0}, x=-3.7, c=0.0, expected=0.5298361409084934
         ),
         FormulaTestCase.value(
-            params={"a": -0.333333333333, "b": 1.0, "c_scale": 1.33}, x=0.0666667, c=0.0, expected=0.06661732818267964
+            params={"a": -0.333333333333, "b": 1.0, "c_scale": 1.0}, x=0.0666667, c=0.0, expected=0.06661732818267964
         ),
         FormulaTestCase.interval_bounds(params={"a": 3.0, "b": 4.0, "c_scale": 1.0}, expected=(3.0, 4.0)),
         FormulaTestCase.interval_bounds(params={"a": -4.0, "b": -3.0, "c_scale": 1.0}, expected=(-4.0, -3.0)),
         FormulaTestCase.interval_bounds(
-            params={"a": -0.333333333333, "b": 1.0, "c_scale": 1.33}, expected=(-0.333333333333, 1.0)
+            params={"a": -0.333333333333, "b": 1.0, "c_scale": 1.0}, expected=(-0.333333333333, 1.0)
         ),
     )

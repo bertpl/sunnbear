@@ -25,7 +25,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF25(Formula):
     params = ()
     location_in_publication = "Table 2, f25"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 4\right)^{5} \ln{\left(\tmp{u} \right)}",
         interval="[3.6, 5.6]",
         summary="A 5th power times a slowly varying logarithm, with a root of multiplicity 5.",
@@ -35,7 +35,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF25(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (x - 4) ** 5 * math.log(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF25(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=4.2, c=0.0, expected=0.0004592270480925853),
-        FormulaTestCase.value(params={}, x=4.2, c=0.25, expected=-0.0031792487517499253),
+        FormulaTestCase.value(params={}, x=4.2, c=0.5, expected=-0.0031792487517499253),
         FormulaTestCase.interval_bounds(params={}, expected=(3.6, 5.6)),
     )

@@ -65,11 +65,11 @@ class Chandrupatla1997Function8(Formula):
             ParamTable(
                 names=("xi", "a", "b", "c_scale"),
                 rows=(
-                    (0.61489, 0.0002, 2.0, 2.0),
-                    (0.61489, 0.0002, 3.0, 3.0),
-                    (0.61489, 0.0002, 9.0, 9.0),
-                    (0.61489, 0.0002, 27.0, 27.0),
-                    (0.61489, 0.0002, 81.0, 81.0),
+                    (0.61489, 0.0002, 2.0, 1.0),
+                    (0.61489, 0.0002, 3.0, 1.0),
+                    (0.61489, 0.0002, 9.0, 10.0),
+                    (0.61489, 0.0002, 27.0, 10.0),
+                    (0.61489, 0.0002, 81.0, 100.0),
                 ),
                 summary="The published parameter values and intervals.",
             ),
@@ -77,45 +77,45 @@ class Chandrupatla1997Function8(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 2.0}, x=0.60014, c=0.0, expected=916.522638861195
+            params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 1.0}, x=0.60014, c=0.0, expected=916.522638861195
         ),
         FormulaTestCase.value(
-            params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 2.0},
+            params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 1.0},
             x=0.60014,
-            c=0.25,
+            c=0.5,
             expected=14136.757677926018,
         ),
         FormulaTestCase.value(
-            params={"xi": 0.61489, "a": 0.0002, "b": 3.0, "c_scale": 3.0}, x=0.90014, c=0.0, expected=174.22250247527253
+            params={"xi": 0.61489, "a": 0.0002, "b": 3.0, "c_scale": 1.0}, x=0.90014, c=0.0, expected=174.22250247527253
         ),
         FormulaTestCase.value(
-            params={"xi": 0.61489, "a": 0.0002, "b": 9.0, "c_scale": 9.0}, x=2.70014, c=0.0, expected=-533.729466491803
+            params={"xi": 0.61489, "a": 0.0002, "b": 9.0, "c_scale": 10.0}, x=2.70014, c=0.0, expected=-533.729466491803
         ),
         FormulaTestCase.value(
-            params={"xi": 0.61489, "a": 0.0002, "b": 27.0, "c_scale": 27.0},
+            params={"xi": 0.61489, "a": 0.0002, "b": 27.0, "c_scale": 10.0},
             x=8.10014,
             c=0.0,
             expected=-812.597740310443,
         ),
         FormulaTestCase.value(
-            params={"xi": 0.61489, "a": 0.0002, "b": 81.0, "c_scale": 81.0},
+            params={"xi": 0.61489, "a": 0.0002, "b": 81.0, "c_scale": 100.0},
             x=24.3001,
             c=0.0,
             expected=-946.0043909820606,
         ),
         FormulaTestCase.interval_bounds(
-            params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 2.0}, expected=(0.0002, 2.0)
+            params={"xi": 0.61489, "a": 0.0002, "b": 2.0, "c_scale": 1.0}, expected=(0.0002, 2.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"xi": 0.61489, "a": 0.0002, "b": 3.0, "c_scale": 3.0}, expected=(0.0002, 3.0)
+            params={"xi": 0.61489, "a": 0.0002, "b": 3.0, "c_scale": 1.0}, expected=(0.0002, 3.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"xi": 0.61489, "a": 0.0002, "b": 9.0, "c_scale": 9.0}, expected=(0.0002, 9.0)
+            params={"xi": 0.61489, "a": 0.0002, "b": 9.0, "c_scale": 10.0}, expected=(0.0002, 9.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"xi": 0.61489, "a": 0.0002, "b": 27.0, "c_scale": 27.0}, expected=(0.0002, 27.0)
+            params={"xi": 0.61489, "a": 0.0002, "b": 27.0, "c_scale": 10.0}, expected=(0.0002, 27.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"xi": 0.61489, "a": 0.0002, "b": 81.0, "c_scale": 81.0}, expected=(0.0002, 81.0)
+            params={"xi": 0.61489, "a": 0.0002, "b": 81.0, "c_scale": 100.0}, expected=(0.0002, 81.0)
         ),
     )

@@ -36,7 +36,7 @@ class ModifiedEpperson2013Table33(Formula):
     params = ()
     location_in_publication = "§3.2 (p. 100), Fig. 3.4, Table 3.3; Example 3.19, Table 3.16"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.19 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
         expression=r"\frac{20 \tmp{u} - 1}{19 \tmp{u}}",
         interval="[0.01, 0.2]",
         summary=(
@@ -59,7 +59,7 @@ class ModifiedEpperson2013Table33(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 0.19 * c
+        x = x - 0.1 * c
         return (20 * x - 1) / (19 * x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -71,6 +71,6 @@ class ModifiedEpperson2013Table33(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=0.067, c=0.25, expected=-1.6464237516869091),
+        FormulaTestCase.value(params={}, x=0.067, c=0.475, expected=-1.6464237516869091),
         FormulaTestCase.interval_bounds(params={}, expected=(0.01, 0.2)),
     )

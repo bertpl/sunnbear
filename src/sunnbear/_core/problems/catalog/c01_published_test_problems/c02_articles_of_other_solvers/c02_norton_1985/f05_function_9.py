@@ -32,7 +32,7 @@ class Norton1985Function9(Formula):
     )
     location_in_publication = "Section 4, function 9"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{\param{n}} + \param{w1} \tmp{u} + \param{w2}",
         interval="[-0.7, 1]",
         summary=(
@@ -46,7 +46,7 @@ class Norton1985Function9(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, w1: float, w2: float, n: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.7 * c
+        x = x - 1.0 * c
         return x**n + w1 * x + w2
 
     def interval_bounds(self, w1: float, w2: float, n: float) -> tuple[float, float]:
@@ -65,7 +65,7 @@ class Norton1985Function9(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"w1": 0.0, "w2": 0.0001, "n": 3.0}, x=-0.19, c=0.0, expected=-0.006759),
-        FormulaTestCase.value(params={"w1": 0.0, "w2": 0.0001, "n": 3.0}, x=-0.19, c=0.25, expected=-0.232508375),
+        FormulaTestCase.value(params={"w1": 0.0, "w2": 0.0001, "n": 3.0}, x=-0.19, c=0.425, expected=-0.232508375),
         FormulaTestCase.value(
             params={"w1": 0.0, "w2": 0.0001, "n": 5.0}, x=-0.19, c=0.0, expected=-0.00014760990000000002
         ),

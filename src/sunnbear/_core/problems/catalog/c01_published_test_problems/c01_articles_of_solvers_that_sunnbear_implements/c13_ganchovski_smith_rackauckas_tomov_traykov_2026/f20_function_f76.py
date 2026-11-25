@@ -27,14 +27,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF76(Formula):
     params = ()
     location_in_publication = "Table 2, f76"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} \frac{1 + 10^{6}}{10^{6}} & \text{for}\: \tmp{u} > \frac{1 - 10^{6}}{10^{6}}"
             r" \\-1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1, 1]",
         summary=(
-            r"A step function with no root: its only sign change is a jump from $-1$ to about 1, at $\x = 2 \c - "
+            r"A step function with no root: its only sign change is a jump from $-1$ to about 1, at $\x = \c - "
             r"0.999999$."
         ),
     )
@@ -43,7 +43,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF76(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         if x > (1 - 10**6) / 10**6:
             return (1 + 10**6) / 10**6
         else:
@@ -59,7 +59,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF76(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=1.000001),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=1.000001),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=1.000001),
         FormulaTestCase.value(params={}, x=-1.0, c=0.0, expected=-1.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

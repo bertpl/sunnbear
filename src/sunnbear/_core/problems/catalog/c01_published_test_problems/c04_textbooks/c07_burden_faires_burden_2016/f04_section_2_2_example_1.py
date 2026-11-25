@@ -25,7 +25,7 @@ class BurdenFairesBurden2016Section22Example1(Formula):
     params = ()
     location_in_publication = "§2.2 Example 1; Fig. 2.2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 6 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u} - \left(\tmp{u}^{2} - 2\right)",
         interval="[-3, 3]",
         summary=(
@@ -38,7 +38,7 @@ class BurdenFairesBurden2016Section22Example1(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 6.0 * c
+        x = x - 10.0 * c
         return (x) - (x**2 - 2)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class BurdenFairesBurden2016Section22Example1(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.2, c=0.0, expected=-0.6399999999999999),
-        FormulaTestCase.value(params={}, x=-1.2, c=0.25, expected=-7.990000000000001),
+        FormulaTestCase.value(params={}, x=-1.2, c=0.15, expected=-7.990000000000001),
         FormulaTestCase.interval_bounds(params={}, expected=(-3.0, 3.0)),
     )

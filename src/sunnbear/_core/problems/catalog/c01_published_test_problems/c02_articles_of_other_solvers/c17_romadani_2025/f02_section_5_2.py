@@ -30,7 +30,7 @@ class Romadani2025Section52(Formula):
     params = ()
     location_in_publication = "Section 5.2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \cos^{3}{\left(2 \tmp{u} \right)}",
         interval="[2.5, 3]",
         summary="A function with 1 simple root near an inflection point, where the function is steepest.",
@@ -40,7 +40,7 @@ class Romadani2025Section52(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.5 * c
+        x = x - 1.0 * c
         return math.sin(x) - math.cos(2 * x) ** 3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class Romadani2025Section52(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=2.65, c=0.0, expected=0.3016541750571082),
-        FormulaTestCase.value(params={}, x=2.65, c=0.25, expected=0.5419169962034848),
+        FormulaTestCase.value(params={}, x=2.65, c=0.125, expected=0.5419169962034848),
         FormulaTestCase.interval_bounds(params={}, expected=(2.5, 3.0)),
     )

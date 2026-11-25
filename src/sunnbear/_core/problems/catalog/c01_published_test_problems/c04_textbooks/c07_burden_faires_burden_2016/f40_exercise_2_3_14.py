@@ -28,7 +28,7 @@ class BurdenFairesBurden2016Exercise2314(Formula):
     params = ()
     location_in_publication = "Exercise 2.3-14"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.48 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tan{\left(\pi \tmp{u} \right)} - 6",
         interval="[0, 0.48]",
         summary=(
@@ -41,7 +41,7 @@ class BurdenFairesBurden2016Exercise2314(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.48 * c
+        x = x - 1.0 * c
         return math.tan(math.pi * x) - 6
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -54,6 +54,6 @@ class BurdenFairesBurden2016Exercise2314(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.144, c=0.0, expected=-5.513994647140799),
-        FormulaTestCase.value(params={}, x=0.144, c=0.25, expected=-5.924458573745623),
+        FormulaTestCase.value(params={}, x=0.144, c=0.12, expected=-5.924458573745623),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 0.48)),
     )

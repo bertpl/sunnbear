@@ -25,7 +25,7 @@ class Epperson2013Exercise312E(Formula):
     params = ()
     location_in_publication = "Exercise 3.1-2(e)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"3 - 2^{\tmp{u}}",
         interval="[0, 2]",
         summary=(
@@ -38,7 +38,7 @@ class Epperson2013Exercise312E(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return 3 - 2**x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Epperson2013Exercise312E(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=1.484283433489602),
-        FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=1.9282265374637069),
+        FormulaTestCase.value(params={}, x=0.6, c=0.5, expected=1.9282265374637069),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),
     )

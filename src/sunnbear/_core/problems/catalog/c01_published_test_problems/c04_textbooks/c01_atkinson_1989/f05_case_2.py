@@ -25,17 +25,17 @@ class Atkinson1989Case2(Formula):
     params = ()
     location_in_publication = "§2.8 case (2); Problem 34(ii); Problem 14"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 1",
         interval="[0, 3]",
-        summary=r"A parabola with its vertex at $\x = 3 \c$ and 1 simple root.",
+        summary=r"A parabola with its vertex at $\x = \c$ and 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x**2 - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Atkinson1989Case2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.9, c=0.0, expected=-0.18999999999999995),
-        FormulaTestCase.value(params={}, x=0.9, c=0.25, expected=-0.9775),
+        FormulaTestCase.value(params={}, x=0.9, c=0.75, expected=-0.9775),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.0)),
     )

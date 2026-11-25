@@ -28,14 +28,14 @@ class Borchers2026FunctionF1(Formula):
     params = ()
     location_in_publication = "§5.6, f1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\tmp{u}^{2} \left(\frac{\tmp{u}^{2}}{3} + \sqrt{2} \sin{\left(\tmp{u} \right)}\right) - "
             r"\frac{\sqrt{3}}{18}"
         ),
         interval="[0, 1.2]",
         summary=(
-            r"An increasing function with 1 simple root, 0.4 above a stationary inflection at $\x = 1.2 \c$, around "
+            r"An increasing function with 1 simple root, 0.4 above a stationary inflection at $\x = \c$, around "
             r"which the function is nearly flat."
         ),
     )
@@ -44,7 +44,7 @@ class Borchers2026FunctionF1(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.2 * c
+        x = x - 1.0 * c
         return x**2 * (x**2 / 3 + math.sqrt(2) * math.sin(x)) - math.sqrt(3) / 18
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -57,6 +57,6 @@ class Borchers2026FunctionF1(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.36, c=0.0, expected=-0.02606077147589848),
-        FormulaTestCase.value(params={}, x=0.36, c=0.25, expected=-0.09591543798455478),
+        FormulaTestCase.value(params={}, x=0.36, c=0.3, expected=-0.09591543798455478),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.2)),
     )

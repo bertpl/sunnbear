@@ -28,7 +28,7 @@ class SteffenEtAl2025Equation6(Formula):
     params = ()
     location_in_publication = "Eq. (6)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"e^{- \frac{\tmp{u}^{2}}{4}} - 2 \cos{\left(\tmp{u} \right)} + \frac{\tmp{u}}{2} - " r"\frac{5}{2}"
         ),
@@ -40,7 +40,7 @@ class SteffenEtAl2025Equation6(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return math.exp(-(x**2) / 4) - 2 * math.cos(x) + x / 2 - 5 / 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class SteffenEtAl2025Equation6(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.6, c=0.0, expected=-1.114308531354374),
-        FormulaTestCase.value(params={}, x=1.6, c=0.25, expected=-2.1182237545922105),
+        FormulaTestCase.value(params={}, x=1.6, c=0.5, expected=-2.1182237545922105),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 3.0)),
     )

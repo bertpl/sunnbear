@@ -25,7 +25,7 @@ class ChapraCanale2015Figure78(Formula):
     params = ()
     location_in_publication = "Fig. 7.8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{3} - 10 \tmp{u} + 2",
         interval="[-4, 4]",
         summary="A cubic with all 3 of its simple roots on the interval.",
@@ -35,7 +35,7 @@ class ChapraCanale2015Figure78(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 8.0 * c
+        x = x - 10.0 * c
         return x**3 - 10 * x + 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class ChapraCanale2015Figure78(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.6, c=0.0, expected=13.904),
-        FormulaTestCase.value(params={}, x=-1.6, c=0.25, expected=-8.656000000000002),
+        FormulaTestCase.value(params={}, x=-1.6, c=0.2, expected=-8.656000000000002),
         FormulaTestCase.interval_bounds(params={}, expected=(-4.0, 4.0)),
     )

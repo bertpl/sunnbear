@@ -28,7 +28,7 @@ class AlefeldPotraShi1995Problem12(Formula):
     params = (FormulaParam("n", latex_symbol="n", meaning=r"The root lies at $\x = \param{n}$."),)
     location_in_publication = "Table I, problem 12"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 99 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=r"\tmp{u}^{\frac{1}{\param{n}}} - \param{n}^{\frac{1}{\param{n}}}",
         interval="[1, 100]",
         summary=(
@@ -41,7 +41,7 @@ class AlefeldPotraShi1995Problem12(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 99.0 * c
+        x = x - 100.0 * c
         return x ** (1 / n) - n ** (1 / n)
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
@@ -80,7 +80,7 @@ class AlefeldPotraShi1995Problem12(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"n": 2.0}, x=30.7, c=0.0, expected=4.126544508504932),
-        FormulaTestCase.value(params={"n": 2.0}, x=30.7, c=0.25, expected=1.0250486211569985),
+        FormulaTestCase.value(params={"n": 2.0}, x=30.7, c=0.2475, expected=1.0250486211569985),
         FormulaTestCase.value(params={"n": 3.0}, x=30.7, c=0.0, expected=1.6889647305566342),
         FormulaTestCase.value(params={"n": 4.0}, x=30.7, c=0.0, expected=0.9396679280333415),
         FormulaTestCase.value(params={"n": 5.0}, x=30.7, c=0.0, expected=0.603749650635323),

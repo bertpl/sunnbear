@@ -57,16 +57,18 @@ class BurdenFairesBurden2016Exercise216D(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((0.0, 0.5, 0.5), (0.5, 1.0, 0.5)), summary="The published intervals."
+                names=("a", "b", "c_scale"), rows=((0.0, 0.5, 1.0), (0.5, 1.0, 1.0)), summary="The published intervals."
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.0, expected=0.24201900052090644),
-        FormulaTestCase.value(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.25, expected=0.8680818085443102),
+        FormulaTestCase.value(params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, x=0.15, c=0.0, expected=0.24201900052090644),
         FormulaTestCase.value(
-            params={"a": 0.5, "b": 1.0, "c_scale": 0.5}, x=0.65, c=0.0, expected=-0.13201304837673564
+            params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, x=0.15, c=0.125, expected=0.8680818085443102
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, expected=(0.0, 0.5)),
-        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 1.0, "c_scale": 0.5}, expected=(0.5, 1.0)),
+        FormulaTestCase.value(
+            params={"a": 0.5, "b": 1.0, "c_scale": 1.0}, x=0.65, c=0.0, expected=-0.13201304837673564
+        ),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, expected=(0.0, 0.5)),
+        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 1.0, "c_scale": 1.0}, expected=(0.5, 1.0)),
     )

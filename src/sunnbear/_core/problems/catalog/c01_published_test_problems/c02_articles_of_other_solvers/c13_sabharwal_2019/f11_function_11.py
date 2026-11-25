@@ -25,7 +25,7 @@ class Sabharwal2019Function11(Formula):
     params = ()
     location_in_publication = "Table 2, function 11"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 6 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"4 \tmp{u}^{4} + 3 \tmp{u}^{3} + 2 \tmp{u}^{2} + \tmp{u} + 1",
         interval="[-6, 0]",
         summary="A quartic with no real root and a positive minimum of 0.83.",
@@ -35,7 +35,7 @@ class Sabharwal2019Function11(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 6.0 * c
+        x = x - 10.0 * c
         return 4 * x**4 + 3 * x**3 + 2 * x**2 + x + 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Sabharwal2019Function11(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.2, c=0.0, expected=1054.4944000000003),
-        FormulaTestCase.value(params={}, x=-4.2, c=0.25, expected=3727.1014000000005),
+        FormulaTestCase.value(params={}, x=-4.2, c=0.15, expected=3727.1014000000005),
         FormulaTestCase.interval_bounds(params={}, expected=(-6.0, 0.0)),
     )

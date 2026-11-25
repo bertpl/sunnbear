@@ -27,7 +27,7 @@ class Epperson2013Exercise3113(Formula):
     params = ()
     location_in_publication = "Exercises 3.1-13, 3.11-24"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"e^{- 4 \tmp{u}} - \frac{1}{10}",
         interval="[0, 5]",
         summary="An exponential with 1 simple root, above which the function levels off at $-0.1$.",
@@ -37,7 +37,7 @@ class Epperson2013Exercise3113(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         return math.exp(-4 * x) - 1 / 10
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Epperson2013Exercise3113(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.5, c=0.0, expected=-0.09752124782333364),
-        FormulaTestCase.value(params={}, x=1.5, c=0.25, expected=0.2678794411714423),
+        FormulaTestCase.value(params={}, x=1.5, c=0.125, expected=0.2678794411714423),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 5.0)),
     )

@@ -34,7 +34,7 @@ class FooTan2025Section42(Formula):
     params = (FormulaParam("y", latex_symbol="y"),)
     location_in_publication = "Section 4.2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} 0 & \text{for}\: \tmp{u} = 0 \\- \tmp{u} \log_{2}{\left(\tmp{u} \right)} & "
             r"\text{otherwise} \end{cases} - \left(1 - \tmp{u}\right) \log_{2}{\left(1 - \tmp{u} "
@@ -51,7 +51,7 @@ class FooTan2025Section42(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, y: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.5 * c
+        x = x - 1.0 * c
         return ((0) if (x) == (0) else (-x * math.log2(x))) - (1 - x) * math.log2(1 - x) - y
 
     def interval_bounds(self, y: float) -> tuple[float, float]:
@@ -70,7 +70,7 @@ class FooTan2025Section42(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"y": 0.1}, x=0.15, c=0.0, expected=0.5098403047164004),
-        FormulaTestCase.value(params={"y": 0.1}, x=0.15, c=0.25, expected=0.06866093149667019),
+        FormulaTestCase.value(params={"y": 0.1}, x=0.15, c=0.125, expected=0.06866093149667019),
         FormulaTestCase.value(params={"y": 0.2}, x=0.15, c=0.0, expected=0.4098403047164004),
         FormulaTestCase.value(params={"y": 0.3}, x=0.15, c=0.0, expected=0.3098403047164004),
         FormulaTestCase.value(params={"y": 0.4}, x=0.15, c=0.0, expected=0.20984030471640042),

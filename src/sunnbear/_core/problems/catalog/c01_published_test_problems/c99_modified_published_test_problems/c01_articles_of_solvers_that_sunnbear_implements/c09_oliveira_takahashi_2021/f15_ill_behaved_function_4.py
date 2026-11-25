@@ -38,7 +38,7 @@ class ModifiedOliveiraTakahashi2021IllBehavedFunction4(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 4"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\operatorname{sign}{\left(3 \tmp{u} + 1 \right)} \frac{\left(3 \tmp{u} + 1\right)^{2} / "
             r"9^{2}}{1 + \sqrt{1 - \left(3 \tmp{u} + 1\right)^{2} / 9^{2}}}"
@@ -66,7 +66,7 @@ class ModifiedOliveiraTakahashi2021IllBehavedFunction4(Formula):
         The form is ``sign(3*y + 1) * ((3*y + 1)**2/9**2) / (1 + sqrt(1 - (3*y + 1)**2/9**2))``. Category 1 states the
         rule for ``c_scale``.
         """
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return sign(3 * x + 1) * ((3 * x + 1) ** 2 / 9**2) / (1 + math.sqrt(1 - (3 * x + 1) ** 2 / 9**2))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -79,5 +79,5 @@ class ModifiedOliveiraTakahashi2021IllBehavedFunction4(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.018001533782093432),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.018001533782093432),
     )

@@ -56,17 +56,17 @@ class LiZhouLangeTian2026Example1(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-2.0, 1.0, 3.0), (0.0, 4.0, 4.0)),
+                rows=((-2.0, 1.0, 1.0), (0.0, 4.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": -2.0, "b": 1.0, "c_scale": 3.0}, x=-1.1, c=0.0, expected=0.9435655349597691),
+        FormulaTestCase.value(params={"a": -2.0, "b": 1.0, "c_scale": 1.0}, x=-1.1, c=0.0, expected=0.9435655349597691),
         FormulaTestCase.value(
-            params={"a": -2.0, "b": 1.0, "c_scale": 3.0}, x=-1.1, c=0.25, expected=0.8776300796023234
+            params={"a": -2.0, "b": 1.0, "c_scale": 1.0}, x=-1.1, c=0.75, expected=0.8776300796023234
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=-1.5090169943749474),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 1.0, "c_scale": 3.0}, expected=(-2.0, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, expected=(0.0, 4.0)),
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.0, expected=-1.5090169943749474),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 1.0, "c_scale": 1.0}, expected=(-2.0, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, expected=(0.0, 4.0)),
     )

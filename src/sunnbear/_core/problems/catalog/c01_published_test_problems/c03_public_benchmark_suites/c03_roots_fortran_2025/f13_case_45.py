@@ -29,7 +29,7 @@ class RootsFortran2025Case45(Formula):
     params = (FormulaParam("n", latex_symbol="n"),)
     location_in_publication = "root_tests.f90, case 45"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\frac{\param{n} \tmp{u} - 1}{\left(\param{n} - 1\right) \tmp{u}}",
         interval="[0.01, 1]",
         summary=(
@@ -50,7 +50,7 @@ class RootsFortran2025Case45(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.99 * c
+        x = x - 1.0 * c
         return (n * x - 1.0) / ((n - 1.0) * x)
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
@@ -63,7 +63,7 @@ class RootsFortran2025Case45(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"n": 20.0}, x=0.307, c=0.0, expected=0.8811932110406309),
-        FormulaTestCase.value(params={"n": 20.0}, x=0.307, c=0.25, expected=0.16806722689075626),
+        FormulaTestCase.value(params={"n": 20.0}, x=0.307, c=0.2475, expected=0.16806722689075626),
         FormulaTestCase.value(params={"n": 30.0}, x=0.307, c=0.0, expected=0.9221610693024823),
         FormulaTestCase.interval_bounds(params={"n": 20.0}, expected=(0.01, 1.0)),
     )

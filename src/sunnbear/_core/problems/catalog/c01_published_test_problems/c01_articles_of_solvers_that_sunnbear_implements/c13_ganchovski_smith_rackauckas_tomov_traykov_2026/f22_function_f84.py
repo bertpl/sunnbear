@@ -24,15 +24,15 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF84(Formula):
     params = ()
     location_in_publication = "Table 2, f84"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\left(\tmp{u} - 1\right) \left(\tmp{u} - 2\right) \left(\tmp{u} - 3\right) \left(\tmp{u} -"
             r" 4\right) \left(\tmp{u} - 5\right) - 0.05"
         ),
         interval="[0.5, 5.5]",
         summary=(
-            r"A quintic with 5 simple roots, each within 0.013 of an integer plus $5 \c$, and much flatter between its "
-            r"roots than outside them."
+            r"A quintic with 5 simple roots, each within 0.013 of an integer plus $10 \c$, and much flatter between "
+            r"its roots than outside them."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -40,7 +40,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF84(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         return (x - 1) * (x - 2) * (x - 3) * (x - 4) * (x - 5) - 0.05
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF84(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=2.0, c=0.0, expected=-0.05),
-        FormulaTestCase.value(params={}, x=2.0, c=0.25, expected=-9.7619140625),
+        FormulaTestCase.value(params={}, x=2.0, c=0.125, expected=-9.7619140625),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 5.5)),
     )

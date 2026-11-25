@@ -26,7 +26,7 @@ class Bradie2006Figure22(Formula):
     params = ()
     location_in_publication = "Fig. 2.2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{7}",
         interval="[0, 2]",
         summary=(
@@ -38,7 +38,7 @@ class Bradie2006Figure22(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (x - 1) ** 7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Bradie2006Figure22(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=-0.0016384000000000006),
-        FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=-0.4782969000000001),
+        FormulaTestCase.value(params={}, x=0.6, c=0.5, expected=-0.4782969000000001),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),
     )

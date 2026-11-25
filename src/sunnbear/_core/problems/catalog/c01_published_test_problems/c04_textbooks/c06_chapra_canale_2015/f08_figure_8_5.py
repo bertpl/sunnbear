@@ -42,7 +42,7 @@ class ChapraCanale2015Figure85(Formula):
     location_in_publication = "§8.4, Eq. (8.21), Fig. 8.5; Prob. 8.13"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 0.072 \c"),
+            (r"\tmp{u}", r"\x - 0.1 \c"),
             (r"\tmp{\mathrm{Re}}", r"\frac{1.23 \cdot 40 \cdot 0.005}{1.79 \cdot 10^{-5}}"),
         ),
         expression=(
@@ -62,7 +62,7 @@ class ChapraCanale2015Figure85(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, eps: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.072 * c
+        x = x - 0.1 * c
         # compute the Reynolds number Re = rho*V*D/mu as the book's MATLAB code computes it
         diameter = 0.005
         reynolds = 1.23 * 40.0 * diameter / 1.79e-5
@@ -78,7 +78,7 @@ class ChapraCanale2015Figure85(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.0, expected=-0.07179608309477187),
-        FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.25, expected=3.7840607685120067),
+        FormulaTestCase.value(params={"eps": 1.5e-06}, x=0.0296, c=0.18, expected=3.7840607685120067),
         FormulaTestCase.value(params={"eps": 4.5e-05}, x=0.0296, c=0.0, expected=0.899026613174279),
         FormulaTestCase.interval_bounds(params={"eps": 1.5e-06}, expected=(0.008, 0.08)),
     )

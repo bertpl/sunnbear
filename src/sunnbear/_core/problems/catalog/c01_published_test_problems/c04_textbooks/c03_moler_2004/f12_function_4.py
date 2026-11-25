@@ -25,11 +25,11 @@ class Moler2004Function4(Formula):
     params = ()
     location_in_publication = "Exercise 4.1, function 4"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\arctan{\left(\tmp{u} \right)} - \frac{\pi}{3}",
         interval="[0, 5]",
         summary=(
-            r"An arctangent with 1 simple root, at $\x = \sqrt{3} + 5 \c$, and a slope that decreases above that root."
+            r"An arctangent with 1 simple root, at $\x = \sqrt{3} + 10 \c$, and a slope that decreases above that root."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -37,7 +37,7 @@ class Moler2004Function4(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         return math.atan(x) - math.pi / 3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Moler2004Function4(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.5, c=0.0, expected=-0.06440382794926867),
-        FormulaTestCase.value(params={}, x=1.5, c=0.25, expected=-0.8022188880697336),
+        FormulaTestCase.value(params={}, x=1.5, c=0.125, expected=-0.8022188880697336),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 5.0)),
     )

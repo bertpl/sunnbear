@@ -59,7 +59,7 @@ class Ford1997Function3(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((550.0, 560.0, 10.0), (400.0, 600.0, 200.0), (350.0, 850.0, 500.0)),
+                rows=((550.0, 560.0, 10.0), (400.0, 600.0, 100.0), (350.0, 850.0, 1000.0)),
                 summary="The published intervals.",
             ),
         )
@@ -72,12 +72,12 @@ class Ford1997Function3(Formula):
             params={"a": 550.0, "b": 560.0, "c_scale": 10.0}, x=553.0, c=0.25, expected=0.09712049308920227
         ),
         FormulaTestCase.value(
-            params={"a": 400.0, "b": 600.0, "c_scale": 200.0}, x=460.0, c=0.0, expected=2854.279157641333
+            params={"a": 400.0, "b": 600.0, "c_scale": 100.0}, x=460.0, c=0.0, expected=2854.279157641333
         ),
         FormulaTestCase.value(
-            params={"a": 350.0, "b": 850.0, "c_scale": 500.0}, x=500.0, c=0.0, expected=61.676574469207246
+            params={"a": 350.0, "b": 850.0, "c_scale": 1000.0}, x=500.0, c=0.0, expected=61.676574469207246
         ),
         FormulaTestCase.interval_bounds(params={"a": 550.0, "b": 560.0, "c_scale": 10.0}, expected=(550.0, 560.0)),
-        FormulaTestCase.interval_bounds(params={"a": 400.0, "b": 600.0, "c_scale": 200.0}, expected=(400.0, 600.0)),
-        FormulaTestCase.interval_bounds(params={"a": 350.0, "b": 850.0, "c_scale": 500.0}, expected=(350.0, 850.0)),
+        FormulaTestCase.interval_bounds(params={"a": 400.0, "b": 600.0, "c_scale": 100.0}, expected=(400.0, 600.0)),
+        FormulaTestCase.interval_bounds(params={"a": 350.0, "b": 850.0, "c_scale": 1000.0}, expected=(350.0, 850.0)),
     )

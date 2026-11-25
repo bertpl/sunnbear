@@ -26,14 +26,14 @@ class AlefeldPotra1992Problem2(Formula):
     params = ()
     location_in_publication = "Table 1, problem 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\tmp{u}^{2} \left(\frac{\tmp{u}^{2}}{3} + \sqrt{2} \sin{\left(\tmp{u} \right)}\right) - "
             r"\frac{\sqrt{3}}{18}"
         ),
         interval="[0.1, 1]",
         summary=(
-            r"A function with 1 simple root, 0.4 above a stationary inflection at $\x = 0.9 \c$, around which the "
+            r"A function with 1 simple root, 0.4 above a stationary inflection at $\x = \c$, around which the "
             r"function is nearly flat."
         ),
     )
@@ -42,7 +42,7 @@ class AlefeldPotra1992Problem2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.9 * c
+        x = x - 1.0 * c
         return x**2 * (x**2 / 3 + math.sqrt(2) * math.sin(x)) - math.sqrt(3) / 18
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -55,6 +55,6 @@ class AlefeldPotra1992Problem2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.37, c=0.0, expected=-0.01996698326641826),
-        FormulaTestCase.value(params={}, x=0.37, c=0.25, expected=-0.09178137984886615),
+        FormulaTestCase.value(params={}, x=0.37, c=0.225, expected=-0.09178137984886615),
         FormulaTestCase.interval_bounds(params={}, expected=(0.1, 1.0)),
     )

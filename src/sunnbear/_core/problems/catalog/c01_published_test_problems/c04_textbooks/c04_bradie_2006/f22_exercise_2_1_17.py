@@ -29,14 +29,14 @@ class Bradie2006Exercise2117(Formula):
     params = ()
     location_in_publication = "Exercise 2.1-17"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\cos{\left(4 \tmp{u} \sqrt{1 - \tmp{u}^{2}} \right)} - \left(-1 + 8 "
             r"\tmp{u}^{2} - 8 \tmp{u}^{4}\right)"
         ),
         interval="[0, 0.5]",
         summary=(
-            r"A function symmetric about its maximum at $\x = 0.5 \c$, decreasing from that maximum to 1 simple root "
+            r"A function symmetric about its maximum at $\x = \c$, decreasing from that maximum to 1 simple root "
             r"0.40 above the maximum."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $\zeta$, the nondimensional damping coefficient.",),
@@ -46,7 +46,7 @@ class Bradie2006Exercise2117(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.5 * c
+        x = x - 1.0 * c
         return (math.cos(4 * x * math.sqrt(1 - x**2))) - (-1 + 8 * x**2 - 8 * x**4)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -59,6 +59,6 @@ class Bradie2006Exercise2117(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.15, c=0.0, expected=1.6531995889164552),
-        FormulaTestCase.value(params={}, x=0.15, c=0.25, expected=1.990010410073922),
+        FormulaTestCase.value(params={}, x=0.15, c=0.125, expected=1.990010410073922),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 0.5)),
     )

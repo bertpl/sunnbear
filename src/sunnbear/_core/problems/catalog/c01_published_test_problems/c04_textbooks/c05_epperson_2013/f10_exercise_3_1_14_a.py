@@ -25,17 +25,17 @@ class Epperson2013Exercise3114A(Formula):
     params = ()
     location_in_publication = "Exercise 3.1-14(a)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\frac{1}{\tmp{u}^{2} + 1}",
         interval="[0, 5]",
-        summary=r"A positive, bell-shaped function with no real root and its maximum at $\x = 5 \c$.",
+        summary=r"A positive, bell-shaped function with no real root and its maximum at $\x = 10 \c$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         return 1 / (x**2 + 1)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Epperson2013Exercise3114A(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.5, c=0.0, expected=0.3076923076923077),
-        FormulaTestCase.value(params={}, x=1.5, c=0.25, expected=0.9411764705882353),
+        FormulaTestCase.value(params={}, x=1.5, c=0.125, expected=0.9411764705882353),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 5.0)),
     )

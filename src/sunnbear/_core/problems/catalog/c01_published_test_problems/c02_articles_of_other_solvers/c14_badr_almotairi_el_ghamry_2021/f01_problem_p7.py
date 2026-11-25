@@ -25,11 +25,11 @@ class BadrAlmotairiElGhamry2021ProblemP7(Formula):
     params = ()
     location_in_publication = "Table 1, P7"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[0, 2]",
         summary=(
-            r"An increasing convex function with 1 simple root, at $2 \c$ plus the value of the Lambert W function at "
+            r"An increasing convex function with 1 simple root, at $\c$ plus the value of the Lambert W function at "
             r"7."
         ),
     )
@@ -38,7 +38,7 @@ class BadrAlmotairiElGhamry2021ProblemP7(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x * math.exp(x) - 7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class BadrAlmotairiElGhamry2021ProblemP7(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=-5.906728719765694),
-        FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=-6.889482908192435),
+        FormulaTestCase.value(params={}, x=0.6, c=0.5, expected=-6.889482908192435),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),
     )

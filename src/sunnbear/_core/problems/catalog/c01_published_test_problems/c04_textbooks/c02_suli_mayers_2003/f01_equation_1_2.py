@@ -66,8 +66,8 @@ class SuliMayers2003Equation12(Formula):
                     (200000.0, 0.8, 1.8, 1.0),
                     (2000000.0, 0.8, 1.8, 1.0),
                     (20000000.0, 0.8, 1.8, 1.0),
-                    (2000000.0, 1.04999, 1.05001, 2e-05),
-                    (20000000.0, 1.04999, 1.05001, 2e-05),
+                    (2000000.0, 1.04999, 1.05001, 1e-05),
+                    (20000000.0, 1.04999, 1.05001, 1e-05),
                 ),
                 summary="The published parameter values and intervals.",
             ),
@@ -98,14 +98,14 @@ class SuliMayers2003Equation12(Formula):
             params={"M": 20000000.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, x=1.1, c=0.0, expected=0.499999000001
         ),
         FormulaTestCase.value(
-            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 2e-05},
+            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 1e-05},
             x=1.05,
             c=0.0,
             expected=-0.49999999991118216,
             atol=2e-08,
         ),
         FormulaTestCase.value(
-            params={"M": 20000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 2e-05},
+            params={"M": 20000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 1e-05},
             x=1.05,
             c=0.0,
             expected=-0.4999999991118216,
@@ -113,6 +113,6 @@ class SuliMayers2003Equation12(Formula):
         ),
         FormulaTestCase.interval_bounds(params={"M": 200.0, "a": 0.8, "b": 1.8, "c_scale": 1.0}, expected=(0.8, 1.8)),
         FormulaTestCase.interval_bounds(
-            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 2e-05}, expected=(1.04999, 1.05001)
+            params={"M": 2000000.0, "a": 1.04999, "b": 1.05001, "c_scale": 1e-05}, expected=(1.04999, 1.05001)
         ),
     )

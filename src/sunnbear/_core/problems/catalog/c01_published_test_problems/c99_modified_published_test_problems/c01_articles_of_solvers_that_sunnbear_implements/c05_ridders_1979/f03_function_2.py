@@ -36,7 +36,7 @@ class ModifiedRidders1979Function2(Formula):
     params = ()
     location_in_publication = "Section III, function 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.48 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tan^{\tan{\left(\tmp{u} \right)}}{\left(\tmp{u} \right)} - 10^{3}",
         interval="[0.02, 1.5]",
         summary=(
@@ -55,7 +55,7 @@ class ModifiedRidders1979Function2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.48 * c
+        x = x - 1.0 * c
         return math.tan(x) ** math.tan(x) - 10**3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -67,6 +67,6 @@ class ModifiedRidders1979Function2(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=0.464, c=0.25, expected=-999.1995954429276),
+        FormulaTestCase.value(params={}, x=0.464, c=0.37, expected=-999.1995954429276),
         FormulaTestCase.interval_bounds(params={}, expected=(0.02, 1.5)),
     )

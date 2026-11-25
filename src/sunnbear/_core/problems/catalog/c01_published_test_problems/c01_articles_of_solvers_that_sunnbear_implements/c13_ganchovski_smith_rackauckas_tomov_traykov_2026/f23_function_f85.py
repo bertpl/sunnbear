@@ -25,7 +25,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF85(Formula):
     params = ()
     location_in_publication = "Table 2, f85"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - 0.5 \tmp{u} - 0.3",
         interval="[-10, 10]",
         summary="A sine minus a line, with 3 roots, the upper 2 on either side of a local maximum only 0.042 above 0.",
@@ -35,7 +35,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF85(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return math.sin(x) - 0.5 * x - 0.3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF85(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=2.456802495307928),
-        FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=3.7878815147582436),
+        FormulaTestCase.value(params={}, x=-4.0, c=0.5, expected=3.7878815147582436),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),
     )

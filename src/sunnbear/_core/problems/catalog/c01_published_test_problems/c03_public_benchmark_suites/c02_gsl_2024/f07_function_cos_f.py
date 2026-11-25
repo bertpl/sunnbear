@@ -55,17 +55,17 @@ class Gsl2024FunctionCosF(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 3.0, 3.0), (-3.0, 0.0, 3.0)),
+                rows=((0.0, 3.0, 1.0), (-3.0, 0.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.0, expected=0.6216099682706644),
-        FormulaTestCase.value(params={"a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.25, expected=0.9887710779360422),
+        FormulaTestCase.value(params={"a": 0.0, "b": 3.0, "c_scale": 1.0}, x=0.9, c=0.0, expected=0.6216099682706644),
+        FormulaTestCase.value(params={"a": 0.0, "b": 3.0, "c_scale": 1.0}, x=0.9, c=0.75, expected=0.9887710779360422),
         FormulaTestCase.value(
-            params={"a": -3.0, "b": 0.0, "c_scale": 3.0}, x=-2.1, c=0.0, expected=-0.5048461045998576
+            params={"a": -3.0, "b": 0.0, "c_scale": 1.0}, x=-2.1, c=0.0, expected=-0.5048461045998576
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 3.0, "c_scale": 3.0}, expected=(0.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": 0.0, "c_scale": 3.0}, expected=(-3.0, 0.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 3.0, "c_scale": 1.0}, expected=(0.0, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": 0.0, "c_scale": 1.0}, expected=(-3.0, 0.0)),
     )

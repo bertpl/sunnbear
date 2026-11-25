@@ -26,17 +26,17 @@ class TomovGanchovski2026FunctionB(Formula):
     params = ()
     location_in_publication = "Section 7.6, function b"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.75 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \frac{1}{4}",
         interval="[0.25, 1]",
-        summary=r"A line, shifted so that its root lies at $\x = 0.75 \c + 1/4$.",
+        summary=r"A line, shifted so that its root lies at $\x = \c + 1/4$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.75 * c
+        x = x - 1.0 * c
         return x - 1 / 4
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class TomovGanchovski2026FunctionB(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.475, c=0.0, expected=0.22499999999999998),
-        FormulaTestCase.value(params={}, x=0.475, c=0.25, expected=0.03749999999999998),
+        FormulaTestCase.value(params={}, x=0.475, c=0.1875, expected=0.03749999999999998),
         FormulaTestCase.interval_bounds(params={}, expected=(0.25, 1.0)),
     )

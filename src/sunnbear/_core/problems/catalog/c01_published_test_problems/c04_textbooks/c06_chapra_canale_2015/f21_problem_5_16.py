@@ -30,7 +30,7 @@ class ChapraCanale2015Problem516(Formula):
     location_in_publication = "Prob. 5.16"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 2 \c"),
+            (r"\tmp{u}", r"\x - \c"),
             (r"\tmp{B}", r"3 + \tmp{u}"),
             (r"\tmp{A_c}", r"3 \tmp{u} + \frac{\tmp{u}^2}{2}"),
         ),
@@ -47,7 +47,7 @@ class ChapraCanale2015Problem516(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         surface_width = 3.0 + x
         area = 3.0 * x + x**2 / 2.0
         return 1.0 - 20.0**2 / (9.81 * area**3) * surface_width
@@ -62,6 +62,6 @@ class ChapraCanale2015Problem516(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.1, c=0.0, expected=-1.8074480329135572),
-        FormulaTestCase.value(params={}, x=1.1, c=0.25, expected=-17.910278020703927),
+        FormulaTestCase.value(params={}, x=1.1, c=0.5, expected=-17.910278020703927),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 2.5)),
     )

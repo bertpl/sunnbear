@@ -40,7 +40,7 @@ class ModifiedBradie2006Example210(Formula):
     params = ()
     location_in_publication = "Example 2.10; Exercises 2.5-11(a), 2.6-4, 2.6-12, 2.6-13"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \tmp{u} \sin^{2}{\left(\frac{\tmp{u}}{2} \right)}",
         interval="[-2, 1]",
         summary=(
@@ -63,7 +63,7 @@ class ModifiedBradie2006Example210(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return 2 * x * math.sin(x / 2) ** 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -76,5 +76,5 @@ class ModifiedBradie2006Example210(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 1.0)),
-        FormulaTestCase.value(params={}, x=-1.1, c=0.25, expected=-2.359841956625349),
+        FormulaTestCase.value(params={}, x=-1.1, c=0.75, expected=-2.359841956625349),
     )

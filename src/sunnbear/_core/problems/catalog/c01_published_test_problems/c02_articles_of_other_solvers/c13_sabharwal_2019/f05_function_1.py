@@ -57,7 +57,7 @@ class Sabharwal2019Function1(Formula):
         return (
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
-                rows=((3.0, 1.0, 2.0, 1.0), (5.0, 2.0, 7.0, 5.0), (10.0, 3.0, 4.0, 1.0)),
+                rows=((3.0, 1.0, 2.0, 1.0), (5.0, 2.0, 7.0, 10.0), (10.0, 3.0, 4.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
@@ -67,11 +67,11 @@ class Sabharwal2019Function1(Formula):
             params={"k": 3.0, "a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.0, expected=-1.3099999999999998
         ),
         FormulaTestCase.value(params={"k": 3.0, "a": 1.0, "b": 2.0, "c_scale": 1.0}, x=1.3, c=0.25, expected=-1.8975),
-        FormulaTestCase.value(params={"k": 5.0, "a": 2.0, "b": 7.0, "c_scale": 5.0}, x=3.5, c=0.0, expected=7.25),
+        FormulaTestCase.value(params={"k": 5.0, "a": 2.0, "b": 7.0, "c_scale": 10.0}, x=3.5, c=0.0, expected=7.25),
         FormulaTestCase.value(
             params={"k": 10.0, "a": 3.0, "b": 4.0, "c_scale": 1.0}, x=3.3, c=0.0, expected=0.8899999999999988
         ),
         FormulaTestCase.interval_bounds(params={"k": 3.0, "a": 1.0, "b": 2.0, "c_scale": 1.0}, expected=(1.0, 2.0)),
-        FormulaTestCase.interval_bounds(params={"k": 5.0, "a": 2.0, "b": 7.0, "c_scale": 5.0}, expected=(2.0, 7.0)),
+        FormulaTestCase.interval_bounds(params={"k": 5.0, "a": 2.0, "b": 7.0, "c_scale": 10.0}, expected=(2.0, 7.0)),
         FormulaTestCase.interval_bounds(params={"k": 10.0, "a": 3.0, "b": 4.0, "c_scale": 1.0}, expected=(3.0, 4.0)),
     )

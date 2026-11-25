@@ -26,17 +26,17 @@ class Suhadolnik2012Function2(Formula):
     params = ()
     location_in_publication = "Table 1, function 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 7.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\left(10 - \tmp{u}\right) e^{- 10 \tmp{u}} - \tmp{u}^{10} + 1",
         interval="[0.5, 8]",
-        summary=r"A decreasing function with 1 root only $4 \cdot 10^{-5}$ above $\x = 1 + 7.5 \c$.",
+        summary=r"A decreasing function with 1 root only $4 \cdot 10^{-5}$ above $\x = 1 + 10 \c$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 7.5 * c
+        x = x - 10.0 * c
         return (10 - x) * math.exp(-10 * x) - x**10 + 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class Suhadolnik2012Function2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=2.75, c=0.0, expected=-24734.85567569732),
-        FormulaTestCase.value(params={}, x=2.75, c=0.25, expected=0.7383703834278529),
+        FormulaTestCase.value(params={}, x=2.75, c=0.1875, expected=0.7383703834278529),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 8.0)),
     )

@@ -25,7 +25,7 @@ class GottliebThompson2010Test7(Formula):
     params = ()
     location_in_publication = "Table 1, test 7"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\frac{1}{\tmp{u}} - 1",
         interval="[0.5, 2]",
         summary=(
@@ -38,7 +38,7 @@ class GottliebThompson2010Test7(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.5 * c
+        x = x - 1.0 * c
         return 1 / x - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class GottliebThompson2010Test7(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.95, c=0.0, expected=0.052631578947368474),
-        FormulaTestCase.value(params={}, x=0.95, c=0.25, expected=0.7391304347826089),
+        FormulaTestCase.value(params={}, x=0.95, c=0.375, expected=0.7391304347826089),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 2.0)),
     )

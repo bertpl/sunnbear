@@ -63,17 +63,19 @@ class RootsJl2026FunctionFunc9(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((5.0, 12.0, 7.0), (4.0, 8.0, 4.0)),
+                rows=((5.0, 12.0, 10.0), (4.0, 8.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 5.0, "b": 12.0, "c_scale": 7.0}, x=7.1, c=0.0, expected=-0.06489448847872395
+            params={"a": 5.0, "b": 12.0, "c_scale": 10.0}, x=7.1, c=0.0, expected=-0.06489448847872395
         ),
-        FormulaTestCase.value(params={"a": 5.0, "b": 12.0, "c_scale": 7.0}, x=7.1, c=0.25, expected=2.349779305773395),
-        FormulaTestCase.value(params={"a": 4.0, "b": 8.0, "c_scale": 4.0}, x=5.2, c=0.0, expected=2.885581014405963),
-        FormulaTestCase.interval_bounds(params={"a": 5.0, "b": 12.0, "c_scale": 7.0}, expected=(5.0, 12.0)),
-        FormulaTestCase.interval_bounds(params={"a": 4.0, "b": 8.0, "c_scale": 4.0}, expected=(4.0, 8.0)),
+        FormulaTestCase.value(
+            params={"a": 5.0, "b": 12.0, "c_scale": 10.0}, x=7.1, c=0.175, expected=2.349779305773395
+        ),
+        FormulaTestCase.value(params={"a": 4.0, "b": 8.0, "c_scale": 10.0}, x=5.2, c=0.0, expected=2.885581014405963),
+        FormulaTestCase.interval_bounds(params={"a": 5.0, "b": 12.0, "c_scale": 10.0}, expected=(5.0, 12.0)),
+        FormulaTestCase.interval_bounds(params={"a": 4.0, "b": 8.0, "c_scale": 10.0}, expected=(4.0, 8.0)),
     )

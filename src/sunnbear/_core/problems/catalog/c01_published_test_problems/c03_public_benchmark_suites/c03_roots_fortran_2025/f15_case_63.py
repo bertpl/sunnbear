@@ -23,17 +23,17 @@ class RootsFortran2025Case63(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 63"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + 4 \tmp{u}^{2} - 10",
         interval="[0, 1.5]",
-        summary=r"A cubic with a local minimum at $\x = 1.5 \c$ and 1 root 1.37 above that minimum.",
+        summary=r"A cubic with a local minimum at $\x = \c$ and 1 root 1.37 above that minimum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.5 * c
+        x = x - 1.0 * c
         return x**3 + 4.0 * x**2 - 10.0
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -46,6 +46,6 @@ class RootsFortran2025Case63(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.45, c=0.0, expected=-9.098875),
-        FormulaTestCase.value(params={}, x=0.45, c=0.25, expected=-9.977078125),
+        FormulaTestCase.value(params={}, x=0.45, c=0.375, expected=-9.977078125),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5)),
     )

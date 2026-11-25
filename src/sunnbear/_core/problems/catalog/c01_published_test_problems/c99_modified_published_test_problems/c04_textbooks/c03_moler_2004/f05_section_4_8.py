@@ -39,7 +39,7 @@ class ModifiedMoler2004Section48(Formula):
     params = ()
     location_in_publication = "§4.7, §4.8; Exercises 4.7, 4.10(a)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 30 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"J_{0}\left(\tmp{u}\right)",
         interval="[0, 30]",
         summary="The Bessel function $J_0$, an oscillation of decaying amplitude, with 9 simple roots.",
@@ -56,7 +56,7 @@ class ModifiedMoler2004Section48(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 30.0 * c
+        x = x - 10.0 * c
         return bessel_j0(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -68,6 +68,6 @@ class ModifiedMoler2004Section48(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=9.0, c=0.25, expected=0.5118276717359181),
+        FormulaTestCase.value(params={}, x=9.0, c=0.75, expected=0.5118276717359181),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 30.0)),
     )

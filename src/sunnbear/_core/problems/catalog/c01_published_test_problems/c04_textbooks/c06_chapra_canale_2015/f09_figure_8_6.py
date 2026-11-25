@@ -35,7 +35,7 @@ class ChapraCanale2015Figure86(Formula):
     location_in_publication = "§8.4, Eq. (8.23), Fig. 8.6"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 0.072 \c"),
+            (r"\tmp{u}", r"\x - 0.1 \c"),
             (r"\tmp{\mathrm{Re}}", r"\frac{1.23 \cdot 40 \cdot 0.005}{1.79 \cdot 10^{-5}}"),
         ),
         expression=(
@@ -54,7 +54,7 @@ class ChapraCanale2015Figure86(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.072 * c
+        x = x - 0.1 * c
         # the formula is the difference form x - 0.25/(...)^2 of the fixed-point equation (8.23), with the values
         # of Section 8.4's example
         diameter, eps = 0.005, 1.5e-6
@@ -71,6 +71,6 @@ class ChapraCanale2015Figure86(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.0296, c=0.0, expected=0.0007179248847414975),
-        FormulaTestCase.value(params={}, x=0.0296, c=0.25, expected=-0.021449364335113793),
+        FormulaTestCase.value(params={}, x=0.0296, c=0.18, expected=-0.021449364335113793),
         FormulaTestCase.interval_bounds(params={}, expected=(0.008, 0.08)),
     )

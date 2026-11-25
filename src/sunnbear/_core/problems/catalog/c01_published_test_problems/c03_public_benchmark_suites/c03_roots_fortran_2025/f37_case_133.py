@@ -34,7 +34,7 @@ class RootsFortran2025Case133(Formula):
     )
     location_in_publication = "root_tests.f90, case 133"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 157 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=(
             r"\param{y1} + \frac{\tmp{u} - \param{x1}}{\param{x2} - \param{x1}} \left(\param{y2} - "
             r"\param{y1}\right)"
@@ -47,7 +47,7 @@ class RootsFortran2025Case133(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, x1: float, x2: float, y1: float, y2: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 157.0 * c
+        x = x - 100.0 * c
         return y1 + ((x - x1) / (x2 - x1)) * (y2 - y1)
 
     def interval_bounds(self, x1: float, x2: float, y1: float, y2: float) -> tuple[float, float]:
@@ -69,7 +69,10 @@ class RootsFortran2025Case133(Formula):
             params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0}, x=47.124, c=0.0, expected=374.2
         ),
         FormulaTestCase.value(
-            params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0}, x=47.124, c=0.25, expected=905.4293099057804
+            params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0},
+            x=47.124,
+            c=0.3925,
+            expected=905.4293099057804,
         ),
         FormulaTestCase.interval_bounds(
             params={"x1": 0.0, "x2": 157.08, "y1": 1012.0, "y2": -1114.0}, expected=(0.0, 157.08)

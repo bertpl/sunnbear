@@ -42,7 +42,7 @@ class Ellithy2026Problem30(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"Wilkinson's polynomial, above $10^{15}$ in magnitude over most of each interval, with 1 root inside each "
-            r"interval and another at $\x = 19 + 2 \c$ for the upper interval."
+            r"interval and another at $\x = 19 + \c$ for the upper interval."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -66,21 +66,21 @@ class Ellithy2026Problem30(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 1.5, 1.5), (19.0, 21.0, 2.0)),
+                rows=((0.0, 1.5, 1.0), (19.0, 21.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 1.5, "c_scale": 1.5}, x=0.45, c=0.0, expected=3.8859900569265306e17
+            params={"a": 0.0, "b": 1.5, "c_scale": 1.0}, x=0.45, c=0.0, expected=3.8859900569265306e17
         ),
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 1.5, "c_scale": 1.5}, x=0.45, c=0.25, expected=1.848893119048187e18
+            params={"a": 0.0, "b": 1.5, "c_scale": 1.0}, x=0.45, c=0.375, expected=1.848893119048187e18
         ),
         FormulaTestCase.value(
-            params={"a": 19.0, "b": 21.0, "c_scale": 2.0}, x=19.6, c=0.0, expected=-9999185058305838.0
+            params={"a": 19.0, "b": 21.0, "c_scale": 1.0}, x=19.6, c=0.0, expected=-9999185058305838.0
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.5, "c_scale": 1.5}, expected=(0.0, 1.5)),
-        FormulaTestCase.interval_bounds(params={"a": 19.0, "b": 21.0, "c_scale": 2.0}, expected=(19.0, 21.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.5, "c_scale": 1.0}, expected=(0.0, 1.5)),
+        FormulaTestCase.interval_bounds(params={"a": 19.0, "b": 21.0, "c_scale": 1.0}, expected=(19.0, 21.0)),
     )

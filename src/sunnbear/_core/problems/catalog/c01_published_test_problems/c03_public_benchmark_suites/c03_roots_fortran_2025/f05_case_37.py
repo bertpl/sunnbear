@@ -24,11 +24,11 @@ class RootsFortran2025Case37(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 37"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{3} - 5 \tmp{u}^{2} + 12 \tmp{u} - 8",
         interval="[-10, 10]",
         summary=(
-            r"An increasing cubic with 1 real root and complex roots $2 + 20 \c \pm 2i$ near that root, which make the "
+            r"An increasing cubic with 1 real root and complex roots $2 + 10 \c \pm 2i$ near that root, which make the "
             r"cubic flattest close to the real root."
         ),
     )
@@ -37,7 +37,7 @@ class RootsFortran2025Case37(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return x**3 - 5.0 * x**2 + 12.0 * x - 8.0
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class RootsFortran2025Case37(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=-200.0),
-        FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=-1250.0),
+        FormulaTestCase.value(params={}, x=-4.0, c=0.5, expected=-1250.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),
     )

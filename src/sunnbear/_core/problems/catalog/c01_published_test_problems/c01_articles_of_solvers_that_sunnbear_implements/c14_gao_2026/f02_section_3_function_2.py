@@ -26,7 +26,7 @@ class Gao2026Section3Function2(Formula):
     params = ()
     location_in_publication = "Section 3, function 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 15 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\frac{\sqrt[5]{\tmp{u}}}{1 + \sqrt[5]{\left|{\tmp{u}}\right|}}",
         interval="[-5, 10]",
         summary="A function with an infinite slope at its root, nearly flat farther than 1 from that root.",
@@ -36,7 +36,7 @@ class Gao2026Section3Function2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 15.0 * c
+        x = x - 10.0 * c
         return real_root(x, 5) / (1 + real_root(abs(x), 5))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class Gao2026Section3Function2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.5, c=0.0, expected=-0.4653980386192365),
-        FormulaTestCase.value(params={}, x=-0.5, c=0.25, expected=-0.5718452694455244),
+        FormulaTestCase.value(params={}, x=-0.5, c=0.375, expected=-0.5718452694455244),
         FormulaTestCase.interval_bounds(params={}, expected=(-5.0, 10.0)),
     )

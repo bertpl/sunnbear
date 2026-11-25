@@ -25,7 +25,7 @@ class ChapraCanale2015Problem51(Formula):
     params = ()
     location_in_publication = "Prob. 5.1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"- 0.5 \tmp{u}^{2} + 2.5 \tmp{u} + 4.5",
         interval="[5, 10]",
         summary="A concave parabola on an interval that holds only the larger of the parabola's 2 simple roots.",
@@ -35,7 +35,7 @@ class ChapraCanale2015Problem51(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         return -0.5 * x**2 + 2.5 * x + 4.5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class ChapraCanale2015Problem51(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=6.5, c=0.0, expected=-0.375),
-        FormulaTestCase.value(params={}, x=6.5, c=0.25, expected=3.84375),
+        FormulaTestCase.value(params={}, x=6.5, c=0.125, expected=3.84375),
         FormulaTestCase.interval_bounds(params={}, expected=(5.0, 10.0)),
     )

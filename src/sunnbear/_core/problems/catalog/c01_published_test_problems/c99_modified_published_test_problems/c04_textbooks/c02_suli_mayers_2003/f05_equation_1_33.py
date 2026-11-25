@@ -82,9 +82,9 @@ class ModifiedSuliMayers2003Equation133(Formula):
             ParamTable(
                 names=("mu", "a", "b", "c_scale"),
                 rows=(
-                    (3.4, 0.01, 1.0, 0.99),
-                    (3.5, 0.01, 1.0, 0.99),
-                    (3.99, 0.01, 1.0, 0.99),
+                    (3.4, 0.01, 1.0, 1.0),
+                    (3.5, 0.01, 1.0, 1.0),
+                    (3.99, 0.01, 1.0, 1.0),
                 ),
                 summary="The published parameter values, on the interval $[0.01, 1]$.",
             ),
@@ -92,17 +92,15 @@ class ModifiedSuliMayers2003Equation133(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"mu": 3.4, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.13076315
+            params={"mu": 3.4, "a": 0.01, "b": 1.0, "c_scale": 1.0}, x=0.307, c=0.2475, expected=-0.13076315
         ),
         FormulaTestCase.value(
-            params={"mu": 3.5, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.136359125
+            params={"mu": 3.5, "a": 0.01, "b": 1.0, "c_scale": 1.0}, x=0.307, c=0.2475, expected=-0.136359125
         ),
         FormulaTestCase.value(
-            params={"mu": 3.99, "a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=-0.1637794025
+            params={"mu": 3.99, "a": 0.01, "b": 1.0, "c_scale": 1.0}, x=0.307, c=0.2475, expected=-0.1637794025
         ),
-        FormulaTestCase.interval_bounds(params={"mu": 3.4, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
-        FormulaTestCase.interval_bounds(params={"mu": 3.5, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
-        FormulaTestCase.interval_bounds(
-            params={"mu": 3.99, "a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)
-        ),
+        FormulaTestCase.interval_bounds(params={"mu": 3.4, "a": 0.01, "b": 1.0, "c_scale": 1.0}, expected=(0.01, 1.0)),
+        FormulaTestCase.interval_bounds(params={"mu": 3.5, "a": 0.01, "b": 1.0, "c_scale": 1.0}, expected=(0.01, 1.0)),
+        FormulaTestCase.interval_bounds(params={"mu": 3.99, "a": 0.01, "b": 1.0, "c_scale": 1.0}, expected=(0.01, 1.0)),
     )

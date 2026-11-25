@@ -38,7 +38,7 @@ class ModifiedBurkardt2016ProblemP06(Formula):
     params = ()
     location_in_publication = "Problem p06"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 19.9 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"e^{\tmp{u}} - 2 - \frac{1}{\left(10 \tmp{u}\right)^{2}} + \frac{2}{\left(100 "
             r"\tmp{u}\right)^{3}}"
@@ -46,7 +46,7 @@ class ModifiedBurkardt2016ProblemP06(Formula):
         interval="[0.08, 20]",
         summary=(
             r"A function with a simple root and, below that root, a narrow dip to about $-3.7 \cdot 10^{4}$, a second "
-            r"root, and a pole of order 3 at $\x = 19.9 \c$."
+            r"root, and a pole of order 3 at $\x = 10 \c$."
         ),
         notes=(
             (
@@ -61,7 +61,7 @@ class ModifiedBurkardt2016ProblemP06(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 19.9 * c
+        x = x - 10.0 * c
         return math.exp(x) - 2.0 - 1.0 / (10.0 * x) ** 2 + 2.0 / (100.0 * x) ** 3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -73,6 +73,6 @@ class ModifiedBurkardt2016ProblemP06(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=6.056, c=0.25, expected=0.9390697531278249),
+        FormulaTestCase.value(params={}, x=6.056, c=0.4975, expected=0.9390697531278249),
         FormulaTestCase.interval_bounds(params={}, expected=(0.08, 20.0)),
     )

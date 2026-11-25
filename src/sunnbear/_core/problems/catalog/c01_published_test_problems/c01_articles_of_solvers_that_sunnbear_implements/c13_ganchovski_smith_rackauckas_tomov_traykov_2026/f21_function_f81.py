@@ -32,14 +32,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF81(Formula):
     params = ()
     location_in_publication = "Table 2, f81"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} 1 + \sin{\left(\frac{1}{\tmp{u} + 1} \right)} & \text{for}\: \tmp{u} > -1 "
             r"\\-1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1, 1]",
         summary=(
-            r"A function negative only up to $\x = 2 \c - 1$ and, above that point, oscillating ever faster toward it "
+            r"A function negative only up to $\x = \c - 1$ and, above that point, oscillating ever faster toward it "
             r'and touching 0 infinitely often, referred to in the source as "Warsaw".'
         ),
     )
@@ -48,7 +48,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF81(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         if x > -1:
             return 1 + math.sin(1 / (x + 1))
         else:
@@ -64,7 +64,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF81(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=1.995407957751765),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=0.45597888911062834),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=0.45597888911062834),
         FormulaTestCase.value(params={}, x=-1.0, c=0.0, expected=-1.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

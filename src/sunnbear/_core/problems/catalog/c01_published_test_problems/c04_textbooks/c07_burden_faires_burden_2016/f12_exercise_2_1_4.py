@@ -57,7 +57,7 @@ class BurdenFairesBurden2016Exercise214(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-2.0, -1.0, 1.0), (0.0, 2.0, 2.0), (2.0, 3.0, 1.0), (-1.0, 0.0, 1.0)),
+                rows=((-2.0, -1.0, 1.0), (0.0, 2.0, 1.0), (2.0, 3.0, 1.0), (-1.0, 0.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
@@ -67,13 +67,13 @@ class BurdenFairesBurden2016Exercise214(Formula):
         FormulaTestCase.value(
             params={"a": -2.0, "b": -1.0, "c_scale": 1.0}, x=-1.7, c=0.25, expected=10.278756249999999
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=4.6576),
+        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.0, expected=4.6576),
         FormulaTestCase.value(params={"a": 2.0, "b": 3.0, "c_scale": 1.0}, x=2.3, c=0.0, expected=-4.309900000000001),
         FormulaTestCase.value(
             params={"a": -1.0, "b": 0.0, "c_scale": 1.0}, x=-0.7, c=0.0, expected=0.16610000000000025
         ),
         FormulaTestCase.interval_bounds(params={"a": -2.0, "b": -1.0, "c_scale": 1.0}, expected=(-2.0, -1.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, expected=(0.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, expected=(0.0, 2.0)),
         FormulaTestCase.interval_bounds(params={"a": 2.0, "b": 3.0, "c_scale": 1.0}, expected=(2.0, 3.0)),
         FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 0.0, "c_scale": 1.0}, expected=(-1.0, 0.0)),
     )

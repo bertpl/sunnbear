@@ -31,7 +31,7 @@ class ModifiedEpperson2013Exercise3114B(Formula):
     params = ()
     location_in_publication = "Exercise 3.1-14(b)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} 0 & \text{if } \tmp{u} = 1 \\ \frac{1}{\tmp{u} - 1} & \text{otherwise} " r"\end{cases}"
         ),
@@ -49,7 +49,7 @@ class ModifiedEpperson2013Exercise3114B(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate f at ``x - c_scale*c``, with 0 at the pole; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         if x == 1:
             return 0.0
         else:
@@ -64,7 +64,7 @@ class ModifiedEpperson2013Exercise3114B(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=0.9, c=0.25, expected=-1.1764705882352942),
+        FormulaTestCase.value(params={}, x=0.9, c=0.75, expected=-1.1764705882352942),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.0)),
     )

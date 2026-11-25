@@ -27,7 +27,7 @@ class Gsl2024FunctionFunc4(Formula):
     params = ()
     location_in_publication = "test_funcs.c, func4"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2.33 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{- \tmp{u}}",
         interval=r"\left[- \frac{1}{3}, 2\right]",
         summary=(
@@ -40,7 +40,7 @@ class Gsl2024FunctionFunc4(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.33 * c
+        x = x - 1.0 * c
         return x * math.exp(-x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class Gsl2024FunctionFunc4(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.366667, c=0.0, expected=0.2541150403402077),
-        FormulaTestCase.value(params={}, x=0.366667, c=0.25, expected=-0.26782611907005804),
+        FormulaTestCase.value(params={}, x=0.366667, c=0.5825, expected=-0.26782611907005804),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.3333333333333333, 2.0)),
     )

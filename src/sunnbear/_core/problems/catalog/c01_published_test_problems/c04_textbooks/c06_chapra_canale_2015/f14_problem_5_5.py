@@ -27,7 +27,7 @@ class ChapraCanale2015Problem55(Formula):
     params = ()
     location_in_publication = "Prob. 5.5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - \tmp{u}^{2}",
         interval="[0.5, 1]",
         summary="A concave function with 2 roots, a maximum between them, and only the upper root on the interval.",
@@ -37,7 +37,7 @@ class ChapraCanale2015Problem55(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.5 * c
+        x = x - 1.0 * c
         return (math.sin(x)) - (x**2)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class ChapraCanale2015Problem55(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.65, c=0.0, expected=0.18268640573603956),
-        FormulaTestCase.value(params={}, x=0.65, c=0.25, expected=0.22558800467379783),
+        FormulaTestCase.value(params={}, x=0.65, c=0.125, expected=0.22558800467379783),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 1.0)),
     )

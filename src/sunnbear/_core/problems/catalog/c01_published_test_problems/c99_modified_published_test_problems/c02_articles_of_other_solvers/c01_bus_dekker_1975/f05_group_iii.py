@@ -45,7 +45,7 @@ class ModifiedBusDekker1975GroupIii(Formula):
     params = (FormulaParam("n", latex_symbol="n"),)
     location_in_publication = "Group III"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 11 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{\param{n}} + 2^{-918} \, \tmp{u}",
         interval="[-1, 10]",
         summary="A function antisymmetric about its root, below 0.01 in magnitude within 0.83 of that root.",
@@ -65,7 +65,7 @@ class ModifiedBusDekker1975GroupIii(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 11.0 * c
+        x = x - 10.0 * c
         published_value = x**n
         return published_value + TINY_LINEAR_TERM_SLOPE * x
 
@@ -81,6 +81,6 @@ class ModifiedBusDekker1975GroupIii(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={"n": 25.0}, expected=(-1.0, 10.0)),
-        FormulaTestCase.value(params={"n": 25.0}, x=2.3, c=0.25, expected=-2.1395027270670523e-09),
+        FormulaTestCase.value(params={"n": 25.0}, x=2.3, c=0.275, expected=-2.1395027270670523e-09),
         FormulaTestCase.value(params={"n": 25.0}, x=1e-14, c=0.0, expected=4.512985939662074e-291, atol=0.0),
     )

@@ -66,15 +66,15 @@ class Epperson2013Exercise311(Formula):
         return (
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
-                rows=((2.0, 0.0, 2.0, 2.0), (3.0, 0.0, 3.0, 3.0)),
+                rows=((2.0, 0.0, 2.0, 1.0), (3.0, 0.0, 3.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=-1.784),
-        FormulaTestCase.value(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.25, expected=-1.999),
-        FormulaTestCase.value(params={"k": 3.0, "a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.0, expected=-2.271),
-        FormulaTestCase.interval_bounds(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 2.0}, expected=(0.0, 2.0)),
-        FormulaTestCase.interval_bounds(params={"k": 3.0, "a": 0.0, "b": 3.0, "c_scale": 3.0}, expected=(0.0, 3.0)),
+        FormulaTestCase.value(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.0, expected=-1.784),
+        FormulaTestCase.value(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.5, expected=-1.999),
+        FormulaTestCase.value(params={"k": 3.0, "a": 0.0, "b": 3.0, "c_scale": 1.0}, x=0.9, c=0.0, expected=-2.271),
+        FormulaTestCase.interval_bounds(params={"k": 2.0, "a": 0.0, "b": 2.0, "c_scale": 1.0}, expected=(0.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"k": 3.0, "a": 0.0, "b": 3.0, "c_scale": 1.0}, expected=(0.0, 3.0)),
     )

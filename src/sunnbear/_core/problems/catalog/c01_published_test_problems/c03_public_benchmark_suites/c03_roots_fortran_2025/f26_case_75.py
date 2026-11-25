@@ -57,23 +57,21 @@ class RootsFortran2025Case75(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-5.0, -3.0, 2.0), (-3.0, -2.0, 1.0), (-2.0, 0.0, 2.0), (0.0, 9.0, 9.0)),
+                rows=((-5.0, -3.0, 1.0), (-3.0, -2.0, 1.0), (-2.0, 0.0, 1.0), (0.0, 9.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": -5.0, "b": -3.0, "c_scale": 2.0}, x=-4.4, c=0.0, expected=79.68960000000006),
-        FormulaTestCase.value(
-            params={"a": -5.0, "b": -3.0, "c_scale": 2.0}, x=-4.4, c=0.25, expected=182.8101000000001
-        ),
+        FormulaTestCase.value(params={"a": -5.0, "b": -3.0, "c_scale": 1.0}, x=-4.4, c=0.0, expected=79.68960000000006),
+        FormulaTestCase.value(params={"a": -5.0, "b": -3.0, "c_scale": 1.0}, x=-4.4, c=0.5, expected=182.8101000000001),
         FormulaTestCase.value(
             params={"a": -3.0, "b": -2.0, "c_scale": 1.0}, x=-2.7, c=0.0, expected=-7.885900000000002
         ),
-        FormulaTestCase.value(params={"a": -2.0, "b": 0.0, "c_scale": 2.0}, x=-1.4, c=0.0, expected=16.5216),
-        FormulaTestCase.value(params={"a": 0.0, "b": 9.0, "c_scale": 9.0}, x=2.7, c=0.0, expected=-299.4859),
-        FormulaTestCase.interval_bounds(params={"a": -5.0, "b": -3.0, "c_scale": 2.0}, expected=(-5.0, -3.0)),
+        FormulaTestCase.value(params={"a": -2.0, "b": 0.0, "c_scale": 1.0}, x=-1.4, c=0.0, expected=16.5216),
+        FormulaTestCase.value(params={"a": 0.0, "b": 9.0, "c_scale": 10.0}, x=2.7, c=0.0, expected=-299.4859),
+        FormulaTestCase.interval_bounds(params={"a": -5.0, "b": -3.0, "c_scale": 1.0}, expected=(-5.0, -3.0)),
         FormulaTestCase.interval_bounds(params={"a": -3.0, "b": -2.0, "c_scale": 1.0}, expected=(-3.0, -2.0)),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 0.0, "c_scale": 2.0}, expected=(-2.0, 0.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 9.0, "c_scale": 9.0}, expected=(0.0, 9.0)),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 0.0, "c_scale": 1.0}, expected=(-2.0, 0.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 9.0, "c_scale": 10.0}, expected=(0.0, 9.0)),
     )

@@ -59,7 +59,7 @@ class Romadani2025Section54(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 1.0, 1.0), (-1.0, 1.0, 2.0)),
+                rows=((0.0, 1.0, 1.0), (-1.0, 1.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
@@ -68,8 +68,8 @@ class Romadani2025Section54(Formula):
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=0.03588203867309906),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.25, expected=0.13953564474479144),
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, x=-0.4, c=0.0, expected=0.38282008000056855
+            params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, x=-0.4, c=0.0, expected=0.38282008000056855
         ),
         FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, expected=(0.0, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, expected=(-1.0, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, expected=(-1.0, 1.0)),
     )

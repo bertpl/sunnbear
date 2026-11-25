@@ -30,14 +30,14 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF49(Formula):
     params = ()
     location_in_publication = "Table 2, f49"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} - \tmp{u}^{3} - \tmp{u} - 1 & \text{for}\: \tmp{u} \leq 0 "
             r"\\\sqrt[3]{\tmp{u}} - \tmp{u} - 1 & \text{otherwise} \end{cases}"
         ),
         interval="[-1, 1]",
         summary=(
-            r"A cubic piece holding the 1 root, joined continuously at $\x = 2 \c$ to a cube-root piece that starts "
+            r"A cubic piece holding the 1 root, joined continuously at $\x = \c$ to a cube-root piece that starts "
             r"with an infinite slope and stays below $-0.6$."
         ),
     )
@@ -46,7 +46,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF49(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         if x <= 0:
             return -(x**3) - x - 1
         else:
@@ -62,7 +62,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF49(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.5359999999999999),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=0.6290000000000001),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=0.6290000000000001),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=-1.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

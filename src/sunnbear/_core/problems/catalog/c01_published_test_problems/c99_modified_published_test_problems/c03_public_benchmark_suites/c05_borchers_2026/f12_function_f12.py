@@ -122,8 +122,8 @@ class ModifiedBorchers2026FunctionF12(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=(
-                    (1.0, 3.4, 2.4),
-                    (1.0, 2.5, 1.5),
+                    (1.0, 3.4, 1.0),
+                    (1.0, 2.5, 1.0),
                 ),
                 summary="The published intervals.",
             ),
@@ -133,15 +133,15 @@ class ModifiedBorchers2026FunctionF12(Formula):
     # would accept any value near 0, 0 among them; the case at `x=1.65` is the only
     # one with `abs(s) < 1/16`, where the formula sums the series
     test_cases = (
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 3.4, "c_scale": 2.4}, expected=(1.0, 3.4)),
+        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 3.4, "c_scale": 1.0}, expected=(1.0, 3.4)),
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 3.4, "c_scale": 2.4}, x=1.72, c=0.25, expected=-0.01456600694656706
+            params={"a": 1.0, "b": 3.4, "c_scale": 1.0}, x=1.72, c=0.6, expected=-0.01456600694656706
         ),
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 3.4, "c_scale": 2.4}, x=1.65, c=0.0, expected=1.5542480440130112e-10, atol=0.0
+            params={"a": 1.0, "b": 3.4, "c_scale": 1.0}, x=1.65, c=0.0, expected=1.5542480440130112e-10, atol=0.0
         ),
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 2.5, "c_scale": 1.5}, expected=(1.0, 2.5)),
+        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 2.5, "c_scale": 1.0}, expected=(1.0, 2.5)),
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 2.5, "c_scale": 1.5}, x=1.45, c=0.25, expected=-0.019154917200661727
+            params={"a": 1.0, "b": 2.5, "c_scale": 1.0}, x=1.45, c=0.375, expected=-0.019154917200661727
         ),
     )

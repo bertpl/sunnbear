@@ -39,7 +39,7 @@ class ModifiedEpperson2013Exercise31125(Formula):
     params = ()
     location_in_publication = "Exercise 3.11-25"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.004 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.01 \c"),),
         expression=r"\tmp{u}^{5}",
         interval="[-0.002, 0.002]",
         summary="A 5th power that is at most $10^{-15}$ in magnitude within 0.001 of its root.",
@@ -60,7 +60,7 @@ class ModifiedEpperson2013Exercise31125(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 0.004 * c
+        x = x - 0.01 * c
         return x**5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -75,5 +75,5 @@ class ModifiedEpperson2013Exercise31125(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(-0.002, 0.002)),
-        FormulaTestCase.value(params={}, x=-0.0008, c=0.25, expected=-1.889568e-14, atol=0.0),
+        FormulaTestCase.value(params={}, x=-0.0008, c=0.1, expected=-1.889568e-14, atol=0.0),
     )

@@ -24,7 +24,7 @@ class Brent1973Row3(Formula):
     params = ()
     location_in_publication = "Table 4.1, row 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{19}",
         interval="[-1, 4]",
         summary=(
@@ -37,7 +37,7 @@ class Brent1973Row3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         return x**19
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Brent1973Row3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.5, c=0.0, expected=1.9073486328125e-06),
-        FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.004228282585245324),
+        FormulaTestCase.value(params={}, x=0.5, c=0.125, expected=-0.004228282585245324),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),
     )

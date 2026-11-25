@@ -64,25 +64,25 @@ class Moler2004Section44(Formula):
         return (
             ParamTable(
                 names=("x_star", "a", "b", "c_scale"),
-                rows=((2.0, 0.0, 4.0, 4.0), (2.0, 1.0, 4.0, 3.0)),
+                rows=((2.0, 0.0, 4.0, 10.0), (2.0, 1.0, 4.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"x_star": 2.0, "a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=-0.8944271909999159
+            params={"x_star": 2.0, "a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.0, expected=-0.8944271909999159
         ),
         FormulaTestCase.value(
-            params={"x_star": 2.0, "a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.25, expected=-1.3416407864998738
+            params={"x_star": 2.0, "a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.1, expected=-1.3416407864998738
         ),
         FormulaTestCase.value(
-            params={"x_star": 2.0, "a": 1.0, "b": 4.0, "c_scale": 3.0}, x=1.9, c=0.0, expected=-0.31622776601683805
+            params={"x_star": 2.0, "a": 1.0, "b": 4.0, "c_scale": 1.0}, x=1.9, c=0.0, expected=-0.31622776601683805
         ),
         FormulaTestCase.interval_bounds(
-            params={"x_star": 2.0, "a": 0.0, "b": 4.0, "c_scale": 4.0}, expected=(0.0, 4.0)
+            params={"x_star": 2.0, "a": 0.0, "b": 4.0, "c_scale": 10.0}, expected=(0.0, 4.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"x_star": 2.0, "a": 1.0, "b": 4.0, "c_scale": 3.0}, expected=(1.0, 4.0)
+            params={"x_star": 2.0, "a": 1.0, "b": 4.0, "c_scale": 1.0}, expected=(1.0, 4.0)
         ),
     )

@@ -26,11 +26,11 @@ class Ellithy2026Problem48(Formula):
     params = ()
     location_in_publication = "dataset.json, problem 48"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.29 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
         expression=r"0.05 - \frac{\tmp{u}^{3}}{\left(1 - \tmp{u}\right) \left(0.8 - 2 \tmp{u}\right)^{2}}",
         interval="[0.01, 0.3]",
         summary=(
-            r"An equilibrium equation for a reaction's extent, nearly flat around $\x = 0.29 \c$ and falling steeply "
+            r"An equilibrium equation for a reaction's extent, nearly flat around $\x = 0.1 \c$ and falling steeply "
             r"toward a double pole 0.21 above the root."
         ),
     )
@@ -39,7 +39,7 @@ class Ellithy2026Problem48(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.29 * c
+        x = x - 0.1 * c
         return 0.05 - x**3 / ((1 - x) * (0.8 - 2 * x) ** 2)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class Ellithy2026Problem48(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.097, c=0.0, expected=0.04724778597175968),
-        FormulaTestCase.value(params={}, x=0.097, c=0.25, expected=0.04997327048335758),
+        FormulaTestCase.value(params={}, x=0.097, c=0.725, expected=0.04997327048335758),
         FormulaTestCase.interval_bounds(params={}, expected=(0.01, 0.3)),
     )

@@ -72,23 +72,23 @@ class Stage2013Section313(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-10.0, 10.0, 20.0), (0.0, 7.0, 7.0)),
+                rows=((-10.0, 10.0, 10.0), (0.0, 7.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.0, expected=-0.21428571428571427
+            params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=-4.0, c=0.0, expected=-0.21428571428571427
         ),
         FormulaTestCase.value(
-            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.25, expected=-0.10344827586206896
+            params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=-4.0, c=0.5, expected=-0.10344827586206896
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 7.0, "c_scale": 7.0}, x=2.1, c=0.0, expected=0.6976744186046511),
-        FormulaTestCase.value(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=0.0, c=0.0, expected=-1.5),
+        FormulaTestCase.value(params={"a": 0.0, "b": 7.0, "c_scale": 10.0}, x=2.1, c=0.0, expected=0.6976744186046511),
+        FormulaTestCase.value(params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=0.0, c=0.0, expected=-1.5),
         FormulaTestCase.value(
-            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=0.6666666666666666, c=0.0, expected=0.0
+            params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=0.6666666666666666, c=0.0, expected=0.0
         ),
-        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, expected=(-10.0, 10.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 7.0, "c_scale": 7.0}, expected=(0.0, 7.0)),
+        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, expected=(-10.0, 10.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 7.0, "c_scale": 10.0}, expected=(0.0, 7.0)),
     )

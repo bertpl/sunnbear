@@ -31,12 +31,12 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF47(Formula):
     params = (FormulaParam("k", latex_symbol="k"),)
     location_in_publication = "Table 2, f47 and f48"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.499 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(r"\frac{1}{\sqrt{\tmp{u}}} - 2 \ln{\left(5 \cdot 10^{\param{k}} \sqrt{\tmp{u}} \right)} + " r"0.8"),
         interval="[0.0005, 0.5]",
         summary=(
-            r"A decreasing function, unbounded toward $\x = 0.499 \c$ just below the lower bound, with its 1 root 0.008"
-            r" above $\x = 0.499 \c$, or 0.0013 for $\param{k} = 7$."
+            r"A decreasing function, unbounded toward $\x = \c$ just below the lower bound, with its 1 root 0.008"
+            r" above $\x = \c$, or 0.0013 for $\param{k} = 7$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -44,7 +44,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF47(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.499 * c
+        x = x - 1.0 * c
         return 1 / math.sqrt(x) - 2 * math.log(5 * 10**k * math.sqrt(x)) + 0.8
 
     def interval_bounds(self, k: float) -> tuple[float, float]:
@@ -57,7 +57,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF47(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.0, expected=-11.760615174862355),
-        FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.25, expected=-6.319223455335856),
+        FormulaTestCase.value(params={"k": 3.0}, x=0.15035, c=0.12475, expected=-6.319223455335856),
         FormulaTestCase.value(params={"k": 7.0}, x=0.15035, c=0.0, expected=-30.181295918814723),
         FormulaTestCase.interval_bounds(params={"k": 3.0}, expected=(0.0005, 0.5)),
     )

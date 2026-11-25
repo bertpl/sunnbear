@@ -58,21 +58,21 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF42(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 3.14159265359, 3.14), (0.0, 4.0, 4.0)),
+                rows=((0.0, 3.14159265359, 1.0), (0.0, 4.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 3.14159265359, "c_scale": 3.14}, x=0.942478, c=0.0, expected=-0.36828251535970846
+            params={"a": 0.0, "b": 3.14159265359, "c_scale": 1.0}, x=0.942478, c=0.0, expected=-0.36828251535970846
         ),
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 3.14159265359, "c_scale": 3.14}, x=0.942478, c=0.25, expected=-9.520157703752249
+            params={"a": 0.0, "b": 3.14159265359, "c_scale": 1.0}, x=0.942478, c=0.785, expected=-9.520157703752249
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=0.9215999999999999),
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.0, expected=0.9215999999999999),
         FormulaTestCase.interval_bounds(
-            params={"a": 0.0, "b": 3.14159265359, "c_scale": 3.14}, expected=(0.0, 3.14159265359)
+            params={"a": 0.0, "b": 3.14159265359, "c_scale": 1.0}, expected=(0.0, 3.14159265359)
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, expected=(0.0, 4.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, expected=(0.0, 4.0)),
     )

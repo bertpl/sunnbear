@@ -25,7 +25,7 @@ class Epperson2013Exercise313G(Formula):
     params = ()
     location_in_publication = "Exercises 3.1-3(g), 3.2-5(d), 3.3-3(b)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.15 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
         expression=r"5 - \frac{1}{\tmp{u}}",
         interval="[0.1, 0.25]",
         summary="A hyperbola with 1 simple root, steepest at the lower bound because of a pole below that bound.",
@@ -35,7 +35,7 @@ class Epperson2013Exercise313G(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.15 * c
+        x = x - 0.1 * c
         return 5 - x**-1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Epperson2013Exercise313G(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.145, c=0.0, expected=-1.8965517241379315),
-        FormulaTestCase.value(params={}, x=0.145, c=0.25, expected=-4.30232558139535),
+        FormulaTestCase.value(params={}, x=0.145, c=0.375, expected=-4.30232558139535),
         FormulaTestCase.interval_bounds(params={}, expected=(0.1, 0.25)),
     )

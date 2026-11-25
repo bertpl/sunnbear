@@ -82,9 +82,9 @@ class ChapraCanale2015EquationPt23(Formula):
             ParamTable(
                 names=("g", "m", "v", "t", "a", "b", "c_scale"),
                 rows=(
-                    (9.81, 68.1, 40.0, 10.0, 12.0, 16.0, 4.0),
-                    (9.81, 68.1, 40.0, 10.0, 4.0, 20.0, 16.0),
-                    (9.81, 82.0, 36.0, 4.0, 3.0, 5.0, 2.0),
+                    (9.81, 68.1, 40.0, 10.0, 12.0, 16.0, 10.0),
+                    (9.81, 68.1, 40.0, 10.0, 4.0, 20.0, 10.0),
+                    (9.81, 82.0, 36.0, 4.0, 3.0, 5.0, 1.0),
                 ),
                 summary="The published parameter values and intervals.",
             ),
@@ -92,38 +92,38 @@ class ChapraCanale2015EquationPt23(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 10.0},
             x=13.2,
             c=0.0,
             expected=3.325541753212046,
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 10.0},
             x=13.2,
-            c=0.25,
+            c=0.1,
             expected=5.630059449656643,
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0, "c_scale": 16.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0, "c_scale": 10.0},
             x=8.8,
             c=0.0,
             expected=15.064844887009704,
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0, "c_scale": 2.0},
+            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0, "c_scale": 1.0},
             x=3.6,
             c=0.0,
             expected=-0.012330135450636158,
         ),
         FormulaTestCase.interval_bounds(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 4.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 12.0, "b": 16.0, "c_scale": 10.0},
             expected=(12.0, 16.0),
         ),
         FormulaTestCase.interval_bounds(
-            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0, "c_scale": 16.0},
+            params={"g": 9.81, "m": 68.1, "v": 40.0, "t": 10.0, "a": 4.0, "b": 20.0, "c_scale": 10.0},
             expected=(4.0, 20.0),
         ),
         FormulaTestCase.interval_bounds(
-            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0, "c_scale": 2.0}, expected=(3.0, 5.0)
+            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0, "a": 3.0, "b": 5.0, "c_scale": 1.0}, expected=(3.0, 5.0)
         ),
     )

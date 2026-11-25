@@ -30,7 +30,7 @@ class Atkinson1989Case4(Formula):
     params = ()
     location_in_publication = "§2.8 case (4); Problem 34(iv)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} "
             r"0 & \text{if } \tmp{u} = 1 \\ "
@@ -45,7 +45,7 @@ class Atkinson1989Case4(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         if x == 1.0:
             # at its root x = 1, the expression divides by 0; the formula takes its limit 0
             return 0.0
@@ -62,7 +62,7 @@ class Atkinson1989Case4(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.9, c=0.0, expected=-3.72007597602067e-45),
-        FormulaTestCase.value(params={}, x=0.9, c=0.25, expected=-0.21297042461623097),
+        FormulaTestCase.value(params={}, x=0.9, c=0.75, expected=-0.21297042461623097),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.0)),
     )

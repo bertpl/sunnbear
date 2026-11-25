@@ -27,7 +27,7 @@ class ChenLi2007Example1(Formula):
     params = ()
     location_in_publication = "Example 1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0.5, 5]",
         summary=(
@@ -40,7 +40,7 @@ class ChenLi2007Example1(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.5 * c
+        x = x - 10.0 * c
         return math.log(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class ChenLi2007Example1(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.85, c=0.0, expected=0.6151856390902335),
-        FormulaTestCase.value(params={}, x=1.85, c=0.25, expected=-0.32158362412746216),
+        FormulaTestCase.value(params={}, x=1.85, c=0.1125, expected=-0.32158362412746216),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 5.0)),
     )

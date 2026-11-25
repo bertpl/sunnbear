@@ -32,7 +32,7 @@ class AlefeldPotraShi1993Problem3(Formula):
     )
     location_in_publication = "Table 5.1, problem 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 40 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=r"\param{w} \tmp{u} e^{\param{k} \tmp{u}}",
         interval="[-9, 31]",
         summary=(
@@ -46,7 +46,7 @@ class AlefeldPotraShi1993Problem3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, w: float, k: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 40.0 * c
+        x = x - 100.0 * c
         return w * x * math.exp(k * x)
 
     def interval_bounds(self, w: float, k: float) -> tuple[float, float]:
@@ -65,7 +65,7 @@ class AlefeldPotraShi1993Problem3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"w": -40.0, "k": -1.0}, x=3.0, c=0.0, expected=-5.974448204143673),
-        FormulaTestCase.value(params={"w": -40.0, "k": -1.0}, x=3.0, c=0.25, expected=307057.2843599684),
+        FormulaTestCase.value(params={"w": -40.0, "k": -1.0}, x=3.0, c=0.1, expected=307057.2843599684),
         FormulaTestCase.value(params={"w": -100.0, "k": -2.0}, x=3.0, c=0.0, expected=-0.7436256529999076),
         FormulaTestCase.value(params={"w": -200.0, "k": -3.0}, x=3.0, c=0.0, expected=-0.07404588245200773),
         FormulaTestCase.interval_bounds(params={"w": -40.0, "k": -1.0}, expected=(-9.0, 31.0)),

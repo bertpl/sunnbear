@@ -37,11 +37,11 @@ class LiZhouLangeTian2026Section71(Formula):
     )
     location_in_publication = "Section 7.1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(r"\param{a3} \tmp{u}^{\param{m}} + \param{a2} \tmp{u}^2 + \param{a1} \tmp{u} + \param{a0}"),
         interval="[0, 2]",
         summary=(
-            r"A cubic with 1 simple root on the interval for both parameter sets, at $\x = 1 + 2 \c$ for $\param{a2} = "
+            r"A cubic with 1 simple root on the interval for both parameter sets, at $\x = 1 + \c$ for $\param{a2} = "
             r"1$, where the cubic decreases everywhere."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $\theta$.",),
@@ -51,7 +51,7 @@ class LiZhouLangeTian2026Section71(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, a0: float, a1: float, a2: float, a3: float, m: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return a3 * x**m + a2 * x**2 + a1 * x + a0
 
     def interval_bounds(self, a0: float, a1: float, a2: float, a3: float, m: float) -> tuple[float, float]:
@@ -88,7 +88,7 @@ class LiZhouLangeTian2026Section71(Formula):
             params={"a0": 1.0, "a1": -1.0, "a2": 1.0, "a3": -1.0, "m": 3.0}, x=0.6, c=0.0, expected=0.544
         ),
         FormulaTestCase.value(
-            params={"a0": 1.0, "a1": -1.0, "a2": 1.0, "a3": -1.0, "m": 3.0}, x=0.6, c=0.25, expected=0.909
+            params={"a0": 1.0, "a1": -1.0, "a2": 1.0, "a3": -1.0, "m": 3.0}, x=0.6, c=0.5, expected=0.909
         ),
         FormulaTestCase.value(
             params={"a0": 1.0, "a1": -1.0, "a2": -3.0, "a3": 1.0, "m": 3.0}, x=0.6, c=0.0, expected=-0.4639999999999999

@@ -29,7 +29,7 @@ class Ridders1979Function3(Formula):
     params = ()
     location_in_publication = "Section III, function 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 270 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=r"\sin{\left(\frac{\pi \tmp{u}}{180} \right)}",
         interval="[10, 280]",
         summary=(
@@ -42,7 +42,7 @@ class Ridders1979Function3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 270.0 * c
+        x = x - 100.0 * c
         return math.sin(math.pi * x / 180)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -55,6 +55,6 @@ class Ridders1979Function3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=91.0, c=0.0, expected=0.9998476951563913),
-        FormulaTestCase.value(params={}, x=91.0, c=0.25, expected=0.3987490689252462),
+        FormulaTestCase.value(params={}, x=91.0, c=0.675, expected=0.3987490689252462),
         FormulaTestCase.interval_bounds(params={}, expected=(10.0, 280.0)),
     )

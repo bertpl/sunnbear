@@ -40,7 +40,7 @@ class ModifiedBurdenFairesBurden2016Exercise242D(Formula):
     params = ()
     location_in_publication = "Exercise 2.4-2(d)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(e^{\tmp{u}} - 3 \tmp{u}^{2}\right)^{3}",
         interval="[3, 5]",
         summary=(
@@ -63,7 +63,7 @@ class ModifiedBurdenFairesBurden2016Exercise242D(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (math.exp(x) - 3 * x**2) ** 3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -76,5 +76,5 @@ class ModifiedBurdenFairesBurden2016Exercise242D(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(3.0, 5.0)),
-        FormulaTestCase.value(params={}, x=3.6, c=0.25, expected=-291.7044964422511),
+        FormulaTestCase.value(params={}, x=3.6, c=0.5, expected=-291.7044964422511),
     )

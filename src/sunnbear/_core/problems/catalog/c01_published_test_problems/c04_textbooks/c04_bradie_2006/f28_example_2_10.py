@@ -31,7 +31,7 @@ class Bradie2006Example210(Formula):
     params = ()
     location_in_publication = "Example 2.10; Exercises 2.5-11(a), 2.6-4, 2.6-12, 2.6-13"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} \left(1 - \cos{\left(\tmp{u} \right)}\right)",
         interval="[-2, 1]",
         summary=(
@@ -44,7 +44,7 @@ class Bradie2006Example210(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x * (1 - math.cos(x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -57,6 +57,6 @@ class Bradie2006Example210(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.1, c=0.0, expected=-0.601044266431865),
-        FormulaTestCase.value(params={}, x=-1.1, c=0.25, expected=-2.359841956625349),
+        FormulaTestCase.value(params={}, x=-1.1, c=0.75, expected=-2.359841956625349),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 1.0)),
     )

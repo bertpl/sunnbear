@@ -23,11 +23,11 @@ class Ellithy2026Problem41(Formula):
     params = ()
     location_in_publication = "dataset.json, problem 41"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} + 0.3\right)^{7} - 0.01",
         interval="[-2, 1]",
         summary=(
-            r"A 7th power, nearly flat around $\x = 3 \c - 0.3$, with 1 root and values below 0.02 in magnitude on a "
+            r"A 7th power, nearly flat around $\x = \c - 0.3$, with 1 root and values below 0.02 in magnitude on a "
             r"band 1.12 wide that holds that root."
         ),
     )
@@ -36,7 +36,7 @@ class Ellithy2026Problem41(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return (x + 0.3) ** 7 - 0.01
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class Ellithy2026Problem41(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.1, c=0.0, expected=-0.21971520000000017),
-        FormulaTestCase.value(params={}, x=-1.1, c=0.25, expected=-21.504229774218757),
+        FormulaTestCase.value(params={}, x=-1.1, c=0.75, expected=-21.504229774218757),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 1.0)),
     )

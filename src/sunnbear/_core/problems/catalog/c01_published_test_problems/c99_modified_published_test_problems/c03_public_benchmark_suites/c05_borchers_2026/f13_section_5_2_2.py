@@ -39,10 +39,10 @@ class ModifiedBorchers2026Section522(Formula):
     params = ()
     location_in_publication = "§5.2.2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u} \sin{\left(\pi \tmp{u} \right)}",
         interval="[-2.04, 1.96]",
-        summary=r"A function symmetric about its double root at $\x = 4 \c$, with 3 simple roots on the interval.",
+        summary=r"A function symmetric about its double root at $\x = 10 \c$, with 3 simple roots on the interval.",
         notes=(
             (
                 "The interval is the published $[-2, 2]$ moved left by 0.04, so that neither bound is a "
@@ -60,7 +60,7 @@ class ModifiedBorchers2026Section522(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         return x * math.sin(math.pi * x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -72,6 +72,6 @@ class ModifiedBorchers2026Section522(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-0.84, c=0.25, expected=-0.8864267603471567),
+        FormulaTestCase.value(params={}, x=-0.84, c=0.1, expected=-0.8864267603471567),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.04, 1.96)),
     )

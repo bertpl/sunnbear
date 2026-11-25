@@ -25,7 +25,7 @@ class Sabharwal2019Figure1(Formula):
     params = ()
     location_in_publication = "Fig. 1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"4 - \left(\tmp{u} - 1\right)^{3}",
         interval="[1, 4]",
         summary="A decreasing cubic with 1 simple root and a stationary inflection point 1.59 below that root.",
@@ -35,7 +35,7 @@ class Sabharwal2019Figure1(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return 4 - (x - 1) ** 3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Sabharwal2019Figure1(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.9, c=0.0, expected=3.2710000000000004),
-        FormulaTestCase.value(params={}, x=1.9, c=0.25, expected=3.996625),
+        FormulaTestCase.value(params={}, x=1.9, c=0.75, expected=3.996625),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 4.0)),
     )

@@ -26,11 +26,11 @@ class RootsFortran2025Case21(Formula):
     params = (FormulaParam("n", latex_symbol="n"),)
     location_in_publication = "root_tests.f90, case 21"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.01 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \left(1 - \tmp{u}\right)^{\param{n}}",
         interval="[0, 1.01]",
         summary=(
-            r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, steeper at $\x = 1.01 \c$, with "
+            r"A function that is a line at $\param{n} = 2$ and, as $\param{n}$ grows, steeper at $\x = \c$, with "
             r"its 1 root closer to that point."
         ),
     )
@@ -39,7 +39,7 @@ class RootsFortran2025Case21(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.01 * c
+        x = x - 1.0 * c
         return x**2 - (1.0 - x) ** n
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
@@ -58,7 +58,7 @@ class RootsFortran2025Case21(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"n": 2.0}, x=0.303, c=0.0, expected=-0.394),
-        FormulaTestCase.value(params={"n": 2.0}, x=0.303, c=0.25, expected=-0.899),
+        FormulaTestCase.value(params={"n": 2.0}, x=0.303, c=0.2525, expected=-0.899),
         FormulaTestCase.value(params={"n": 5.0}, x=0.303, c=0.0, expected=-0.07269023798325701),
         FormulaTestCase.value(params={"n": 10.0}, x=0.303, c=0.0, expected=0.06474900070292777),
         FormulaTestCase.value(params={"n": 15.0}, x=0.303, c=0.0, expected=0.08735765073580415),

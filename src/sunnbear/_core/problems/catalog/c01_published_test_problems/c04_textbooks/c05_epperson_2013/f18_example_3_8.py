@@ -61,18 +61,18 @@ class Epperson2013Example38(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((0.0, 0.5, 0.5), (0.0, 1.0, 1.0)), summary="The published intervals."
+                names=("a", "b", "c_scale"), rows=((0.0, 0.5, 1.0), (0.0, 1.0, 1.0)), summary="The published intervals."
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.0, expected=-0.28035398821252894
+            params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, x=0.15, c=0.0, expected=-0.28035398821252894
         ),
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.25, expected=-0.46265495601416634
+            params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, x=0.15, c=0.125, expected=-0.46265495601416634
         ),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=-0.07040911034085895),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, expected=(0.0, 0.5)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, expected=(0.0, 0.5)),
         FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, expected=(0.0, 1.0)),
     )

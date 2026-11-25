@@ -39,7 +39,7 @@ class ChapraCanale2015Problem839(Formula):
     )
     location_in_publication = "Prob. 8.39"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 40 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=(
             r"\param{v} - \left(\param{uex} \ln{\left(\frac{\param{m0}}{\param{m0} - \param{q} \tmp{u}} "
             r"\right)} - \param{g} \tmp{u}\right)"
@@ -47,7 +47,7 @@ class ChapraCanale2015Problem839(Formula):
         interval="[10, 50]",
         summary=(
             r"The rocket equation with a gravity term, in terms of the time, decreasing through 1 simple root toward a "
-            r"logarithmic singularity at $\x = \param{m0}/\param{q} + 40 \c$."
+            r"logarithmic singularity at $\x = \param{m0}/\param{q} + 100 \c$."
         ),
         notes=(
             r"$\tmp{u}$ is the source's variable $t$, the time, in s.",
@@ -59,7 +59,7 @@ class ChapraCanale2015Problem839(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, uex: float, m0: float, q: float, g: float, v: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 40.0 * c
+        x = x - 100.0 * c
         return (v) - (uex * math.log(m0 / (m0 - q * x)) - g * x)
 
     def interval_bounds(self, uex: float, m0: float, q: float, g: float, v: float) -> tuple[float, float]:
@@ -86,7 +86,7 @@ class ChapraCanale2015Problem839(Formula):
         FormulaTestCase.value(
             params={"uex": 2200.0, "m0": 160000.0, "q": 2680.0, "g": 9.81, "v": 1000.0},
             x=22.0,
-            c=0.25,
+            c=0.1,
             expected=624.0524669251027,
         ),
         FormulaTestCase.interval_bounds(

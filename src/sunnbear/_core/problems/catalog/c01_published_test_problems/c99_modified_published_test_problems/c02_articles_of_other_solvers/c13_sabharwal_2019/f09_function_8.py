@@ -34,7 +34,7 @@ class ModifiedSabharwal2019Function8(Formula):
     params = ()
     location_in_publication = "Table 2, function 8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} e^{\tmp{u}} - 7",
         interval="[-1, 2]",
         summary=r"A function with 1 simple root, below $-6$ wherever $\x$ lies more than 0.96 below that root.",
@@ -50,7 +50,7 @@ class ModifiedSabharwal2019Function8(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x * math.exp(x) - 7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -62,6 +62,6 @@ class ModifiedSabharwal2019Function8(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-0.1, c=0.25, expected=-7.3633026921564175),
+        FormulaTestCase.value(params={}, x=-0.1, c=0.75, expected=-7.3633026921564175),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 2.0)),
     )

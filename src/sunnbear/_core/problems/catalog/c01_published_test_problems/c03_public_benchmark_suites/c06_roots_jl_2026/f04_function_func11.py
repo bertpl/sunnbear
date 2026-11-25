@@ -27,7 +27,7 @@ class RootsJl2026FunctionFunc11(Formula):
     params = ()
     location_in_publication = "test_derivative_free.jl, func11"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"e^{- \tmp{u}} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 2]",
         summary=(
@@ -40,7 +40,7 @@ class RootsJl2026FunctionFunc11(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         return math.exp(-x) - math.cos(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class RootsJl2026FunctionFunc11(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.8, c=0.0, expected=1.5288342191453024),
-        FormulaTestCase.value(params={}, x=-0.8, c=0.25, expected=6.276849559106034),
+        FormulaTestCase.value(params={}, x=-0.8, c=0.1, expected=6.276849559106034),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 2.0)),
     )

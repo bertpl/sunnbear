@@ -23,17 +23,17 @@ class Sabharwal2019Function5(Formula):
     params = ()
     location_in_publication = "Table 2, function 5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} + 2 \tmp{u} - 7",
         interval="[1, 3]",
-        summary=r"A quadratic whose only root on the interval lies at $\x = 2\sqrt{2} - 1 + 2 \c$.",
+        summary=r"A quadratic whose only root on the interval lies at $\x = 2\sqrt{2} - 1 + \c$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x**2 + 2 * x - 7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -46,6 +46,6 @@ class Sabharwal2019Function5(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.6, c=0.0, expected=-1.2399999999999995),
-        FormulaTestCase.value(params={}, x=1.6, c=0.25, expected=-3.5899999999999994),
+        FormulaTestCase.value(params={}, x=1.6, c=0.5, expected=-3.5899999999999994),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 3.0)),
     )

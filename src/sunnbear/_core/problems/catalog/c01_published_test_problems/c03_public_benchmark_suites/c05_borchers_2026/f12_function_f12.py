@@ -62,20 +62,20 @@ class Borchers2026FunctionF12(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((1.0, 3.4, 2.4), (1.0, 2.5, 1.5)), summary="The published intervals."
+                names=("a", "b", "c_scale"), rows=((1.0, 3.4, 1.0), (1.0, 2.5, 1.0)), summary="The published intervals."
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 3.4, "c_scale": 2.4}, x=1.72, c=0.0, expected=2.609079470017915e-05
+            params={"a": 1.0, "b": 3.4, "c_scale": 1.0}, x=1.72, c=0.0, expected=2.609079470017915e-05
         ),
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 3.4, "c_scale": 2.4}, x=1.72, c=0.25, expected=-0.01456600694656706
+            params={"a": 1.0, "b": 3.4, "c_scale": 1.0}, x=1.72, c=0.6, expected=-0.01456600694656706
         ),
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 2.5, "c_scale": 1.5}, x=1.45, c=0.0, expected=-0.0006420942026751546
+            params={"a": 1.0, "b": 2.5, "c_scale": 1.0}, x=1.45, c=0.0, expected=-0.0006420942026751546
         ),
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 3.4, "c_scale": 2.4}, expected=(1.0, 3.4)),
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 2.5, "c_scale": 1.5}, expected=(1.0, 2.5)),
+        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 3.4, "c_scale": 1.0}, expected=(1.0, 3.4)),
+        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 2.5, "c_scale": 1.0}, expected=(1.0, 2.5)),
     )

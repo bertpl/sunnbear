@@ -47,7 +47,7 @@ class LiZhouLangeTian2026Example3(Formula):
     )
     location_in_publication = "Example 3; Section 7.2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\param{p} - \frac{1}{2} "
             r"\operatorname{erfc}\left(-\frac{\tmp{u} - \param{mu}}{\param{sigma} \sqrt{2}}\right)"
@@ -55,7 +55,7 @@ class LiZhouLangeTian2026Example3(Formula):
         interval="[-2.5, -0.5]",
         summary=(
             r"A decreasing function, flattening below its only root, which is the 5% quantile of a normal distribution "
-            r"shifted by $2 \c$."
+            r"shifted by $\c$."
         ),
         notes=(
             r"The expression equals $$\param{p} - \Phi\left(\frac{\tmp{u} - \param{mu}}{\param{sigma}}\right),$$ with "
@@ -67,7 +67,7 @@ class LiZhouLangeTian2026Example3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, p: float, mu: float, sigma: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return p - 0.5 * math.erfc(-(x - mu) / (sigma * math.sqrt(2)))
 
     def interval_bounds(self, p: float, mu: float, sigma: float) -> tuple[float, float]:
@@ -94,8 +94,6 @@ class LiZhouLangeTian2026Example3(Formula):
         FormulaTestCase.value(
             params={"p": 0.05, "mu": 1.0, "sigma": 1.0}, x=-1.9, c=0.0, expected=0.048134186699615965
         ),
-        FormulaTestCase.value(
-            params={"p": 0.05, "mu": 1.0, "sigma": 1.0}, x=-1.9, c=0.25, expected=0.04966307073432312
-        ),
+        FormulaTestCase.value(params={"p": 0.05, "mu": 1.0, "sigma": 1.0}, x=-1.9, c=0.5, expected=0.04966307073432312),
         FormulaTestCase.interval_bounds(params={"p": 0.05, "mu": 1.0, "sigma": 1.0}, expected=(-2.5, -0.5)),
     )

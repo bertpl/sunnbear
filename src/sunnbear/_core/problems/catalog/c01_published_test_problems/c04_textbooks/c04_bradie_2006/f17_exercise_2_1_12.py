@@ -26,11 +26,11 @@ class Bradie2006Exercise2112(Formula):
     params = ()
     location_in_publication = "Exercises 2.1-12, 2.2-7, 2.4-6, 2.5-8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.09 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
         expression=r"\frac{1}{\tmp{u}} - 37",
         interval="[0.01, 0.1]",
         summary=(
-            r"A hyperbola with 1 simple root on the interval and a pole at $\x = 0.09 \c$, just below the lower bound."
+            r"A hyperbola with 1 simple root on the interval and a pole at $\x = 0.1 \c$, just below the lower bound."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -38,7 +38,7 @@ class Bradie2006Exercise2112(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.09 * c
+        x = x - 0.1 * c
         return 1 / x - 37
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Bradie2006Exercise2112(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.037, c=0.0, expected=-9.972972972972972),
-        FormulaTestCase.value(params={}, x=0.037, c=0.25, expected=31.965517241379317),
+        FormulaTestCase.value(params={}, x=0.037, c=0.225, expected=31.965517241379317),
         FormulaTestCase.interval_bounds(params={}, expected=(0.01, 0.1)),
     )

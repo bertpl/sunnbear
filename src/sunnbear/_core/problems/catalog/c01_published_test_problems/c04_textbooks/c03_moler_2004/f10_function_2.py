@@ -23,17 +23,17 @@ class Moler2004Function2(Formula):
     params = ()
     location_in_publication = "Exercise 4.1, function 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 0.001",
         interval="[-1, 1]",
-        summary=r"A cubic with a slope of 0 at $\x = 2 \c$ and 1 simple root close above that point.",
+        summary=r"A cubic with a slope of 0 at $\x = \c$ and 1 simple root close above that point.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x**3 - 0.001
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -46,6 +46,6 @@ class Moler2004Function2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.06500000000000002),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.7300000000000001),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.7300000000000001),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

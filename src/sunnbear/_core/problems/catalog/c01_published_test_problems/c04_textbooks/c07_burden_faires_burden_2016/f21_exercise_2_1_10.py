@@ -27,11 +27,11 @@ class BurdenFairesBurden2016Exercise2110(Formula):
     params = ()
     location_in_publication = "Exercise 2.1-10"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - 1 - e^{1 - \tmp{u}^{2}}",
         interval="[-2, 0]",
         summary=(
-            r"A function symmetric about its minimum at $\x = 2 \c$ and decreasing through 1 simple root on the "
+            r"A function symmetric about its minimum at $\x = \c$ and decreasing through 1 simple root on the "
             r"interval."
         ),
     )
@@ -40,7 +40,7 @@ class BurdenFairesBurden2016Exercise2110(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (x**2 - 1) - (math.exp(1 - x**2))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class BurdenFairesBurden2016Exercise2110(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.4, c=0.0, expected=0.5771071140248877),
-        FormulaTestCase.value(params={}, x=-1.4, c=0.25, expected=2.5364654562369426),
+        FormulaTestCase.value(params={}, x=-1.4, c=0.5, expected=2.5364654562369426),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 0.0)),
     )

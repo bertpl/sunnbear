@@ -28,17 +28,17 @@ class GorgeyEtAl2025Equation2(Formula):
     params = ()
     location_in_publication = "Equation 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0, 2]",
-        summary=r"The natural logarithm, which tends to $-\infty$ at $\x = 2 \c$ and is steep next to that point.",
+        summary=r"The natural logarithm, which tends to $-\infty$ at $\x = \c$ and is steep next to that point.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return math.log(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class GorgeyEtAl2025Equation2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=-0.5108256237659907),
-        FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=-2.302585092994046),
+        FormulaTestCase.value(params={}, x=0.6, c=0.5, expected=-2.302585092994046),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),
     )

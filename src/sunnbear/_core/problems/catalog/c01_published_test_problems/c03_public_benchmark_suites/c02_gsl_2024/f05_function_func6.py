@@ -25,7 +25,7 @@ class Gsl2024FunctionFunc6(Formula):
     params = ()
     location_in_publication = "test_funcs.c, func6"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.0007 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.001 \c"),),
         expression=r"\left(\tmp{u} - 1\right)^{7}",
         interval="[0.9995, 1.0002]",
         summary="A 7th power on an interval so narrow that the function stays below $10^{-22}$ in magnitude there.",
@@ -35,7 +35,7 @@ class Gsl2024FunctionFunc6(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.0007 * c
+        x = x - 0.001 * c
         return (x - 1) ** 7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Gsl2024FunctionFunc6(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.value(params={}, x=0.99971, c=0.0, expected=-1.7249876309005193e-25, atol=0.0),
-        FormulaTestCase.value(params={}, x=0.99971, c=0.25, expected=-4.700788051625088e-24, atol=0.0),
+        FormulaTestCase.value(params={}, x=0.99971, c=0.175, expected=-4.700788051625088e-24, atol=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.9995, 1.0002)),
     )

@@ -25,7 +25,7 @@ class Suhadolnik2012Function5(Formula):
     params = ()
     location_in_publication = "Table 1, function 5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.947 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \sin{\left(\tmp{u} \right)} - 1",
         interval=r"\left[0.1, \frac{\pi}{3}\right]",
         summary=(
@@ -37,7 +37,7 @@ class Suhadolnik2012Function5(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.947 * c
+        x = x - 1.0 * c
         return 2 * math.sin(x) - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Suhadolnik2012Function5(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.384159, c=0.0, expected=-0.2504408669108196),
-        FormulaTestCase.value(params={}, x=0.384159, c=0.25, expected=-0.7062485442653509),
+        FormulaTestCase.value(params={}, x=0.384159, c=0.23675, expected=-0.7062485442653509),
         FormulaTestCase.interval_bounds(params={}, expected=(0.1, 1.0471975511965979)),
     )

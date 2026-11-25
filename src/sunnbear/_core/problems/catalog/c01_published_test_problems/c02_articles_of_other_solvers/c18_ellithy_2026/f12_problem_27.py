@@ -23,7 +23,7 @@ class Ellithy2026Problem27(Formula):
     params = ()
     location_in_publication = "dataset.json, problem 27"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{4} - 2 \tmp{u}^{2} - 4",
         interval="[1, 3]",
         summary="A quartic with 1 root on the interval, 0.80 above the upper of the quartic's 2 minima of $-5$.",
@@ -33,7 +33,7 @@ class Ellithy2026Problem27(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x**4 - 2 * x**2 - 4
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -46,6 +46,6 @@ class Ellithy2026Problem27(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.6, c=0.0, expected=-2.566399999999999),
-        FormulaTestCase.value(params={}, x=1.6, c=0.25, expected=-4.9559),
+        FormulaTestCase.value(params={}, x=1.6, c=0.5, expected=-4.9559),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 3.0)),
     )

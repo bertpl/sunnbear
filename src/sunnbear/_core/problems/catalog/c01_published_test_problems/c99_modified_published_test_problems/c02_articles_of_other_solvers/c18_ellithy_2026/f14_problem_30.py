@@ -40,7 +40,7 @@ class ModifiedEllithy2026Problem30(Formula):
     params = ()
     location_in_publication = "dataset.json, problems 30 and 31"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\prod_{i=1}^{20} (\tmp{u} - i)",
         interval="[19.02, 21]",
         summary=(
@@ -59,7 +59,7 @@ class ModifiedEllithy2026Problem30(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.98 * c
+        x = x - 1.0 * c
         # the loop multiplies the 20 factors (x - 1) to (x - 20) from the left, in the order of the author's file
         product = x - 1
         for i in range(2, 21):
@@ -75,6 +75,6 @@ class ModifiedEllithy2026Problem30(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=19.6, c=0.25, expected=-861217411598204.5),
+        FormulaTestCase.value(params={}, x=19.6, c=0.495, expected=-861217411598204.5),
         FormulaTestCase.interval_bounds(params={}, expected=(19.02, 21.0)),
     )

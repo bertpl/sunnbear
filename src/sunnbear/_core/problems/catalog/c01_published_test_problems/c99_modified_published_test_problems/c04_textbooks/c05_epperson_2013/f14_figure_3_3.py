@@ -36,7 +36,7 @@ class ModifiedEpperson2013Figure33(Formula):
     params = ()
     location_in_publication = "§3.2 (p. 99), Fig. 3.3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 7.92 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\frac{4 e^{2 - \frac{\tmp{u}}{2}} \left(1 + \frac{\ln{\left(\tmp{u} " r"\right)}}{\tmp{u}}\right)}{3}"
         ),
@@ -57,7 +57,7 @@ class ModifiedEpperson2013Figure33(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 7.92 * c
+        x = x - 10.0 * c
         return (4 / 3) * math.exp(2 - x / 2) * (1 + x**-1 * math.log(x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -69,6 +69,6 @@ class ModifiedEpperson2013Figure33(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=2.456, c=0.25, expected=-4.345010769099701),
+        FormulaTestCase.value(params={}, x=2.456, c=0.198, expected=-4.345010769099701),
         FormulaTestCase.interval_bounds(params={}, expected=(0.08, 8.0)),
     )

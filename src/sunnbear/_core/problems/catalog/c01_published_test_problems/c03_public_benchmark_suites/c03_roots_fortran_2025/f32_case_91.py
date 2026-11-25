@@ -60,7 +60,7 @@ class RootsFortran2025Case91(Formula):
         return (
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
-                rows=((20.0, 2.0, 3.0, 1.0), (5.0, 0.0, 2.0, 2.0)),
+                rows=((20.0, 2.0, 3.0, 1.0), (5.0, 0.0, 2.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
@@ -73,8 +73,8 @@ class RootsFortran2025Case91(Formula):
             params={"k": 20.0, "a": 2.0, "b": 3.0, "c_scale": 1.0}, x=2.3, c=0.25, expected=-10.18209889369323
         ),
         FormulaTestCase.value(
-            params={"k": 5.0, "a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=-2.5778811996094912
+            params={"k": 5.0, "a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.0, expected=-2.5778811996094912
         ),
         FormulaTestCase.interval_bounds(params={"k": 20.0, "a": 2.0, "b": 3.0, "c_scale": 1.0}, expected=(2.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"k": 5.0, "a": 0.0, "b": 2.0, "c_scale": 2.0}, expected=(0.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"k": 5.0, "a": 0.0, "b": 2.0, "c_scale": 1.0}, expected=(0.0, 2.0)),
     )

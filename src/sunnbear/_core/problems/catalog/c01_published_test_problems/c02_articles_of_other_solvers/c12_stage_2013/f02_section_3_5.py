@@ -25,11 +25,11 @@ class Stage2013Section35(Formula):
     params = ()
     location_in_publication = "§3.5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[-10, 10]",
         summary=(
-            r"A decreasing function with 1 root, at $20 \c$ plus the fixed point of the cosine, and 3 or 4 inflection "
+            r"A decreasing function with 1 root, at $10 \c$ plus the fixed point of the cosine, and 3 or 4 inflection "
             r"points where the slope is 0."
         ),
     )
@@ -38,7 +38,7 @@ class Stage2013Section35(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return math.cos(x) - x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Stage2013Section35(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=3.346356379136388),
-        FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=8.088869738115323),
+        FormulaTestCase.value(params={}, x=-4.0, c=0.5, expected=8.088869738115323),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),
     )

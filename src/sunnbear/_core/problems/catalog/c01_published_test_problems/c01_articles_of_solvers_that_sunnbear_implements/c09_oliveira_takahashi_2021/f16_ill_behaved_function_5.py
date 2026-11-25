@@ -24,7 +24,7 @@ class OliveiraTakahashi2021IllBehavedFunction5(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} \frac{1 + 10^{6}}{10^{6}} & \text{for}\: \tmp{u} > \frac{1 - 10^{6}}{10^{6}}"
             r" \\0 & \text{otherwise} \end{cases} - 1"
@@ -37,7 +37,7 @@ class OliveiraTakahashi2021IllBehavedFunction5(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (((1 + 10**6) / 10**6) if (x) > ((1 - 10**6) / 10**6) else 0.0) - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class OliveiraTakahashi2021IllBehavedFunction5(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=1e-06),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=1e-06),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=1e-06),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )
