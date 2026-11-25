@@ -16,8 +16,11 @@ from sunnbear._core.problems.catalog.c02_standard_function_families.c02_named_po
     f05_jacobi_polynomial,
     f06_hermite_polynomial,
     f07_laguerre_polynomial,
+    f09_wilkinson_polynomial,
+    f10_second_wilkinson_polynomial,
 )
 from sunnbear._core.problems.catalog.c02_standard_function_families.c02_named_polynomials.helpers import (
+    VALUE_RANGE_EXPONENT_LIMIT,
     jacobi_interval_bounds,
 )
 from sunnbear._core.problems.core import FormulaRegistry
@@ -94,6 +97,30 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
     return 2.0 * math.factorial(int(n)) / (2.0 * math.pi) ** n
 
 
+def _value_range_ratio(formula, n: int) -> float:
+    """Return the range of values of a formula whose only parameter is the degree, at degree `n` and ``c = 0``.
+
+    The comment on `VALUE_RANGE_EXPONENT_LIMIT` in `helpers` defines the range of values: the largest absolute value on
+    the interval divided by the lowest peak of the absolute value between 2 neighboring roots. The interval must hold at
+    least 2 roots, so that at least 1 peak lies between 2 neighboring roots.
+    """
+    a, b = formula.interval_bounds(float(n))
+    # 200 x-values per root, spaced evenly and, for a positive lower bound, also evenly in ``log(x)``, so that they also
+    # sample the roots of `SecondWilkinsonPolynomial`, which lie closer together toward its lower bound
+    n_x_values = 200 * (n + 1)
+    x_values = np.linspace(a, b, n_x_values)
+    if a > 0.0:
+        x_values = np.union1d(x_values, np.geomspace(a, b, n_x_values))
+    values = np.array([formula.parametrized_fun(float(x), 0.0, float(n)) for x in x_values])
+    # an x-value at which the function is exactly 0 is dropped, so that a root on the grid still separates its 2
+    # neighboring peaks
+    values = values[values != 0.0]
+    segments = np.split(np.abs(values), np.flatnonzero(np.diff(np.sign(values))) + 1)
+    # the first and the last segment run from a bound to the nearest root, so they hold no peak between 2 roots
+    lowest_peak = min(float(segment.max()) for segment in segments[1:-1])
+    return float(np.abs(values).max()) / lowest_peak
+
+
 # Each entry holds, for a named polynomial formula:
 # - its number;
 # - its number of candidates;
@@ -104,22 +131,22 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
 # product of factors, the scale is 0, so only the relative tolerance applies: its values span many orders of magnitude,
 # and each is accurate relative to its own size.
 NAMED_POLYNOMIAL_FORMULAS = [
-    pytest.param((2, 2, 1), 50, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
-    pytest.param((2, 2, 2), 50, _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
-    pytest.param((2, 2, 3), 50, _legendre, lambda *params: 1.0, id="legendre"),
-    pytest.param((2, 2, 4), 50 * 13, _gegenbauer, lambda *params: 1.0, id="gegenbauer"),
-    pytest.param((2, 2, 5), 50 * 6 * 6, _jacobi, lambda *params: 1.0, id="jacobi"),
-    pytest.param((2, 2, 6), 40, _hermite, lambda *params: 1.0, id="hermite"),
-    pytest.param((2, 2, 7), 20, _laguerre, lambda *params: 1.0, id="laguerre"),
+    pytest.param((2, 2, 1), 180, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
+    pytest.param((2, 2, 2), 180, _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
+    pytest.param((2, 2, 3), 180, _legendre, lambda *params: 1.0, id="legendre"),
+    pytest.param((2, 2, 4), 60 * 13, _gegenbauer, lambda *params: 1.0, id="gegenbauer"),
+    pytest.param((2, 2, 5), 14 * 10 * 10, _jacobi, lambda *params: 1.0, id="jacobi"),
+    pytest.param((2, 2, 6), 45, _hermite, lambda *params: 1.0, id="hermite"),
+    pytest.param((2, 2, 7), 23, _laguerre, lambda *params: 1.0, id="laguerre"),
     pytest.param((2, 2, 8), 12 + 8 + 5, _bernoulli, _bernoulli_amplitude, id="bernoulli"),
-    pytest.param((2, 2, 9), 40, _wilkinson, lambda *params: 0.0, id="wilkinson"),
+    pytest.param((2, 2, 9), 63, _wilkinson, lambda *params: 0.0, id="wilkinson"),
     pytest.param((2, 2, 10), 20, _second_wilkinson, lambda *params: 0.0, id="second_wilkinson"),
 ]
 
 # `test_every_formula_agrees_with_its_reference` compares a formula with its reference at those of these degrees
 # that the formula sweeps. The odd degree 1001 is left out: next to the bound -1 of its interval, scipy's reference is
 # less accurate than the comparison's tolerance.
-COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 20.0, 21.0, 31.0, 40.0, 49.0, 51.0, 64.0, 129.0, 199.0, 1000.0, 1024.0)
+COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 20.0, 21.0, 23.0, 31.0, 40.0, 45.0, 49.0, 51.0, 63.0, 129.0, 1000.0)
 
 # `test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros` checks the interval rule at these Jacobi
 # parameters: just above the excluded lower limit of ``alpha`` and ``beta``, at their upper limit, and at the upper
@@ -259,6 +286,38 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
             assert a < zeros[0], n
         assert zeros[-1] < b, n
         assert all(math.isfinite(value) for value in values_at_bounds), n
+
+
+@pytest.mark.parametrize(
+    "formula_number, highest_degree_within_limit",
+    [
+        pytest.param((2, 2, 6), f06_hermite_polynomial.HIGHEST_SWEPT_DEGREE, id="hermite"),
+        pytest.param((2, 2, 7), f07_laguerre_polynomial.HIGHEST_SWEPT_DEGREE, id="laguerre"),
+        pytest.param((2, 2, 9), f09_wilkinson_polynomial.HIGHEST_SWEPT_DEGREE, id="wilkinson"),
+        pytest.param(
+            (2, 2, 10),
+            f10_second_wilkinson_polynomial.FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT - 1,
+            id="second_wilkinson",
+        ),
+    ],
+)
+def test_the_range_of_values_exceeds_its_limit_just_above_the_highest_degree_within_it(
+    formula_number, highest_degree_within_limit
+):
+    """At ``c = 0``, the range of values is at most ``10^VALUE_RANGE_EXPONENT_LIMIT`` at the given degree, not the next.
+
+    For the Second Wilkinson polynomial, the checked degree is the last one before its sweep exceeds the limit.
+    """
+    # --- arrange ----------------------
+    formula = FormulaRegistry.formula_from_number(formula_number)
+    limit = 10.0**VALUE_RANGE_EXPONENT_LIMIT
+
+    # --- act --------------------------
+    ratio_at_degree = _value_range_ratio(formula, highest_degree_within_limit)
+    ratio_at_next_degree = _value_range_ratio(formula, highest_degree_within_limit + 1)
+
+    # --- assert -----------------------
+    assert ratio_at_degree <= limit < ratio_at_next_degree
 
 
 def test_every_real_zero_of_a_bernoulli_candidate_lies_well_inside_its_interval():

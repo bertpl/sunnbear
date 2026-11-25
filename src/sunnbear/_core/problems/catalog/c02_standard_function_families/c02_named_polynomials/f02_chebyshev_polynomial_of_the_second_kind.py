@@ -8,12 +8,11 @@ from sunnbear._core.problems.core import (
     FormulaParam,
     FormulaPresentation,
     FormulaTestCase,
-    ParamGrid,
     ParamRecipe,
 )
 
 from .helpers import (
-    JACOBI_DEGREE_SWEEPS,
+    CHEBYSHEV_LEGENDRE_RECIPE,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -88,11 +87,8 @@ class ChebyshevSecondKindPolynomial(Formula):
         return jacobi_interval_bounds(n, 0.5, 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipes that sweep the odd and the even degrees of `JACOBI_DEGREE_SWEEPS`."""
-        return tuple(
-            ParamGrid(axes=(degree_axis,), summary=degree_summary + ".")
-            for degree_axis, degree_summary in JACOBI_DEGREE_SWEEPS
-        )
+        """Return `CHEBYSHEV_LEGENDRE_RECIPE`, which sweeps the degree on a logarithmic scale."""
+        return (CHEBYSHEV_LEGENDRE_RECIPE,)
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Check the parameter conditions listed in the presentation's `param_conditions`."""

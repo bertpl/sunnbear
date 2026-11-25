@@ -10,12 +10,14 @@ from sunnbear._core.problems.core import (
     ParamRecipe,
 )
 
-from .helpers import interval_by_parity_latex, is_valid_degree
+from .helpers import interval_by_parity_latex, is_valid_degree, value_range_limit_latex
 
 # Above about degree 44 the values next to the lower bound of the interval underflow. The highest valid degree is a
 # round degree below that, which leaves a margin for the values of ``c``.
 HIGHEST_VALID_DEGREE = 40
 HIGHEST_SWEPT_DEGREE = 20
+# From this degree on, this formula's range of values exceeds the category's limit, `VALUE_RANGE_EXPONENT_LIMIT`.
+FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT = 11
 
 
 class SecondWilkinsonPolynomial(Formula):
@@ -81,8 +83,9 @@ class SecondWilkinsonPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
-        The sweep ends at the degree of Wilkinson's own second polynomial. This formula's range of values is far wider
-        than that of the category's other formulas, and a higher degree would widen it further.
+        The sweep ends at the degree of Wilkinson's own second polynomial, as an exception to the category's limit on
+        the range of values, `VALUE_RANGE_EXPONENT_LIMIT`: this formula's range of values exceeds the limit from
+        `FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT` on, and a higher degree would widen the range further.
         """
         return (
             ParamGrid.decimal(
@@ -90,7 +93,12 @@ class SecondWilkinsonPolynomial(Formula):
                 1.0,
                 float(HIGHEST_SWEPT_DEGREE),
                 1.0,
-                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}.",
+                summary=(
+                    rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}, the degree of Wilkinson's own "
+                    r"second polynomial. The sweep goes beyond the limit that ends the sweeps of the category's other "
+                    r"formulas whose values grow quickly as the degree rises: from degree "
+                    rf"{FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT} on, " + value_range_limit_latex("more than") + "."
+                ),
             ),
         )
 
