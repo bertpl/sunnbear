@@ -61,7 +61,7 @@ class ModifiedPublishedTestProblems(FormulaCategory):
         "The test problems are modified versions of published test problems that do not satisfy the benchmark "
         "suite inclusion conditions, each as close to the published one as the conditions allow. A modified test "
         r"problem that shifts its function along the x-axis shifts it by $s \c$, with $s$ the width of its own "
-        "interval, rounded to the nearest power of 10. Where such a shift does not work, such as next to a pole or "
-        r"the end of the function's domain, $\c$ is added to the function's value or scales x instead."
+        "interval, rounded to the nearest power of 10 on a log scale. Where such a shift does not work, such as next "
+        r"to a pole or the end of the function's domain, $\c$ is added to the function's value or scales x instead."
     )
     original_category_number = (1,)

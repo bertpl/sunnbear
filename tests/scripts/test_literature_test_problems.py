@@ -800,7 +800,9 @@ def _c_ways_followed(candidate, c):
     - "scales x": it scales x with the formula's own operations; only for an interval right of 0.
 
     The x-value lies at 0.6 of the interval, in log scale for "scales x", so that the shifted or scaled x-values stay in
-    the interval for an absolute `c` of at most 0.1: ``c_scale`` is at most about 3.2 times the interval's width.
+    the interval for an absolute `c` of at most 0.1: ``c_scale`` is at most about 3.2 times the interval's width, so a
+    shift moves x by at most about 0.32 of the width, and a scaling moves it by 0.1 of the interval's width on the log
+    scale.
     """
     a, b = candidate.a, candidate.b
     x_linear = a + 0.6 * (b - a)

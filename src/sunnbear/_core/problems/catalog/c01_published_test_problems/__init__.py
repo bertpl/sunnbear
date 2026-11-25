@@ -28,8 +28,10 @@ class PublishedTestProblems(FormulaCategory):
 
     ``c_scale`` is the power of 10 nearest the width of the formula's interval ``[a, b]`` on a log scale, so the width
     lies between about 0.32 and 3.2 times ``c_scale``, and the values of ``c`` that keep a root inside the interval span
-    a range of about 0.3 to 3. A power of 10 shows a reader that the scale's exact value does not matter: the benchmark
-    suite pipeline calibrates the range of ``c`` of each test problem, whatever its scale.
+    a range whose length lies between about 0.3 and 3.
+
+    A power of 10 shows a reader that the scale's exact value does not matter: the benchmark suite pipeline calibrates
+    the range of ``c`` of each test problem, whatever its scale.
 
     - A formula that shifts x and has 1 interval writes ``c_scale`` as a number.
     - A formula that shifts x and has several intervals takes ``c_scale`` as a parameter after ``a`` and ``b``, and
@@ -50,7 +52,7 @@ class PublishedTestProblems(FormulaCategory):
     description = (
         "The test problems come from articles on root-finding methods, public benchmark suites and textbooks. A "
         r"formula that shifts its function along the x-axis evaluates the function at $\x - s \c$, with $s$ the width "
-        "of each published interval, rounded to the nearest power of 10."
+        "of each published interval, rounded to the nearest power of 10 on a log scale."
     )
     is_builtin_only = True
 
