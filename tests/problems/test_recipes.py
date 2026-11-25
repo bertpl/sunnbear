@@ -347,8 +347,10 @@ def test_grid_coupled_sweep_with_a_rounded_axis_follows_the_grid_argument():
     # --- arrange ----------------------
     grid = ParamGrid(
         axes=(
-            ParamAxis("p1", 0.0, 0.4, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER),  # 1, 1, 2, 2, 3
-            ParamAxis("p2", 0.0, 4.0, 1.0),  # 5 values, at the same positions as p1's grid points
+            # p1's values are 1, 1, 2, 2, 3
+            ParamAxis("p1", 0.0, 0.4, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER),
+            # p2 has 5 values, at the same positions as p1's grid points
+            ParamAxis("p2", 0.0, 4.0, 1.0),
         ),
         product=False,
     )

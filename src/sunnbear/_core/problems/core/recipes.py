@@ -70,8 +70,8 @@ class ParamRounding(StrEnum):
     """`ParamRounding` is a way for a `ParamAxis` to round each of its notation's values to an integer.
 
     An axis on a logarithmic scale for a parameter that must be an integer, such as a polynomial's degree, rounds its
-    values this way. A value halfway between 2 integers of the kind goes to the larger one, so the nearest odd integer
-    of 10 is 11.
+    values this way. A value halfway between 2 integers that the member allows goes to the larger one, so the nearest
+    odd integer of 10 is 11.
     """
 
     NEAREST_INTEGER = "nearest_integer"
@@ -96,7 +96,7 @@ class ParamRounding(StrEnum):
 #  ValuePositionRange
 # ==================================================================================================
 class ValuePositionRange(NamedTuple):
-    """`ValuePositionRange` is 1 value of a `ParamAxis` with the part of ``[0, 1]`` in which it applies.
+    """`ValuePositionRange` is 1 value of a `ParamAxis` with its position range: where in ``[0, 1]`` it applies.
 
     `ParamAxis.value_position_ranges` explains the positions.
     """
@@ -167,18 +167,18 @@ class ParamAxis:
 
     def values(self) -> tuple[float, ...]:
         """Return the axis's values in grid order, each value once."""
-        # rounding never reverses the order of the grid values, so a repeated value sits next to the value that it
-        # repeats
-        return tuple(value for value, _ in itertools.groupby(self._values_per_grid_point()))
+        return tuple(value_position_range.value for value_position_range in self.value_position_ranges())
 
     def value_position_ranges(self) -> tuple[ValuePositionRange, ...]:
-        """Return each value of `values` with the part of ``[0, 1]`` in which it applies, for a coupled sweep.
+        """Return each value of `values` with its position range in ``[0, 1]``, for a coupled sweep.
 
         The grid points sit evenly on ``[0, 1]``: point ``k`` of ``n`` at ``k / (n - 1)``, so a point's position is
         linear in its grid argument, which for a power notation is the exponent.
 
-        Each point applies from the midpoint between it and its lower neighbor to the midpoint between it and its upper
-        neighbor, and the first and last points reach 0 and 1; a single-point axis applies on all of ``[0, 1]``.
+        Each point applies from the edge below it to the edge above it:
+
+        - **between 2 neighboring points**, the edge is the midpoint between them;
+        - **at the ends**, the edges are 0 and 1, so a single-point axis applies on all of ``[0, 1]``.
 
         A 5-point and a 3-point axis divide ``[0, 1]`` like this::
 
@@ -190,10 +190,12 @@ class ParamAxis:
         """
         values_per_grid_point = self._values_per_grid_point()
         n_points = len(values_per_grid_point)
-        # the edges of the points' parts: 0, the midpoints between neighboring points, and 1
+        # the points' parts have their edges at 0, at the midpoints between neighboring points, and at 1
         edges = [Fraction(0), *(Fraction(2 * k + 1, 2 * (n_points - 1)) for k in range(n_points - 1)), Fraction(1)]
         value_position_ranges = []
         i_first = 0
+        # rounding never reverses the order of the grid values, so a repeated value sits next to the value that it
+        # repeats
         for value, group in itertools.groupby(values_per_grid_point):
             i_next = i_first + len(list(group))
             value_position_ranges.append(ValuePositionRange(value, edges[i_first], edges[i_next]))
@@ -204,9 +206,7 @@ class ParamAxis:
     #  Helpers
     # --------------------------------------------------------------------------
     def _values_per_grid_point(self) -> tuple[float, ...]:
-        """Return 1 value per grid point, repeated values included: the notation's value of each argument, rounded.
-
-        The axis's `rounding` rounds each value, if the axis has one.
+        """Return 1 value per grid point, repeated values included, rounded by the axis's `rounding` if it has one.
 
         The accumulated float error in ``start + i * step`` is removed by
         `ParamNotation.build_value_from_argument`, which rounds the argument to
@@ -276,7 +276,8 @@ class ParamGrid(ParamRecipe):
 
         Each axis divides ``[0, 1]`` into the position ranges of its values (`ParamAxis.value_position_ranges`). The
         sweep walks the *union* of all axes' boundaries from 0 to 1, emitting the current value of every axis after
-        each crossing. The 5-point and 3-point axes of `ParamAxis.value_position_ranges` line up like this::
+        each crossing. The 5-point axis p1 (boundaries 1/8, 3/8, 5/8, 7/8) and the 3-point axis p2 (boundaries 1/4,
+        3/4) of `ParamAxis.value_position_ranges` line up like this::
 
             shared position:  0 --+--+--+--+--+--+-- 1
                                  1/8 | 3/8 5/8 | 7/8
@@ -287,18 +288,21 @@ class ParamGrid(ParamRecipe):
         Two properties follow, and they are the whole point: each axis steps at
         its own resolution, and no axis ever loses a value — so axis lengths
         need neither match nor be reconciled, where a fixed-count sample of the
-        shared position would silently skip values of the finer axis. Usually
-        one coordinate steps at a time; axes whose boundaries coincide step
-        together (any two unrounded even-length axes share the boundary
+        shared position would silently skip values of the finer axis.
+
+        Usually one coordinate steps at a time; axes whose boundaries coincide
+        step together (any 2 unrounded even-length axes share the boundary
         ``1/2``). Unrounded axes of equal length reduce to a plain zip, and
-        axes that each hold a single value yield exactly one tuple. An axis has a boundary only where
-        its value changes, so the sweep never emits the same tuple twice in a
-        row.
+        axes that each hold a single value yield exactly one tuple.
+
+        An axis has a boundary only where its value changes, so the sweep
+        never emits the same tuple twice in a row.
 
         The implementation is a merge walk: instead of sampling positions and
         locating each axis within them, the boundaries become a sorted event
         stream, and each event advances the axes it belongs to. The boundaries
         are exact fractions, so ordering and coincidence need no tolerance.
+
         The sweep assumes every axis holds at least one value range, which
         `ParamAxis.value_position_ranges` guarantees.
         """
