@@ -26,6 +26,7 @@ from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, Pa
 )
 def test_rounding_gives_the_nearest_integer_of_its_kind(rounding, value, expected):
     """Each rounding gives the nearest integer of its kind, and the larger one on a tie."""
+    # --- act / assert -----------------
     assert rounding.round_value(value) == expected
 
 
@@ -167,10 +168,10 @@ def test_rounded_axis_yields_each_value_once(rounding, values):
 def test_axis_value_position_ranges(axis, expected):
     """Each value applies from the midpoint below its first grid point to the midpoint above its last one."""
     # --- act --------------------------
-    value_ranges = axis.value_position_ranges()
+    value_position_ranges = axis.value_position_ranges()
 
     # --- assert -----------------------
-    assert value_ranges == tuple(expected)
+    assert value_position_ranges == tuple(expected)
 
 
 def test_coupled_sweep_with_tiny_magnitude_axis():
@@ -342,7 +343,7 @@ def test_grid_coupled_sweep_coinciding_boundaries_step_together():
 
 
 def test_grid_coupled_sweep_with_a_rounded_axis_follows_the_grid_argument():
-    """A rounded axis steps where its value changes, at the grid argument's position, and no tuple repeats."""
+    """A rounded axis advances only at the boundary where its value changes, and no tuple repeats."""
     # --- arrange ----------------------
     grid = ParamGrid(
         axes=(

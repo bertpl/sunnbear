@@ -14,10 +14,7 @@ from sunnbear._core.problems.core import (
 )
 
 from .helpers import (
-    JACOBI_EVEN_DEGREE_AXIS,
-    JACOBI_EVEN_DEGREE_SUMMARY,
-    JACOBI_ODD_DEGREE_AXIS,
-    JACOBI_ODD_DEGREE_SUMMARY,
+    JACOBI_DEGREE_SWEEPS,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -127,7 +124,7 @@ class JacobiPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipes that combine the odd and the even degrees with 6 values of ``alpha`` and of ``beta``.
 
-        The degrees are those of `JACOBI_ODD_DEGREE_AXIS` and `JACOBI_EVEN_DEGREE_AXIS`.
+        The degrees are those of `JACOBI_DEGREE_SWEEPS`.
 
         Both parameters take -0.75 and the values from -0.5 to 1.5 in steps of 0.5:
 
@@ -137,7 +134,7 @@ class JacobiPolynomial(Formula):
           formula's ``alpha`` is 0.5 higher than the ``alpha`` and ``beta`` here.
         """
         alpha_beta_values = (-0.75, *ParamAxis("alpha", -0.5, 1.5, 0.5).values())
-        alpha_beta_text = (
+        alpha_beta_summary = (
             r", combined with $\param{alpha}$ and $\param{beta}$, each $-0.75$ or a value from $-0.5$ to 1.5 in "
             "steps of 0.5."
         )
@@ -145,12 +142,9 @@ class JacobiPolynomial(Formula):
             ParamTable(
                 names=self.param_names,
                 rows=tuple(itertools.product(degree_axis.values(), alpha_beta_values, alpha_beta_values)),
-                summary=degree_summary + alpha_beta_text,
+                summary=degree_summary + alpha_beta_summary,
             )
-            for degree_axis, degree_summary in (
-                (JACOBI_ODD_DEGREE_AXIS, JACOBI_ODD_DEGREE_SUMMARY),
-                (JACOBI_EVEN_DEGREE_AXIS, JACOBI_EVEN_DEGREE_SUMMARY),
-            )
+            for degree_axis, degree_summary in JACOBI_DEGREE_SWEEPS
         )
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:

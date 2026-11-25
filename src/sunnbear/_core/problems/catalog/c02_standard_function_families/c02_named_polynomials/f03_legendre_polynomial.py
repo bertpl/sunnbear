@@ -13,10 +13,7 @@ from sunnbear._core.problems.core import (
 )
 
 from .helpers import (
-    JACOBI_EVEN_DEGREE_AXIS,
-    JACOBI_EVEN_DEGREE_SUMMARY,
-    JACOBI_ODD_DEGREE_AXIS,
-    JACOBI_ODD_DEGREE_SUMMARY,
+    JACOBI_DEGREE_SWEEPS,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -79,10 +76,10 @@ class LegendrePolynomial(Formula):
         return jacobi_interval_bounds(n, 0.0, 0.0)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipes that sweep the odd and the even degrees, `JACOBI_ODD_DEGREE_AXIS` and its even twin."""
-        return (
-            ParamGrid(axes=(JACOBI_ODD_DEGREE_AXIS,), summary=JACOBI_ODD_DEGREE_SUMMARY + "."),
-            ParamGrid(axes=(JACOBI_EVEN_DEGREE_AXIS,), summary=JACOBI_EVEN_DEGREE_SUMMARY + "."),
+        """Return the recipes that sweep the odd and the even degrees of `JACOBI_DEGREE_SWEEPS`."""
+        return tuple(
+            ParamGrid(axes=(degree_axis,), summary=degree_summary + ".")
+            for degree_axis, degree_summary in JACOBI_DEGREE_SWEEPS
         )
 
     def is_param_tuple_valid(self, n: float) -> bool:

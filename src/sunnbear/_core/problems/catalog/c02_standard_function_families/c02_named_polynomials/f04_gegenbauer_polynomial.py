@@ -14,10 +14,7 @@ from sunnbear._core.problems.core import (
 )
 
 from .helpers import (
-    JACOBI_EVEN_DEGREE_AXIS,
-    JACOBI_EVEN_DEGREE_SUMMARY,
-    JACOBI_ODD_DEGREE_AXIS,
-    JACOBI_ODD_DEGREE_SUMMARY,
+    JACOBI_DEGREE_SWEEPS,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -123,7 +120,7 @@ class GegenbauerPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipes that combine the odd and the even degrees with ``alpha`` from -0.4 to 2 in steps of 0.2.
 
-        The degrees are those of `JACOBI_ODD_DEGREE_AXIS` and `JACOBI_EVEN_DEGREE_AXIS`.
+        The degrees are those of `JACOBI_DEGREE_SWEEPS`.
 
         - The sweep starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
         - The sweep ends at 2: at that ``alpha`` and a degree above 100, the amplitude in the middle of ``[-1, 1]`` is
@@ -131,10 +128,10 @@ class GegenbauerPolynomial(Formula):
           further and gives no other kind of function.
         """
         alpha_axis = ParamAxis("alpha", -0.4, 2.0, 0.2)
-        alpha_text = r", combined with $\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
-        return (
-            ParamGrid(axes=(JACOBI_ODD_DEGREE_AXIS, alpha_axis), summary=JACOBI_ODD_DEGREE_SUMMARY + alpha_text),
-            ParamGrid(axes=(JACOBI_EVEN_DEGREE_AXIS, alpha_axis), summary=JACOBI_EVEN_DEGREE_SUMMARY + alpha_text),
+        alpha_summary = r", combined with $\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
+        return tuple(
+            ParamGrid(axes=(degree_axis, alpha_axis), summary=degree_summary + alpha_summary)
+            for degree_axis, degree_summary in JACOBI_DEGREE_SWEEPS
         )
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:

@@ -10,19 +10,27 @@ from sunnbear._core.problems.core import ParamAxis, ParamNotation, ParamRounding
 
 # Each of the formulas whose polynomials are orthogonal on ``[-1, 1]`` sweeps its degree on a logarithmic scale, with
 # 1 recipe for the odd and 1 for the even degrees, because an odd and an even degree differ in their intervals
-# (`jacobi_interval_bounds`). Each axis rounds ``10^(0.1*i)``, for ``i`` from 0 to 30, to the nearest odd or even
-# integer; a tie goes to the larger integer, so the odd degrees end at 1001 and the even degrees start at 2.
+# (`jacobi_interval_bounds`).
+#
+# Each axis rounds ``10^(0.1*i)``, for ``i`` from 0 to 30, to the nearest odd or even integer; a tie goes to the
+# larger integer, so the odd degrees end at 1001 and the even degrees start at 2.
 #
 # The sweep ends at about 1000, where a recurrence over the degrees already takes about 1000 steps per evaluation.
 JACOBI_ODD_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_ODD_INTEGER)
 JACOBI_EVEN_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_EVEN_INTEGER)
-# A recipe that sweeps 1 of the 2 axes starts its summary with that axis's text, which has no final period, so that
-# the recipe can name its other parameters after it. Each text describes its axis, so the 2 change together.
+# A recipe that sweeps 1 of the 2 axes starts its summary with that axis's summary constant, which has no final
+# period, so that the recipe can name its other parameters after that text. Each summary constant describes its axis,
+# so a change to an axis needs the same change to its summary constant.
 JACOBI_ODD_DEGREE_SUMMARY = (
     r"The odd degrees $\param{n}$ nearest to $10^{0.1 i}$, for $i$ from 0 to 30, with a tie going to the larger degree"
 )
 JACOBI_EVEN_DEGREE_SUMMARY = (
     r"The even degrees $\param{n}$ nearest to $10^{0.1 i}$, for $i$ from 0 to 30, with a tie going to the larger degree"
+)
+# Each degree axis with its summary constant, so that a recipe takes the 2 together.
+JACOBI_DEGREE_SWEEPS = (
+    (JACOBI_ODD_DEGREE_AXIS, JACOBI_ODD_DEGREE_SUMMARY),
+    (JACOBI_EVEN_DEGREE_AXIS, JACOBI_EVEN_DEGREE_SUMMARY),
 )
 
 
