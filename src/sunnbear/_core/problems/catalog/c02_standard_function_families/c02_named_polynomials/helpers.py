@@ -6,23 +6,31 @@ rule gives the interval of all of them, from the degree and the 2 parameters of 
 
 import math
 
-# Each of the formulas whose polynomials are orthogonal on ``[-1, 1]`` sweeps these degrees: each degree up to 32,
-# then an even and an odd degree at each power of 2 up to 1024.
+from sunnbear._core.problems.core import ParamAxis, ParamNotation, ParamRounding
+
+# Each of the formulas whose polynomials are orthogonal on ``[-1, 1]`` sweeps its degree on a logarithmic scale, with
+# 1 recipe for the odd and 1 for the even degrees, because an odd and an even degree differ in their intervals
+# (`jacobi_interval_bounds`).
 #
-# An even and an odd degree differ in their intervals (`jacobi_interval_bounds`), so the high degrees come in pairs
-# too. Neighboring high degrees give nearly the same kind of function, so above 32 the sweep keeps only 2 degrees per
-# power of 2.
+# Each axis rounds ``10^(0.1*i)``, for ``i`` from 0 to 30, to the nearest odd or even integer; a tie goes to the
+# larger integer, so 1000 rounds to the odd degree 1001, and 1 to the even degree 2.
 #
-# The sweep ends at 1025, where a recurrence over the degrees already takes about 1000 steps per evaluation.
-JACOBI_SWEPT_DEGREES = (
-    *(float(degree) for degree in range(1, 33)),
-    *(2.0**exponent + parity for exponent in range(6, 11) for parity in (0.0, 1.0)),
+# The sweep ends at about 1000, where a recurrence over the degrees already takes about 1000 steps per evaluation.
+JACOBI_ODD_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_ODD_INTEGER)
+JACOBI_EVEN_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_EVEN_INTEGER)
+# A recipe that sweeps 1 of the 2 axes starts its summary with that axis's summary constant, which has no final
+# period, so that the recipe can name its other parameters after that summary constant. Each summary constant
+# describes its axis, so a change to an axis needs the same change to its summary constant.
+JACOBI_ODD_DEGREE_SUMMARY = (
+    r"The odd degrees $\param{n}$ nearest to $10^{0.1 i}$, for $i$ from 0 to 30, with a tie going to the larger degree"
 )
-# A recipe that sweeps `JACOBI_SWEPT_DEGREES` starts its summary with this text, which has no final period, so that
-# the recipe can name its other parameters after it. The text names the degrees of `JACOBI_SWEPT_DEGREES`, so the 2
-# change together.
-JACOBI_SWEPT_DEGREES_TEXT = (
-    r"The degrees $\param{n}$ from 1 to 32, then each power of 2 from 64 to 1024 and that power plus 1"
+JACOBI_EVEN_DEGREE_SUMMARY = (
+    r"The even degrees $\param{n}$ nearest to $10^{0.1 i}$, for $i$ from 0 to 30, with a tie going to the larger degree"
+)
+# `JACOBI_DEGREE_SWEEPS` pairs each degree axis with its summary constant, so that a recipe takes the 2 together.
+JACOBI_DEGREE_SWEEPS = (
+    (JACOBI_ODD_DEGREE_AXIS, JACOBI_ODD_DEGREE_SUMMARY),
+    (JACOBI_EVEN_DEGREE_AXIS, JACOBI_EVEN_DEGREE_SUMMARY),
 )
 
 

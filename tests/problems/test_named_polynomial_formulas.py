@@ -104,11 +104,11 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
 # product of factors, the scale is 0, so only the relative tolerance applies: its values span many orders of magnitude,
 # and each is accurate relative to its own size.
 NAMED_POLYNOMIAL_FORMULAS = [
-    pytest.param((2, 2, 1), 42, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
-    pytest.param((2, 2, 2), 42, _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
-    pytest.param((2, 2, 3), 42, _legendre, lambda *params: 1.0, id="legendre"),
-    pytest.param((2, 2, 4), 42 * 13, _gegenbauer, lambda *params: 1.0, id="gegenbauer"),
-    pytest.param((2, 2, 5), 42 * 6 * 6, _jacobi, lambda *params: 1.0, id="jacobi"),
+    pytest.param((2, 2, 1), 50, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
+    pytest.param((2, 2, 2), 50, _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
+    pytest.param((2, 2, 3), 50, _legendre, lambda *params: 1.0, id="legendre"),
+    pytest.param((2, 2, 4), 50 * 13, _gegenbauer, lambda *params: 1.0, id="gegenbauer"),
+    pytest.param((2, 2, 5), 50 * 6 * 6, _jacobi, lambda *params: 1.0, id="jacobi"),
     pytest.param((2, 2, 6), 40, _hermite, lambda *params: 1.0, id="hermite"),
     pytest.param((2, 2, 7), 20, _laguerre, lambda *params: 1.0, id="laguerre"),
     pytest.param((2, 2, 8), 12 + 8 + 5, _bernoulli, _bernoulli_amplitude, id="bernoulli"),
@@ -117,8 +117,9 @@ NAMED_POLYNOMIAL_FORMULAS = [
 ]
 
 # `test_every_formula_agrees_with_its_reference` compares a formula with its reference at those of these degrees
-# that the formula sweeps.
-COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 20.0, 21.0, 31.0, 40.0, 49.0, 64.0, 129.0, 1024.0)
+# that the formula sweeps. The odd degree 1001 is left out: next to the bound -1 of its interval, scipy's reference is
+# less accurate than the comparison's tolerance.
+COMPARED_DEGREES = (1.0, 2.0, 3.0, 8.0, 20.0, 21.0, 31.0, 40.0, 49.0, 51.0, 64.0, 129.0, 199.0, 1000.0, 1024.0)
 
 # `test_the_lower_bound_of_an_even_degree_lies_between_the_2_lowest_zeros` checks the interval rule at these Jacobi
 # parameters: just above the excluded lower limit of ``alpha`` and ``beta``, at their upper limit, and at the upper

@@ -62,7 +62,7 @@ from .param_values import (
 )
 from .presentation import PLAIN_MARKER_MACROS, FormulaPresentation, LatexTemplate
 from .publication import Publication
-from .recipes import ParamAxis, ParamGrid, ParamRecipe, ParamTable
+from .recipes import ParamAxis, ParamGrid, ParamRecipe, ParamRounding, ParamTable
 from .registry import FormulaRegistry
 from .test_cases import FormulaTestCase
 from .test_problem import CandidateTestProblem, TestProblem
