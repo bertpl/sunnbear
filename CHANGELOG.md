@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Round the scale of the shift along x in the published test problems to a power of 10, sweep the degrees of 5 named polynomials on a logarithmic scale, and write whole numbers without a decimal point in the formulas' LaTeX and in test problem ids; this changes test problem ids
+
 ### Deprecated
 
 ### Removed
