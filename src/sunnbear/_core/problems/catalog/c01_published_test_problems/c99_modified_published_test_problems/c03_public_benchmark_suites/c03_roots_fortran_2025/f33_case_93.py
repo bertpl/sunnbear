@@ -32,7 +32,7 @@ class ModifiedRootsFortran2025Case93(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 93–94"
     presentation = FormulaPresentation(
-        expression=r"\left(\x - 10.0\right) \x + 23.0 - \x^{0.4} + \c",
+        expression=r"\left(\x - 10\right) \x + 23 - \x^{0.4} + \c",
         interval="[0, 6]",
         summary=r"A quadratic minus $\x^{0.4}$, with 1 root and an infinite slope at the lower bound.",
         notes=(

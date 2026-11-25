@@ -24,7 +24,7 @@ class RootsFortran2025Case65(Formula):
     location_in_publication = "root_tests.f90, case 65"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.1 \c"),),
-        expression=r"\left(\tmp{u} - 1.0\right)^{6} - 1.0",
+        expression=r"\left(\tmp{u} - 1\right)^{6} - 1",
         interval="[1, 2.1]",
         summary=(
             "A 6th power minus 1 that stays within 0.01 of $-1$ from 0.54 to 1.46 below its 1 root on the interval."

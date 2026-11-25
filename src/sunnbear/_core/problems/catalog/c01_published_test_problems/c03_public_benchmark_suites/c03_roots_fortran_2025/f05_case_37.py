@@ -25,7 +25,7 @@ class RootsFortran2025Case37(Formula):
     location_in_publication = "root_tests.f90, case 37"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
-        expression=r"\tmp{u}^{3} - 5.0 \tmp{u}^{2} + 12.0 \tmp{u} - 8.0",
+        expression=r"\tmp{u}^{3} - 5 \tmp{u}^{2} + 12 \tmp{u} - 8",
         interval="[-10, 10]",
         summary=(
             r"An increasing cubic with 1 real root and complex roots $2 + 20 \c \pm 2i$ near that root, which make the "

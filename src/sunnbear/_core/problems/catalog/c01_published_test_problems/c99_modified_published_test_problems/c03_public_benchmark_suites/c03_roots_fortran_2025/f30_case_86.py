@@ -34,7 +34,7 @@ class ModifiedRootsFortran2025Case86(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 86–88"
     presentation = FormulaPresentation(
-        expression=r"\left(\left(\x - 13.0\right) \x + 47.0\right) \x - 36.0 - \sqrt{\x} + \c",
+        expression=r"\left(\left(\x - 13\right) \x + 47\right) \x - 36 - \sqrt{\x} + \c",
         interval="[0, 2]",
         summary=r"A cubic minus $\sqrt{\x}$, with 1 root and an infinite slope at the lower bound.",
         notes=(

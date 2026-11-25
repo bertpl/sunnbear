@@ -26,7 +26,7 @@ class Scipy2026FunctionF1(Formula):
     location_in_publication = "Collection “original”, f1"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.23 \c"),),
-        expression=r"\tmp{u} \left(\tmp{u} - 1.0\right)",
+        expression=r"\tmp{u} \left(\tmp{u} - 1\right)",
         interval=r"[0.5, \sqrt{3}]",
         summary=r"A quadratic with its minimum at $\x = 0.5 + 1.23 \c$ and 1 simple root on the interval.",
     )

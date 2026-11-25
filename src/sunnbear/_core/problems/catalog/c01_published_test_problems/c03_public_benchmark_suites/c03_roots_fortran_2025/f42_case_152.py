@@ -26,7 +26,7 @@ class RootsFortran2025Case152(Formula):
     location_in_publication = "root_tests.f90, case 152"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 4.95 \c"),),
-        expression=r"\pi - \frac{1.0}{\tmp{u}}",
+        expression=r"\pi - \frac{1}{\tmp{u}}",
         interval="[0.05, 5]",
         summary=(
             "An increasing function with a pole just below the lower bound, steep next to that bound and nearly flat "

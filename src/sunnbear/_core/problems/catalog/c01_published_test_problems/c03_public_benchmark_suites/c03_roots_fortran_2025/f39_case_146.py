@@ -26,7 +26,7 @@ class RootsFortran2025Case146(Formula):
     location_in_publication = "root_tests.f90, case 146"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
-        expression=r"\tmp{u}^{3} - 1.0",
+        expression=r"\tmp{u}^{3} - 1",
         interval="[0.51, 1.5]",
         summary="A cubic with 1 simple root, increasing and convex on the interval.",
     )

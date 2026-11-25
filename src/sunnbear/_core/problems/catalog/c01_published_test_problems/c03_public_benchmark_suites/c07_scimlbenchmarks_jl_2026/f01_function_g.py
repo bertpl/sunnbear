@@ -29,7 +29,7 @@ class ScimlbenchmarksJl2026FunctionG(Formula):
     location_in_publication = "Section “A different function”, g"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 100 \c"),),
-        expression=r"e^{\tmp{u}} - 1.0 \cdot 10^{-15}",
+        expression=r"e^{\tmp{u}} - 10^{-15}",
         interval="[-100, 0]",
         summary=(
             "An exponential minus $10^{-15}$, with 1 root, at most $10^{-15}$ in magnitude below that root, and "

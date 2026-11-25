@@ -35,7 +35,7 @@ class RootsFortran2025Case86(Formula):
     location_in_publication = "root_tests.f90, case 86–88"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\left(\left(\tmp{u} - 13.0\right) \tmp{u} + 47.0\right) \tmp{u} - 36.0 - \sqrt{\tmp{u}}",
+        expression=r"\left(\left(\tmp{u} - 13\right) \tmp{u} + 47\right) \tmp{u} - 36 - \sqrt{\tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A cubic minus $\sqrt{\tmp{u}}$, with 1 root on each published interval and an infinite slope where the "

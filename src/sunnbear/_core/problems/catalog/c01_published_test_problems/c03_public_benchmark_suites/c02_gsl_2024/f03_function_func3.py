@@ -26,7 +26,7 @@ class Gsl2024FunctionFunc3(Formula):
     location_in_publication = "test_funcs.c, func3"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
-        expression=r"\tmp{u}^{2} - 1.0 \cdot 10^{-8}",
+        expression=r"\tmp{u}^{2} - 10^{-8}",
         interval="[0, 1]",
         summary=(
             r"A parabola that is negative only between 2 roots $2 \cdot 10^{-4}$ apart, and no lower than $-10^{-8}$ "

@@ -24,7 +24,7 @@ class RootsFortran2025Case73(Formula):
     location_in_publication = "root_tests.f90, case 73"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
-        expression=r"\left(\tmp{u} - 1.0\right) \tmp{u} \tmp{u} - 1.0",
+        expression=r"\left(\tmp{u} - 1\right) \tmp{u} \tmp{u} - 1",
         interval="[0, 5]",
         summary=(
             "A cubic that stays between $-1.15$ and $-1$ from 1.47 to 0.47 below its 1 simple root, and rises steeply "

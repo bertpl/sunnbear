@@ -30,7 +30,7 @@ class RootsFortran2025Case45(Formula):
     location_in_publication = "root_tests.f90, case 45"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
-        expression=r"\frac{\param{n} \tmp{u} - 1.0}{\left(\param{n} - 1.0\right) \tmp{u}}",
+        expression=r"\frac{\param{n} \tmp{u} - 1}{\left(\param{n} - 1\right) \tmp{u}}",
         interval="[0.01, 1]",
         summary=(
             r"A hyperbola with 1 root close to the lower bound, steep there because of a pole $1/\param{n}$ below that "

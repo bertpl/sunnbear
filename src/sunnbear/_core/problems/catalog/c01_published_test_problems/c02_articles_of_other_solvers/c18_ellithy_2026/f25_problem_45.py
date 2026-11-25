@@ -28,7 +28,7 @@ class Ellithy2026Problem45(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
-            r"\left(10.0 + \frac{3.592}{\tmp{u}^{2}}\right) \left(\tmp{u} - 0.04267\right) - 0.08206 " r"\cdot 300"
+            r"\left(10 + \frac{3.592}{\tmp{u}^{2}}\right) \left(\tmp{u} - 0.04267\right) - 0.08206 " r"\cdot 300"
         ),
         interval="[2, 3]",
         summary=(

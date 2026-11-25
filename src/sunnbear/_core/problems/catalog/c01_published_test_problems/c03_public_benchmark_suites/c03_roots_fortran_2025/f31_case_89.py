@@ -35,7 +35,7 @@ class RootsFortran2025Case89(Formula):
     location_in_publication = "root_tests.f90, case 89–90"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"e^{1.0 - \tmp{u}} \left(\tmp{u} - 1.0\right) \cdot 10.0 - 1.0",
+        expression=r"e^{1 - \tmp{u}} \left(\tmp{u} - 1\right) \cdot 10 - 1",
         interval=r"[\param{a}, \param{b}]",
         summary="A function with 1 root on each of 2 adjacent intervals and its maximum between those 2 roots.",
     )

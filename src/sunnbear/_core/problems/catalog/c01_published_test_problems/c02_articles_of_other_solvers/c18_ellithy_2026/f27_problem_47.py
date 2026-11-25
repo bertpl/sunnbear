@@ -30,7 +30,7 @@ class Ellithy2026Problem47(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
         expression=(
-            r"\cos{\left(\tmp{u} \right)} + 1.0 \left(1 - \cos{\left(\tmp{u} \right)}\right)^{2} - 0.05 " r"\tmp{u}^{2}"
+            r"\cos{\left(\tmp{u} \right)} + \left(1 - \cos{\left(\tmp{u} \right)}\right)^{2} - 0.05 " r"\tmp{u}^{2}"
         ),
         interval="[3, 6]",
         summary="A function with 1 root and, 1.60 below that root, a local maximum of 2.52.",

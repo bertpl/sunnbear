@@ -42,7 +42,7 @@ class ModifiedBurkardt2016ProblemP04(Formula):
     location_in_publication = "Problem p04"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(20/10^{-5})}"),),
-        expression=r"e^{\tmp{u}} - \frac{1.0}{100.0 \tmp{u} \tmp{u}}",
+        expression=r"e^{\tmp{u}} - \frac{1}{100 \tmp{u} \tmp{u}}",
         interval="[10^{-5}, 20]",
         summary=r"An increasing function with 1 root, steep next to the lower bound because of a pole at $\x = 0$.",
         notes=(

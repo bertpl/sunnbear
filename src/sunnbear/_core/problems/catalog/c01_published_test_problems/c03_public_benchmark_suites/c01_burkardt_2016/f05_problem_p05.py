@@ -33,7 +33,7 @@ class Burkardt2016ProblemP05(Formula):
     location_in_publication = "Problem p05"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\left(\tmp{u} + 3.0\right) \left(\tmp{u} - 1.0\right) \left(\tmp{u} - 1.0\right)",
+        expression=r"\left(\tmp{u} + 3\right) \left(\tmp{u} - 1\right) \left(\tmp{u} - 1\right)",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A cubic with a simple root on the interval and, 4 above that root, a double root, where the cubic touches "

@@ -44,7 +44,7 @@ class ModifiedChandrupatla1997Function9(Formula):
     location_in_publication = "Table 1, function 9"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x e^{-\c \ln(\param{b}/\param{a})}"),),
-        expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2.0 \cdot 10^{-6}}{\tmp{u}^{3}}",
+        expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2 \cdot 10^{-6}}{\tmp{u}^{3}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A function with a simple root and, below that root, a narrow dip to about $-3.7 \cdot 10^{4}$, a second "

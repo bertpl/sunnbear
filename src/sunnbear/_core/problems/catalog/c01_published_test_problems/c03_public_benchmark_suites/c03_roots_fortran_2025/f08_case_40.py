@@ -24,7 +24,7 @@ class RootsFortran2025Case40(Formula):
     location_in_publication = "root_tests.f90, case 40"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 10 \c"),),
-        expression=r"\left(\tmp{u} - 1.0\right)^{5}",
+        expression=r"\left(\tmp{u} - 1\right)^{5}",
         interval="[0, 10]",
         summary="A 5th power that stays below $10^{-4}$ in magnitude within 0.15 of its root of multiplicity 5.",
     )

@@ -27,9 +27,7 @@ class RootsFortran2025Case44(Formula):
     location_in_publication = "root_tests.f90, case 44"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.1 \c"),),
-        expression=(
-            r"3.0 \tmp{u}^{2} \sin{\left(\tmp{u} \cdot 20.0 \right)} + \cos{\left(\tmp{u} \cdot 2.0 " r"\right)}"
-        ),
+        expression=r"3 \tmp{u}^{2} \sin{\left(\tmp{u} \cdot 20 \right)} + \cos{\left(\tmp{u} \cdot 2 \right)}",
         interval="[-0.7, 0.4]",
         summary=(
             r"An oscillation whose amplitude grows away from $\x = 1.1 \c$, with 1 root close to the lower bound and, "

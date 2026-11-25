@@ -264,7 +264,7 @@ Each active formula of `formulas.csv` is a `Formula` in sunnbear's catalog, belo
   - the shifted variable `\tmp{u} = \x - c_scale \c`, where `c_scale` is written as its number for a formula with 1 interval, and as `\param{c_scale}` for a formula with several intervals:
     - the shifted variable is `\tmp{u}` in every formula, so that a reader meets the same symbol everywhere;
     - where the source's name for the function's variable is not `x`, a note in the presentation's `notes` says what `\tmp{u}` stands for, such as `$\tmp{u}$ is the source's variable $h$, the depth of the water in the tank, in m.`; the word "variable" keeps a source's symbol apart from sunnbear's own, such as `c` or `f`; or `$\tmp{u}$ is the pH of the rainwater.` where the source's name for the variable is a word;
-  - the expression: the function of the shifted variable, with the source's own numbers and order of terms;
+  - the expression: the function of the shifted variable, with the source's own numbers and order of terms; a whole number is written without a decimal point, as `2` for the source's `2.0`, and a factor of `1.0` is left out, as every text for a reader writes it;
   - the interval;
 - declares `effect_of_c = EffectOfC.SHIFTS_X`;
 - gives its `ParamTable` a summary that names what the table lists:

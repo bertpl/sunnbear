@@ -25,7 +25,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 20 \c"),),
         expression=(
-            r"\begin{cases} 0.0 & \text{for}\: \tmp{u} = 0 \\\frac{1}{\tmp{u} - \frac{2}{3}} & "
+            r"\begin{cases} 0 & \text{for}\: \tmp{u} = 0 \\\frac{1}{\tmp{u} - \frac{2}{3}} & "
             r"\text{otherwise} \end{cases}"
         ),
         interval="[-11, 9]",

@@ -28,7 +28,7 @@ class RootsFortran2025Case42(Formula):
     location_in_publication = "root_tests.f90, case 42"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
-        expression=r"e^{\tmp{u}} - 2.0 \tmp{u} - 1.0",
+        expression=r"e^{\tmp{u}} - 2 \tmp{u} - 1",
         interval="[-0.001, 1]",
         summary=(
             r"A convex function with 2 roots 1.26 apart, of which only the lower one, $\x = \c$, lies on the interval."

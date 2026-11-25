@@ -27,7 +27,7 @@ class RootsFortran2025Case66(Formula):
     location_in_publication = "root_tests.f90, case 66"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 0.8 \c"),),
-        expression=r"\sin{\left(\tmp{u} \right)} e^{\tmp{u}} + \ln{\left(\tmp{u}^{2} + 1.0 \right)}",
+        expression=r"\sin{\left(\tmp{u} \right)} e^{\tmp{u}} + \ln{\left(\tmp{u}^{2} + 1 \right)}",
         interval="[-0.9, -0.1]",
         summary=(
             "A function with a local minimum between 2 roots 0.6 apart, of which only the lower one lies on the "

@@ -31,7 +31,7 @@ class Borchers2026FunctionF7(Formula):
         expression=r"\tmp{u}^{2} + \sin{\left(\frac{\tmp{u}}{9} \right)} - \frac{1}{4}",
         interval="[-0.5, 1.9]",
         summary=(
-            "A function close to a parabola, with 1 root on the interval and a second root, about 1.0 lower, below the "
+            "A function close to a parabola, with 1 root on the interval and a second root, about 1 lower, below the "
             "lower bound."
         ),
     )

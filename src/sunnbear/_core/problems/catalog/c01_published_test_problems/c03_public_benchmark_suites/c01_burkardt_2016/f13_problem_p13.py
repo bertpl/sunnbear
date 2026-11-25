@@ -36,7 +36,7 @@ class Burkardt2016ProblemP13(Formula):
     location_in_publication = "Problem p13"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\param{m} \left(\tmp{u} - 100.0\right)",
+        expression=r"\param{m} \left(\tmp{u} - 100\right)",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A line so flat that its values stay below $10^{-9}$ in magnitude within 100 of its root, referred to in "

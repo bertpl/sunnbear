@@ -38,7 +38,7 @@ class ModifiedGsl2024FunctionFunc3(Formula):
     params = ()
     location_in_publication = "test_funcs.c, func3"
     presentation = FormulaPresentation(
-        expression=r"\x^{2} - 1.0 \cdot 10^{-8} + \c",
+        expression=r"\x^{2} - 10^{-8} + \c",
         interval="[0, 1]",
         summary="A parabola with its minimum at the lower bound and 1 root on the interval.",
         notes=(

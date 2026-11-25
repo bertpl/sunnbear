@@ -35,7 +35,7 @@ class Chandrupatla1997Function9(Formula):
     location_in_publication = "Table 1, function 9"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2.0 \cdot 10^{-6}}{\tmp{u}^{3}}",
+        expression=r"e^{\tmp{u}} - 2 - \frac{0.01}{\tmp{u}^{2}} + \frac{2 \cdot 10^{-6}}{\tmp{u}^{3}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A function with 1 simple root on the interval and, just above a pole below the lower bound, a second root"

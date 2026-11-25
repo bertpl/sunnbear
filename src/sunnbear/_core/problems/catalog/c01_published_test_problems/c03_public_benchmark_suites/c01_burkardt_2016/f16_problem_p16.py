@@ -44,8 +44,8 @@ class Burkardt2016ProblemP16(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(
-            r"\frac{\pi \left(\tmp{u} - \param{m}\right)}{180.0} - \param{e} \sin{\left(\frac{\pi "
-            r"\tmp{u}}{180.0} \right)}"
+            r"\frac{\pi \left(\tmp{u} - \param{m}\right)}{180} - \param{e} \sin{\left(\frac{\pi "
+            r"\tmp{u}}{180} \right)}"
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=r"Kepler's equation in degrees, at the eccentricity $\param{e} = 0.8$, flattest 23 below the root.",

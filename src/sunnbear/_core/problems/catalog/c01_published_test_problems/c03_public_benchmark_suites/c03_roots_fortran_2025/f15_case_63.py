@@ -24,7 +24,7 @@ class RootsFortran2025Case63(Formula):
     location_in_publication = "root_tests.f90, case 63"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
-        expression=r"\tmp{u}^{3} + 4.0 \tmp{u}^{2} - 10.0",
+        expression=r"\tmp{u}^{3} + 4 \tmp{u}^{2} - 10",
         interval="[0, 1.5]",
         summary=r"A cubic with a local minimum at $\x = 1.5 \c$ and 1 root 1.37 above that minimum.",
     )
