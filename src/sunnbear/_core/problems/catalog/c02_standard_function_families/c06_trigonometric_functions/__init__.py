@@ -6,10 +6,10 @@ The trigonometric functions give behaviors absent from the other families:
 - a root so close to an extremum that it nearly forms a double root;
 - an interval in which roots and poles alternate.
 
-The sine, the cosine and the tangent evaluate their argument at ``0.5*pi*x``, so that their zeros, extrema and poles
-lie at integers.
+The sine, the cosine and the tangent take ``0.5*pi*x`` as their argument, so that their zeros, extrema and poles lie
+at integers.
 
-A further scale of ``x`` would add nothing: the benchmark's ``xtol`` is a fixed fraction of the interval's width, so a
+Scaling ``x`` further would add nothing: the benchmark's ``xtol`` is a fixed fraction of the interval's width, so a
 formula on a wider interval gives the same problem as a steeper formula on a narrower one.
 
 The category has 3 kinds of formulas, which differ in how ``c`` enters:

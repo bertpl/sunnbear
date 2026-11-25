@@ -52,8 +52,8 @@ class TangentAcrossPoles(Formula):
         expression=r"\tan\left(\frac{\pi}{2} \x - \c\right)",
         interval=r"\left[-\left(\param{n} + \frac{1}{2}\right), \param{n} + \frac{1}{2}\right]",
         summary=(
-            "The tangent across its poles, whose sign changes alternate between roots and poles, and a sign change at "
-            "a pole holds no root."
+            "The tangent across its poles, whose sign changes alternate between roots and poles; a sign change at a "
+            "pole holds no root."
         ),
         param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
@@ -69,7 +69,7 @@ class TangentAcrossPoles(Formula):
         return (-(n + 0.5), n + 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe of the integers ``n`` nearest to 2^0 to 2^10.
+        """Return the recipe of the integers ``n`` nearest to 2^(0.1*i), for i from 0 to 100.
 
         The recipe holds every ``n`` up to 18, then values that lie further apart as ``n`` grows.
         """

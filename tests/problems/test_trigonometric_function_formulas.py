@@ -22,9 +22,10 @@ def test_cosine_keeps_full_precision_next_to_its_root():
     ``x = d``, to within a relative 1e-8.
 
     The tolerance covers the rounding of ``pi*x/2``, which at a relative distance of 1e-6 from the root changes
-    ``pi*x/2 - pi*d/2`` by up to about 1e-10 of its value. Computed as the difference of 2 cosines, the function would
-    have an error of about 1e-16, which at ``d = 2^-30`` is about 5e7 times its value at a relative distance of 1e-6
-    from the root.
+    ``pi*x/2 - pi*d/2`` by up to about 1e-10 of its value.
+
+    Computed as the difference of 2 cosines, the function would have an error of about 1e-16, which at ``d = 2^-30`` is
+    about 5e7 times its value at a relative distance of 1e-6 from the root.
     """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 6, 2))
@@ -59,8 +60,8 @@ def test_inverse_tangent_keeps_full_precision_across_the_sweep_of_d():
     """At every ``d`` in the sweep of ``d``, `InverseTangent` agrees with ``(2/pi)*atan(x) + 1 - d`` from mpmath at
     x-values around the root, to within a few ulps of the larger of ``(2/pi)*atan(x) + 1`` and ``d``.
 
-    Computed by adding 1 to ``(2/pi)*atan(x)``, ``(2/pi)*atan(x) + 1`` has an error of about 1e-16 whatever its size,
-    which next to a root at ``d = 2^-30`` is about 1e-7 of ``d``.
+    If it were computed by adding 1 to ``(2/pi)*atan(x)``, ``(2/pi)*atan(x) + 1`` would have an error of about 1e-16
+    whatever its size, which next to a root at ``d = 2^-30`` is about 1e-7 of ``d``.
     """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 6, 6))
@@ -84,7 +85,7 @@ def test_tangent_across_poles_changes_sign_2_n_plus_1_times():
     poles.
 
     The x-values lie 0.1 apart, none on an integer, so that each root and pole lies between 2 of them. The test covers
-    every ``n`` up to 64, which keeps it fast.
+    the candidates with ``n`` up to 64, which keeps it fast.
     """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 6, 4))

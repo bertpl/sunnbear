@@ -70,8 +70,9 @@ class InverseSine(Formula):
 
         A sweep in powers of 2 cannot reach ``d = 0``, so ``d = 0`` has a recipe of its own. The sweep's low end does
         not replace it: for a small ``d`` the function differs from the one at ``d = 0`` by about ``sqrt(2*d)``, still
-        about 4e-5 at ``d = 2^-30``. At ``d = 2^-0.1`` the interval is about ``[-0.067, 0.067]``, where ``asin`` is
-        close to a line.
+        about 4e-5 at ``d = 2^-30``.
+
+        At ``d = 2^-0.1`` the interval is about ``[-0.067, 0.067]``, where ``asin`` is close to a line.
         """
         return (
             ParamGrid(

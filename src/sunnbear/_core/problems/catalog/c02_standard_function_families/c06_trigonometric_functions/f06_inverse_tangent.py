@@ -103,8 +103,9 @@ class InverseTangent(Formula):
           less than 10 ulps wherever x lies farther than ``b/2`` from the step, so solvers see a function close to a
           step.
         - The sweep of ``d``: from 2^-30 to 1. At ``d = 2^-30`` the root at ``c = 0`` lies at about ``-0.64*b``, where f
-          is only about ``d`` above its value at the lower bound. The benchmark's ``xtol`` at this ``b`` is about 1e-3,
-          so the root lies many ``xtol`` away from the step at every ``d`` of the sweep except ``d = 1``.
+          is only about ``d`` above its value at the lower bound. The benchmark's ``xtol`` at this ``b`` is about
+          ``4*b*2^-n_bisection_fevals``, so the root lies many ``xtol`` away from the step at every ``d`` of the sweep
+          except ``d = 1``.
         """
         return (
             ParamGrid(

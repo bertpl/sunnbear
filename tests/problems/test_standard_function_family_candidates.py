@@ -8,13 +8,15 @@ from sunnbear._core.problems.core import FormulaRegistry
 #
 # - A simple polynomial (2.1) combines every value of its first parameter, a power or a term count, with every value of
 #   its second, a weight or a slope.
-# - `NearEdgePower` (2.3.3) has 81 candidates whose interval starts at the edge, and 63 whose interval starts near it.
-# - `NearPolePower` (2.3.4) sweeps 81 powers at each of 6 distances, of which 63 pairs have no root inside the interval.
+# - `NearEdgePower` (2.3.3) has 81 candidates whose interval starts at the edge of the power's domain, and 63 whose
+#   interval starts near it.
+# - `NearPolePower` (2.3.4) sweeps 81 powers at each of 6 distances from the pole to the lower bound, of which 63 pairs
+#   have no root inside the interval.
 # - `HyperbolicTangent` (2.4.3) has 161 candidates from the sweep of ``b``, and 151 from the sweep of ``d``.
-# - `Sine` (2.6.1) has 110 candidates from the sweep of a small ``b`` and 66 from the odd values of a large ``b``,
-#   which share ``b = 1``; `InverseSine` (2.6.5) has 1 at ``d = 0`` and 300 from the sweep of ``d``.
-# - `InverseTangent` (2.6.6) has 601 candidates from the sweep of ``b`` and 301 from the sweep of ``d``, which share
-#   ``b = 2^30``, ``d = 1``.
+# - `Sine` (2.6.1) has 110 candidates from the sweep of a small ``b`` and 66 from the odd values of a large ``b``; both
+#   recipes hold ``b = 1``, which counts once. `InverseSine` (2.6.5) has 1 at ``d = 0`` and 300 from the sweep of ``d``.
+# - `InverseTangent` (2.6.6) has 601 candidates from the sweep of ``b`` and 301 from the sweep of ``d``; both sweeps
+#   hold ``b = 2^30``, ``d = 1``, which counts once.
 CANDIDATE_COUNTS = [
     pytest.param((2, 1, 1), 1, id="linear"),
     pytest.param((2, 1, 2), 5 * 31, id="linear_plus_even_power"),
@@ -64,7 +66,7 @@ def test_the_parametrization_names_every_formula_of_category_2():
 
 
 @pytest.mark.parametrize("formula_number, n_candidates", CANDIDATE_COUNTS)
-def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formula_number, n_candidates):
+def test_every_formula_gives_its_number_of_candidates_with_opposite_signs_at_the_bounds(formula_number, n_candidates):
     """A formula gives its expected number of candidates, and at ``c = 0`` each candidate is negative at one bound of
     its interval and positive at the other."""
     # --- arrange ----------------------
