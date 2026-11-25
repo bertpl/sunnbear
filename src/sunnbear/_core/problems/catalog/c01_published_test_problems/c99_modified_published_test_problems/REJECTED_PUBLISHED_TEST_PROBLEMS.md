@@ -34,14 +34,14 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.1.7.7[a=-1,b=10,c_scale=10]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.7.7[a=-1,b=10,c_scale=10]` | a tiny linear term added to f | yes |
 | `f1.1.7.7[a=-5,b=50,c_scale=100]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.7.7[a=-5,b=50,c_scale=100]` | a tiny linear term added to f | yes |
 | `f1.1.7.7[a=-10,b=100,c_scale=100]` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.7.7[a=-10,b=100,c_scale=100]` | a tiny linear term added to f | yes |
-| `f1.1.7.8[xi=0.61489,a=0.0002,b=2,c_scale=1]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=0.0002,b=2]` | `c` scales x |  |
-| `f1.1.7.8[xi=0.61489,a=0.0002,b=3,c_scale=1]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=0.0002,b=3]` | `c` scales x |  |
-| `f1.1.7.8[xi=0.61489,a=0.0002,b=9,c_scale=10]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=0.0002,b=9]` | `c` scales x |  |
-| `f1.1.7.8[xi=0.61489,a=0.0002,b=27,c_scale=10]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=0.0002,b=27]` | `c` scales x |  |
-| `f1.1.7.8[xi=0.61489,a=0.0002,b=81,c_scale=100]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=0.0002,b=81]` | `c` scales x |  |
-| `f1.1.7.9[a=0.0002,b=9,c_scale=10]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=0.0002,b=9]` | `c` scales x |  |
-| `f1.1.7.9[a=0.0002,b=27,c_scale=10]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=0.0002,b=27]` | `c` scales x |  |
-| `f1.1.7.9[a=0.0002,b=81,c_scale=100]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=0.0002,b=81]` | `c` scales x |  |
+| `f1.1.7.8[xi=0.61489,a=2e-04,b=2,c_scale=1]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=2e-04,b=2]` | `c` scales x |  |
+| `f1.1.7.8[xi=0.61489,a=2e-04,b=3,c_scale=1]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=2e-04,b=3]` | `c` scales x |  |
+| `f1.1.7.8[xi=0.61489,a=2e-04,b=9,c_scale=10]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=2e-04,b=9]` | `c` scales x |  |
+| `f1.1.7.8[xi=0.61489,a=2e-04,b=27,c_scale=10]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=2e-04,b=27]` | `c` scales x |  |
+| `f1.1.7.8[xi=0.61489,a=2e-04,b=81,c_scale=100]` | `calibration_c_range_too_narrow` | all parameter tuples modified | `f1.99.1.7.8[xi=0.61489,a=2e-04,b=81]` | `c` scales x |  |
+| `f1.1.7.9[a=2e-04,b=9,c_scale=10]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=2e-04,b=9]` | `c` scales x |  |
+| `f1.1.7.9[a=2e-04,b=27,c_scale=10]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=2e-04,b=27]` | `c` scales x |  |
+| `f1.1.7.9[a=2e-04,b=81,c_scale=100]` | `calibration_fails_at_first_probe` | some parameter tuples modified | `f1.99.1.7.9[a=2e-04,b=81]` | `c` scales x |  |
 | `f1.1.8.1[a=0.004,b=200,c_scale=100]` | `calibration_c_range_too_narrow` | some parameter tuples modified | `f1.99.1.8.1` | `c` scales x |  |
 | `f1.1.8.5[a=0.035,b=0.05,c_scale=0.01]` | `bisection_count_not_exact` | no action | | bisection lands on an exact 0 at the root for some values of `c` of the shipped Monte Carlo tuple set; f is exactly 0 at only a few floats there, not in a band that a form without cancellation could remove | |
 | `f1.1.9.15` | `bisection_count_not_exact` | all parameter tuples modified | `f1.99.1.9.15` | f in an equivalent form without cancellation |  |
@@ -143,11 +143,11 @@ After a change of any of them, running the pipeline, as `python -m sunnbear._cor
 | `f1.4.2.1[M=200,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=200,a=-0.01,b=0,c_scale=0.01]` | x shifted so that the interval becomes `[-0.01, 0]` | yes |
 | `f1.4.2.1[M=2000,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=2000,a=-0.001,b=0,c_scale=0.001]` | x shifted so that the interval becomes `[-0.001, 0]` | yes |
 | `f1.4.2.1[M=20000,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=20000,a=-10^-4,b=0,c_scale=10^-4]` | x shifted so that the interval becomes `[-0.0001, 0]` | yes |
-| `f1.4.2.1[M=200000,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=200000,a=-1e-05,b=0,c_scale=1e-05]` | x shifted so that the interval becomes `[-1e-05, 0]` | yes |
-| `f1.4.2.1[M=2000000,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=2000000,a=-1e-06,b=0,c_scale=1e-06]` | x shifted so that the interval becomes `[-1e-06, 0]` | yes |
-| `f1.4.2.1[M=20000000,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=20000000,a=-1e-07,b=0,c_scale=1e-07]` | x shifted so that the interval becomes `[-1e-07, 0]` | yes |
-| `f1.4.2.1[M=2000000,a=1.04999,b=1.05001,c_scale=1e-05]` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.4.2.1[M=2000000,a=-1e-05,b=0,c_scale=1e-05]` | x shifted so that the interval becomes `[-1e-05, 0]` | yes |
-| `f1.4.2.1[M=20000000,a=1.04999,b=1.05001,c_scale=1e-05]` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.4.2.1[M=20000000,a=-1e-05,b=0,c_scale=1e-05]` | x shifted so that the interval becomes `[-1e-05, 0]` | yes |
+| `f1.4.2.1[M=2e+05,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=2e+05,a=-1e-05,b=0,c_scale=1e-05]` | x shifted so that the interval becomes `[-1e-05, 0]` | yes |
+| `f1.4.2.1[M=2e+06,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=2e+06,a=-1e-06,b=0,c_scale=1e-06]` | x shifted so that the interval becomes `[-1e-06, 0]` | yes |
+| `f1.4.2.1[M=2e+07,a=0.8,b=1.8,c_scale=1]` | `calibration_no_finite_sign_change_at_0` | all parameter tuples modified | `f1.99.4.2.1[M=2e+07,a=-1e-07,b=0,c_scale=1e-07]` | x shifted so that the interval becomes `[-1e-07, 0]` | yes |
+| `f1.4.2.1[M=2e+06,a=1.04999,b=1.05001,c_scale=1e-05]` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.4.2.1[M=2e+06,a=-1e-05,b=0,c_scale=1e-05]` | x shifted so that the interval becomes `[-1e-05, 0]` | yes |
+| `f1.4.2.1[M=2e+07,a=1.04999,b=1.05001,c_scale=1e-05]` | `bound_to_width_ratio` | all parameter tuples modified | `f1.99.4.2.1[M=2e+07,a=-1e-05,b=0,c_scale=1e-05]` | x shifted so that the interval becomes `[-1e-05, 0]` | yes |
 | `f1.4.2.3[alpha=0.5]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.2.3[alpha=1]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
 | `f1.4.2.3[alpha=2]` | `calibration_no_finite_sign_change_at_0` | no action | | f is exactly 0 at `a`, and the interval holds no other root | |
