@@ -1,8 +1,32 @@
 import itertools
+from fractions import Fraction
 
 import pytest
 
-from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, ParamTable
+from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, ParamRounding, ParamTable
+
+
+# ==================================================================================================
+#  ParamRounding
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "rounding, value, expected",
+    [
+        (ParamRounding.NEAREST_INTEGER, 2.4, 2.0),
+        (ParamRounding.NEAREST_INTEGER, 2.5, 3.0),  # a tie goes to the larger integer
+        (ParamRounding.NEAREST_ODD_INTEGER, 1.0, 1.0),
+        (ParamRounding.NEAREST_ODD_INTEGER, 1.995, 1.0),
+        (ParamRounding.NEAREST_ODD_INTEGER, 2.0, 3.0),  # a tie goes to the larger integer
+        (ParamRounding.NEAREST_ODD_INTEGER, 9.9, 9.0),
+        (ParamRounding.NEAREST_ODD_INTEGER, 10.0, 11.0),  # a tie goes to the larger integer
+        (ParamRounding.NEAREST_EVEN_INTEGER, 1.0, 2.0),  # a tie goes to the larger integer
+        (ParamRounding.NEAREST_EVEN_INTEGER, 2.9, 2.0),
+        (ParamRounding.NEAREST_EVEN_INTEGER, 3.1, 4.0),
+    ],
+)
+def test_rounding_gives_the_nearest_integer_of_its_kind(rounding, value, expected):
+    """Each rounding gives the nearest integer of its kind, and the larger one on a tie."""
+    assert rounding.round_value(value) == expected
 
 
 # ==================================================================================================
@@ -49,6 +73,104 @@ def test_axis_single_point_preserves_value_exactly(value):
 def test_axis_never_yields_an_empty_grid(start, stop, step):
     """An empty grid would make coupled sweeps index out of range."""
     assert len(ParamAxis("p1", start, stop, step).values()) >= 1
+
+
+@pytest.mark.parametrize(
+    "rounding, values",
+    [
+        (
+            ParamRounding.NEAREST_ODD_INTEGER,
+            (
+                1,
+                3,
+                5,
+                7,
+                11,
+                13,
+                15,
+                19,
+                25,
+                31,
+                39,
+                51,
+                63,
+                79,
+                101,
+                125,
+                159,
+                199,
+                251,
+                317,
+                399,
+                501,
+                631,
+                795,
+                1001,
+            ),
+        ),
+        (
+            ParamRounding.NEAREST_EVEN_INTEGER,
+            (
+                2,
+                4,
+                6,
+                8,
+                10,
+                12,
+                16,
+                20,
+                26,
+                32,
+                40,
+                50,
+                64,
+                80,
+                100,
+                126,
+                158,
+                200,
+                252,
+                316,
+                398,
+                502,
+                630,
+                794,
+                1000,
+            ),
+        ),
+    ],
+)
+def test_rounded_axis_yields_each_value_once(rounding, values):
+    """A rounded power axis yields each integer once, in grid order, though several grid points round to it."""
+    # --- arrange ----------------------
+    axis = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, rounding)
+
+    # --- act / assert -----------------
+    assert axis.values() == tuple(float(value) for value in values)
+
+
+@pytest.mark.parametrize(
+    "axis, expected",
+    [
+        (
+            ParamAxis("p1", 0.0, 2.0, 1.0),
+            [(0.0, 0, Fraction(1, 4)), (1.0, Fraction(1, 4), Fraction(3, 4)), (2.0, Fraction(3, 4), 1)],
+        ),
+        (ParamAxis("p1", 5.0, 5.0, 1.0), [(5.0, 0, 1)]),
+        (
+            # the 5 grid values 1, 1.26, 1.58, 2.0, 2.51 round to 1, 1, 2, 2, 3
+            ParamAxis("p1", 0.0, 0.4, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER),
+            [(1.0, 0, Fraction(3, 8)), (2.0, Fraction(3, 8), Fraction(7, 8)), (3.0, Fraction(7, 8), 1)],
+        ),
+    ],
+)
+def test_axis_value_position_ranges(axis, expected):
+    """Each value applies from the midpoint below its first grid point to the midpoint above its last one."""
+    # --- act --------------------------
+    value_ranges = axis.value_position_ranges()
+
+    # --- assert -----------------------
+    assert value_ranges == tuple(expected)
 
 
 def test_coupled_sweep_with_tiny_magnitude_axis():
@@ -203,7 +325,7 @@ def test_grid_coupled_sweep_all_single_value_axes():
 
 
 def test_grid_coupled_sweep_coinciding_boundaries_step_together():
-    """Axes whose plateau boundaries coincide advance in the same step (2- and 4-value axes share 1/2)."""
+    """Axes whose position ranges share a boundary advance in the same step (2- and 4-value axes share 1/2)."""
     # --- arrange ----------------------
     grid = ParamGrid(
         axes=(ParamAxis("p1", 0.0, 1.0, 1.0), ParamAxis("p2", 0.0, 3.0, 1.0)),  # 2 values, 4 values
@@ -217,6 +339,21 @@ def test_grid_coupled_sweep_coinciding_boundaries_step_together():
         (1.0, 2.0),  # both axes crossed the shared boundary 1/2 in one step
         (1.0, 3.0),
     ]
+
+
+def test_grid_coupled_sweep_with_a_rounded_axis_follows_the_grid_argument():
+    """A rounded axis steps where its value changes, at the grid argument's position, and no tuple repeats."""
+    # --- arrange ----------------------
+    grid = ParamGrid(
+        axes=(
+            ParamAxis("p1", 0.0, 0.4, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER),  # 1, 1, 2, 2, 3
+            ParamAxis("p2", 0.0, 4.0, 1.0),  # 5 values, at the same positions as p1's grid points
+        ),
+        product=False,
+    )
+
+    # --- act / assert -----------------
+    assert list(grid.tuples()) == [(1.0, 0.0), (1.0, 1.0), (2.0, 2.0), (2.0, 3.0), (3.0, 4.0)]
 
 
 def test_grid_mixed_notations_survive_combining_into_tuples():

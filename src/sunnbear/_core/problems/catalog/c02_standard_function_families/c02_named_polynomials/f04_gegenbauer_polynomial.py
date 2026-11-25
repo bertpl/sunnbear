@@ -1,6 +1,5 @@
 """This formula is the Gegenbauer polynomial, divided by its value at 1, with ``x`` shifted by ``c``."""
 
-import itertools
 import math
 
 from sunnbear._core.problems.core import (
@@ -10,13 +9,15 @@ from sunnbear._core.problems.core import (
     FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
+    ParamGrid,
     ParamRecipe,
-    ParamTable,
 )
 
 from .helpers import (
-    JACOBI_SWEPT_DEGREES,
-    JACOBI_SWEPT_DEGREES_TEXT,
+    JACOBI_EVEN_DEGREE_AXIS,
+    JACOBI_EVEN_DEGREE_SUMMARY,
+    JACOBI_ODD_DEGREE_AXIS,
+    JACOBI_ODD_DEGREE_SUMMARY,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -120,22 +121,20 @@ class GegenbauerPolynomial(Formula):
         return jacobi_interval_bounds(n, alpha - 0.5, alpha - 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe that combines `JACOBI_SWEPT_DEGREES` with ``alpha`` from -0.4 to 2 in steps of 0.2.
+        """Return the recipes that combine the odd and the even degrees with ``alpha`` from -0.4 to 2 in steps of 0.2.
+
+        The degrees are those of `JACOBI_ODD_DEGREE_AXIS` and `JACOBI_EVEN_DEGREE_AXIS`.
 
         - The sweep starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
         - The sweep ends at 2: at that ``alpha`` and a degree above 100, the amplitude in the middle of ``[-1, 1]`` is
           already thousands of times lower than the value at the bounds. A higher ``alpha`` lowers that amplitude
           further and gives no other kind of function.
         """
-        alpha_values = ParamAxis("alpha", -0.4, 2.0, 0.2).values()
+        alpha_axis = ParamAxis("alpha", -0.4, 2.0, 0.2)
+        alpha_text = r", combined with $\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
         return (
-            ParamTable(
-                names=self.param_names,
-                rows=tuple(itertools.product(JACOBI_SWEPT_DEGREES, alpha_values)),
-                summary=(
-                    JACOBI_SWEPT_DEGREES_TEXT + r", combined with $\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
-                ),
-            ),
+            ParamGrid(axes=(JACOBI_ODD_DEGREE_AXIS, alpha_axis), summary=JACOBI_ODD_DEGREE_SUMMARY + alpha_text),
+            ParamGrid(axes=(JACOBI_EVEN_DEGREE_AXIS, alpha_axis), summary=JACOBI_EVEN_DEGREE_SUMMARY + alpha_text),
         )
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
