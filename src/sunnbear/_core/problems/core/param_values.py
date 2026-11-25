@@ -75,9 +75,9 @@ class ParamNotation(StrEnum):
     can spell it under the validity rule and returns the shortest spelling, so the spelling depends
     on the float alone, not on how it was authored: ``2^2`` and ``4`` both spell as ``4``.
 
-    A spelling writes a whole-number argument without ``.0`` in every notation, as in the spellings ``4`` and ``10^-5``.
-
     A tie in length goes to the notation declared first below, so the decimal wins every tie.
+
+    Every notation writes a whole-number argument without ``.0``, as in the spellings ``4`` and ``10^-5``.
 
     Power spellings depend on the platform's ``pow``, which is not guaranteed to be correctly
     rounded: ``2^1.23`` can parse to a float that differs in the last bit on another platform, so one
@@ -249,10 +249,7 @@ class ParamNotation(StrEnum):
                 raise ValueError(f"{self._spell_rounded_argument(argument)} overflows to a non-finite value.") from exc
 
     def _spell_rounded_argument(self, argument: float) -> str:
-        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2``, ``-10^0.3`` or ``10^-5``.
-
-        The argument is written as its shortest round-trip form, without the ``.0`` of a whole number.
-        """
+        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2``, ``-10^0.3`` or ``10^-5``."""
         argument_text = repr(argument).removesuffix(".0")
         if self is ParamNotation.DECIMAL:
             return argument_text
