@@ -5,21 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
-
-### Added
+## 0.4.12 (2026-11-25)
 
 ### Changed
 
 - Spell a parameter value in e-notation where that is shorter, as in `2e+06` for `2000000` and `2e-04` for `0.0002`, and change the degrees and parameter values that the named polynomials sweep; this changes test problem ids
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 0.4.11 (2026-11-25)
 
