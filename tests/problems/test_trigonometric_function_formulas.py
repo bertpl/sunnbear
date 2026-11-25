@@ -1,4 +1,4 @@
-"""The trigonometric function formulas (category 2.6) add to the plain functions what these tests cover:
+"""These tests cover what the trigonometric function formulas (category 2.6) add to the plain functions:
 
 - the precision of `Cosine` and `InverseTangent` next to the root, where subtracting 2 nearly equal values would cancel
   their leading digits;
@@ -21,9 +21,10 @@ def test_cosine_keeps_full_precision_next_to_its_root():
     """At ``c = 0`` and every ``d``, `Cosine` agrees with ``cos(pi*x/2) - cos(pi*d/2)`` from mpmath next to its root
     ``x = d``, to within a relative 1e-8.
 
-    The tolerance covers the rounding of ``pi*x/2``, which at 1e-6 of the root changes ``pi*x/2 - pi*d/2`` by up to
-    about 1e-10 of its value. Computed as the difference of 2 cosines, the function would have an error of about 1e-16,
-    which at ``d = 2^-30`` is about 5e7 times its value at 1e-6 of the root.
+    The tolerance covers the rounding of ``pi*x/2``, which at a relative distance of 1e-6 from the root changes
+    ``pi*x/2 - pi*d/2`` by up to about 1e-10 of its value. Computed as the difference of 2 cosines, the function would
+    have an error of about 1e-16, which at ``d = 2^-30`` is about 5e7 times its value at a relative distance of 1e-6
+    from the root.
     """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 6, 2))
@@ -41,7 +42,7 @@ def test_cosine_keeps_full_precision_next_to_its_root():
 @pytest.mark.parametrize("c", [0.0, 0.3, -0.7])
 def test_inverse_tangent_at_d_equal_to_1_has_the_sign_of_x_minus_c_next_to_its_root(c):
     """At ``d = 1``, `InverseTangent` is 0 at its root ``x = c`` and has the sign of ``x - c`` at the floats next to
-    it."""
+    the root."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number((2, 6, 6))
     candidates = [candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[1] == 1.0]
@@ -72,9 +73,9 @@ def test_inverse_tangent_keeps_full_precision_across_the_sweep_of_d():
             [_, d] = candidate.id.param_values
             root = math.tan(0.5 * math.pi * (d - 1.0))
             for x in (root - 1.0, root * (1.0 - 1e-6), root, root * (1.0 + 1e-6), root + 1.0):
-                atan_plus_1 = 2 * mpmath.atan(mpmath.mpf(x)) / mpmath.pi + 1
-                expected = float(atan_plus_1 - d)
-                max_error = 8 * math.ulp(max(float(atan_plus_1), d))
+                one_plus_scaled_atan = 1 + 2 * mpmath.atan(mpmath.mpf(x)) / mpmath.pi
+                expected = float(one_plus_scaled_atan - d)
+                max_error = 8 * math.ulp(max(float(one_plus_scaled_atan), d))
                 assert abs(candidate.xc_fun(x, 0.0) - expected) <= max_error, (candidate.id, x)
 
 
@@ -108,8 +109,8 @@ def test_tangent_across_poles_is_finite_at_its_poles():
     # --- act / assert -----------------
     for candidate in formula.build_all_candidates():
         [n] = candidate.id.param_values
-        for pole in range(-int(n), int(n) + 1):
-            if pole % 2 != 0:
-                value = candidate.xc_fun(float(pole), 0.0)
-                assert math.isfinite(value), (candidate.id, pole)
-                assert abs(value) > 1e10, (candidate.id, pole)
+        for k in range(-int(n), int(n) + 1):
+            if k % 2 != 0:
+                value = candidate.xc_fun(float(k), 0.0)
+                assert math.isfinite(value), (candidate.id, k)
+                assert abs(value) > 1e10, (candidate.id, k)

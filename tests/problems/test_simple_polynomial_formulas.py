@@ -4,8 +4,8 @@ import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-# Each entry holds a simple polynomial formula's number and the bounds of its interval, at which its value at ``c = 0``
-# is half the interval's width, negative at the lower bound.
+# Each entry holds a simple polynomial formula's number and the bounds of its interval. At ``c = 0`` the formula is
+# minus half the interval's width at the lower bound, and half the interval's width at the upper bound.
 SIMPLE_POLYNOMIAL_INTERVALS = [
     pytest.param((2, 1, 1), (-1.0, 1.0), id="linear"),
     pytest.param((2, 1, 2), (-1.0, 1.0), id="linear_plus_even_power"),

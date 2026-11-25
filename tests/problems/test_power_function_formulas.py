@@ -1,4 +1,4 @@
-"""The power function formulas (category 2.3) add to a plain power what these tests cover:
+"""These tests cover what the power function formulas (category 2.3) add to a plain power:
 
 - the linear term of `SignedPower1`;
 - the pairs of ``p`` and ``d`` that give a root inside ``[d, 1]``;

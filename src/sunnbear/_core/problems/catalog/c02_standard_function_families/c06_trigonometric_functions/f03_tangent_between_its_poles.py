@@ -18,9 +18,11 @@ from sunnbear._core.problems.core import (
 class TangentBetweenPoles(Formula):
     """`TangentBetweenPoles` is ``tan(0.5*pi*x)/tan(0.5*pi*(1 - d)) + c`` on ``[-(1 - d), 1 - d]``.
 
-    The scale ``0.5*pi`` puts the poles of the tangent next to its zero at 0 at -1 and 1. ``d`` is the distance from
-    each pole to the nearest bound, between 0 and 1. For a ``d`` close to 1 the function is close to a line; for a
-    small ``d`` it is steep next to both bounds and flat between them.
+    The scale ``0.5*pi`` puts the zero of the tangent at 0 and the poles on either side of it at -1 and 1. ``d`` is
+    the distance from each pole to the nearest bound, between 0 and 1.
+
+    For a ``d`` close to 1 the function is close to a line; for a small ``d`` it is steep next to both bounds and flat
+    between them.
 
     The division by ``tan(0.5*pi*(1 - d))`` makes the function -1 at the lower bound and 1 at the upper bound at
     ``c = 0``, for every ``d``.

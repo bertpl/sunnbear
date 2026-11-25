@@ -83,8 +83,9 @@ class InverseTangent(Formula):
         """Evaluate ``(2/pi)*atan(u) + 1 - d`` at ``u = x - c``, in the form that keeps full precision at the root."""
         u = x - c
         if u < 0.0 and d <= MAX_D_FOR_TAIL_EVALUATION:
-            # (2/pi)*atan(u) + 1 as (2/pi)*atan(-1/u): adding 1 to (2/pi)*atan(u) would cancel its leading digits, so
-            # next to a root at a small d the function would take only a few values, 1.1e-16 apart.
+            # This branch computes (2/pi)*atan(u) + 1 as (2/pi)*atan(-1/u): adding 1 to (2/pi)*atan(u) would cancel
+            # its leading digits, so next to a root at a small d the function would take only a few values, 1.1e-16
+            # apart.
             return (2.0 / math.pi) * math.atan(-1.0 / u) - d
         else:
             # At d = 1 this form is (2/pi)*atan(u) itself, which is exactly 0 only at u = 0; the form from atan(-1/u)
@@ -99,10 +100,11 @@ class InverseTangent(Formula):
         """Return 2 recipes: one that sweeps ``b`` at ``d = 1``, and one that sweeps ``d`` at ``b = 2^30``.
 
         - The sweep of ``b``: from 2^-10 to 2^50, about 1.1e15. At the high end, ``atan`` differs from its asymptotes by
-          less than 10 ulps wherever x lies farther than ``b/2`` from the step, so solvers see close to a step.
+          less than 10 ulps wherever x lies farther than ``b/2`` from the step, so solvers see a function close to a
+          step.
         - The sweep of ``d``: from 2^-30 to 1. At ``d = 2^-30`` the root at ``c = 0`` lies at about ``-0.64*b``, where f
           is only about ``d`` above its value at the lower bound. The benchmark's ``xtol`` at this ``b`` is about 1e-3,
-          so the root lies many ``xtol`` away from the step at every ``d`` of the sweep but 1.
+          so the root lies many ``xtol`` away from the step at every ``d`` of the sweep except ``d = 1``.
         """
         return (
             ParamGrid(

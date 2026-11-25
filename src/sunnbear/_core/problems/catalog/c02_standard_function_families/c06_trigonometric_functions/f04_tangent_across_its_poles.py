@@ -1,4 +1,4 @@
-"""This formula is the tangent across its poles, ``tan(0.5*pi*x - c)``, on an interval of ``2*n + 1`` sign changes."""
+"""This formula is the tangent ``tan(0.5*pi*x - c)`` on an interval where it changes sign ``2*n + 1`` times."""
 
 import math
 
@@ -22,9 +22,11 @@ class TangentAcrossPoles(Formula):
     The scale ``0.5*pi`` puts the zeros of the tangent at the even integers and its poles at the odd integers, at
     ``c = 0``.
 
-    ``n`` is an integer of at least 1. Each side of 0 holds the ``n`` integers 1 to ``n``, each a zero or a pole, so
-    the function changes sign ``2*n + 1`` times on the interval: ``n`` or ``n + 1`` of those sign changes are poles,
-    where the function has no root, and bisection can converge to one of them.
+    ``n`` is an integer of at least 1. Each side of 0 holds ``n`` integers, 1 to ``n`` or -1 to -``n``, each a zero
+    or a pole, so with the zero at 0 the function changes sign ``2*n + 1`` times on the interval.
+
+    Of those sign changes, ``n`` or ``n + 1`` are poles, where the function has no root, and bisection can converge to
+    a pole.
 
     The bounds lie halfway between a zero and a pole, where the function is -1 or 1 at ``c = 0``. For an odd ``n`` the
     function is positive at the lower bound, though it increases on every branch.
@@ -50,7 +52,8 @@ class TangentAcrossPoles(Formula):
         expression=r"\tan\left(\frac{\pi}{2} \x - \c\right)",
         interval=r"\left[-\left(\param{n} + \frac{1}{2}\right), \param{n} + \frac{1}{2}\right]",
         summary=(
-            "The tangent across its poles, whose sign changes alternate between roots and poles, where it has no root."
+            "The tangent across its poles, whose sign changes alternate between roots and poles, and a sign change at "
+            "a pole holds no root."
         ),
         param_conditions=(r"$\param{n}$ is an integer of at least 1",),
     )
@@ -66,7 +69,10 @@ class TangentAcrossPoles(Formula):
         return (-(n + 0.5), n + 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe of the integers ``n`` nearest to 2^0 to 2^10: every ``n`` up to 18, then fewer."""
+        """Return the recipe of the integers ``n`` nearest to 2^0 to 2^10.
+
+        The recipe holds every ``n`` up to 18, then values that lie further apart as ``n`` grows.
+        """
         return (
             ParamGrid(
                 axes=(ParamAxis("n", 0.0, 10.0, 0.1, ParamNotation.POW2, ParamRounding.NEAREST_INTEGER),),

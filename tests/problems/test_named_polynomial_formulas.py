@@ -1,5 +1,5 @@
-"""The named polynomial formulas (category 2.2) agree with a reference, and the interval of an even degree leaves out
-exactly the lowest zero.
+"""The named polynomial formulas (category 2.2) agree with a reference, and the interval of a polynomial of even
+degree leaves out exactly its lowest zero.
 """
 
 import itertools

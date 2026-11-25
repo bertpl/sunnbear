@@ -22,13 +22,16 @@ class Cosine(Formula):
     interval runs from a maximum at its lower bound to a minimum at its upper bound.
 
     ``d`` is the root at ``c = 0``, above 0 and at most 1. The cosine is even, so ``-d`` is a root too, which the
-    interval leaves out. At ``d = 1`` the function is the plain cosine, whose root is an inflection point, as every
-    root of the sine is. As ``d`` falls, the root moves toward the maximum: the slope at the root falls with ``d``,
-    and the roots ``d`` and ``-d`` come close to a double root.
+    interval leaves out. At ``d = 1`` the function is the plain cosine, whose root is an inflection point.
+
+    As ``d`` falls, the root moves toward the maximum: the slope at the root falls with ``d``, and the roots ``d`` and
+    ``-d`` come close to a double root.
 
     ``c`` scales x about the maximum, so the root moves to ``x = d*exp(c)``, while the maximum stays at the lower bound
-    and the root ``-d`` outside the interval. A shift of x would move the maximum and the root ``-d`` into the
-    interval, so the range of ``c`` that keeps the sign at both bounds would shrink with ``d``.
+    and the root ``-d`` stays outside the interval.
+
+    A shift of x would move the maximum and the root ``-d`` into the interval, so the range of ``c`` that keeps the
+    sign of the function at both bounds would shrink with ``d``.
 
     References:
         - NIST Digital Library of Mathematical Functions, §4.14, for the definition. https://dlmf.nist.gov/4.14
@@ -47,8 +50,9 @@ class Cosine(Formula):
         expression=r"-2 \sin\left(\frac{\tmp{u} + \tmp{v}}{2}\right) \, \sin\left(\frac{\tmp{u} - \tmp{v}}{2}\right)",
         interval="[0, 2]",
         summary=(
-            r"The cosine minus a level, with 1 root on the interval, close to a maximum of the cosine for a small "
-            r"$\param{d}$, where that root and its mirror image across the maximum come close to a double root."
+            r"The cosine minus a level, with 1 root on the interval; for a small $\param{d}$ the root lies close to "
+            r"a maximum of the cosine, where the root and its mirror image across the maximum come close to a double "
+            r"root."
         ),
         notes=(
             r"The expression equals $$\cos(\tmp{u}) - \cos(\tmp{v}),$$ in a form that loses no precision to "

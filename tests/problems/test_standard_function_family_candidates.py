@@ -54,7 +54,7 @@ CANDIDATE_COUNTS = [
 ]
 
 
-def test_the_table_names_every_formula_of_category_2():
+def test_the_parametrization_names_every_formula_of_category_2():
     """`CANDIDATE_COUNTS` names exactly the formulas of category 2."""
     # --- act --------------------------
     formula_numbers_in_category = {formula.number for formula in FormulaRegistry.formulas() if formula.number[0] == 2}
