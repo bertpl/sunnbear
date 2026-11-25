@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Spell a parameter value in e-notation where that is shorter, as in `2e+06` for `2000000` and `2e-04` for `0.0002`, and change the degrees and parameter values that the named polynomials sweep; this changes test problem ids
+
 ### Deprecated
 
 ### Removed
