@@ -41,7 +41,7 @@ class Bradie2006Section21Page67(Formula):
     location_in_publication = "§2.1 (p. 67); Exercises 2.1-19, 2.5-20"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 0.09 \c"),
+            (r"\tmp{u}", r"\x - 0.1 \c"),
             (r"\tmp{g}", r"\left(1 + \frac{\tmp{u}}{12}\right)^{36}"),
         ),
         expression=(
@@ -64,7 +64,7 @@ class Bradie2006Section21Page67(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, P: float, d: float, A: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.09 * c
+        x = x - 0.1 * c
         if x == 0.0:
             # at x = 0, the factor ((1 + x/12)^36 - 1)/(x/12) takes its limit 36
             return P + 36.0 * d - A
@@ -114,7 +114,7 @@ class Bradie2006Section21Page67(Formula):
         FormulaTestCase.value(
             params={"P": 13500.0, "d": 250.0, "A": 25000.0},
             x=0.037,
-            c=0.25,
+            c=0.225,
             expected=-1707.2154378902246,
             atol=2e-09,
         ),

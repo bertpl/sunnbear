@@ -48,7 +48,7 @@ class ModifiedAtkinson1989Case4(Formula):
     location_in_publication = "§2.8 case (4); Problem 34(iv)"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 3 \c"),
+            (r"\tmp{u}", r"\x - \c"),
             (
                 r"\fn{g}(\x)",
                 (
@@ -80,7 +80,7 @@ class ModifiedAtkinson1989Case4(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         if x == 1.0:
             # at its root x = 1, the expression divides by 0; the formula takes its limit 0
             published_value = 0.0
@@ -100,7 +100,7 @@ class ModifiedAtkinson1989Case4(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.0)),
-        FormulaTestCase.value(params={}, x=0.9, c=0.25, expected=-0.21297042461623097),
+        FormulaTestCase.value(params={}, x=0.9, c=0.75, expected=-0.21297042461623097),
         FormulaTestCase.value(params={}, x=0.9999, c=0.0, expected=-4.512985939661577e-281, atol=0.0),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=0.0, atol=0.0),
     )

@@ -46,7 +46,7 @@ class ModifiedBradie2006Example22(Formula):
         " Exercises 2.1-13, 2.5-15, 2.6-3"
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.495 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tan{\left(\pi \tmp{u} \right)} - \tmp{u} - 6",
         interval="[0, 0.495]",
         summary=(
@@ -66,7 +66,7 @@ class ModifiedBradie2006Example22(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.495 * c
+        x = x - 1.0 * c
         return math.tan(math.pi * x) - x - 6
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -78,6 +78,6 @@ class ModifiedBradie2006Example22(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=0.1485, c=0.25, expected=-5.946838507380154),
+        FormulaTestCase.value(params={}, x=0.1485, c=0.12375, expected=-5.946838507380154),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 0.495)),
     )

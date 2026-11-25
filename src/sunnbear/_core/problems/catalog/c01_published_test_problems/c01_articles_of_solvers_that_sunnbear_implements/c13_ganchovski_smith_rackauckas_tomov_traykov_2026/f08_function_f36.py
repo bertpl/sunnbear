@@ -24,7 +24,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF36(Formula):
     params = ()
     location_in_publication = "Table 2, f36"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\left|{\tmp{u} - \frac{2}{3}}\right|^{0.2} \left(\begin{cases} 1 & \text{for}\: \tmp{u} "
             r"\leq \frac{2}{3} \\-1 & \text{otherwise} \end{cases}\right)"
@@ -40,7 +40,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF36(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return abs(x - 2 / 3) ** 0.2 * ((1) if (x) <= (2 / 3) else (-1))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF36(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-5.0, c=0.0, expected=1.4147038431719823),
-        FormulaTestCase.value(params={}, x=-5.0, c=0.25, expected=1.6054831235204614),
+        FormulaTestCase.value(params={}, x=-5.0, c=0.5, expected=1.6054831235204614),
         FormulaTestCase.interval_bounds(params={}, expected=(-11.0, 9.0)),
     )

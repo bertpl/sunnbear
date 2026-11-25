@@ -23,7 +23,7 @@ class Suhadolnik2012Function14(Formula):
     params = ()
     location_in_publication = "Table 1, function 14"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 1",
         interval="[0.1, 1.5]",
         summary="A cubic with 1 simple root and a slope that falls to 0 at the inflection point, 1 below that root.",
@@ -33,7 +33,7 @@ class Suhadolnik2012Function14(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.4 * c
+        x = x - 1.0 * c
         return x**3 - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -46,6 +46,6 @@ class Suhadolnik2012Function14(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.52, c=0.0, expected=-0.8593919999999999),
-        FormulaTestCase.value(params={}, x=0.52, c=0.25, expected=-0.9950869999999999),
+        FormulaTestCase.value(params={}, x=0.52, c=0.35, expected=-0.9950869999999999),
         FormulaTestCase.interval_bounds(params={}, expected=(0.1, 1.5)),
     )

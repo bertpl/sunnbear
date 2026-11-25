@@ -58,7 +58,7 @@ class Burkardt2016ProblemP11(Formula):
         return (
             ParamTable(
                 names=("epsilon", "a", "b", "c_scale"),
-                rows=((1e-05, 0.0, 10.0, 10.0), (1e-05, 0.25, 5.0, 4.75)),
+                rows=((1e-05, 0.0, 10.0, 10.0), (1e-05, 0.25, 5.0, 10.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
@@ -74,7 +74,7 @@ class Burkardt2016ProblemP11(Formula):
             params={"epsilon": 1e-05, "a": 0.0, "b": 10.0, "c_scale": 10.0}, x=3.0, c=0.25, expected=15.937340626593734
         ),
         FormulaTestCase.value(
-            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0, "c_scale": 4.75},
+            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0, "c_scale": 10.0},
             x=1.675,
             c=0.0,
             expected=0.06454007368800385,
@@ -83,6 +83,6 @@ class Burkardt2016ProblemP11(Formula):
             params={"epsilon": 1e-05, "a": 0.0, "b": 10.0, "c_scale": 10.0}, expected=(0.0, 10.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0, "c_scale": 4.75}, expected=(0.25, 5.0)
+            params={"epsilon": 1e-05, "a": 0.25, "b": 5.0, "c_scale": 10.0}, expected=(0.25, 5.0)
         ),
     )

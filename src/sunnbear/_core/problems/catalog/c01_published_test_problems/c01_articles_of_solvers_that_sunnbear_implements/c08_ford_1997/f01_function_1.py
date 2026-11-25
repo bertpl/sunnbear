@@ -59,25 +59,25 @@ class Ford1997Function1(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.5, 2.0, 1.5), (0.2, 6.0, 5.8), (0.004, 200.0, 200.0)),
+                rows=((0.5, 2.0, 1.0), (0.2, 6.0, 10.0), (0.004, 200.0, 100.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.5, "b": 2.0, "c_scale": 1.5}, x=0.95, c=0.0, expected=0.0005261213987539786
+            params={"a": 0.5, "b": 2.0, "c_scale": 1.0}, x=0.95, c=0.0, expected=0.0005261213987539786
         ),
         FormulaTestCase.value(
-            params={"a": 0.5, "b": 2.0, "c_scale": 1.5}, x=0.95, c=0.25, expected=0.00739042767277413
+            params={"a": 0.5, "b": 2.0, "c_scale": 1.0}, x=0.95, c=0.375, expected=0.00739042767277413
         ),
         FormulaTestCase.value(
-            params={"a": 0.2, "b": 6.0, "c_scale": 5.8}, x=1.94, c=0.0, expected=-0.004845383651434474
+            params={"a": 0.2, "b": 6.0, "c_scale": 10.0}, x=1.94, c=0.0, expected=-0.004845383651434474
         ),
         FormulaTestCase.value(
-            params={"a": 0.004, "b": 200.0, "c_scale": 200.0}, x=60.0028, c=0.0, expected=-0.009833341111519662
+            params={"a": 0.004, "b": 200.0, "c_scale": 100.0}, x=60.0028, c=0.0, expected=-0.009833341111519662
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 2.0, "c_scale": 1.5}, expected=(0.5, 2.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.2, "b": 6.0, "c_scale": 5.8}, expected=(0.2, 6.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.004, "b": 200.0, "c_scale": 200.0}, expected=(0.004, 200.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 2.0, "c_scale": 1.0}, expected=(0.5, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.2, "b": 6.0, "c_scale": 10.0}, expected=(0.2, 6.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.004, "b": 200.0, "c_scale": 100.0}, expected=(0.004, 200.0)),
     )

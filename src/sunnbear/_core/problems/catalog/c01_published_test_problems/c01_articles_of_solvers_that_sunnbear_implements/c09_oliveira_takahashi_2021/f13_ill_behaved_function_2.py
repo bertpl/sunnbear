@@ -25,11 +25,11 @@ class OliveiraTakahashi2021IllBehavedFunction2(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}} \left(\tmp{u} \cdot 10^{6} - 1\right)^{3}",
         interval="[-1, 1]",
         summary=(
-            r"An exponential times a cube, with a triple root just above $\x = 2 \c$ and a magnitude above $10^{17}$ at"
+            r"An exponential times a cube, with a triple root just above $\x = \c$ and a magnitude above $10^{17}$ at"
             r" a distance of 1 from that root."
         ),
     )
@@ -38,7 +38,7 @@ class OliveiraTakahashi2021IllBehavedFunction2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return math.exp(x) * (x * 10**6 - 1) ** 3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class OliveiraTakahashi2021IllBehavedFunction2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-4.29008047007074e16),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-2.9639026991626765e17),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-2.9639026991626765e17),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

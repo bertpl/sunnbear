@@ -36,7 +36,7 @@ class ChapraCanale2015Problem515(Formula):
     )
     location_in_publication = "Prob. 5.15"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\param{v} - \sqrt{2 \param{g} \tmp{u}} \tanh{\left(\frac{\sqrt{2 \param{g} \tmp{u}}}{2 "
             r"\param{L}} \param{t} \right)}"
@@ -53,7 +53,7 @@ class ChapraCanale2015Problem515(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, g: float, L: float, t: float, v: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (v) - (math.sqrt(2 * g * x) * math.tanh(math.sqrt(2 * g * x) / (2 * L) * t))
 
     def interval_bounds(self, g: float, L: float, t: float, v: float) -> tuple[float, float]:
@@ -73,7 +73,7 @@ class ChapraCanale2015Problem515(Formula):
             params={"g": 9.81, "L": 4.0, "t": 2.5, "v": 5.0}, x=0.6, c=0.0, expected=2.2884942505464694
         ),
         FormulaTestCase.value(
-            params={"g": 9.81, "L": 4.0, "t": 2.5, "v": 5.0}, x=0.6, c=0.25, expected=4.423248410414592
+            params={"g": 9.81, "L": 4.0, "t": 2.5, "v": 5.0}, x=0.6, c=0.5, expected=4.423248410414592
         ),
         FormulaTestCase.interval_bounds(params={"g": 9.81, "L": 4.0, "t": 2.5, "v": 5.0}, expected=(0.0, 2.0)),
     )

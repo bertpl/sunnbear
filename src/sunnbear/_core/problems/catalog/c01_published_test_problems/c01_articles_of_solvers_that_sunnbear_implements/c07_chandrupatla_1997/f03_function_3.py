@@ -55,45 +55,45 @@ class Chandrupatla1997Function3(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=(
-                    (0.0, 5.0, 5.0),
-                    (-10.0, 10.0, 20.0),
-                    (-10000.0, 10000.0, 20000.0),
-                    (-1000000.0, 1000000.0, 2000000.0),
-                    (-10000000000.0, 10000000000.0, 20000000000.0),
+                    (0.0, 5.0, 10.0),
+                    (-10.0, 10.0, 10.0),
+                    (-10000.0, 10000.0, 10000.0),
+                    (-1000000.0, 1000000.0, 1000000.0),
+                    (-10000000000.0, 10000000000.0, 10000000000.0),
                 ),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=-3.375),
-        FormulaTestCase.value(params={"a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.25, expected=-20.796875),
-        FormulaTestCase.value(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.0, expected=-343.0),
+        FormulaTestCase.value(params={"a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=-3.375),
+        FormulaTestCase.value(params={"a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.125, expected=-20.796875),
+        FormulaTestCase.value(params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=-4.0, c=0.0, expected=-343.0),
         FormulaTestCase.value(
-            params={"a": -10000.0, "b": 10000.0, "c_scale": 20000.0}, x=-4000.0, c=0.0, expected=-64144108027.0
+            params={"a": -10000.0, "b": 10000.0, "c_scale": 10000.0}, x=-4000.0, c=0.0, expected=-64144108027.0
         ),
         FormulaTestCase.value(
-            params={"a": -1000000.0, "b": 1000000.0, "c_scale": 2000000.0},
+            params={"a": -1000000.0, "b": 1000000.0, "c_scale": 1000000.0},
             x=-400000.0,
             c=0.0,
             expected=-6.4001440010800024e16,
         ),
         FormulaTestCase.value(
-            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 20000000000.0},
+            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 10000000000.0},
             x=-4000000000.0,
             c=0.0,
             expected=-6.4000000144e28,
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 5.0, "c_scale": 5.0}, expected=(0.0, 5.0)),
-        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, expected=(-10.0, 10.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 5.0, "c_scale": 10.0}, expected=(0.0, 5.0)),
+        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, expected=(-10.0, 10.0)),
         FormulaTestCase.interval_bounds(
-            params={"a": -10000.0, "b": 10000.0, "c_scale": 20000.0}, expected=(-10000.0, 10000.0)
+            params={"a": -10000.0, "b": 10000.0, "c_scale": 10000.0}, expected=(-10000.0, 10000.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": -1000000.0, "b": 1000000.0, "c_scale": 2000000.0}, expected=(-1000000.0, 1000000.0)
+            params={"a": -1000000.0, "b": 1000000.0, "c_scale": 1000000.0}, expected=(-1000000.0, 1000000.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 20000000000.0},
+            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 10000000000.0},
             expected=(-10000000000.0, 10000000000.0),
         ),
     )

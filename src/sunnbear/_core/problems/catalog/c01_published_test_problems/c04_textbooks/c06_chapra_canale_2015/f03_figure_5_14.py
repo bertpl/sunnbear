@@ -62,21 +62,21 @@ class ChapraCanale2015Figure514(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 1.3, 1.3), (-1.3, 0.0, 1.3), (0.0, 4.0, 4.0)),
+                rows=((0.0, 1.3, 1.0), (-1.3, 0.0, 1.0), (0.0, 4.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 1.3, "c_scale": 1.3}, x=0.39, c=0.0, expected=-0.9999185959391481),
+        FormulaTestCase.value(params={"a": 0.0, "b": 1.3, "c_scale": 1.0}, x=0.39, c=0.0, expected=-0.9999185959391481),
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 1.3, "c_scale": 1.3}, x=0.91, c=0.25, expected=-0.9953058316511282
+            params={"a": 0.0, "b": 1.3, "c_scale": 1.0}, x=0.91, c=0.325, expected=-0.9953058316511282
         ),
         FormulaTestCase.value(
-            params={"a": -1.3, "b": 0.0, "c_scale": 1.3}, x=-0.91, c=0.0, expected=-0.6105838818818924
+            params={"a": -1.3, "b": 0.0, "c_scale": 1.0}, x=-0.91, c=0.0, expected=-0.6105838818818924
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=5.191736422399997),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.3, "c_scale": 1.3}, expected=(0.0, 1.3)),
-        FormulaTestCase.interval_bounds(params={"a": -1.3, "b": 0.0, "c_scale": 1.3}, expected=(-1.3, 0.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, expected=(0.0, 4.0)),
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.0, expected=5.191736422399997),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.3, "c_scale": 1.0}, expected=(0.0, 1.3)),
+        FormulaTestCase.interval_bounds(params={"a": -1.3, "b": 0.0, "c_scale": 1.0}, expected=(-1.3, 0.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, expected=(0.0, 4.0)),
     )

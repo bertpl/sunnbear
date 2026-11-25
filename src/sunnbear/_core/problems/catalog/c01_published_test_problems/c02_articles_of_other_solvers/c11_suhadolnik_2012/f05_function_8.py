@@ -25,17 +25,17 @@ class Suhadolnik2012Function8(Formula):
     params = ()
     location_in_publication = "Table 1, function 8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}",
         interval="[0, 1.7]",
-        summary=r"A decreasing function with 1 root, at $1.7 \c$ plus the fixed point of the cosine.",
+        summary=r"A decreasing function with 1 root, at $\c$ plus the fixed point of the cosine.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.7 * c
+        x = x - 1.0 * c
         return math.cos(x) - x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Suhadolnik2012Function8(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.51, c=0.0, expected=0.3627445076457512),
-        FormulaTestCase.value(params={}, x=0.51, c=0.25, expected=0.9113896745022905),
+        FormulaTestCase.value(params={}, x=0.51, c=0.425, expected=0.9113896745022905),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.7)),
     )

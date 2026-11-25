@@ -40,7 +40,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
     params = ()
     location_in_publication = "Table 2, f27"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - 1.88889\right)^{3} \left|\tmp{u} - 1.88889\right|",
         interval="[1, 3]",
         summary=(
@@ -63,7 +63,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (x - 1.88889) ** 3 * abs(x - 1.88889)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -76,5 +76,5 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 3.0)),
-        FormulaTestCase.value(params={}, x=1.6, c=0.25, expected=-0.38731632624146395),
+        FormulaTestCase.value(params={}, x=1.6, c=0.5, expected=-0.38731632624146395),
     )

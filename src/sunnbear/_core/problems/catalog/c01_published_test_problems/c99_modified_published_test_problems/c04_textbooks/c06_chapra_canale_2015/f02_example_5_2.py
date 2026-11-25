@@ -91,8 +91,8 @@ class ModifiedChapraCanale2015Example52(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=(
-                    (3.3, 5.0, 1.7),
-                    (4.2, 4.26, 0.06),
+                    (3.3, 5.0, 1.0),
+                    (4.2, 4.26, 0.1),
                 ),
                 summary=(
                     "The published intervals $[3, 5]$ and $[4.2, 4.3]$, each narrowed to hold an odd number of roots."
@@ -102,11 +102,11 @@ class ModifiedChapraCanale2015Example52(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 3.3, "b": 5.0, "c_scale": 1.7}, x=3.81, c=0.25, expected=-0.09507589774771713
+            params={"a": 3.3, "b": 5.0, "c_scale": 1.0}, x=3.81, c=0.425, expected=-0.09507589774771713
         ),
         FormulaTestCase.value(
-            params={"a": 4.2, "b": 4.26, "c_scale": 0.06}, x=4.218, c=0.25, expected=0.07098460158622959
+            params={"a": 4.2, "b": 4.26, "c_scale": 0.1}, x=4.218, c=0.15, expected=0.07098460158622959
         ),
-        FormulaTestCase.interval_bounds(params={"a": 3.3, "b": 5.0, "c_scale": 1.7}, expected=(3.3, 5.0)),
-        FormulaTestCase.interval_bounds(params={"a": 4.2, "b": 4.26, "c_scale": 0.06}, expected=(4.2, 4.26)),
+        FormulaTestCase.interval_bounds(params={"a": 3.3, "b": 5.0, "c_scale": 1.0}, expected=(3.3, 5.0)),
+        FormulaTestCase.interval_bounds(params={"a": 4.2, "b": 4.26, "c_scale": 0.1}, expected=(4.2, 4.26)),
     )

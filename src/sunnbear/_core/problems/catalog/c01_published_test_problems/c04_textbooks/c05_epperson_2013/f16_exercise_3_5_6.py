@@ -27,7 +27,7 @@ class Epperson2013Exercise356(Formula):
     params = ()
     location_in_publication = "Exercises 3.5-6, 3.5-7, 3.11-15, 3.11-16"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"4 \tmp{u} - \cos{\left(\tmp{u} \right)}",
         interval="[-2, 2]",
         summary="A function close to a line, with a slope between 3 and 5 everywhere and 1 simple root.",
@@ -37,7 +37,7 @@ class Epperson2013Exercise356(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         return 4 * x - math.cos(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Epperson2013Exercise356(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.8, c=0.0, expected=-3.8967067093471655),
-        FormulaTestCase.value(params={}, x=-0.8, c=0.25, expected=-6.972797905306913),
+        FormulaTestCase.value(params={}, x=-0.8, c=0.1, expected=-6.972797905306913),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 2.0)),
     )

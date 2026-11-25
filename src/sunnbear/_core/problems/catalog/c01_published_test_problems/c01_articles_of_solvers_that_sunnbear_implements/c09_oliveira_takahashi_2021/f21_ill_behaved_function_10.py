@@ -30,14 +30,14 @@ class OliveiraTakahashi2021IllBehavedFunction10(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 10"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} 1 + \sin{\left(\frac{1}{\tmp{u} + 1} \right)} & \text{for}\: \tmp{u} > -1 "
             r"\\0 & \text{otherwise} \end{cases} - 1"
         ),
         interval="[-1, 1]",
         summary=(
-            r"A sine that oscillates ever faster toward $\x = 2 \c - 1$, with roots that accumulate at that point, "
+            r"A sine that oscillates ever faster toward $\x = \c - 1$, with roots that accumulate at that point, "
             r'referred to in the source as "Warsaw".'
         ),
     )
@@ -46,7 +46,7 @@ class OliveiraTakahashi2021IllBehavedFunction10(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return ((1 + math.sin(1 / (x + 1))) if (x) > (-1) else 0.0) - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -59,6 +59,6 @@ class OliveiraTakahashi2021IllBehavedFunction10(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=0.9954079577517649),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.5440211108893717),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.5440211108893717),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

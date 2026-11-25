@@ -25,7 +25,7 @@ class RootsFortran2025Case152(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 152"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4.95 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\pi - \frac{1}{\tmp{u}}",
         interval="[0.05, 5]",
         summary=(
@@ -38,7 +38,7 @@ class RootsFortran2025Case152(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.95 * c
+        x = x - 10.0 * c
         return math.pi - 1.0 / x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class RootsFortran2025Case152(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.535, c=0.0, expected=2.4901268555441907),
-        FormulaTestCase.value(params={}, x=1.535, c=0.25, expected=-0.2197518842253342),
+        FormulaTestCase.value(params={}, x=1.535, c=0.12375, expected=-0.2197518842253342),
         FormulaTestCase.interval_bounds(params={}, expected=(0.05, 5.0)),
     )

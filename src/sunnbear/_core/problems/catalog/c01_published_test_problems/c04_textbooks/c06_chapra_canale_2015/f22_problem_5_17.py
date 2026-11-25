@@ -39,7 +39,7 @@ class ChapraCanale2015Problem517(Formula):
     )
     location_in_publication = "Prob. 5.17, 5.19, 6.19, 8.9"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\param{V} - \frac{\pi \tmp{u}^{2} \left(3 \param{R} - \tmp{u}\right)}{3}",
         interval="[0, 3]",
         summary=(
@@ -53,7 +53,7 @@ class ChapraCanale2015Problem517(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, R: float, V: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return (V) - (math.pi * x**2 * (3 * R - x) / 3)
 
     def interval_bounds(self, R: float, V: float) -> tuple[float, float]:
@@ -66,6 +66,6 @@ class ChapraCanale2015Problem517(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.0, expected=23.12933686659912),
-        FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.25, expected=29.791476787617977),
+        FormulaTestCase.value(params={"R": 3.0, "V": 30.0}, x=0.9, c=0.75, expected=29.791476787617977),
         FormulaTestCase.interval_bounds(params={"R": 3.0, "V": 30.0}, expected=(0.0, 3.0)),
     )

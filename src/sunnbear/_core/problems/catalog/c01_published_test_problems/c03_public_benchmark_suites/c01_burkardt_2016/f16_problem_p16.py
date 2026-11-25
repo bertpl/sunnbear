@@ -73,34 +73,34 @@ class Burkardt2016ProblemP16(Formula):
         return (
             ParamTable(
                 names=("e", "m", "a", "b", "c_scale"),
-                rows=((0.8, 5.0, -175.0, 185.0, 360.0), (0.8, 5.0, 0.0, 185.0, 185.0)),
+                rows=((0.8, 5.0, -175.0, 185.0, 1000.0), (0.8, 5.0, 0.0, 185.0, 100.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0},
+            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 1000.0},
             x=-67.0,
             c=0.0,
             expected=-0.520233178673965,
         ),
         FormulaTestCase.value(
-            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0},
+            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 1000.0},
             x=-67.0,
-            c=0.25,
+            c=0.09,
             expected=-2.514848485439395,
         ),
         FormulaTestCase.value(
-            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0, "c_scale": 185.0},
+            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0, "c_scale": 100.0},
             x=55.5,
             c=0.0,
             expected=0.22209032135952392,
         ),
         FormulaTestCase.interval_bounds(
-            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 360.0}, expected=(-175.0, 185.0)
+            params={"e": 0.8, "m": 5.0, "a": -175.0, "b": 185.0, "c_scale": 1000.0}, expected=(-175.0, 185.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0, "c_scale": 185.0}, expected=(0.0, 185.0)
+            params={"e": 0.8, "m": 5.0, "a": 0.0, "b": 185.0, "c_scale": 100.0}, expected=(0.0, 185.0)
         ),
     )

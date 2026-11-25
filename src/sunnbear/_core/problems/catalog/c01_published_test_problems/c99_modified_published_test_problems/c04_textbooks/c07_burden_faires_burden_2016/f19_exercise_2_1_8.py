@@ -36,7 +36,7 @@ class ModifiedBurdenFairesBurden2016Exercise218(Formula):
     params = ()
     location_in_publication = "Exercises 2.1-8, 2.2-16"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.6 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} - \tan{\left(\tmp{u} \right)}",
         interval="[4, 4.6]",
         summary=(
@@ -59,7 +59,7 @@ class ModifiedBurdenFairesBurden2016Exercise218(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 0.6 * c
+        x = x - 1.0 * c
         return (x) - (math.tan(x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -71,6 +71,6 @@ class ModifiedBurdenFairesBurden2016Exercise218(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=4.18, c=0.25, expected=2.7994128881553113),
+        FormulaTestCase.value(params={}, x=4.18, c=0.15, expected=2.7994128881553113),
         FormulaTestCase.interval_bounds(params={}, expected=(4.0, 4.6)),
     )

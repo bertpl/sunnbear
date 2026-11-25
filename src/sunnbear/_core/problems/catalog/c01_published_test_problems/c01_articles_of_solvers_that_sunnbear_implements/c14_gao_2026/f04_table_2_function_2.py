@@ -25,7 +25,7 @@ class Gao2026Table2Function2(Formula):
     params = ()
     location_in_publication = "Table 2, function 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{7}",
         interval="[-3, 5]",
         summary="A 7th power, below $10^{-4}$ in magnitude within 0.26 of its root.",
@@ -35,7 +35,7 @@ class Gao2026Table2Function2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 8.0 * c
+        x = x - 10.0 * c
         return x**7
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Gao2026Table2Function2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.6, c=0.0, expected=-0.027993599999999993),
-        FormulaTestCase.value(params={}, x=-0.6, c=0.25, expected=-803.1810176000002),
+        FormulaTestCase.value(params={}, x=-0.6, c=0.2, expected=-803.1810176000002),
         FormulaTestCase.interval_bounds(params={}, expected=(-3.0, 5.0)),
     )

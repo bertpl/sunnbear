@@ -29,7 +29,8 @@ class ModifiedEllithy2026Problem20(Formula):
     ``[0.02, 2]``: its lower bound moves right of the root at 0 by 1% of the published interval's width, rounded half up
     to 1 significant digit.
 
-    ``c`` shifts x by the rule of category 1, with ``c_scale`` the rounded width of the new interval.
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the power of 10 nearest the width of the new interval
+    on a log scale.
 
     The published test problem on ``[0, 2]`` does not satisfy the benchmark suite inclusion conditions, because
     ``f(a)`` is 0 at the root ``a = 0``.
@@ -40,11 +41,11 @@ class ModifiedEllithy2026Problem20(Formula):
     params = (FormulaParam("k", latex_symbol="k"),)
     location_in_publication = "dataset.json, problems 20 and 39"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"e^{\tmp{u}^{2}} - e^{\param{k} \tmp{u}}",
         interval="[0.02, 2]",
         summary=(
-            r"A function negative between its roots $\x = 1.98 \c$ and $\x = 1.98 \c + \param{k}$, with only the second"
+            r"A function negative between its roots $\x = \c$ and $\x = \c + \param{k}$, with only the second"
             r" root on the interval."
         ),
         notes=(
@@ -59,7 +60,7 @@ class ModifiedEllithy2026Problem20(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, k: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.98 * c
+        x = x - 1.0 * c
         return math.exp(x**2) - math.exp(k * x)
 
     def interval_bounds(self, k: float) -> tuple[float, float]:
@@ -71,6 +72,6 @@ class ModifiedEllithy2026Problem20(Formula):
         return (ParamTable(names=("k",), rows=((1.2,),), summary="The published parameter value $\\param{k} = 1.2$."),)
 
     test_cases = (
-        FormulaTestCase.value(params={"k": 1.2}, x=0.614, c=0.25, expected=-0.1392373368444251),
+        FormulaTestCase.value(params={"k": 1.2}, x=0.614, c=0.495, expected=-0.1392373368444251),
         FormulaTestCase.interval_bounds(params={"k": 1.2}, expected=(0.02, 2.0)),
     )

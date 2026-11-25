@@ -68,23 +68,23 @@ class Bradie2006Example22(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.4, 0.48, 0.08), (0.0, 0.48, 0.48), (0.0, 0.5, 0.5)),
+                rows=((0.4, 0.48, 0.1), (0.0, 0.48, 1.0), (0.0, 0.5, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.4, "b": 0.48, "c_scale": 0.08}, x=0.424, c=0.0, expected=-2.315603156282293
+            params={"a": 0.4, "b": 0.48, "c_scale": 0.1}, x=0.424, c=0.0, expected=-2.315603156282293
         ),
         FormulaTestCase.value(
-            params={"a": 0.4, "b": 0.48, "c_scale": 0.08}, x=0.424, c=0.25, expected=-3.189417921365977
+            params={"a": 0.4, "b": 0.48, "c_scale": 0.1}, x=0.424, c=0.2, expected=-3.189417921365977
         ),
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 0.48, "c_scale": 0.48}, x=0.144, c=0.0, expected=-5.657994647140798
+            params={"a": 0.0, "b": 0.48, "c_scale": 1.0}, x=0.144, c=0.0, expected=-5.657994647140798
         ),
-        FormulaTestCase.value(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, x=0.15, c=0.0, expected=-5.640474550505571),
-        FormulaTestCase.interval_bounds(params={"a": 0.4, "b": 0.48, "c_scale": 0.08}, expected=(0.4, 0.48)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.48, "c_scale": 0.48}, expected=(0.0, 0.48)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 0.5}, expected=(0.0, 0.5)),
+        FormulaTestCase.value(params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, x=0.15, c=0.0, expected=-5.640474550505571),
+        FormulaTestCase.interval_bounds(params={"a": 0.4, "b": 0.48, "c_scale": 0.1}, expected=(0.4, 0.48)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.48, "c_scale": 1.0}, expected=(0.0, 0.48)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 0.5, "c_scale": 1.0}, expected=(0.0, 0.5)),
     )

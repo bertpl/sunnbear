@@ -31,7 +31,7 @@ class DowellJarratt1972Problem2(Formula):
     params = (FormulaParam("K", latex_symbol="K"),)
     location_in_publication = "Problem 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.9 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"J_{0}\left(\param{K}\right) Y_{1}\left(\param{K} \tmp{u}\right) - J_{1}\left(\param{K} "
             r"\tmp{u}\right) Y_{0}\left(\param{K}\right)"
@@ -44,7 +44,7 @@ class DowellJarratt1972Problem2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, K: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.9 * c
+        x = x - 1.0 * c
         return bessel_j0(K) * bessel_y1(K * x) - bessel_j1(K * x) * bessel_y0(K)
 
     def interval_bounds(self, K: float) -> tuple[float, float]:
@@ -57,7 +57,7 @@ class DowellJarratt1972Problem2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"K": 2.5}, x=0.37, c=0.0, expected=-0.16549921993513564),
-        FormulaTestCase.value(params={"K": 2.5}, x=0.37, c=0.25, expected=0.0050575863514413745),
+        FormulaTestCase.value(params={"K": 2.5}, x=0.37, c=0.225, expected=0.0050575863514413745),
         FormulaTestCase.value(params={"K": 3.0}, x=0.37, c=0.0, expected=0.0009313171849989814),
         FormulaTestCase.interval_bounds(params={"K": 2.5}, expected=(0.1, 1.0)),
     )

@@ -28,7 +28,7 @@ class BusDekker1975GroupIii(Formula):
     params = (FormulaParam("n", latex_symbol="n"),)
     location_in_publication = "Group III"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 11 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{\param{n}}",
         interval="[-1, 10]",
         summary="An odd power, below 0.01 in magnitude within 0.2 of its root.",
@@ -38,7 +38,7 @@ class BusDekker1975GroupIii(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 11.0 * c
+        x = x - 10.0 * c
         return x**n
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
@@ -57,7 +57,7 @@ class BusDekker1975GroupIii(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"n": 3.0}, x=2.3, c=0.0, expected=12.166999999999998),
-        FormulaTestCase.value(params={"n": 3.0}, x=2.3, c=0.25, expected=-0.09112500000000011),
+        FormulaTestCase.value(params={"n": 3.0}, x=2.3, c=0.275, expected=-0.09112500000000011),
         FormulaTestCase.value(params={"n": 5.0}, x=2.3, c=0.0, expected=64.36342999999998),
         FormulaTestCase.value(params={"n": 7.0}, x=2.3, c=0.0, expected=340.48254469999983),
         FormulaTestCase.value(params={"n": 9.0}, x=2.3, c=0.0, expected=1801.1526614629988),

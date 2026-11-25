@@ -46,7 +46,7 @@ class ModifiedBusDekker1975GroupIv(Formula):
     location_in_publication = "Group IV"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 5 \c"),
+            (r"\tmp{u}", r"\x - 10 \c"),
             (
                 r"\fn{g}(\x)",
                 (
@@ -82,7 +82,7 @@ class ModifiedBusDekker1975GroupIv(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         # below 1e-100, float64 rounds x*exp(-x^-2) to 0, and x**-2 overflows
         if abs(x) < 1e-100:
             published_value = 0.0
@@ -102,7 +102,7 @@ class ModifiedBusDekker1975GroupIv(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),
-        FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.12675998655454956),
+        FormulaTestCase.value(params={}, x=0.5, c=0.125, expected=-0.12675998655454956),
         FormulaTestCase.value(params={}, x=0.01, c=0.0, expected=4.512985939662074e-279, atol=0.0),
         FormulaTestCase.value(params={}, x=0.0, c=0.0, expected=0.0, atol=0.0),
     )

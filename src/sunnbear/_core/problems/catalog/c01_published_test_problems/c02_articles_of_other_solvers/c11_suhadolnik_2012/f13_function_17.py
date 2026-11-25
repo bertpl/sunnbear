@@ -25,7 +25,7 @@ class Suhadolnik2012Function17(Formula):
     params = ()
     location_in_publication = "Table 1, function 17"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.833 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3}",
         interval=r"\left[-0.5, \frac{1}{3}\right]",
         summary="A cube with a triple root, below 0.02 in magnitude within 0.25 of that root.",
@@ -35,7 +35,7 @@ class Suhadolnik2012Function17(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.833 * c
+        x = x - 1.0 * c
         return x**3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Suhadolnik2012Function17(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.25, c=0.0, expected=-0.015625),
-        FormulaTestCase.value(params={}, x=-0.25, c=0.25, expected=-0.096229320890625),
+        FormulaTestCase.value(params={}, x=-0.25, c=0.20825, expected=-0.096229320890625),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.5, 0.3333333333333333)),
     )

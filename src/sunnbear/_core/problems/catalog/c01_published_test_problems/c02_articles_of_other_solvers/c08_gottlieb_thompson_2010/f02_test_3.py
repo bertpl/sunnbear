@@ -56,16 +56,14 @@ class GottliebThompson2010Test3(Formula):
         """Return the published parameter values."""
         return (
             ParamTable(
-                names=("a", "b", "c_scale"), rows=((0.1, 0.9, 0.8), (0.4, 1.0, 0.6)), summary="The published intervals."
+                names=("a", "b", "c_scale"), rows=((0.1, 0.9, 1.0), (0.4, 1.0, 1.0)), summary="The published intervals."
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.1, "b": 0.9, "c_scale": 0.8}, x=0.34, c=0.0, expected=-0.9999227922719982),
-        FormulaTestCase.value(
-            params={"a": 0.1, "b": 0.9, "c_scale": 0.8}, x=0.34, c=0.25, expected=-0.9999999955454784
-        ),
-        FormulaTestCase.value(params={"a": 0.4, "b": 1.0, "c_scale": 0.6}, x=0.58, c=0.0, expected=-0.972514691599818),
-        FormulaTestCase.interval_bounds(params={"a": 0.1, "b": 0.9, "c_scale": 0.8}, expected=(0.1, 0.9)),
-        FormulaTestCase.interval_bounds(params={"a": 0.4, "b": 1.0, "c_scale": 0.6}, expected=(0.4, 1.0)),
+        FormulaTestCase.value(params={"a": 0.1, "b": 0.9, "c_scale": 1.0}, x=0.34, c=0.0, expected=-0.9999227922719982),
+        FormulaTestCase.value(params={"a": 0.1, "b": 0.9, "c_scale": 1.0}, x=0.34, c=0.2, expected=-0.9999999955454784),
+        FormulaTestCase.value(params={"a": 0.4, "b": 1.0, "c_scale": 1.0}, x=0.58, c=0.0, expected=-0.972514691599818),
+        FormulaTestCase.interval_bounds(params={"a": 0.1, "b": 0.9, "c_scale": 1.0}, expected=(0.1, 0.9)),
+        FormulaTestCase.interval_bounds(params={"a": 0.4, "b": 1.0, "c_scale": 1.0}, expected=(0.4, 1.0)),
     )

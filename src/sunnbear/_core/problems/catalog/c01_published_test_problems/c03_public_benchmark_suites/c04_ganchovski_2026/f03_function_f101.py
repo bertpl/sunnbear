@@ -25,7 +25,7 @@ class Ganchovski2026FunctionF101(Formula):
     params = ()
     location_in_publication = "f101"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\begin{cases} - \tmp{u}^{2} & \text{for}\: \tmp{u} < 0 \\7 \tmp{u}^{2} & \text{otherwise} " r"\end{cases}"
         ),
@@ -40,7 +40,7 @@ class Ganchovski2026FunctionF101(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         if x < 0:
             return -(x**2)
         else:
@@ -56,7 +56,7 @@ class Ganchovski2026FunctionF101(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.8, c=0.0, expected=-3.24),
-        FormulaTestCase.value(params={}, x=-1.8, c=0.25, expected=-7.839999999999999),
+        FormulaTestCase.value(params={}, x=-1.8, c=0.1, expected=-7.839999999999999),
         FormulaTestCase.value(params={}, x=1.0, c=0.0, expected=7.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-3.0, 1.0)),
     )

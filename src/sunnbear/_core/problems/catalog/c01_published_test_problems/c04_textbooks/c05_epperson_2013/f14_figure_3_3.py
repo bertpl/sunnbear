@@ -29,14 +29,14 @@ class Epperson2013Figure33(Formula):
     params = ()
     location_in_publication = "§3.2 (p. 99), Fig. 3.3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\frac{4 e^{2 - \frac{\tmp{u}}{2}} \left(1 + \frac{\ln{\left(\tmp{u} " r"\right)}}{\tmp{u}}\right)}{3}"
         ),
         interval="[0, 8]",
         summary=(
-            r"A function that tends to $-\infty$ as $\x$ decreases to $8 \c$, rises through 1 simple root to a maximum,"
-            r" and then decays toward 0."
+            r"A function that tends to $-\infty$ as $\x$ decreases to $10 \c$, rises through 1 simple root to a "
+            r"maximum, and then decays toward 0."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -44,7 +44,7 @@ class Epperson2013Figure33(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 8.0 * c
+        x = x - 10.0 * c
         return (4 / 3) * math.exp(2 - x / 2) * (1 + x**-1 * math.log(x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -57,6 +57,6 @@ class Epperson2013Figure33(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=2.4, c=0.0, expected=4.049827630543694),
-        FormulaTestCase.value(params={}, x=2.4, c=0.25, expected=-10.411256389941297),
+        FormulaTestCase.value(params={}, x=2.4, c=0.2, expected=-10.411256389941297),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 8.0)),
     )

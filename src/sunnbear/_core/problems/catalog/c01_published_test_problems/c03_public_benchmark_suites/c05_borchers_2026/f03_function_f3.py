@@ -25,12 +25,12 @@ class Borchers2026FunctionF3(Formula):
     params = ()
     location_in_publication = "§5.6, f3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2.4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"35 \tmp{u}^{35} - 1",
         interval="[-0.5, 1.9]",
         summary=(
             r"A 35th power minus 1, with 1 root, steep above that root, and exactly $-1$ in floating point on a band "
-            r"0.63 wide centered on $\x = 2.4 \c$."
+            r"0.63 wide centered on $\x = \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -38,7 +38,7 @@ class Borchers2026FunctionF3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.4 * c
+        x = x - 1.0 * c
         return 35 * x**35 - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Borchers2026FunctionF3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.18, c=0.0, expected=11478.905156430781),
-        FormulaTestCase.value(params={}, x=1.18, c=0.25, expected=-0.9999998163259429),
+        FormulaTestCase.value(params={}, x=1.18, c=0.6, expected=-0.9999998163259429),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.5, 1.9)),
     )

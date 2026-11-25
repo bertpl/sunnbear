@@ -24,7 +24,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF37(Formula):
     params = ()
     location_in_publication = "Table 2, f37"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\left(\tmp{u} - \frac{7}{9}\right)^{3} + \frac{\tmp{u} - \frac{7}{9}}{10^{3}}",
         interval="[-11, 9]",
         summary="A cubic plus a small linear term, increasing, with a simple root where its slope is only $10^{-3}$.",
@@ -34,7 +34,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF37(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return (x - 7 / 9) ** 3 + (x - 7 / 9) * 10**-3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -47,6 +47,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF37(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-5.0, c=0.0, expected=-192.8836927297668),
-        FormulaTestCase.value(params={}, x=-5.0, c=0.25, expected=-1251.9627668038409),
+        FormulaTestCase.value(params={}, x=-5.0, c=0.5, expected=-1251.9627668038409),
         FormulaTestCase.interval_bounds(params={}, expected=(-11.0, 9.0)),
     )

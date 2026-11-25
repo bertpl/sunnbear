@@ -27,7 +27,7 @@ class Zhang2011Section3(Formula):
     params = ()
     location_in_publication = "Section 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} - \tmp{u}^{3}",
         interval="[-4, 4]",
         summary=(
@@ -40,7 +40,7 @@ class Zhang2011Section3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 8.0 * c
+        x = x - 10.0 * c
         return math.cos(x) - x**3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class Zhang2011Section3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.6, c=0.0, expected=4.0668004776987114),
-        FormulaTestCase.value(params={}, x=-1.6, c=0.25, expected=45.759241583665855),
+        FormulaTestCase.value(params={}, x=-1.6, c=0.2, expected=45.759241583665855),
         FormulaTestCase.interval_bounds(params={}, expected=(-4.0, 4.0)),
     )

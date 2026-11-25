@@ -61,7 +61,7 @@ class Ellithy2026Problem20(Formula):
         return (
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
-                rows=((1.4142135623730951, 0.5, 1.5, 1.0), (1.2, 0.0, 2.0, 2.0)),
+                rows=((1.4142135623730951, 0.5, 1.5, 1.0), (1.2, 0.0, 2.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
@@ -80,10 +80,10 @@ class Ellithy2026Problem20(Formula):
             expected=-0.8234786290091135,
         ),
         FormulaTestCase.value(
-            params={"k": 1.2, "a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=-0.6211037960835475
+            params={"k": 1.2, "a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.0, expected=-0.6211037960835475
         ),
         FormulaTestCase.interval_bounds(
             params={"k": 1.4142135623730951, "a": 0.5, "b": 1.5, "c_scale": 1.0}, expected=(0.5, 1.5)
         ),
-        FormulaTestCase.interval_bounds(params={"k": 1.2, "a": 0.0, "b": 2.0, "c_scale": 2.0}, expected=(0.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"k": 1.2, "a": 0.0, "b": 2.0, "c_scale": 1.0}, expected=(0.0, 2.0)),
     )

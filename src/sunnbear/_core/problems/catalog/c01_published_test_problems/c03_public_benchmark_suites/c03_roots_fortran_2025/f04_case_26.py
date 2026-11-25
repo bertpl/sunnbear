@@ -77,7 +77,7 @@ class RootsFortran2025Case26(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-1.0, 4.0, 5.0), (-1.1234, 4.4567, 5.58)),
+                rows=((-1.0, 4.0, 10.0), (-1.1234, 4.4567, 10.0)),
                 summary="The published intervals.",
             ),
         )
@@ -85,21 +85,23 @@ class RootsFortran2025Case26(Formula):
     # a case with `atol=0.0` has an expected value so small that the default `atol`
     # would accept any value near 0, 0 among them
     test_cases = (
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.5, c=0.0, expected=0.00915781944436709),
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.5, c=0.25, expected=-0.12675998655454956
+            params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=0.5, c=0.0, expected=0.00915781944436709
         ),
         FormulaTestCase.value(
-            params={"a": -1.1234, "b": 4.4567, "c_scale": 5.58}, x=0.55063, c=0.0, expected=0.020345061698967323
+            params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=0.5, c=0.125, expected=-0.12675998655454956
         ),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.0, c=0.0, expected=0.0),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=1e-200, c=0.0, expected=0.0),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.01, c=0.0, expected=0.0, atol=0.0),
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.04, c=0.0, expected=1.4723423419207585e-273, atol=0.0
+            params={"a": -1.1234, "b": 4.4567, "c_scale": 10.0}, x=0.55063, c=0.0, expected=0.020345061698967323
         ),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, expected=(-1.0, 4.0)),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=0.0, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=1e-200, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=0.01, c=0.0, expected=0.0, atol=0.0),
+        FormulaTestCase.value(
+            params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=0.04, c=0.0, expected=1.4723423419207585e-273, atol=0.0
+        ),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, expected=(-1.0, 4.0)),
         FormulaTestCase.interval_bounds(
-            params={"a": -1.1234, "b": 4.4567, "c_scale": 5.58}, expected=(-1.1234, 4.4567)
+            params={"a": -1.1234, "b": 4.4567, "c_scale": 10.0}, expected=(-1.1234, 4.4567)
         ),
     )

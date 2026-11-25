@@ -36,7 +36,7 @@ class ChapraCanale2015Problem833(Formula):
     )
     location_in_publication = "Prob. 8.33"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 999 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 1000 \c"),),
         expression=(
             r"\frac{1}{\param{Z}} - \sqrt{\frac{1}{\param{R}^{2}} + \left(\tmp{u} \param{C} - "
             r"\frac{1}{\tmp{u} \param{L}}\right)^{2}}"
@@ -53,7 +53,7 @@ class ChapraCanale2015Problem833(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, R: float, C: float, L: float, Z: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 999.0 * c
+        x = x - 1000.0 * c
         return (1 / Z) - (math.sqrt(1 / R**2 + (x * C - 1 / (x * L)) ** 2))
 
     def interval_bounds(self, R: float, C: float, L: float, Z: float) -> tuple[float, float]:
@@ -73,7 +73,7 @@ class ChapraCanale2015Problem833(Formula):
             params={"R": 225.0, "C": 6e-07, "L": 0.5, "Z": 75.0}, x=300.7, c=0.0, expected=0.005483276103780892
         ),
         FormulaTestCase.value(
-            params={"R": 225.0, "C": 6e-07, "L": 0.5, "Z": 75.0}, x=300.7, c=0.25, expected=-0.026141265368335758
+            params={"R": 225.0, "C": 6e-07, "L": 0.5, "Z": 75.0}, x=300.7, c=0.24975, expected=-0.026141265368335758
         ),
         FormulaTestCase.interval_bounds(params={"R": 225.0, "C": 6e-07, "L": 0.5, "Z": 75.0}, expected=(1.0, 1000.0)),
     )

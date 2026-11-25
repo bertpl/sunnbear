@@ -57,19 +57,19 @@ class Brent1973Row1(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-1.0, 1.1, 2.1), (-1.0, 4.0, 5.0)),
+                rows=((-1.0, 1.1, 1.0), (-1.0, 4.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 1.1, "c_scale": 2.1}, x=-0.37, c=0.0, expected=-0.00012996173979507698
+            params={"a": -1.0, "b": 1.1, "c_scale": 1.0}, x=-0.37, c=0.0, expected=-0.00012996173979507698
         ),
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 1.1, "c_scale": 2.1}, x=-0.37, c=0.25, expected=-0.36847439787320274
+            params={"a": -1.0, "b": 1.1, "c_scale": 1.0}, x=-0.37, c=0.525, expected=-0.36847439787320274
         ),
-        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, x=0.5, c=0.0, expected=0.001953125),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.1, "c_scale": 2.1}, expected=(-1.0, 1.1)),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0, "c_scale": 5.0}, expected=(-1.0, 4.0)),
+        FormulaTestCase.value(params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, x=0.5, c=0.0, expected=0.001953125),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.1, "c_scale": 1.0}, expected=(-1.0, 1.1)),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 4.0, "c_scale": 10.0}, expected=(-1.0, 4.0)),
     )

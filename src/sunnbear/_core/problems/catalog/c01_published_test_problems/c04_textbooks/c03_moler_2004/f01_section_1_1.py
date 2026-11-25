@@ -28,17 +28,17 @@ class Moler2004Section11(Formula):
     params = ()
     location_in_publication = "§1.1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\frac{1}{\tmp{u}} - \left(\tmp{u} - 1\right)",
         interval="[0, 4]",
-        summary=r"A decreasing function with a pole at $\x = 4 \c$ and 1 root, at $4 \c$ plus the golden ratio.",
+        summary=r"A decreasing function with a pole at $\x = 10 \c$ and 1 root, at $10 \c$ plus the golden ratio.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         return 1 / x - (x - 1)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Moler2004Section11(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.2, c=0.0, expected=0.6333333333333334),
-        FormulaTestCase.value(params={}, x=1.2, c=0.25, expected=5.800000000000002),
+        FormulaTestCase.value(params={}, x=1.2, c=0.1, expected=5.800000000000002),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 4.0)),
     )

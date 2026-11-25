@@ -31,17 +31,17 @@ class Moler2004Section47Function3(Formula):
     params = (FormulaParam("y", latex_symbol="y"),)
     location_in_publication = "§4.7, function 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"J_{0}\left(\tmp{u}\right) - \param{y}",
         interval="[0, 2]",
-        summary=r"A function with a maximum at $\x = 2 \c$ and 1 simple root on the interval, 1.52 above that maximum.",
+        summary=r"A function with a maximum at $\x = \c$ and 1 simple root on the interval, 1.52 above that maximum.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float, y: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return bessel_j0(x) - y
 
     def interval_bounds(self, y: float) -> tuple[float, float]:
@@ -54,6 +54,6 @@ class Moler2004Section47Function3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"y": 0.5}, x=0.6, c=0.0, expected=0.41200486349721077),
-        FormulaTestCase.value(params={"y": 0.5}, x=0.6, c=0.25, expected=0.49750156206604),
+        FormulaTestCase.value(params={"y": 0.5}, x=0.6, c=0.5, expected=0.49750156206604),
         FormulaTestCase.interval_bounds(params={"y": 0.5}, expected=(0.0, 2.0)),
     )

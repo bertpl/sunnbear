@@ -32,7 +32,7 @@ class ModifiedEllithy2026Problem38(Formula):
     params = ()
     location_in_publication = "dataset.json, problem 38"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3.96 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{4} + 2 \tmp{u}^{3} - 13 \tmp{u}^{2} - 14 \tmp{u} + 24",
         interval="[-3, 0.96]",
         summary=(
@@ -51,7 +51,7 @@ class ModifiedEllithy2026Problem38(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.96 * c
+        x = x - 10.0 * c
         return x**4 + 2 * x**3 - 13 * x**2 - 14 * x + 24
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -63,6 +63,6 @@ class ModifiedEllithy2026Problem38(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-1.812, c=0.25, expected=-21.194394966384),
+        FormulaTestCase.value(params={}, x=-1.812, c=0.099, expected=-21.194394966384),
         FormulaTestCase.interval_bounds(params={}, expected=(-3.0, 0.96)),
     )

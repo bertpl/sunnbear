@@ -56,19 +56,19 @@ class Burkardt2016ProblemP08(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-10.0, 10.0, 20.0), (0.5, 1.0, 0.5)),
+                rows=((-10.0, 10.0, 10.0), (0.5, 1.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.0, expected=3.346356379136388
+            params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=-4.0, c=0.0, expected=3.346356379136388
         ),
         FormulaTestCase.value(
-            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.25, expected=8.088869738115323
+            params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=-4.0, c=0.5, expected=8.088869738115323
         ),
-        FormulaTestCase.value(params={"a": 0.5, "b": 1.0, "c_scale": 0.5}, x=0.65, c=0.0, expected=0.1460837985490558),
-        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, expected=(-10.0, 10.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 1.0, "c_scale": 0.5}, expected=(0.5, 1.0)),
+        FormulaTestCase.value(params={"a": 0.5, "b": 1.0, "c_scale": 1.0}, x=0.65, c=0.0, expected=0.1460837985490558),
+        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, expected=(-10.0, 10.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.5, "b": 1.0, "c_scale": 1.0}, expected=(0.5, 1.0)),
     )

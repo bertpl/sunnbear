@@ -82,7 +82,7 @@ class Burkardt2016ProblemP12(Formula):
         return (
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
-                rows=((1000.0, -4.0, 4.1, 8.1), (1000.0, 0.5, 2.0, 1.5)),
+                rows=((1000.0, -4.0, 4.1, 10.0), (1000.0, 0.5, 2.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
@@ -91,24 +91,24 @@ class Burkardt2016ProblemP12(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.value(
-            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.0, expected=-2208.918772196994
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 10.0}, x=-1.57, c=0.0, expected=-2208.918772196994
         ),
         FormulaTestCase.value(
-            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=-1.57, c=0.25, expected=-4382.445368656935
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 10.0}, x=-1.57, c=0.2025, expected=-4382.445368656935
         ),
         FormulaTestCase.value(
-            params={"k": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5},
+            params={"k": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.0},
             x=0.95,
             c=0.0,
             expected=-9.575847983576841e-173,
             atol=0.0,
         ),
-        FormulaTestCase.value(params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=1.0, c=0.0, expected=0.0),
+        FormulaTestCase.value(params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 10.0}, x=1.0, c=0.0, expected=0.0),
         FormulaTestCase.value(
-            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, x=1.5, c=0.0, expected=9.15781944436709
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 10.0}, x=1.5, c=0.0, expected=9.15781944436709
         ),
         FormulaTestCase.interval_bounds(
-            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 8.1}, expected=(-4.0, 4.1)
+            params={"k": 1000.0, "a": -4.0, "b": 4.1, "c_scale": 10.0}, expected=(-4.0, 4.1)
         ),
-        FormulaTestCase.interval_bounds(params={"k": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.5}, expected=(0.5, 2.0)),
+        FormulaTestCase.interval_bounds(params={"k": 1000.0, "a": 0.5, "b": 2.0, "c_scale": 1.0}, expected=(0.5, 2.0)),
     )

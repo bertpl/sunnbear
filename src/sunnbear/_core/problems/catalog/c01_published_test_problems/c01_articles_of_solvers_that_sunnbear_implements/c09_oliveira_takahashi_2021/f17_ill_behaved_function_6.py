@@ -28,7 +28,7 @@ class OliveiraTakahashi2021IllBehavedFunction6(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 6"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\begin{cases} "
             r"0 & \text{if } 21 \tmp{u} - 1 = 0 \\ "
@@ -46,7 +46,7 @@ class OliveiraTakahashi2021IllBehavedFunction6(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         denominator = 21 * x - 1
         if denominator == 0.0:
             return 0.0
@@ -63,7 +63,7 @@ class OliveiraTakahashi2021IllBehavedFunction6(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.10638297872340426),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.05025125628140703),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.05025125628140703),
         FormulaTestCase.value(params={}, x=1 / 21, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

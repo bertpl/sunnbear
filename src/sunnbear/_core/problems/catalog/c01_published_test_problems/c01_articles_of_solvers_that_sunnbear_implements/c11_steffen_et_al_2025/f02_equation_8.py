@@ -69,7 +69,7 @@ class SteffenEtAl2025Equation8(Formula):
     location_in_publication = "Eq. (8)"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 3 \c"),
+            (r"\tmp{u}", r"\x - \c"),
             (
                 r"\fn{\alpha}(\param{omega}, \param{Tr})",
                 r"\left(1 + (0.37464 + 1.54226 \param{omega} - 0.26992 \param{omega}^2)"
@@ -105,7 +105,7 @@ class SteffenEtAl2025Equation8(Formula):
         Pr: float,
     ) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         alpha = (1 + (0.37464 + 1.54226 * omega - 0.26992 * omega**2) * (1 - math.sqrt(Tr))) ** 2
         return (
             x**3
@@ -156,7 +156,7 @@ class SteffenEtAl2025Equation8(Formula):
                 "Pr": 0.45,
             },
             x=14.9,
-            c=0.25,
+            c=0.75,
             expected=-86.8301765128466,
         ),
         FormulaTestCase.interval_bounds(

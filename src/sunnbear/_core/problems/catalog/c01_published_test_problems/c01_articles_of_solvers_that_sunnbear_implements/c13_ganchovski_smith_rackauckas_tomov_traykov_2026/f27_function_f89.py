@@ -25,7 +25,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF89(Formula):
     params = ()
     location_in_publication = "Table 2, f89"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 9 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\sin{\left(20 \tmp{u} \right)} + 0.1 \tmp{u} - 0.1",
         interval="[-4, 5]",
         summary="A sine with about 29 periods on a slowly rising line, with 57 simple roots.",
@@ -35,7 +35,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF89(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 9.0 * c
+        x = x - 10.0 * c
         return math.sin(20 * x) + 0.1 * x - 0.1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF89(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.3, c=0.0, expected=-0.9925584504796033),
-        FormulaTestCase.value(params={}, x=-1.3, c=0.25, expected=-1.4060546532543756),
+        FormulaTestCase.value(params={}, x=-1.3, c=0.225, expected=-1.4060546532543756),
         FormulaTestCase.interval_bounds(params={}, expected=(-4.0, 5.0)),
     )

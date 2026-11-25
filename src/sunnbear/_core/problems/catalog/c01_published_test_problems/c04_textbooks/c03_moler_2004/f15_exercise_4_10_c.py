@@ -26,11 +26,11 @@ class Moler2004Exercise410C(Formula):
     params = ()
     location_in_publication = "Exercise 4.10(c)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 31.4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"J_{0}\left(\tmp{u}\right) - Y_{0}\left(\tmp{u}\right)",
         interval=r"[0, 10 \pi]",
         summary=(
-            r"A function, $+\infty$ at $\x = 31.4 \c$, with 10 simple roots and an oscillation of decaying amplitude."
+            r"A function, $+\infty$ at $\x = 10 \c$, with 10 simple roots and an oscillation of decaying amplitude."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -38,7 +38,7 @@ class Moler2004Exercise410C(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 31.4 * c
+        x = x - 10.0 * c
         return (bessel_j0(x)) - (bessel_y0(x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Moler2004Exercise410C(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=9.42478, c=0.0, expected=-0.36726657736486834),
-        FormulaTestCase.value(params={}, x=9.42478, c=0.25, expected=0.05828461127689465),
+        FormulaTestCase.value(params={}, x=9.42478, c=0.785, expected=0.05828461127689465),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 31.41592653589793)),
     )

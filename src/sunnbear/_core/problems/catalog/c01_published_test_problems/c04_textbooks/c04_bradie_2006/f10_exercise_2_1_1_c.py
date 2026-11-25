@@ -65,7 +65,7 @@ class Bradie2006Exercise211C(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 1.0, 1.0), (-2.0, 5.0, 7.0)),
+                rows=((0.0, 1.0, 1.0), (-2.0, 5.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
@@ -73,7 +73,7 @@ class Bradie2006Exercise211C(Formula):
     test_cases = (
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=0.4408182206817179),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.25, expected=0.9012294245007141),
-        FormulaTestCase.value(params={"a": -2.0, "b": 5.0, "c_scale": 7.0}, x=0.1, c=0.0, expected=0.8048374180359595),
+        FormulaTestCase.value(params={"a": -2.0, "b": 5.0, "c_scale": 10.0}, x=0.1, c=0.0, expected=0.8048374180359595),
         FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, expected=(0.0, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 5.0, "c_scale": 7.0}, expected=(-2.0, 5.0)),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 5.0, "c_scale": 10.0}, expected=(-2.0, 5.0)),
     )

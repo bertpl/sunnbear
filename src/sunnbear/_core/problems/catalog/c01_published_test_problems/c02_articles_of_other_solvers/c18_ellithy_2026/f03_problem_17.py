@@ -65,20 +65,20 @@ class Ellithy2026Problem17(Formula):
         return (
             ParamTable(
                 names=("e", "M", "a", "b", "c_scale"),
-                rows=((0.8, 1.2, 1.0, 3.0, 2.0), (0.5, 1.0, 0.0, 3.0, 3.0), (0.99, 2.0, 2.0, 3.0, 1.0)),
+                rows=((0.8, 1.2, 1.0, 3.0, 1.0), (0.5, 1.0, 0.0, 3.0, 1.0), (0.99, 2.0, 2.0, 3.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, x=1.6, c=0.0, expected=-0.399658882433204
+            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 1.0}, x=1.6, c=0.0, expected=-0.399658882433204
         ),
         FormulaTestCase.value(
-            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, x=1.6, c=0.25, expected=-0.8129658880491483
+            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 1.0}, x=1.6, c=0.5, expected=-0.8129658880491483
         ),
         FormulaTestCase.value(
-            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0, "c_scale": 3.0}, x=0.9, c=0.0, expected=-0.4916634548137417
+            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0, "c_scale": 1.0}, x=0.9, c=0.0, expected=-0.4916634548137417
         ),
         FormulaTestCase.value(
             params={"e": 0.99, "M": 2.0, "a": 2.0, "b": 3.0, "c_scale": 1.0},
@@ -87,10 +87,10 @@ class Ellithy2026Problem17(Formula):
             expected=-0.43824816005495326,
         ),
         FormulaTestCase.interval_bounds(
-            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 2.0}, expected=(1.0, 3.0)
+            params={"e": 0.8, "M": 1.2, "a": 1.0, "b": 3.0, "c_scale": 1.0}, expected=(1.0, 3.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0, "c_scale": 3.0}, expected=(0.0, 3.0)
+            params={"e": 0.5, "M": 1.0, "a": 0.0, "b": 3.0, "c_scale": 1.0}, expected=(0.0, 3.0)
         ),
         FormulaTestCase.interval_bounds(
             params={"e": 0.99, "M": 2.0, "a": 2.0, "b": 3.0, "c_scale": 1.0}, expected=(2.0, 3.0)

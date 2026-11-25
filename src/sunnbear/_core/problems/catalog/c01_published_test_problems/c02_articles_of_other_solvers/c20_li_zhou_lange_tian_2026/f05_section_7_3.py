@@ -30,7 +30,7 @@ class LiZhouLangeTian2026Section73(Formula):
     params = ()
     location_in_publication = "Section 7.3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"- 0.5 \tmp{u} - 2 \sin{\left(\tmp{u} \right)} + 1",
         interval="[0, 7]",
         summary="A function with 3 simple roots, the upper 2 on either side of a local maximum 0.71 above 0.",
@@ -40,7 +40,7 @@ class LiZhouLangeTian2026Section73(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 7.0 * c
+        x = x - 10.0 * c
         return -0.5 * x - 2 * math.sin(x) + 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class LiZhouLangeTian2026Section73(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=2.1, c=0.0, expected=-1.7764187332977475),
-        FormulaTestCase.value(params={}, x=2.1, c=0.25, expected=0.13920438508909708),
+        FormulaTestCase.value(params={}, x=2.1, c=0.175, expected=0.13920438508909708),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 7.0)),
     )

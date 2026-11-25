@@ -25,7 +25,7 @@ class Atkinson1989Case3(Formula):
     params = ()
     location_in_publication = "§2.8 case (3); Problem 34(iii)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"-1 + \tmp{u} \left(3 + \tmp{u} \left(-3 + \tmp{u}\right)\right)",
         interval="[0, 3]",
         summary=(
@@ -38,7 +38,7 @@ class Atkinson1989Case3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return -1 + x * (3 + x * (-3 + x))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Atkinson1989Case3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.9, c=0.0, expected=-0.0009999999999999994),
-        FormulaTestCase.value(params={}, x=0.9, c=0.25, expected=-0.6141249999999999),
+        FormulaTestCase.value(params={}, x=0.9, c=0.75, expected=-0.6141249999999999),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.0)),
     )

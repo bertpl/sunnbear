@@ -23,12 +23,12 @@ class OliveiraTakahashi2021WellBehavedFunction5(Formula):
     params = ()
     location_in_publication = "Table 1, well-behaved function 5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} + \tmp{u}^{10} - 1",
         interval="[-1, 1]",
         summary=(
-            r"A line plus a 10th power that matters only near and beyond $\x = 2 \c \pm 1$, with 1 simple root 0.16 "
-            r"below $\x = 2 \c + 1$."
+            r"A line plus a 10th power that matters only near and beyond $\x = \c \pm 1$, with 1 simple root 0.16 "
+            r"below $\x = \c + 1$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -36,7 +36,7 @@ class OliveiraTakahashi2021WellBehavedFunction5(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x + x**10 - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -49,6 +49,6 @@ class OliveiraTakahashi2021WellBehavedFunction5(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-1.3998951424000001),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-1.5513215598999999),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-1.5513215598999999),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

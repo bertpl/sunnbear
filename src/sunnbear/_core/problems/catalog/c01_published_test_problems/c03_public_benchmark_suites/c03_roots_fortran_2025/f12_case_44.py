@@ -26,11 +26,11 @@ class RootsFortran2025Case44(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 44"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"3 \tmp{u}^{2} \sin{\left(\tmp{u} \cdot 20 \right)} + \cos{\left(\tmp{u} \cdot 2 \right)}",
         interval="[-0.7, 0.4]",
         summary=(
-            r"An oscillation whose amplitude grows away from $\x = 1.1 \c$, with 1 root close to the lower bound and, "
+            r"An oscillation whose amplitude grows away from $\x = \c$, with 1 root close to the lower bound and, "
             r"above that root, no local minimum below 0.2."
         ),
     )
@@ -39,7 +39,7 @@ class RootsFortran2025Case44(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.1 * c
+        x = x - 1.0 * c
         return 3.0 * x**2 * math.sin(x * 20.0) + math.cos(x * 2.0)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class RootsFortran2025Case44(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.37, c=0.0, expected=0.36936914377975283),
-        FormulaTestCase.value(params={}, x=-0.37, c=0.25, expected=-0.13159178557021867),
+        FormulaTestCase.value(params={}, x=-0.37, c=0.275, expected=-0.13159178557021867),
         FormulaTestCase.interval_bounds(params={}, expected=(-0.7, 0.4)),
     )

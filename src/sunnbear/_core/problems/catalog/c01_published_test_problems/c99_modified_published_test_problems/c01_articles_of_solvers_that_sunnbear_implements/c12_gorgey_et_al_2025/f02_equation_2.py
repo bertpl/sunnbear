@@ -34,7 +34,7 @@ class ModifiedGorgeyEtAl2025Equation2(Formula):
     params = ()
     location_in_publication = "Equation 2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.98 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(\tmp{u} \right)}",
         interval="[0.02, 2]",
         summary="The natural logarithm, steepest at the lower bound.",
@@ -45,7 +45,7 @@ class ModifiedGorgeyEtAl2025Equation2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.98 * c
+        x = x - 1.0 * c
         return math.log(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -57,6 +57,6 @@ class ModifiedGorgeyEtAl2025Equation2(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=0.614, c=0.25, expected=-2.1286317858706076),
+        FormulaTestCase.value(params={}, x=0.614, c=0.495, expected=-2.1286317858706076),
         FormulaTestCase.interval_bounds(params={}, expected=(0.02, 2.0)),
     )

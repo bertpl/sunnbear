@@ -59,17 +59,17 @@ class Stage2013Section34(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 4.0, 4.0), (-10.0, 10.0, 20.0)),
+                rows=((0.0, 4.0, 10.0), (-10.0, 10.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.0, expected=-1.3656422455233261),
-        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, x=1.2, c=0.25, expected=0.9720665778412416),
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.0, expected=-1.3656422455233261),
+        FormulaTestCase.value(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, x=1.2, c=0.1, expected=0.9720665778412416),
         FormulaTestCase.value(
-            params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, x=-4.0, c=0.0, expected=63.34635637913639
+            params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, x=-4.0, c=0.0, expected=63.34635637913639
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 4.0}, expected=(0.0, 4.0)),
-        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 20.0}, expected=(-10.0, 10.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 4.0, "c_scale": 10.0}, expected=(0.0, 4.0)),
+        FormulaTestCase.interval_bounds(params={"a": -10.0, "b": 10.0, "c_scale": 10.0}, expected=(-10.0, 10.0)),
     )

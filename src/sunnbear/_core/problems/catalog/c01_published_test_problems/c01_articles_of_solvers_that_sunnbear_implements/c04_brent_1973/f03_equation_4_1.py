@@ -34,7 +34,7 @@ class Brent1973Equation41(Formula):
     params = ()
     location_in_publication = "Section 4, Eq. (4.1)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\begin{cases} "
             r"0 & \text{if } |\tmp{u}| < 3.8 \cdot 10^{-4} \\ "
@@ -52,7 +52,7 @@ class Brent1973Equation41(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         if abs(x) < 3.8e-4:
             return 0.0
         else:
@@ -68,7 +68,7 @@ class Brent1973Equation41(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.5, c=0.0, expected=0.00915781944436709),
-        FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.12675998655454956),
+        FormulaTestCase.value(params={}, x=0.5, c=0.125, expected=-0.12675998655454956),
         FormulaTestCase.value(params={}, x=0.0001, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),
     )

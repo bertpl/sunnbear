@@ -26,12 +26,12 @@ class Ganchovski2026FunctionF100(Formula):
     params = ()
     location_in_publication = "f100"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2.72 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sqrt[3]{\frac{4 \tmp{u} - 3}{\tmp{u}}}",
         interval="[0, e]",
         summary=(
             r"The cube root of a rational function, with an infinite slope at its root, and tending to $-\infty$ as "
-            r"$\x$ falls to $2.72 \c$, where the function is undefined."
+            r"$\x$ falls to $\c$, where the function is undefined."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -39,7 +39,7 @@ class Ganchovski2026FunctionF100(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.72 * c
+        x = x - 1.0 * c
         return real_root((4 * x - 3) / x, 3)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class Ganchovski2026FunctionF100(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.815485, c=0.0, expected=0.6848497192199624),
-        FormulaTestCase.value(params={}, x=0.815485, c=0.25, expected=-2.62764740296579),
+        FormulaTestCase.value(params={}, x=0.815485, c=0.68, expected=-2.62764740296579),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.718281828459045)),
     )

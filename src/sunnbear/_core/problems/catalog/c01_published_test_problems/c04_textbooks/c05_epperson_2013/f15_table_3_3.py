@@ -58,21 +58,21 @@ class Epperson2013Table33(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.01, 1.0, 0.99), (-0.2, 0.2, 0.4)),
+                rows=((0.01, 1.0, 1.0), (-0.2, 0.2, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.0, expected=0.8811932110406309
+            params={"a": 0.01, "b": 1.0, "c_scale": 1.0}, x=0.307, c=0.0, expected=0.8811932110406309
         ),
         FormulaTestCase.value(
-            params={"a": 0.01, "b": 1.0, "c_scale": 0.99}, x=0.307, c=0.25, expected=0.16806722689075626
+            params={"a": 0.01, "b": 1.0, "c_scale": 1.0}, x=0.307, c=0.2475, expected=0.16806722689075626
         ),
         FormulaTestCase.value(
-            params={"a": -0.2, "b": 0.2, "c_scale": 0.4}, x=-0.08, c=0.0, expected=1.7105263157894737
+            params={"a": -0.2, "b": 0.2, "c_scale": 1.0}, x=-0.08, c=0.0, expected=1.7105263157894737
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.01, "b": 1.0, "c_scale": 0.99}, expected=(0.01, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": -0.2, "b": 0.2, "c_scale": 0.4}, expected=(-0.2, 0.2)),
+        FormulaTestCase.interval_bounds(params={"a": 0.01, "b": 1.0, "c_scale": 1.0}, expected=(0.01, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": -0.2, "b": 0.2, "c_scale": 1.0}, expected=(-0.2, 0.2)),
     )

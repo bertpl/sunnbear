@@ -61,21 +61,21 @@ class GorgeyEtAl2025Equation3(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-1.0, 2.0, 3.0), (-0.5, 1.0, 1.5)),
+                rows=((-1.0, 2.0, 1.0), (-0.5, 1.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 2.0, "c_scale": 3.0}, x=-0.1, c=0.0, expected=-0.0004190701450455845
+            params={"a": -1.0, "b": 2.0, "c_scale": 1.0}, x=-0.1, c=0.0, expected=-0.0004190701450455845
         ),
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 2.0, "c_scale": 3.0}, x=-0.1, c=0.25, expected=-0.15639950620951584
+            params={"a": -1.0, "b": 2.0, "c_scale": 1.0}, x=-0.1, c=0.75, expected=-0.15639950620951584
         ),
         FormulaTestCase.value(
-            params={"a": -0.5, "b": 1.0, "c_scale": 1.5}, x=-0.05, c=0.0, expected=-5.264654416755481e-05
+            params={"a": -0.5, "b": 1.0, "c_scale": 1.0}, x=-0.05, c=0.0, expected=-5.264654416755481e-05
         ),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 2.0, "c_scale": 3.0}, expected=(-1.0, 2.0)),
-        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 1.0, "c_scale": 1.5}, expected=(-0.5, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 2.0, "c_scale": 1.0}, expected=(-1.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": -0.5, "b": 1.0, "c_scale": 1.0}, expected=(-0.5, 1.0)),
     )

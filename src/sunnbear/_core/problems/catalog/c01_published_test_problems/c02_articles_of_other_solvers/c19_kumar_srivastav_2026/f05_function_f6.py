@@ -27,7 +27,7 @@ class KumarSrivastav2026FunctionF6(Formula):
     params = ()
     location_in_publication = "Table 3, f6"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\sin{\left(\tmp{u} \right)} - 0.3",
         interval="[0, 2]",
         summary="A function that rises through 1 simple root to a maximum of 0.7, 1.27 above that root.",
@@ -37,7 +37,7 @@ class KumarSrivastav2026FunctionF6(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return math.sin(x) - 0.3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class KumarSrivastav2026FunctionF6(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.6, c=0.0, expected=0.2646424733950353),
-        FormulaTestCase.value(params={}, x=0.6, c=0.25, expected=-0.20016658335317186),
+        FormulaTestCase.value(params={}, x=0.6, c=0.5, expected=-0.20016658335317186),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 2.0)),
     )

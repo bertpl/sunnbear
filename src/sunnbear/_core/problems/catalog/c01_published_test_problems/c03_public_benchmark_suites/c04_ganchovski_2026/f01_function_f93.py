@@ -35,12 +35,12 @@ class Ganchovski2026FunctionF93(Formula):
     params = (FormulaParam("n", latex_symbol="n"),)
     location_in_publication = "f93, f94, f95, f96, f97, f98 and f99"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{\param{n}} - 0.001",
         interval="[-10, 10]",
         summary=(
-            r"An odd power minus 0.001, nearly flat on a band around $\x = 20 \c$ that ends at the root, and steep more"
-            r" than 1 away from $\x = 20 \c$."
+            r"An odd power minus 0.001, nearly flat on a band around $\x = 10 \c$ that ends at the root, and steep more"
+            r" than 1 away from $\x = 10 \c$."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -48,7 +48,7 @@ class Ganchovski2026FunctionF93(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return x**n - 0.001
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
@@ -67,7 +67,7 @@ class Ganchovski2026FunctionF93(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"n": 5.0}, x=-4.0, c=0.0, expected=-1024.001),
-        FormulaTestCase.value(params={"n": 5.0}, x=-4.0, c=0.25, expected=-59049.001),
+        FormulaTestCase.value(params={"n": 5.0}, x=-4.0, c=0.5, expected=-59049.001),
         FormulaTestCase.value(params={"n": 7.0}, x=-4.0, c=0.0, expected=-16384.001),
         FormulaTestCase.value(params={"n": 9.0}, x=-4.0, c=0.0, expected=-262144.001),
         FormulaTestCase.value(params={"n": 11.0}, x=-4.0, c=0.0, expected=-4194304.001),

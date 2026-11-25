@@ -29,14 +29,14 @@ class OliveiraTakahashi2021WellBehavedFunction9(Formula):
     params = ()
     location_in_publication = "Table 1, well-behaved function 9"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\frac{1}{10^{3}} + \sum_{i=1}^{10} \frac{\sin{\left(\frac{\pi i^{3} \tmp{u}}{2} " r"\right)}}{\pi i^{3}}"
         ),
         interval="[-1, 1]",
         summary=(
             r"A sum of 10 sines of rapidly rising frequency, with about 500 local extrema but only 1 simple root, near "
-            r'$\x = 2 \c$, referred to in the source as "Weierstrass".'
+            r'$\x = \c$, referred to in the source as "Weierstrass".'
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -44,7 +44,7 @@ class OliveiraTakahashi2021WellBehavedFunction9(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return 1 / 10**3 + (
             (math.sin(math.pi * (1) ** 3 * x / 2) / (math.pi * (1) ** 3))
             + (math.sin(math.pi * (2) ** 3 * x / 2) / (math.pi * (2) ** 3))
@@ -68,6 +68,6 @@ class OliveiraTakahashi2021WellBehavedFunction9(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.14031870036510996),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.28624612512652314),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.28624612512652314),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

@@ -27,7 +27,7 @@ class OliveiraTakahashi2021IllBehavedFunction4(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 4"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\operatorname{sign}{\left(3 \tmp{u} + 1 \right)} \left(1 - \sqrt{1 - \frac{\left(3 \tmp{u}"
             r" + 1\right)^{2}}{9^{2}}}\right)"
@@ -43,7 +43,7 @@ class OliveiraTakahashi2021IllBehavedFunction4(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return sign(3 * x + 1) * (1 - math.sqrt(1 - (3 * x + 1) ** 2 / 9**2))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -56,6 +56,6 @@ class OliveiraTakahashi2021IllBehavedFunction4(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.00024694407093399845),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-0.018001533782093432),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-0.018001533782093432),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

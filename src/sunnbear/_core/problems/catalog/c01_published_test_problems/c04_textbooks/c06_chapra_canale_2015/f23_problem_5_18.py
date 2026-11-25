@@ -47,7 +47,7 @@ class ChapraCanale2015Problem518(Formula):
     location_in_publication = "Prob. 5.18"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 40 \c"),
+            (r"\tmp{u}", r"\x - 100 \c"),
             (r"\tmp{T_a}", r"\tmp{u} + 273.15"),
         ),
         expression=(
@@ -67,7 +67,7 @@ class ChapraCanale2015Problem518(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, osf: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 40.0 * c
+        x = x - 100.0 * c
         # the formula's variable is the temperature T in °C; the source's function is in Ta = T + 273.15
         t_a = x + 273.15
         return math.log(osf) - (
@@ -84,7 +84,7 @@ class ChapraCanale2015Problem518(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"osf": 8.0}, x=28.0, c=0.0, expected=0.021762506592685964),
-        FormulaTestCase.value(params={"osf": 8.0}, x=12.0, c=0.25, expected=-0.5474113296149795),
+        FormulaTestCase.value(params={"osf": 8.0}, x=12.0, c=0.1, expected=-0.5474113296149795),
         FormulaTestCase.value(params={"osf": 10.0}, x=28.0, c=0.0, expected=0.2449060579068957),
         FormulaTestCase.value(params={"osf": 12.0}, x=28.0, c=0.0, expected=0.42722761470085036),
         FormulaTestCase.interval_bounds(params={"osf": 8.0}, expected=(0.0, 40.0)),

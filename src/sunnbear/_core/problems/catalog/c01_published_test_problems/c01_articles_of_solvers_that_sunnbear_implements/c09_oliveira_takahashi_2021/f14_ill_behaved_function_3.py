@@ -27,7 +27,7 @@ class OliveiraTakahashi2021IllBehavedFunction3(Formula):
     params = ()
     location_in_publication = "Table 1, ill-behaved function 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\left(\tmp{u} - \frac{1}{3}\right)^{2} \arctan{\left(\tmp{u} - \frac{1}{3} \right)}",
         interval="[-1, 1]",
         summary=(
@@ -40,7 +40,7 @@ class OliveiraTakahashi2021IllBehavedFunction3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (x - 1 / 3) ** 2 * math.atan(x - 1 / 3)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class OliveiraTakahashi2021IllBehavedFunction3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.34027826237895187),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-1.3530254455146091),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-1.3530254455146091),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

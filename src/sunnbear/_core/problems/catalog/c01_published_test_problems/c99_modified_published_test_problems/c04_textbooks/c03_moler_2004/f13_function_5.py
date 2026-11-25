@@ -33,7 +33,7 @@ class ModifiedMoler2004Function5(Formula):
     params = ()
     location_in_publication = "Exercise 4.1, function 5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\begin{cases} 0 & \text{if } \tmp{u} = \pi \\ \frac{1}{\tmp{u} - \pi} & \text{otherwise} " r"\end{cases}"
         ),
@@ -51,7 +51,7 @@ class ModifiedMoler2004Function5(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate f at ``x - c_scale*c``, with 0 at the pole; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         if x == math.pi:
             return 0.0
         else:
@@ -66,7 +66,7 @@ class ModifiedMoler2004Function5(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=1.5, c=0.25, expected=-0.3458301772756758),
+        FormulaTestCase.value(params={}, x=1.5, c=0.125, expected=-0.3458301772756758),
         FormulaTestCase.value(params={}, x=3.141592653589793, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 5.0)),
     )

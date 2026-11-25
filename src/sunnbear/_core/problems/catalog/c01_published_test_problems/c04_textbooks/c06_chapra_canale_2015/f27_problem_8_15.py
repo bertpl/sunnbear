@@ -35,7 +35,7 @@ class ChapraCanale2015Problem815(Formula):
     )
     location_in_publication = "Prob. 8.15"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\param{Ct} - \left(10 - 20 \left(e^{- 0.2 \tmp{u}} - e^{- 0.75 \tmp{u}}\right)\right)",
         interval="[0, 2]",
         summary=(
@@ -49,7 +49,7 @@ class ChapraCanale2015Problem815(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float, Ct: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (Ct) - (10 - 20 * (math.exp(-0.2 * x) - math.exp(-0.75 * x)))
 
     def interval_bounds(self, Ct: float) -> tuple[float, float]:
@@ -62,6 +62,6 @@ class ChapraCanale2015Problem815(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={"Ct": 5.0}, x=0.6, c=0.0, expected=-0.014154298092315686),
-        FormulaTestCase.value(params={"Ct": 5.0}, x=0.6, c=0.25, expected=-3.950896260435952),
+        FormulaTestCase.value(params={"Ct": 5.0}, x=0.6, c=0.5, expected=-3.950896260435952),
         FormulaTestCase.interval_bounds(params={"Ct": 5.0}, expected=(0.0, 2.0)),
     )

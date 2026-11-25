@@ -58,11 +58,11 @@ class Bradie2006Exercise2114(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=(
-                    (-3.0, 3.0, 6.0),
-                    (-1.5, 3.0, 4.5),
-                    (-2.0, 4.0, 6.0),
-                    (-2.0, 3.0, 5.0),
-                    (-1.5, 2.2, 3.7),
+                    (-3.0, 3.0, 10.0),
+                    (-1.5, 3.0, 10.0),
+                    (-2.0, 4.0, 10.0),
+                    (-2.0, 3.0, 10.0),
+                    (-1.5, 2.2, 10.0),
                     (-7.0, 3.0, 10.0),
                 ),
                 summary="The published intervals.",
@@ -71,20 +71,20 @@ class Bradie2006Exercise2114(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": -3.0, "b": 3.0, "c_scale": 6.0}, x=-1.2, c=0.0, expected=-0.04351999999999997
+            params={"a": -3.0, "b": 3.0, "c_scale": 10.0}, x=-1.2, c=0.0, expected=-0.04351999999999997
         ),
         FormulaTestCase.value(
-            params={"a": -3.0, "b": 3.0, "c_scale": 6.0}, x=-1.2, c=0.25, expected=-73.89152000000003
+            params={"a": -3.0, "b": 3.0, "c_scale": 10.0}, x=-1.2, c=0.15, expected=-73.89152000000003
         ),
-        FormulaTestCase.value(params={"a": -1.5, "b": 3.0, "c_scale": 4.5}, x=-0.15, c=0.0, expected=0.8582396875),
-        FormulaTestCase.value(params={"a": -2.0, "b": 4.0, "c_scale": 6.0}, x=-0.2, c=0.0, expected=0.78848),
-        FormulaTestCase.value(params={"a": -2.0, "b": 3.0, "c_scale": 5.0}, x=-0.5, c=0.0, expected=0.3125),
-        FormulaTestCase.value(params={"a": -1.5, "b": 2.2, "c_scale": 3.7}, x=-0.39, c=0.0, expected=0.4828112851),
+        FormulaTestCase.value(params={"a": -1.5, "b": 3.0, "c_scale": 10.0}, x=-0.15, c=0.0, expected=0.8582396875),
+        FormulaTestCase.value(params={"a": -2.0, "b": 4.0, "c_scale": 10.0}, x=-0.2, c=0.0, expected=0.78848),
+        FormulaTestCase.value(params={"a": -2.0, "b": 3.0, "c_scale": 10.0}, x=-0.5, c=0.0, expected=0.3125),
+        FormulaTestCase.value(params={"a": -1.5, "b": 2.2, "c_scale": 10.0}, x=-0.39, c=0.0, expected=0.4828112851),
         FormulaTestCase.value(params={"a": -7.0, "b": 3.0, "c_scale": 10.0}, x=-4.0, c=0.0, expected=-729.0),
-        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": 3.0, "c_scale": 6.0}, expected=(-3.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"a": -1.5, "b": 3.0, "c_scale": 4.5}, expected=(-1.5, 3.0)),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 4.0, "c_scale": 6.0}, expected=(-2.0, 4.0)),
-        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 3.0, "c_scale": 5.0}, expected=(-2.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"a": -1.5, "b": 2.2, "c_scale": 3.7}, expected=(-1.5, 2.2)),
+        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": 3.0, "c_scale": 10.0}, expected=(-3.0, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": -1.5, "b": 3.0, "c_scale": 10.0}, expected=(-1.5, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 4.0, "c_scale": 10.0}, expected=(-2.0, 4.0)),
+        FormulaTestCase.interval_bounds(params={"a": -2.0, "b": 3.0, "c_scale": 10.0}, expected=(-2.0, 3.0)),
+        FormulaTestCase.interval_bounds(params={"a": -1.5, "b": 2.2, "c_scale": 10.0}, expected=(-1.5, 2.2)),
         FormulaTestCase.interval_bounds(params={"a": -7.0, "b": 3.0, "c_scale": 10.0}, expected=(-7.0, 3.0)),
     )

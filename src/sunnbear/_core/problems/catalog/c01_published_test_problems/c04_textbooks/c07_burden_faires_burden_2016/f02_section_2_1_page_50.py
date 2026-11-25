@@ -54,19 +54,19 @@ class BurdenFairesBurden2016Section21Page50(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-4.0, 4.0, 8.0), (0.0, 1.0, 1.0)),
+                rows=((-4.0, 4.0, 10.0), (0.0, 1.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": -4.0, "b": 4.0, "c_scale": 8.0}, x=-1.6, c=0.0, expected=-13.352000000000002
+            params={"a": -4.0, "b": 4.0, "c_scale": 10.0}, x=-1.6, c=0.0, expected=-13.352000000000002
         ),
         FormulaTestCase.value(
-            params={"a": -4.0, "b": 4.0, "c_scale": 8.0}, x=-1.6, c=0.25, expected=-110.87200000000001
+            params={"a": -4.0, "b": 4.0, "c_scale": 10.0}, x=-1.6, c=0.2, expected=-110.87200000000001
         ),
         FormulaTestCase.value(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, x=0.3, c=0.0, expected=-0.736),
-        FormulaTestCase.interval_bounds(params={"a": -4.0, "b": 4.0, "c_scale": 8.0}, expected=(-4.0, 4.0)),
+        FormulaTestCase.interval_bounds(params={"a": -4.0, "b": 4.0, "c_scale": 10.0}, expected=(-4.0, 4.0)),
         FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 1.0, "c_scale": 1.0}, expected=(0.0, 1.0)),
     )

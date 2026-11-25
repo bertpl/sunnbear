@@ -27,11 +27,11 @@ class RootsFortran2025Case99(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 99"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\cos{\left(\tmp{u} \right)} + \tmp{u}",
         interval="[-10, 10]",
         summary=(
-            r"An increasing function with 3 or 4 inflections of slope 0 on the interval and 1 root, at $20 \c$ minus "
+            r"An increasing function with 3 or 4 inflections of slope 0 on the interval and 1 root, at $10 \c$ minus "
             r"the fixed point of the cosine."
         ),
     )
@@ -40,7 +40,7 @@ class RootsFortran2025Case99(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return math.cos(x) + x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class RootsFortran2025Case99(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=-4.653643620863612),
-        FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=-9.911130261884677),
+        FormulaTestCase.value(params={}, x=-4.0, c=0.5, expected=-9.911130261884677),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),
     )

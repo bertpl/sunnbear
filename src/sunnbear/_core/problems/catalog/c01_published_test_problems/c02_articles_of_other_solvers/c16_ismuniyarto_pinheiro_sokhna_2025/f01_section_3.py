@@ -34,7 +34,7 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
     params = ()
     location_in_publication = "§3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 8 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"- \frac{2000 {1.2}^{\tmp{u}}}{{1.2}^{\tmp{u}} - 1} + \frac{50 \tmp{u}}{{1.2}^{\tmp{u}} - "
             r"1} + 3750 - \left(- \frac{600 \left(1 + 0.2\right)^{\tmp{u}}}{{1.2}^{\tmp{u}} - 1} + "
@@ -43,7 +43,7 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
         interval="[2, 10]",
         summary=(
             r"A break-even equation in the year $\tmp{u}$, with 1 root, steepest at the lower bound, below which lies a"
-            r" pole at $\x = 8 \c$."
+            r" pole at $\x = 10 \c$."
         ),
         notes=(r"$\tmp{u}$ is the source's variable $n$, the year.",),
     )
@@ -52,7 +52,7 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 8.0 * c
+        x = x - 10.0 * c
         return (
             -2000 * 1.2**x / (1.2**x - 1)
             + 50 * x / (1.2**x - 1)
@@ -70,6 +70,6 @@ class IsmuniyartoPinheiroSokhna2025Section3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=4.4, c=0.0, expected=675.8506311323191),
-        FormulaTestCase.value(params={}, x=4.4, c=0.25, expected=-856.170946467351),
+        FormulaTestCase.value(params={}, x=4.4, c=0.2, expected=-856.170946467351),
         FormulaTestCase.interval_bounds(params={}, expected=(2.0, 10.0)),
     )

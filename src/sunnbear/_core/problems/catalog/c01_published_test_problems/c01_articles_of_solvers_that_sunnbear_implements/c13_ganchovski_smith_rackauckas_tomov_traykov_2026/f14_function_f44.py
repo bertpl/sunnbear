@@ -23,7 +23,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF44(Formula):
     params = ()
     location_in_publication = "Table 2, f44"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{5}",
         interval="[-1, 1.5]",
         summary="A 5th power, below $10^{-4}$ in magnitude within 0.15 of its root.",
@@ -33,7 +33,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF44(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.5 * c
+        x = x - 1.0 * c
         return x**5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -46,6 +46,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF44(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.25, c=0.0, expected=-0.0009765625),
-        FormulaTestCase.value(params={}, x=-0.25, c=0.25, expected=-0.512908935546875),
+        FormulaTestCase.value(params={}, x=-0.25, c=0.625, expected=-0.512908935546875),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.5)),
     )

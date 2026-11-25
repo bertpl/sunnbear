@@ -25,11 +25,11 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF91(Formula):
     params = ()
     location_in_publication = "Table 2, f91"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.99 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u} \sin{\left(\frac{1}{\tmp{u}} \right)} - 0.1 - 0.01",
         interval="[0.01, 1]",
         summary=(
-            r"An oscillation that speeds up and shrinks toward $\x = 0.99 \c$, with 3 roots, the lower 2 only 0.018 "
+            r"An oscillation that speeds up and shrinks toward $\x = \c$, with 3 roots, the lower 2 only 0.018 "
             r"apart."
         ),
     )
@@ -38,7 +38,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF91(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.99 * c
+        x = x - 1.0 * c
         return x * math.sin(1 / x) - 0.1 - 0.01
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF91(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.307, c=0.0, expected=-0.14545178597021027),
-        FormulaTestCase.value(params={}, x=0.307, c=0.25, expected=-0.16299331518211085),
+        FormulaTestCase.value(params={}, x=0.307, c=0.2475, expected=-0.16299331518211085),
         FormulaTestCase.interval_bounds(params={}, expected=(0.01, 1.0)),
     )

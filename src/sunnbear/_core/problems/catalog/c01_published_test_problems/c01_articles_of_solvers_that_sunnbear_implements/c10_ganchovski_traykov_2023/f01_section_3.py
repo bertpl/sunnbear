@@ -28,7 +28,7 @@ class GanchovskiTraykov2023Section3(Formula):
     params = ()
     location_in_publication = "§3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"4 - \tan{\left(\tmp{u} \right)}",
         interval="[0, 1.5]",
         summary=(
@@ -41,7 +41,7 @@ class GanchovskiTraykov2023Section3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.5 * c
+        x = x - 1.0 * c
         return 4 - math.tan(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -54,6 +54,6 @@ class GanchovskiTraykov2023Section3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.45, c=0.0, expected=3.516944934383422),
-        FormulaTestCase.value(params={}, x=0.45, c=0.25, expected=3.924859057871715),
+        FormulaTestCase.value(params={}, x=0.45, c=0.375, expected=3.924859057871715),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5)),
     )

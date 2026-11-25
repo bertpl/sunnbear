@@ -28,7 +28,7 @@ class BurdenFairesBurden2016Exercise229(Formula):
     params = ()
     location_in_publication = "Exercise 2.2-9"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 6.28 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u} - \left(\pi + 0.5 \sin{\left(\frac{\tmp{u}}{2} \right)}\right)",
         interval=r"[0, 2 \pi]",
         summary="An increasing function with a slope between 0.75 and 1.25 on the whole interval and 1 simple root.",
@@ -38,7 +38,7 @@ class BurdenFairesBurden2016Exercise229(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 6.28 * c
+        x = x - 10.0 * c
         return (x) - (math.pi + 0.5 * math.sin(x / 2))
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class BurdenFairesBurden2016Exercise229(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.88496, c=0.0, expected=-1.661141798493021),
-        FormulaTestCase.value(params={}, x=1.88496, c=0.25, expected=-2.905047598902962),
+        FormulaTestCase.value(params={}, x=1.88496, c=0.157, expected=-2.905047598902962),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 6.283185307179586)),
     )

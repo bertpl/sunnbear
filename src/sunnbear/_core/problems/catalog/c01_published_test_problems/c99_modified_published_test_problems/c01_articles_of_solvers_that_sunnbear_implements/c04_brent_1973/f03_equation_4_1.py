@@ -52,7 +52,7 @@ class ModifiedBrent1973Equation41(Formula):
     location_in_publication = "Section 4, Eq. (4.1)"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 5 \c"),
+            (r"\tmp{u}", r"\x - 10 \c"),
             (
                 r"\fn{g}(\x)",
                 (
@@ -84,7 +84,7 @@ class ModifiedBrent1973Equation41(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         if abs(x) < 3.8e-4:
             published_value = 0.0
         else:
@@ -103,6 +103,6 @@ class ModifiedBrent1973Equation41(Formula):
     # would accept any value near 0, 0 among them
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),
-        FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.12675998655454956),
+        FormulaTestCase.value(params={}, x=0.5, c=0.125, expected=-0.12675998655454956),
         FormulaTestCase.value(params={}, x=0.0001, c=0.0, expected=4.512985939662074e-281, atol=0.0),
     )

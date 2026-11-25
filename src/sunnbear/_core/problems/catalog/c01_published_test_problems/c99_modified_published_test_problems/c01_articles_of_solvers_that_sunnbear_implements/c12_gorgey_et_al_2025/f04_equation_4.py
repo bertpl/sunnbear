@@ -37,7 +37,7 @@ class ModifiedGorgeyEtAl2025Equation4(Formula):
     params = ()
     location_in_publication = "Equation 4"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\operatorname{expm1}\left(\left(\tmp{u} - 3\right)^{5}\right)",
         interval="[2, 4]",
         summary="A function that stays below $10^{-4}$ in magnitude within 0.15 of its root of multiplicity 5.",
@@ -57,7 +57,7 @@ class ModifiedGorgeyEtAl2025Equation4(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return math.expm1((x - 3) ** 5)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -70,5 +70,5 @@ class ModifiedGorgeyEtAl2025Equation4(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(2.0, 4.0)),
-        FormulaTestCase.value(params={}, x=2.6, c=0.25, expected=-0.4459442690988902),
+        FormulaTestCase.value(params={}, x=2.6, c=0.5, expected=-0.4459442690988902),
     )

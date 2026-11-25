@@ -34,7 +34,7 @@ class ModifiedEpperson2013Exercise398(Formula):
     params = ()
     location_in_publication = "Exercise 3.9-8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"2 \sin{\left(\pi \tmp{u} \right)} + \tmp{u}",
         interval="[1.3, 2]",
         summary=(
@@ -57,7 +57,7 @@ class ModifiedEpperson2013Exercise398(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 0.7 * c
+        x = x - 1.0 * c
         return 2 * math.sin(math.pi * x) + x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -69,6 +69,6 @@ class ModifiedEpperson2013Exercise398(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=1.51, c=0.25, expected=-0.40226302887638243),
+        FormulaTestCase.value(params={}, x=1.51, c=0.175, expected=-0.40226302887638243),
         FormulaTestCase.interval_bounds(params={}, expected=(1.3, 2.0)),
     )

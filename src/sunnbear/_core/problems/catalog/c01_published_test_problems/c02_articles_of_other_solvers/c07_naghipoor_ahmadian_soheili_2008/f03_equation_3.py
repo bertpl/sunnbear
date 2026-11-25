@@ -27,7 +27,7 @@ class NaghipoorAhmadianSoheili2008Equation3(Formula):
     params = ()
     location_in_publication = "Table 1, equation 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 0.1 \c"),),
         expression=r"e^{\tmp{u}^{2} + 7 \tmp{u} - 30} - 1",
         interval="[2.8, 3.1]",
         summary=(
@@ -40,7 +40,7 @@ class NaghipoorAhmadianSoheili2008Equation3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.3 * c
+        x = x - 0.1 * c
         return math.exp(x**2 + 7 * x - 30) - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -53,6 +53,6 @@ class NaghipoorAhmadianSoheili2008Equation3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=2.89, c=0.0, expected=-0.7577778503147906),
-        FormulaTestCase.value(params={}, x=2.89, c=0.25, expected=-0.9065916932186274),
+        FormulaTestCase.value(params={}, x=2.89, c=0.75, expected=-0.9065916932186274),
         FormulaTestCase.interval_bounds(params={}, expected=(2.8, 3.1)),
     )

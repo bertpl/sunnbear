@@ -59,25 +59,25 @@ class Ford1997Function5(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.035, 0.05, 0.015), (0.03, 0.09, 0.06), (0.025, 0.5, 0.475)),
+                rows=((0.035, 0.05, 0.01), (0.03, 0.09, 0.1), (0.025, 0.5, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.035, "b": 0.05, "c_scale": 0.015}, x=0.0395, c=0.0, expected=0.37225544476214745
+            params={"a": 0.035, "b": 0.05, "c_scale": 0.01}, x=0.0395, c=0.0, expected=0.37225544476214745
         ),
         FormulaTestCase.value(
-            params={"a": 0.035, "b": 0.05, "c_scale": 0.015}, x=0.0395, c=0.25, expected=18.53148877277384
+            params={"a": 0.035, "b": 0.05, "c_scale": 0.01}, x=0.0395, c=0.375, expected=18.53148877277384
         ),
         FormulaTestCase.value(
-            params={"a": 0.03, "b": 0.09, "c_scale": 0.06}, x=0.048, c=0.0, expected=-0.9844961464009907
+            params={"a": 0.03, "b": 0.09, "c_scale": 0.1}, x=0.048, c=0.0, expected=-0.9844961464009907
         ),
         FormulaTestCase.value(
-            params={"a": 0.025, "b": 0.5, "c_scale": 0.475}, x=0.1675, c=0.0, expected=-0.9999999945619796
+            params={"a": 0.025, "b": 0.5, "c_scale": 1.0}, x=0.1675, c=0.0, expected=-0.9999999945619796
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.035, "b": 0.05, "c_scale": 0.015}, expected=(0.035, 0.05)),
-        FormulaTestCase.interval_bounds(params={"a": 0.03, "b": 0.09, "c_scale": 0.06}, expected=(0.03, 0.09)),
-        FormulaTestCase.interval_bounds(params={"a": 0.025, "b": 0.5, "c_scale": 0.475}, expected=(0.025, 0.5)),
+        FormulaTestCase.interval_bounds(params={"a": 0.035, "b": 0.05, "c_scale": 0.01}, expected=(0.035, 0.05)),
+        FormulaTestCase.interval_bounds(params={"a": 0.03, "b": 0.09, "c_scale": 0.1}, expected=(0.03, 0.09)),
+        FormulaTestCase.interval_bounds(params={"a": 0.025, "b": 0.5, "c_scale": 1.0}, expected=(0.025, 0.5)),
     )

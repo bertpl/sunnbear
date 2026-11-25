@@ -28,7 +28,7 @@ class GorgeyEtAl2025Equation5(Formula):
     params = ()
     location_in_publication = "Equation 5"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\tmp{u} \sin{\left(\tmp{u} \right)} - \tmp{u}^{2} e^{\tmp{u}} + e^{- \tmp{u}} + "
             r"\cos{\left(\tmp{u} \right)}"
@@ -44,7 +44,7 @@ class GorgeyEtAl2025Equation5(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x * math.sin(x) - x**2 * math.exp(x) + math.exp(-x) + math.cos(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -57,6 +57,6 @@ class GorgeyEtAl2025Equation5(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=2.4614018212019135),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=3.456885873702464),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=3.456885873702464),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

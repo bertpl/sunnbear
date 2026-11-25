@@ -27,7 +27,7 @@ class RootsJl2026FunctionF9(Formula):
     params = ()
     location_in_publication = "runbenchmarks.jl, f9"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\ln{\left(\tmp{u} \right)} + \sqrt{\tmp{u}} - 5",
         interval="[7, 10]",
         summary="A logarithm plus a square root, increasing and close to a line on the interval, with 1 root.",
@@ -37,7 +37,7 @@ class RootsJl2026FunctionF9(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return math.log(x) + math.sqrt(x) - 5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class RootsJl2026FunctionF9(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=7.9, c=0.0, expected=-0.12244337601598487),
-        FormulaTestCase.value(params={}, x=7.9, c=0.25, expected=-0.35893925186989606),
+        FormulaTestCase.value(params={}, x=7.9, c=0.75, expected=-0.35893925186989606),
         FormulaTestCase.interval_bounds(params={}, expected=(7.0, 10.0)),
     )

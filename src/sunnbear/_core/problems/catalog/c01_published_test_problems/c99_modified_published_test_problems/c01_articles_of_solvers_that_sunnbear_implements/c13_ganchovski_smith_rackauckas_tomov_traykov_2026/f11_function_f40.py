@@ -30,13 +30,13 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
     params = ()
     location_in_publication = "Table 2, f40"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\begin{cases} 0 & \text{if } \tmp{u} = 0 \text{ or } \tmp{u} = \frac{2}{3} \\ "
             r"\frac{1}{\tmp{u} - \frac{2}{3}} & \text{otherwise} \end{cases}"
         ),
         interval="[-11, 9]",
-        summary=r"A hyperbola that changes sign only at its pole, with the function's value set to 0 at $\x = 20 \c$.",
+        summary=r"A hyperbola that changes sign only at its pole, with the function's value set to 0 at $\x = 10 \c$.",
         notes=(
             (
                 r"The expression is 0 at the pole, $\tmp{u} = 2/3$ in float64, where the published "
@@ -49,7 +49,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate f at ``x - c_scale*c``, with 0 at the pole; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         if x == 0 or x == 2 / 3:
             return 0.0
         else:
@@ -64,7 +64,7 @@ class ModifiedGanchovskiSmithRackauckasTomovTraykov2026FunctionF40(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-5.0, c=0.25, expected=-0.09375),
+        FormulaTestCase.value(params={}, x=-5.0, c=0.5, expected=-0.09375),
         FormulaTestCase.value(params={}, x=0.0, c=0.0, expected=0.0),
         FormulaTestCase.value(params={}, x=0.6666666666666666, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-11.0, 9.0)),

@@ -25,7 +25,7 @@ class BurdenFairesBurden2016Exercise235A(Formula):
     params = ()
     location_in_publication = "Exercises 2.3-5(a), 2.6-1(a)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} - 2 \tmp{u}^{2} - 5",
         interval="[1, 4]",
         summary="A cubic with only 1 real root and a shallow local minimum 1.36 below that root.",
@@ -35,7 +35,7 @@ class BurdenFairesBurden2016Exercise235A(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x**3 - 2 * x**2 - 5
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class BurdenFairesBurden2016Exercise235A(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.9, c=0.0, expected=-5.361000000000001),
-        FormulaTestCase.value(params={}, x=1.9, c=0.25, expected=-6.124125),
+        FormulaTestCase.value(params={}, x=1.9, c=0.75, expected=-6.124125),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 4.0)),
     )

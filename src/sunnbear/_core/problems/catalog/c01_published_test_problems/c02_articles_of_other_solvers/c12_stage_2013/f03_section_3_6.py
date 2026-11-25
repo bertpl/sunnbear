@@ -25,7 +25,7 @@ class Stage2013Section36(Formula):
     params = ()
     location_in_publication = "§3.6"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"1 - \frac{3 \tmp{u}}{4}",
         interval="[-10, 10]",
         summary="A decreasing straight line with 1 root on the interval.",
@@ -35,7 +35,7 @@ class Stage2013Section36(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         return 1 - (3 / 4) * x
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Stage2013Section36(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=4.0),
-        FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=7.75),
+        FormulaTestCase.value(params={}, x=-4.0, c=0.5, expected=7.75),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),
     )

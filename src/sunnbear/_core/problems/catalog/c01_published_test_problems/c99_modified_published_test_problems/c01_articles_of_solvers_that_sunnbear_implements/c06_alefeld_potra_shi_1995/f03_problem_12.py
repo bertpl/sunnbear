@@ -45,7 +45,7 @@ class ModifiedAlefeldPotraShi1995Problem12(Formula):
     params = (FormulaParam("n", latex_symbol="n", meaning=r"The root lies at $\x = \param{n}$."),)
     location_in_publication = "Table I, problem 12"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 99 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=(
             r"\param{n}^{1/\param{n}} " r"\operatorname{expm1}\left(\frac{\ln(\tmp{u}/\param{n})}{\param{n}}\right)"
         ),
@@ -71,7 +71,7 @@ class ModifiedAlefeldPotraShi1995Problem12(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 99.0 * c
+        x = x - 100.0 * c
         return n ** (1 / n) * math.expm1(math.log(x / n) / n)
 
     def interval_bounds(self, n: float) -> tuple[float, float]:
@@ -110,7 +110,7 @@ class ModifiedAlefeldPotraShi1995Problem12(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={"n": 27.0}, expected=(1.0, 100.0)),
-        FormulaTestCase.value(params={"n": 27.0}, x=30.7, c=0.25, expected=-0.061549203181192384),
+        FormulaTestCase.value(params={"n": 27.0}, x=30.7, c=0.2475, expected=-0.061549203181192384),
         FormulaTestCase.interval_bounds(params={"n": 31.0}, expected=(1.0, 100.0)),
-        FormulaTestCase.value(params={"n": 31.0}, x=30.7, c=0.25, expected=-0.05792643762161267),
+        FormulaTestCase.value(params={"n": 31.0}, x=30.7, c=0.2475, expected=-0.05792643762161267),
     )

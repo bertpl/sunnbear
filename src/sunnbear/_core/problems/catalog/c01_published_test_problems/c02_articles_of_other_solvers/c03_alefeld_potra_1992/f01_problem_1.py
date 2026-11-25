@@ -59,7 +59,7 @@ class AlefeldPotra1992Problem1(Formula):
         return (
             ParamTable(
                 names=("k", "a", "b", "c_scale"),
-                rows=((1.0, 0.5, 1.5, 1.0), (-1.0, -1.8, 0.0, 1.8)),
+                rows=((1.0, 0.5, 1.5, 1.0), (-1.0, -1.8, 0.0, 1.0)),
                 summary="The published parameter values and intervals.",
             ),
         )
@@ -70,8 +70,8 @@ class AlefeldPotra1992Problem1(Formula):
         ),
         FormulaTestCase.value(params={"k": 1.0, "a": 0.5, "b": 1.5, "c_scale": 1.0}, x=0.8, c=0.25, expected=-0.833625),
         FormulaTestCase.value(
-            params={"k": -1.0, "a": -1.8, "b": 0.0, "c_scale": 1.8}, x=-1.26, c=0.0, expected=-1.000376
+            params={"k": -1.0, "a": -1.8, "b": 0.0, "c_scale": 1.0}, x=-1.26, c=0.0, expected=-1.000376
         ),
         FormulaTestCase.interval_bounds(params={"k": 1.0, "a": 0.5, "b": 1.5, "c_scale": 1.0}, expected=(0.5, 1.5)),
-        FormulaTestCase.interval_bounds(params={"k": -1.0, "a": -1.8, "b": 0.0, "c_scale": 1.8}, expected=(-1.8, 0.0)),
+        FormulaTestCase.interval_bounds(params={"k": -1.0, "a": -1.8, "b": 0.0, "c_scale": 1.0}, expected=(-1.8, 0.0)),
     )

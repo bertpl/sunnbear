@@ -63,15 +63,15 @@ class TomovGanchovski2026Equation25(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-1.0, 1.0, 2.0), (-3.0, 1.0, 4.0)),
+                rows=((-1.0, 1.0, 1.0), (-3.0, 1.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, x=-0.4, c=0.0, expected=-0.4),
-        FormulaTestCase.value(params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, x=-0.4, c=0.25, expected=-0.9),
-        FormulaTestCase.value(params={"a": -3.0, "b": 1.0, "c_scale": 4.0}, x=-1.8, c=0.0, expected=-1.8),
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, expected=(-1.0, 1.0)),
-        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": 1.0, "c_scale": 4.0}, expected=(-3.0, 1.0)),
+        FormulaTestCase.value(params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, x=-0.4, c=0.0, expected=-0.4),
+        FormulaTestCase.value(params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, x=-0.4, c=0.5, expected=-0.9),
+        FormulaTestCase.value(params={"a": -3.0, "b": 1.0, "c_scale": 10.0}, x=-1.8, c=0.0, expected=-1.8),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, expected=(-1.0, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": -3.0, "b": 1.0, "c_scale": 10.0}, expected=(-3.0, 1.0)),
     )

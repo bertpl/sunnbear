@@ -25,11 +25,11 @@ class Suhadolnik2012Function15(Formula):
     params = ()
     location_in_publication = "Table 1, function 15"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \sin^{2}{\left(\tmp{u} \right)} - 1",
         interval="[-1, 2]",
         summary=(
-            r"A function with 1 root on the interval, symmetric about a flat minimum at $\x = 3 \c$, where the first 3 "
+            r"A function with 1 root on the interval, symmetric about a flat minimum at $\x = \c$, where the first 3 "
             r"derivatives are 0."
         ),
     )
@@ -38,7 +38,7 @@ class Suhadolnik2012Function15(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x**2 - math.sin(x) ** 2 - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Suhadolnik2012Function15(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.1, c=0.0, expected=-0.9999667110793792),
-        FormulaTestCase.value(params={}, x=-0.1, c=0.25, expected=-0.8419222471477623),
+        FormulaTestCase.value(params={}, x=-0.1, c=0.75, expected=-0.8419222471477623),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 2.0)),
     )

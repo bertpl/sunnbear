@@ -59,10 +59,10 @@ class Chandrupatla1997Function1(Formula):
                 names=("a", "b", "c_scale"),
                 rows=(
                     (2.0, 3.0, 1.0),
-                    (1.0, 10.0, 9.0),
-                    (1.0, 100.0, 99.0),
-                    (-10000.0, 10000.0, 20000.0),
-                    (-10000000000.0, 10000000000.0, 20000000000.0),
+                    (1.0, 10.0, 10.0),
+                    (1.0, 100.0, 100.0),
+                    (-10000.0, 10000.0, 10000.0),
+                    (-10000000000.0, 10000000000.0, 10000000000.0),
                 ),
                 summary="The published intervals.",
             ),
@@ -71,27 +71,27 @@ class Chandrupatla1997Function1(Formula):
     test_cases = (
         FormulaTestCase.value(params={"a": 2.0, "b": 3.0, "c_scale": 1.0}, x=2.3, c=0.0, expected=2.5669999999999975),
         FormulaTestCase.value(params={"a": 2.0, "b": 3.0, "c_scale": 1.0}, x=2.3, c=0.25, expected=-0.4848750000000019),
-        FormulaTestCase.value(params={"a": 1.0, "b": 10.0, "c_scale": 9.0}, x=3.7, c=0.0, expected=38.25300000000001),
+        FormulaTestCase.value(params={"a": 1.0, "b": 10.0, "c_scale": 10.0}, x=3.7, c=0.0, expected=38.25300000000001),
         FormulaTestCase.value(
-            params={"a": 1.0, "b": 100.0, "c_scale": 99.0}, x=30.7, c=0.0, expected=28868.042999999998
+            params={"a": 1.0, "b": 100.0, "c_scale": 100.0}, x=30.7, c=0.0, expected=28868.042999999998
         ),
         FormulaTestCase.value(
-            params={"a": -10000.0, "b": 10000.0, "c_scale": 20000.0}, x=-4000.0, c=0.0, expected=-63999992005.0
+            params={"a": -10000.0, "b": 10000.0, "c_scale": 10000.0}, x=-4000.0, c=0.0, expected=-63999992005.0
         ),
         FormulaTestCase.value(
-            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 20000000000.0},
+            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 10000000000.0},
             x=-4000000000.0,
             c=0.0,
             expected=-6.4e28,
         ),
         FormulaTestCase.interval_bounds(params={"a": 2.0, "b": 3.0, "c_scale": 1.0}, expected=(2.0, 3.0)),
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 10.0, "c_scale": 9.0}, expected=(1.0, 10.0)),
-        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 100.0, "c_scale": 99.0}, expected=(1.0, 100.0)),
+        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 10.0, "c_scale": 10.0}, expected=(1.0, 10.0)),
+        FormulaTestCase.interval_bounds(params={"a": 1.0, "b": 100.0, "c_scale": 100.0}, expected=(1.0, 100.0)),
         FormulaTestCase.interval_bounds(
-            params={"a": -10000.0, "b": 10000.0, "c_scale": 20000.0}, expected=(-10000.0, 10000.0)
+            params={"a": -10000.0, "b": 10000.0, "c_scale": 10000.0}, expected=(-10000.0, 10000.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 20000000000.0},
+            params={"a": -10000000000.0, "b": 10000000000.0, "c_scale": 10000000000.0},
             expected=(-10000000000.0, 10000000000.0),
         ),
     )

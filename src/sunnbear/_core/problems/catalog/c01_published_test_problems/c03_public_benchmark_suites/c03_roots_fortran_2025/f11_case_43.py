@@ -26,7 +26,7 @@ class RootsFortran2025Case43(Formula):
     params = ()
     location_in_publication = "root_tests.f90, case 43"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 0.7 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"3 \tmp{u} \sin{\left(\tmp{u} \cdot 20 \right)} \cos{\left(\tmp{u} \right)} + \tmp{u} - 2",
         interval="[0, 0.7]",
         summary=(
@@ -39,7 +39,7 @@ class RootsFortran2025Case43(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 0.7 * c
+        x = x - 1.0 * c
         return 3.0 * x * math.sin(x * 20.0) * math.cos(x) + x - 2.0
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class RootsFortran2025Case43(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.21, c=0.0, expected=-2.3270296714653926),
-        FormulaTestCase.value(params={}, x=0.21, c=0.25, expected=-1.8973985698607856),
+        FormulaTestCase.value(params={}, x=0.21, c=0.175, expected=-1.8973985698607856),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 0.7)),
     )

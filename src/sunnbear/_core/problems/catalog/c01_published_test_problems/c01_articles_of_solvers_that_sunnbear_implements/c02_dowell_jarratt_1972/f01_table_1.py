@@ -27,17 +27,17 @@ class DowellJarratt1972Table1(Formula):
     params = ()
     location_in_publication = "Table 1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{3} + 1",
         interval="[-2, 0]",
-        summary=r"A cubic whose slope falls to 0 at $\x = 2 \c$, a distance of 1 above the cubic's 1 simple root.",
+        summary=r"A cubic whose slope falls to 0 at $\x = \c$, a distance of 1 above the cubic's 1 simple root.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return x**3 + 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class DowellJarratt1972Table1(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-1.4, c=0.0, expected=-1.7439999999999996),
-        FormulaTestCase.value(params={}, x=-1.4, c=0.25, expected=-5.858999999999999),
+        FormulaTestCase.value(params={}, x=-1.4, c=0.5, expected=-5.858999999999999),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 0.0)),
     )

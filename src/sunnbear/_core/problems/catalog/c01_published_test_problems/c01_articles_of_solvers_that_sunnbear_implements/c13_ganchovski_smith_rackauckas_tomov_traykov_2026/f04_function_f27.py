@@ -28,7 +28,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
     location_in_publication = "Table 2, f27"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 2 \c"),
+            (r"\tmp{u}", r"\x - \c"),
             (r"\tmp{p}", r"\tmp{u} + 1.11111"),
         ),
         expression=r"(81 - \tmp{p}(108 - \tmp{p}(54 - \tmp{p}(12 - \tmp{p})))) \operatorname{sgn}(\tmp{p} - 3)",
@@ -43,7 +43,7 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         p = x + 1.11111
         return (81 - p * (108 - p * (54 - p * (12 - p)))) * sign(p - 3)
 
@@ -57,6 +57,6 @@ class GanchovskiSmithRackauckasTomovTraykov2026FunctionF27(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.6, c=0.0, expected=-0.006965142972726102),
-        FormulaTestCase.value(params={}, x=1.6, c=0.25, expected=-0.38731632624146395),
+        FormulaTestCase.value(params={}, x=1.6, c=0.5, expected=-0.38731632624146395),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 3.0)),
     )

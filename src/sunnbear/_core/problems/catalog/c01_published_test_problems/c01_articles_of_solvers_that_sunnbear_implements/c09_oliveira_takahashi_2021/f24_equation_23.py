@@ -29,7 +29,7 @@ class OliveiraTakahashi2021Equation23(Formula):
     params = ()
     location_in_publication = "Appendix C, Eq. (23)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 200 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 100 \c"),),
         expression=r"\left(\tmp{u} - \left(100 + 10 \pi\right)\right) \left(\tmp{u} - 10 \pi\right)",
         interval="[-100, 100]",
         summary="A parabola with 2 simple roots 100 apart, only the lower of which lies on the interval.",
@@ -39,7 +39,7 @@ class OliveiraTakahashi2021Equation23(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 200.0 * c
+        x = x - 100.0 * c
         return (x - (100 + 10 * math.pi)) * (x - 10 * math.pi)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class OliveiraTakahashi2021Equation23(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-40.0, c=0.0, expected=12241.827216570564),
-        FormulaTestCase.value(params={}, x=-40.0, c=0.25, expected=26883.419870160356),
+        FormulaTestCase.value(params={}, x=-40.0, c=0.5, expected=26883.419870160356),
         FormulaTestCase.interval_bounds(params={}, expected=(-100.0, 100.0)),
     )

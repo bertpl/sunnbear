@@ -57,7 +57,7 @@ class ModifiedChapraCanale2015Problem510(Formula):
     location_in_publication = "Prob. 5.10"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 1.5 \c"),
+            (r"\tmp{u}", r"\x - \c"),
             (r"\tmp{t}", r"\tmp{u} - 5.609788960859374"),
         ),
         expression=(
@@ -88,7 +88,7 @@ class ModifiedChapraCanale2015Problem510(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 1.5 * c
+        x = x - 1.0 * c
         c0, c1, c2, c3 = TAYLOR_COEFFICIENTS
         t = x - ROOT
         return c0 + t * (c1 + t * (c2 + t * (c3 + t)))
@@ -103,5 +103,5 @@ class ModifiedChapraCanale2015Problem510(Formula):
 
     test_cases = (
         FormulaTestCase.interval_bounds(params={}, expected=(4.5, 6.0)),
-        FormulaTestCase.value(params={}, x=4.95, c=0.25, expected=-2.791687109374998),
+        FormulaTestCase.value(params={}, x=4.95, c=0.375, expected=-2.791687109374998),
     )

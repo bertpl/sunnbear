@@ -34,7 +34,7 @@ class ModifiedEpperson2013Example310(Formula):
     params = ()
     location_in_publication = "Examples 3.10, 3.11, 3.14"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{4} - \tmp{u} - 1",
         interval="[-2, 1]",
         summary=(
@@ -57,7 +57,7 @@ class ModifiedEpperson2013Example310(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x**4 - x - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -69,6 +69,6 @@ class ModifiedEpperson2013Example310(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-1.1, c=0.25, expected=12.563506250000003),
+        FormulaTestCase.value(params={}, x=-1.1, c=0.75, expected=12.563506250000003),
         FormulaTestCase.interval_bounds(params={}, expected=(-2.0, 1.0)),
     )

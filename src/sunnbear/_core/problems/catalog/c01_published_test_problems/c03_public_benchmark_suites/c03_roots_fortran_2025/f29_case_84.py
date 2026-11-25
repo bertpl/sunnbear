@@ -40,7 +40,7 @@ class RootsFortran2025Case84(Formula):
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"$\tmp{u}^4 (\tmp{u} + 1)^3 (\tmp{u} - 3) - 1$ multiplied out, with 1 root on each published interval, "
-            r"flat around $\x = 5 \c$ and steep beyond both roots."
+            r"flat around $\x = 10 \c$ and steep beyond both roots."
         ),
     )
     effect_of_c = EffectOfC.SHIFTS_X
@@ -60,15 +60,17 @@ class RootsFortran2025Case84(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((-5.0, 0.0, 5.0), (0.0, 5.0, 5.0)),
+                rows=((-5.0, 0.0, 10.0), (0.0, 5.0, 10.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": -5.0, "b": 0.0, "c_scale": 5.0}, x=-3.5, c=0.0, expected=15239.72265625),
-        FormulaTestCase.value(params={"a": -5.0, "b": 0.0, "c_scale": 5.0}, x=-3.5, c=0.25, expected=208050.0654449463),
-        FormulaTestCase.value(params={"a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=-119.65234375),
-        FormulaTestCase.interval_bounds(params={"a": -5.0, "b": 0.0, "c_scale": 5.0}, expected=(-5.0, 0.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 5.0, "c_scale": 5.0}, expected=(0.0, 5.0)),
+        FormulaTestCase.value(params={"a": -5.0, "b": 0.0, "c_scale": 10.0}, x=-3.5, c=0.0, expected=15239.72265625),
+        FormulaTestCase.value(
+            params={"a": -5.0, "b": 0.0, "c_scale": 10.0}, x=-3.5, c=0.125, expected=208050.0654449463
+        ),
+        FormulaTestCase.value(params={"a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=-119.65234375),
+        FormulaTestCase.interval_bounds(params={"a": -5.0, "b": 0.0, "c_scale": 10.0}, expected=(-5.0, 0.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 5.0, "c_scale": 10.0}, expected=(0.0, 5.0)),
     )

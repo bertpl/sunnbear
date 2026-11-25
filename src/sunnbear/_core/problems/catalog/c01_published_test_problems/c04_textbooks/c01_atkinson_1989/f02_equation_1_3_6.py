@@ -58,17 +58,17 @@ class Atkinson1989Equation136(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 2.0, 2.0), (0.998, 1.002, 0.004)),
+                rows=((0.0, 2.0, 1.0), (0.998, 1.002, 0.01)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=-0.06400000000000002),
-        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.25, expected=-0.7290000000000001),
+        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.0, expected=-0.06400000000000002),
+        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.5, expected=-0.7290000000000001),
         FormulaTestCase.value(
-            params={"a": 0.998, "b": 1.002, "c_scale": 0.004}, x=1.0014, c=0.0, expected=2.744000000000399e-09
+            params={"a": 0.998, "b": 1.002, "c_scale": 0.01}, x=1.0014, c=0.0, expected=2.744000000000399e-09
         ),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, expected=(0.0, 2.0)),
-        FormulaTestCase.interval_bounds(params={"a": 0.998, "b": 1.002, "c_scale": 0.004}, expected=(0.998, 1.002)),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, expected=(0.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": 0.998, "b": 1.002, "c_scale": 0.01}, expected=(0.998, 1.002)),
     )

@@ -25,11 +25,11 @@ class Sabharwal2019Figure3(Formula):
     params = ()
     location_in_publication = "Fig. 3"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 1.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{9} - 8",
         interval="[0, 1.5]",
         summary=(
-            r"A function nearly constant at $-8$ around $\x = 1.5 \c$, 1.26 below the function's 1 simple root, then "
+            r"A function nearly constant at $-8$ around $\x = \c$, 1.26 below the function's 1 simple root, then "
             r"rising steeply through that root."
         ),
     )
@@ -38,7 +38,7 @@ class Sabharwal2019Figure3(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 1.5 * c
+        x = x - 1.0 * c
         return x**9 - 8
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class Sabharwal2019Figure3(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.45, c=0.0, expected=-7.999243319357422),
-        FormulaTestCase.value(params={}, x=1.05, c=0.25, expected=-7.970910654125263),
+        FormulaTestCase.value(params={}, x=1.05, c=0.375, expected=-7.970910654125263),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 1.5)),
     )

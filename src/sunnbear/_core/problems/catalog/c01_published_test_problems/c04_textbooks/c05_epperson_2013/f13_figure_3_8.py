@@ -25,7 +25,7 @@ class Epperson2013Figure38(Formula):
     params = ()
     location_in_publication = "Fig. 3.8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\frac{\tmp{u}^{2}}{2} - \frac{1}{2}",
         interval="[0, 4]",
         summary="A parabola whose 1 simple root on the interval lies at a distance of 1 above the parabola's vertex.",
@@ -35,7 +35,7 @@ class Epperson2013Figure38(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.0 * c
+        x = x - 10.0 * c
         return (1 / 2) * x**2 - 1 / 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -48,6 +48,6 @@ class Epperson2013Figure38(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.2, c=0.0, expected=0.21999999999999995),
-        FormulaTestCase.value(params={}, x=1.2, c=0.25, expected=-0.48),
+        FormulaTestCase.value(params={}, x=1.2, c=0.1, expected=-0.48),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 4.0)),
     )

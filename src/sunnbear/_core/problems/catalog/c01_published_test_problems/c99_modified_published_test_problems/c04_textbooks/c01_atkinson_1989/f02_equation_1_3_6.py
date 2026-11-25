@@ -98,20 +98,18 @@ class ModifiedAtkinson1989Equation136(Formula):
             ParamTable(
                 names=("a", "b", "c_scale"),
                 rows=(
-                    (-1.0, 1.0, 2.0),
-                    (-0.002, 0.002, 0.004),
+                    (-1.0, 1.0, 1.0),
+                    (-0.002, 0.002, 0.01),
                 ),
                 summary="The published intervals, shifted by $-1$.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, expected=(-1.0, 1.0)),
+        FormulaTestCase.interval_bounds(params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, expected=(-1.0, 1.0)),
         FormulaTestCase.value(
-            params={"a": -1.0, "b": 1.0, "c_scale": 2.0}, x=-0.4, c=0.25, expected=-0.7290000000000001
+            params={"a": -1.0, "b": 1.0, "c_scale": 1.0}, x=-0.4, c=0.5, expected=-0.7290000000000001
         ),
-        FormulaTestCase.interval_bounds(params={"a": -0.002, "b": 0.002, "c_scale": 0.004}, expected=(-0.002, 0.002)),
-        FormulaTestCase.value(
-            params={"a": -0.002, "b": 0.002, "c_scale": 0.004}, x=-0.0008, c=0.25, expected=-5.832e-09
-        ),
+        FormulaTestCase.interval_bounds(params={"a": -0.002, "b": 0.002, "c_scale": 0.01}, expected=(-0.002, 0.002)),
+        FormulaTestCase.value(params={"a": -0.002, "b": 0.002, "c_scale": 0.01}, x=-0.0008, c=0.1, expected=-5.832e-09),
     )

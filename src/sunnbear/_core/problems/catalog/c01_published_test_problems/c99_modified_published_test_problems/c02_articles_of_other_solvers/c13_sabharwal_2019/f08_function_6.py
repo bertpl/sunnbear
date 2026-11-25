@@ -32,7 +32,7 @@ class ModifiedSabharwal2019Function6(Formula):
     params = ()
     location_in_publication = "Table 2, function 6"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5.1 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{2} + 5 \tmp{u} + 2",
         interval="[-6, -0.9]",
         summary="A parabola with only the lower of its 2 simple roots on the interval.",
@@ -49,7 +49,7 @@ class ModifiedSabharwal2019Function6(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.1 * c
+        x = x - 10.0 * c
         return x**2 + 5 * x + 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -61,6 +61,6 @@ class ModifiedSabharwal2019Function6(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=-4.47, c=0.25, expected=6.280024999999995),
+        FormulaTestCase.value(params={}, x=-4.47, c=0.1275, expected=6.280024999999995),
         FormulaTestCase.interval_bounds(params={}, expected=(-6.0, -0.9)),
     )

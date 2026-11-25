@@ -315,7 +315,7 @@ def test_modified_category_has_the_name_of_its_published_category(category):
 
 
 @pytest.mark.parametrize("formula", _PUBLISHED_FORMULAS, ids=lambda formula: formula.label)
-@pytest.mark.parametrize("c", [0.25, -0.25])
+@pytest.mark.parametrize("c", [0.1, -0.1])
 def test_published_formula_shifts_x_by_c(formula, c):
     """A published formula shifts x by ``c_scale*c``, by category 1's rule, and declares `EffectOfC.SHIFTS_X`."""
     for candidate in formula.build_all_candidates():
@@ -328,7 +328,7 @@ def test_published_formula_shifts_x_by_c(formula, c):
 
 
 @pytest.mark.parametrize("formula", _MODIFIED_FORMULAS, ids=lambda formula: formula.label)
-@pytest.mark.parametrize("c", [0.25, -0.25])
+@pytest.mark.parametrize("c", [0.1, -0.1])
 def test_modified_formula_applies_c_in_a_way_of_its_subcategory(formula, c):
     """A formula of subcategory 1.99 applies ``c`` in a way of `ModifiedPublishedTestProblems`, and as it declares."""
     for candidate in formula.build_all_candidates():
@@ -345,18 +345,18 @@ def test_c_way_name_by_effect_of_c_covers_every_effect():
 
 
 @pytest.mark.parametrize("formula", _CATEGORY_1_FORMULAS, ids=lambda formula: formula.label)
-def test_category_1_formula_c_scale_is_its_rounded_interval_width(formula):
+def test_category_1_formula_c_scale_is_power_of_10_nearest_interval_width(formula):
     """A formula of category 1 that shifts x multiplies ``c`` by ``PublishedTestProblems.c_scale`` of its interval.
 
     The test reads the factor from the code of ``parametrized_fun``, because a test that compares shifted values
-    cannot see a number that is 1 float step off, such as ``1.9999999999999996`` for ``2.0``: the shifted x-values
+    cannot see a number that is 1 float step off, such as ``0.09999999999999999`` for ``0.1``: the shifted x-values
     round to the same float. A formula that applies ``c`` in another way, as some formulas of subcategory 1.99 do,
     has no such factor.
     """
     # --- arrange ----------------------
     tree = ast.parse(textwrap.dedent(inspect.getsource(type(formula).parametrized_fun)))
     shifting_candidates = [
-        candidate for candidate in formula.build_all_candidates() if "shifts x" in _c_ways_followed(candidate, 0.25)
+        candidate for candidate in formula.build_all_candidates() if "shifts x" in _c_ways_followed(candidate, 0.1)
     ]
 
     # --- act --------------------------
@@ -800,7 +800,9 @@ def _c_ways_followed(candidate, c):
     - "scales x": it scales x with the formula's own operations; only for an interval right of 0.
 
     The x-value lies at 0.6 of the interval, in log scale for "scales x", so that the shifted or scaled x-values stay in
-    the interval.
+    the interval for every `c` between -0.1 and 0.1. ``c_scale`` is at most about 3.2 times the interval's width, so a
+    shift moves x by at most about 0.32 of the width; a scaling moves x by at most 0.1 of the interval's width in log
+    scale.
     """
     a, b = candidate.a, candidate.b
     x_linear = a + 0.6 * (b - a)

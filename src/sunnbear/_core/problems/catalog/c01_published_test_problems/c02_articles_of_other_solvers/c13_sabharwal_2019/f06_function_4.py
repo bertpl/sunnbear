@@ -26,7 +26,7 @@ class Sabharwal2019Function4(Formula):
     params = ()
     location_in_publication = "Table 2, function 4"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \tmp{u} - 2",
         interval="[1, 4]",
         summary=(
@@ -39,7 +39,7 @@ class Sabharwal2019Function4(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.0 * c
+        x = x - 1.0 * c
         return x**2 - x - 2
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -52,6 +52,6 @@ class Sabharwal2019Function4(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.9, c=0.0, expected=-0.29000000000000026),
-        FormulaTestCase.value(params={}, x=1.9, c=0.25, expected=-1.8275000000000001),
+        FormulaTestCase.value(params={}, x=1.9, c=0.75, expected=-1.8275000000000001),
         FormulaTestCase.interval_bounds(params={}, expected=(1.0, 4.0)),
     )

@@ -33,7 +33,7 @@ class ChapraCanale2015Figure84(Formula):
     location_in_publication = "§8.3, Eqs. (8.19), (8.20), Fig. 8.4"
     presentation = FormulaPresentation(
         definitions=(
-            (r"\tmp{u}", r"\x - 400 \c"),
+            (r"\tmp{u}", r"\x - 1000 \c"),
             (r"\tmp{L}", "5"),
             (r"\tmp{C}", r"10^{-4}"),
             (r"\tmp{t}", "0.05"),
@@ -52,7 +52,7 @@ class ChapraCanale2015Figure84(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 400.0 * c
+        x = x - 1000.0 * c
         inductance, capacitance, t = 5.0, 1e-4, 0.05
         omega = math.sqrt(1.0 / (inductance * capacitance) - (x / (2.0 * inductance)) ** 2)
         return math.exp(-x * t / (2.0 * inductance)) * math.cos(omega * t) - 0.01
@@ -67,6 +67,6 @@ class ChapraCanale2015Figure84(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=120.0, c=0.0, expected=-0.3122612452758301),
-        FormulaTestCase.value(params={}, x=120.0, c=0.25, expected=-0.5669375904661977),
+        FormulaTestCase.value(params={}, x=120.0, c=0.1, expected=-0.5669375904661977),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 400.0)),
     )

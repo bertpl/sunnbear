@@ -25,7 +25,7 @@ class RootsJl2026FunctionF2(Formula):
     params = ()
     location_in_publication = "runbenchmarks.jl, f2"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 4.5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\tmp{u}^{5} - \tmp{u} - 1",
         interval="[0.5, 5]",
         summary=(
@@ -38,7 +38,7 @@ class RootsJl2026FunctionF2(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 4.5 * c
+        x = x - 10.0 * c
         return x**5 - x - 1
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -51,6 +51,6 @@ class RootsJl2026FunctionF2(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=1.85, c=0.0, expected=18.819986562500006),
-        FormulaTestCase.value(params={}, x=1.85, c=0.25, expected=-1.5246958105468749),
+        FormulaTestCase.value(params={}, x=1.85, c=0.1125, expected=-1.5246958105468749),
         FormulaTestCase.interval_bounds(params={}, expected=(0.5, 5.0)),
     )

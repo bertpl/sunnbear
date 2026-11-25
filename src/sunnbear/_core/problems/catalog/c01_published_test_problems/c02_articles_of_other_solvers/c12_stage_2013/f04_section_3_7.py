@@ -24,7 +24,7 @@ class Stage2013Section37(Formula):
     params = ()
     location_in_publication = "§3.7"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 20 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\begin{cases} "
             r"|\tmp{u} - 2/3|^{0.5} - 0.1 & \text{if } \tmp{u} \le 2/3 \\ "
@@ -42,7 +42,7 @@ class Stage2013Section37(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 20.0 * c
+        x = x - 10.0 * c
         if x <= 2 / 3:
             return abs(x - 2 / 3) ** 0.5 - 0.1
         else:
@@ -58,7 +58,7 @@ class Stage2013Section37(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-4.0, c=0.0, expected=2.060246899469287),
-        FormulaTestCase.value(params={}, x=-4.0, c=0.25, expected=3.009126351029605),
+        FormulaTestCase.value(params={}, x=-4.0, c=0.5, expected=3.009126351029605),
         FormulaTestCase.value(params={}, x=5.0, c=0.0, expected=-2.1816659994661327),
         FormulaTestCase.interval_bounds(params={}, expected=(-10.0, 10.0)),
     )

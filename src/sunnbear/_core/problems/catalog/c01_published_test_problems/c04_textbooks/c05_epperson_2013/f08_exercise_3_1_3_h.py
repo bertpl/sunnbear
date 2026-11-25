@@ -27,17 +27,17 @@ class Epperson2013Exercise313H(Formula):
     params = ()
     location_in_publication = "Exercises 3.1-3(h), 3.2-5(e), 3.3-3(g)"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3.14 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=r"\tmp{u}^{2} - \sin{\left(\tmp{u} \right)}",
         interval=r"[0, \pi]",
-        summary=r"A convex function with 2 simple roots, 1 of them at $\x = 3.14 \c$.",
+        summary=r"A convex function with 2 simple roots, 1 of them at $\x = \c$.",
     )
     effect_of_c = EffectOfC.SHIFTS_X
 
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.14 * c
+        x = x - 1.0 * c
         return x**2 - math.sin(x)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -50,6 +50,6 @@ class Epperson2013Exercise313H(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.942478, c=0.0, expected=0.07924766624610098),
-        FormulaTestCase.value(params={}, x=0.942478, c=0.25, expected=-0.1320285948907636),
+        FormulaTestCase.value(params={}, x=0.942478, c=0.785, expected=-0.1320285948907636),
         FormulaTestCase.interval_bounds(params={}, expected=(0.0, 3.141592653589793)),
     )

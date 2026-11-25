@@ -25,14 +25,14 @@ class OliveiraTakahashi2021WellBehavedFunction8(Formula):
     params = ()
     location_in_publication = "Table 1, well-behaved function 8"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\frac{1}{3} + \operatorname{sign}{\left(\tmp{u} \right)} \sqrt[3]{\left|{\tmp{u}}\right|} "
             r"+ \tmp{u}^{3}"
         ),
         interval="[-1, 1]",
         summary=(
-            r"A signed cube root plus a cube, with an infinite slope at $\x = 2 \c$ and 1 simple root 0.037 below that "
+            r"A signed cube root plus a cube, with an infinite slope at $\x = \c$ and 1 simple root 0.037 below that "
             r"point."
         ),
     )
@@ -41,7 +41,7 @@ class OliveiraTakahashi2021WellBehavedFunction8(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return 1 / 3 + sign(x) * real_root(abs(x), 3) + x**3
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -54,6 +54,6 @@ class OliveiraTakahashi2021WellBehavedFunction8(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=-0.4, c=0.0, expected=-0.467472966394744),
-        FormulaTestCase.value(params={}, x=-0.4, c=0.25, expected=-1.3611560512722964),
+        FormulaTestCase.value(params={}, x=-0.4, c=0.5, expected=-1.3611560512722964),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 1.0)),
     )

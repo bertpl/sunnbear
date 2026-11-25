@@ -62,20 +62,20 @@ class AlefeldPotraShi1995Problem4(Formula):
             ParamTable(
                 names=("q", "n", "a", "b", "c_scale"),
                 rows=(
-                    (0.2, 4.0, 0.0, 5.0, 5.0),
-                    (0.2, 6.0, 0.0, 5.0, 5.0),
-                    (0.2, 8.0, 0.0, 5.0, 5.0),
-                    (0.2, 10.0, 0.0, 5.0, 5.0),
-                    (0.2, 12.0, 0.0, 5.0, 5.0),
-                    (1.0, 4.0, 0.0, 5.0, 5.0),
-                    (1.0, 6.0, 0.0, 5.0, 5.0),
-                    (1.0, 8.0, 0.0, 5.0, 5.0),
-                    (1.0, 10.0, 0.0, 5.0, 5.0),
-                    (1.0, 12.0, 0.0, 5.0, 5.0),
-                    (1.0, 8.0, -0.95, 4.05, 5.0),
-                    (1.0, 10.0, -0.95, 4.05, 5.0),
-                    (1.0, 12.0, -0.95, 4.05, 5.0),
-                    (1.0, 14.0, -0.95, 4.05, 5.0),
+                    (0.2, 4.0, 0.0, 5.0, 10.0),
+                    (0.2, 6.0, 0.0, 5.0, 10.0),
+                    (0.2, 8.0, 0.0, 5.0, 10.0),
+                    (0.2, 10.0, 0.0, 5.0, 10.0),
+                    (0.2, 12.0, 0.0, 5.0, 10.0),
+                    (1.0, 4.0, 0.0, 5.0, 10.0),
+                    (1.0, 6.0, 0.0, 5.0, 10.0),
+                    (1.0, 8.0, 0.0, 5.0, 10.0),
+                    (1.0, 10.0, 0.0, 5.0, 10.0),
+                    (1.0, 12.0, 0.0, 5.0, 10.0),
+                    (1.0, 8.0, -0.95, 4.05, 10.0),
+                    (1.0, 10.0, -0.95, 4.05, 10.0),
+                    (1.0, 12.0, -0.95, 4.05, 10.0),
+                    (1.0, 14.0, -0.95, 4.05, 10.0),
                 ),
                 summary="The published parameter values and intervals.",
             ),
@@ -83,66 +83,66 @@ class AlefeldPotraShi1995Problem4(Formula):
 
     test_cases = (
         FormulaTestCase.value(
-            params={"q": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=4.8625
+            params={"q": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=4.8625
         ),
         FormulaTestCase.value(
-            params={"q": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.25, expected=-0.19609375
+            params={"q": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.125, expected=-0.19609375
         ),
         FormulaTestCase.value(
-            params={"q": 0.2, "n": 6.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=11.190625
+            params={"q": 0.2, "n": 6.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=11.190625
         ),
         FormulaTestCase.value(
-            params={"q": 0.2, "n": 8.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=25.42890625
+            params={"q": 0.2, "n": 8.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=25.42890625
         ),
         FormulaTestCase.value(
-            params={"q": 0.2, "n": 10.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=57.4650390625
+            params={"q": 0.2, "n": 10.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=57.4650390625
         ),
         FormulaTestCase.value(
-            params={"q": 0.2, "n": 12.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=129.546337890625
+            params={"q": 0.2, "n": 12.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=129.546337890625
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=4.0625
+            params={"q": 1.0, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=4.0625
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 6.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=10.390625
+            params={"q": 1.0, "n": 6.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=10.390625
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 8.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=24.62890625
+            params={"q": 1.0, "n": 8.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=24.62890625
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 10.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=56.6650390625
+            params={"q": 1.0, "n": 10.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=56.6650390625
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 12.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, x=1.5, c=0.0, expected=128.746337890625
+            params={"q": 1.0, "n": 12.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, x=1.5, c=0.0, expected=128.746337890625
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 8.0, "a": -0.95, "b": 4.05, "c_scale": 5.0},
+            params={"q": 1.0, "n": 8.0, "a": -0.95, "b": 4.05, "c_scale": 10.0},
             x=0.55,
             c=0.0,
             expected=-0.9916266062109375,
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 10.0, "a": -0.95, "b": 4.05, "c_scale": 5.0},
+            params={"q": 1.0, "n": 10.0, "a": -0.95, "b": 4.05, "c_scale": 10.0},
             x=0.55,
             c=0.0,
             expected=-0.9974670483788086,
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 12.0, "a": -0.95, "b": 4.05, "c_scale": 5.0},
+            params={"q": 1.0, "n": 12.0, "a": -0.95, "b": 4.05, "c_scale": 10.0},
             x=0.55,
             c=0.0,
             expected=-0.9992337821345896,
         ),
         FormulaTestCase.value(
-            params={"q": 1.0, "n": 14.0, "a": -0.95, "b": 4.05, "c_scale": 5.0},
+            params={"q": 1.0, "n": 14.0, "a": -0.95, "b": 4.05, "c_scale": 10.0},
             x=0.55,
             c=0.0,
             expected=-0.9997682190957133,
         ),
         FormulaTestCase.interval_bounds(
-            params={"q": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 5.0}, expected=(0.0, 5.0)
+            params={"q": 0.2, "n": 4.0, "a": 0.0, "b": 5.0, "c_scale": 10.0}, expected=(0.0, 5.0)
         ),
         FormulaTestCase.interval_bounds(
-            params={"q": 1.0, "n": 8.0, "a": -0.95, "b": 4.05, "c_scale": 5.0}, expected=(-0.95, 4.05)
+            params={"q": 1.0, "n": 8.0, "a": -0.95, "b": 4.05, "c_scale": 10.0}, expected=(-0.95, 4.05)
         ),
     )

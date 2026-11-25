@@ -34,7 +34,7 @@ class ModifiedMoler2004Section11(Formula):
     params = ()
     location_in_publication = "§1.1"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 3.96 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=r"\frac{1}{\tmp{u}} - \left(\tmp{u} - 1\right)",
         interval="[0.04, 4]",
         summary=(
@@ -48,7 +48,7 @@ class ModifiedMoler2004Section11(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 3.96 * c
+        x = x - 10.0 * c
         return 1 / x - (x - 1)
 
     def interval_bounds(self) -> tuple[float, float]:
@@ -60,6 +60,6 @@ class ModifiedMoler2004Section11(Formula):
         return ()
 
     test_cases = (
-        FormulaTestCase.value(params={}, x=1.228, c=0.25, expected=4.963680672268908),
+        FormulaTestCase.value(params={}, x=1.228, c=0.099, expected=4.963680672268908),
         FormulaTestCase.interval_bounds(params={}, expected=(0.04, 4.0)),
     )

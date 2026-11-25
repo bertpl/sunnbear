@@ -62,7 +62,7 @@ class ModifiedChapraCanale2015EquationPt23(Formula):
         " 5.26, 7.20, 7.21"
     )
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 2 \c"),),
+        definitions=((r"\tmp{u}", r"\x - \c"),),
         expression=(
             r"\frac{\param{g} \param{m}}{\tmp{u}} \left(-\operatorname{expm1}\left(- "
             r"\frac{\tmp{u}}{\param{m}} \param{t}\right)\right) - \param{v}"
@@ -91,7 +91,7 @@ class ModifiedChapraCanale2015EquationPt23(Formula):
 
         Category 1 states the rule for ``c_scale``.
         """
-        x = x - 2.0 * c
+        x = x - 1.0 * c
         return (g * m / x) * -math.expm1(-(x / m) * t) - v
 
     def interval_bounds(self, g: float, m: float, v: float, t: float) -> tuple[float, float]:
@@ -111,6 +111,6 @@ class ModifiedChapraCanale2015EquationPt23(Formula):
     test_cases = (
         FormulaTestCase.interval_bounds(params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0}, expected=(3.0, 5.0)),
         FormulaTestCase.value(
-            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0}, x=3.6, c=0.25, expected=0.417138544494483
+            params={"g": 9.81, "m": 82.0, "v": 36.0, "t": 4.0}, x=3.6, c=0.5, expected=0.417138544494483
         ),
     )

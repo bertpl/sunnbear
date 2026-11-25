@@ -28,7 +28,7 @@ class BusDekker1975GroupIv(Formula):
     params = ()
     location_in_publication = "Group IV"
     presentation = FormulaPresentation(
-        definitions=((r"\tmp{u}", r"\x - 5 \c"),),
+        definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
             r"\begin{cases} "
             r"0 & \text{if } |\tmp{u}| < 10^{-100} \\ "
@@ -50,7 +50,7 @@ class BusDekker1975GroupIv(Formula):
     @staticmethod
     def parametrized_fun(x: float, c: float) -> float:
         """Evaluate the published function at ``x - c_scale*c``; category 1 states the rule for ``c_scale``."""
-        x = x - 5.0 * c
+        x = x - 10.0 * c
         # below 1e-100, float64 rounds x*exp(-x^-2) to 0, and x**-2 overflows
         if abs(x) < 1e-100:
             return 0.0
@@ -67,7 +67,7 @@ class BusDekker1975GroupIv(Formula):
 
     test_cases = (
         FormulaTestCase.value(params={}, x=0.5, c=0.0, expected=0.00915781944436709),
-        FormulaTestCase.value(params={}, x=0.5, c=0.25, expected=-0.12675998655454956),
+        FormulaTestCase.value(params={}, x=0.5, c=0.125, expected=-0.12675998655454956),
         FormulaTestCase.value(params={}, x=0.0, c=0.0, expected=0.0),
         FormulaTestCase.value(params={}, x=1e-200, c=0.0, expected=0.0),
         FormulaTestCase.interval_bounds(params={}, expected=(-1.0, 4.0)),

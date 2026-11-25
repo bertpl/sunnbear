@@ -59,17 +59,17 @@ class RootsFortran2025Case86(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 2.0, 2.0), (2.0, 6.0, 4.0), (6.0, 8.0, 2.0)),
+                rows=((0.0, 2.0, 1.0), (2.0, 6.0, 10.0), (6.0, 8.0, 1.0)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
-        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.0, expected=-13.038596669241484),
-        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, x=0.6, c=0.25, expected=-31.74522776601684),
-        FormulaTestCase.value(params={"a": 2.0, "b": 6.0, "c_scale": 4.0}, x=3.2, c=0.0, expected=12.259145618000167),
-        FormulaTestCase.value(params={"a": 6.0, "b": 8.0, "c_scale": 2.0}, x=6.6, c=0.0, expected=-7.153046515733028),
-        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 2.0, "c_scale": 2.0}, expected=(0.0, 2.0)),
-        FormulaTestCase.interval_bounds(params={"a": 2.0, "b": 6.0, "c_scale": 4.0}, expected=(2.0, 6.0)),
-        FormulaTestCase.interval_bounds(params={"a": 6.0, "b": 8.0, "c_scale": 2.0}, expected=(6.0, 8.0)),
+        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.0, expected=-13.038596669241484),
+        FormulaTestCase.value(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, x=0.6, c=0.5, expected=-31.74522776601684),
+        FormulaTestCase.value(params={"a": 2.0, "b": 6.0, "c_scale": 10.0}, x=3.2, c=0.0, expected=12.259145618000167),
+        FormulaTestCase.value(params={"a": 6.0, "b": 8.0, "c_scale": 1.0}, x=6.6, c=0.0, expected=-7.153046515733028),
+        FormulaTestCase.interval_bounds(params={"a": 0.0, "b": 2.0, "c_scale": 1.0}, expected=(0.0, 2.0)),
+        FormulaTestCase.interval_bounds(params={"a": 2.0, "b": 6.0, "c_scale": 10.0}, expected=(2.0, 6.0)),
+        FormulaTestCase.interval_bounds(params={"a": 6.0, "b": 8.0, "c_scale": 1.0}, expected=(6.0, 8.0)),
     )

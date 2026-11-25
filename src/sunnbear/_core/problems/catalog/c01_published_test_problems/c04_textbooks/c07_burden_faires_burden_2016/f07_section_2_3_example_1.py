@@ -61,25 +61,25 @@ class BurdenFairesBurden2016Section23Example1(Formula):
         return (
             ParamTable(
                 names=("a", "b", "c_scale"),
-                rows=((0.0, 1.57079632679, 1.57), (0.5, 0.785398163397, 0.285)),
+                rows=((0.0, 1.57079632679, 1.0), (0.5, 0.785398163397, 0.1)),
                 summary="The published intervals.",
             ),
         )
 
     test_cases = (
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 1.57079632679, "c_scale": 1.57}, x=0.471239, c=0.0, expected=0.41976747789879676
+            params={"a": 0.0, "b": 1.57079632679, "c_scale": 1.0}, x=0.471239, c=0.0, expected=0.41976747789879676
         ),
         FormulaTestCase.value(
-            params={"a": 0.0, "b": 1.57079632679, "c_scale": 1.57}, x=0.471239, c=0.25, expected=0.9181626861874498
+            params={"a": 0.0, "b": 1.57079632679, "c_scale": 1.0}, x=0.471239, c=0.3925, expected=0.9181626861874498
         ),
         FormulaTestCase.value(
-            params={"a": 0.5, "b": 0.785398163397, "c_scale": 0.285}, x=0.585619, c=0.0, expected=0.2477511147682301
+            params={"a": 0.5, "b": 0.785398163397, "c_scale": 0.1}, x=0.585619, c=0.0, expected=0.2477511147682301
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 0.0, "b": 1.57079632679, "c_scale": 1.57}, expected=(0.0, 1.57079632679)
+            params={"a": 0.0, "b": 1.57079632679, "c_scale": 1.0}, expected=(0.0, 1.57079632679)
         ),
         FormulaTestCase.interval_bounds(
-            params={"a": 0.5, "b": 0.785398163397, "c_scale": 0.285}, expected=(0.5, 0.785398163397)
+            params={"a": 0.5, "b": 0.785398163397, "c_scale": 0.1}, expected=(0.5, 0.785398163397)
         ),
     )
