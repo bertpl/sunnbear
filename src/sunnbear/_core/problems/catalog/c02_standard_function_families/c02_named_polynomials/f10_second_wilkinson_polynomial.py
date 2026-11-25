@@ -10,15 +10,13 @@ from sunnbear._core.problems.core import (
     ParamRecipe,
 )
 
-from .helpers import VALUE_RANGE_EXPONENT_LIMIT, interval_by_parity_latex, is_valid_degree
+from .helpers import interval_by_parity_latex, is_valid_degree, value_range_limit_latex
 
 # Above about degree 44 the values next to the lower bound of the interval underflow. The highest valid degree is a
 # round degree below that, which leaves a margin for the values of ``c``.
 HIGHEST_VALID_DEGREE = 40
-# The sweep ends at the degree of Wilkinson's own second polynomial, beyond the category's limit on the range of values,
-# `VALUE_RANGE_EXPONENT_LIMIT`: this formula's range of values exceeds that limit from
-# `FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT` on.
 HIGHEST_SWEPT_DEGREE = 20
+# From this degree on, this formula's range of values exceeds the category's limit, `VALUE_RANGE_EXPONENT_LIMIT`.
 FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT = 11
 
 
@@ -99,9 +97,7 @@ class SecondWilkinsonPolynomial(Formula):
                     rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}, the degree of Wilkinson's own "
                     r"second polynomial. The sweep goes beyond the limit that ends the sweeps of the category's other "
                     r"formulas whose values grow quickly as the degree rises: from degree "
-                    rf"{FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT} on, for $\c = 0$, the largest absolute "
-                    rf"value on the interval is more than $10^{{{VALUE_RANGE_EXPONENT_LIMIT}}}$ times the lowest "
-                    r"peak of the absolute value between 2 neighboring roots."
+                    rf"{FIRST_DEGREE_BEYOND_VALUE_RANGE_LIMIT} on, " + value_range_limit_latex("more than") + "."
                 ),
             ),
         )

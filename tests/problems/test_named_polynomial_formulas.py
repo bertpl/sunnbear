@@ -97,25 +97,23 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
     return 2.0 * math.factorial(int(n)) / (2.0 * math.pi) ** n
 
 
-def _value_range(formula, n: int) -> float:
+def _value_range_ratio(formula, n: int) -> float:
     """Return the range of values of a formula whose only parameter is the degree, at degree `n` and ``c = 0``.
 
     The comment on `VALUE_RANGE_EXPONENT_LIMIT` in `helpers` defines the range of values: the largest absolute value on
-    the interval divided by the lowest peak of the absolute value between 2 neighboring roots.
-
-    The x-values are 200 per root, spaced evenly and, for a positive lower bound, also evenly in ``log(x)``, so that
-    they also sample the roots of `SecondWilkinsonPolynomial`, which crowd toward its lower bound.
-
-    An x-value at which the function is exactly 0 is dropped, so that a root on the grid still separates its 2
-    neighboring peaks. The interval must hold at least 2 roots, so that at least 1 peak lies between 2 neighboring
-    roots.
+    the interval divided by the lowest peak of the absolute value between 2 neighboring roots. The interval must hold at
+    least 2 roots, so that at least 1 peak lies between 2 neighboring roots.
     """
     a, b = formula.interval_bounds(float(n))
+    # 200 x-values per root, spaced evenly and, for a positive lower bound, also evenly in ``log(x)``, so that they also
+    # sample the roots of `SecondWilkinsonPolynomial`, which lie closer together toward its lower bound
     n_x_values = 200 * (n + 1)
     x_values = np.linspace(a, b, n_x_values)
     if a > 0.0:
         x_values = np.union1d(x_values, np.geomspace(a, b, n_x_values))
     values = np.array([formula.parametrized_fun(float(x), 0.0, float(n)) for x in x_values])
+    # an x-value at which the function is exactly 0 is dropped, so that a root on the grid still separates its 2
+    # neighboring peaks
     values = values[values != 0.0]
     segments = np.split(np.abs(values), np.flatnonzero(np.diff(np.sign(values))) + 1)
     # the first and the last segment run from a bound to the nearest root, so they hold no peak between 2 roots
@@ -306,7 +304,7 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
 def test_the_range_of_values_exceeds_its_limit_just_above_the_highest_degree_within_it(
     formula_number, highest_degree_within_limit
 ):
-    """At ``c = 0``, the range of values is within `VALUE_RANGE_EXPONENT_LIMIT` at a degree, and not at the next one.
+    """At ``c = 0``, the range of values is at most ``10^VALUE_RANGE_EXPONENT_LIMIT`` at the given degree, not the next.
 
     For the Second Wilkinson polynomial, the checked degree is the last one before its sweep exceeds the limit.
     """
@@ -315,11 +313,11 @@ def test_the_range_of_values_exceeds_its_limit_just_above_the_highest_degree_wit
     limit = 10.0**VALUE_RANGE_EXPONENT_LIMIT
 
     # --- act --------------------------
-    range_at_degree = _value_range(formula, highest_degree_within_limit)
-    range_at_next_degree = _value_range(formula, highest_degree_within_limit + 1)
+    ratio_at_degree = _value_range_ratio(formula, highest_degree_within_limit)
+    ratio_at_next_degree = _value_range_ratio(formula, highest_degree_within_limit + 1)
 
     # --- assert -----------------------
-    assert range_at_degree <= limit < range_at_next_degree
+    assert ratio_at_degree <= limit < ratio_at_next_degree
 
 
 def test_every_real_zero_of_a_bernoulli_candidate_lies_well_inside_its_interval():

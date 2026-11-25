@@ -145,19 +145,19 @@ class JacobiPolynomial(Formula):
             r", with a tie going to the larger degree, combined with $\param{alpha}$ and $\param{beta}$, each from "
             r"$-0.75$ to 1.5 in steps of 0.25."
         )
-        degree_axes_with_summaries = (
-            (
-                ParamAxis("n", 0.0, 3.0, 0.5, ParamNotation.POW10, ParamRounding.NEAREST_ODD_INTEGER),
-                r"The odd degrees $\param{n}$ nearest to $10^{0.5 i}$, for $i$ from 0 to 6",
-            ),
-            (
-                ParamAxis("n", 0.0, 3.0, 0.5, ParamNotation.POW10, ParamRounding.NEAREST_EVEN_INTEGER),
-                r"The even degrees $\param{n}$ nearest to $10^{0.5 i}$, for $i$ from 0 to 6",
-            ),
+        degree_roundings = (
+            (ParamRounding.NEAREST_ODD_INTEGER, "odd"),
+            (ParamRounding.NEAREST_EVEN_INTEGER, "even"),
         )
         return tuple(
-            ParamGrid(axes=(degree_axis, alpha_axis, beta_axis), summary=degree_summary + alpha_beta_summary)
-            for degree_axis, degree_summary in degree_axes_with_summaries
+            ParamGrid(
+                axes=(ParamAxis("n", 0.0, 3.0, 0.5, ParamNotation.POW10, rounding), alpha_axis, beta_axis),
+                summary=(
+                    rf"The {parity} degrees $\param{{n}}$ nearest to $10^{{0.5 i}}$, for $i$ from 0 to 6"
+                    + alpha_beta_summary
+                ),
+            )
+            for rounding, parity in degree_roundings
         )
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:

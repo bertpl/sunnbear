@@ -19,12 +19,15 @@ steps.
 
 The formulas of the polynomials that are orthogonal on ``[-1, 1]`` come first in the category. `helpers` holds what
 they share: the rule for their intervals, and the recipe of those whose degree is their only parameter,
-`CHEBYSHEV_LEGENDRE_RECIPE`. Each of them but `ChebyshevFirstKindPolynomial` shifts ``x`` by ``c/n^2``, because its
-zeros next to the bounds lie about ``1/n^2`` apart.
+`CHEBYSHEV_LEGENDRE_RECIPE`. Each formula of a polynomial orthogonal on ``[-1, 1]``, except
+`ChebyshevFirstKindPolynomial`, shifts ``x`` by ``c/n^2``, because its zeros next to the bounds lie about ``1/n^2``
+apart.
 
 The formulas whose values grow quickly as the degree rises end the sweep of their degree at a limit on their range of
-values, `VALUE_RANGE_EXPONENT_LIMIT` in `helpers`, which their recipes' summaries state; `SecondWilkinsonPolynomial` is
-the exception, and its sweep goes beyond that limit.
+values: at ``c = 0``, the largest absolute value on the interval is at most ``10^VALUE_RANGE_EXPONENT_LIMIT`` times
+the lowest peak of the absolute value between 2 neighboring roots. `VALUE_RANGE_EXPONENT_LIMIT` lives in `helpers`,
+and the formulas' recipe summaries state the limit; `SecondWilkinsonPolynomial` is the exception, and its sweep goes
+beyond that limit.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

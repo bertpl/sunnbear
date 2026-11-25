@@ -121,8 +121,6 @@ class GegenbauerPolynomial(Formula):
     def recipes(self) -> tuple[ParamRecipe, ...]:
         """Return the recipe that combines degrees on a logarithmic scale with ``alpha`` from -0.4 to 2 in steps of 0.2.
 
-        The degrees are ``10^(0.04*i)``, for ``i`` from 0 to 75, rounded to the nearest integer, each once.
-
         The step is 4 times that of `CHEBYSHEV_LEGENDRE_DEGREE_AXIS`, because each degree combines with 13 values of
         ``alpha``. At this step about half of the degrees are odd, so 1 axis gives odd and even degrees alike.
 
