@@ -29,8 +29,8 @@ class ModifiedEllithy2026Problem20(Formula):
     ``[0.02, 2]``: its lower bound moves right of the root at 0 by 1% of the published interval's width, rounded half up
     to 1 significant digit.
 
-    ``c`` shifts x by the rule of category 1, with ``c_scale`` the width of the new interval rounded to the nearest
-    power of 10.
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the power of 10 nearest the width of the new interval
+    on a log scale.
 
     The published test problem on ``[0, 2]`` does not satisfy the benchmark suite inclusion conditions, because
     ``f(a)`` is 0 at the root ``a = 0``.

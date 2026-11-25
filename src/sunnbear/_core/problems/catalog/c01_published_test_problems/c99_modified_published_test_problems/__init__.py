@@ -38,8 +38,8 @@ class ModifiedPublishedTestProblems(FormulaCategory):
     A formula of this subcategory applies ``c`` in 1 of 3 ways, which its `effect_of_c` declares and its docstring
     states:
 
-    - it shifts x by ``c_scale*c``, as the published formulas do, with ``c_scale`` the width of the formula's own
-      interval rounded to the nearest power of 10;
+    - it shifts x by ``c_scale*c``, as the published formulas do, with ``c_scale`` the power of 10 nearest the width
+      of the formula's own interval on a log scale;
     - it adds ``c`` to the function's value, on the published interval, and does not shift x;
     - it keeps the published interval ``[a, b]`` and evaluates the function at ``x*exp(-c*ln(b/a))``: ``c`` scales x,
       so that the root moves by the factor ``(b/a)**c`` and never reaches 0.

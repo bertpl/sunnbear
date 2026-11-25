@@ -20,15 +20,14 @@ class PublishedTestProblems(FormulaCategory):
     function for, such as finding every root in an interval, minimizing the function, or iterating to a fixed point.
 
     Each formula of category 1 outside subcategory 1.99 evaluates its published function at ``x - c_scale*c``, where
-    ``c_scale`` is the width of the formula's interval rounded to the nearest power of 10, so that ``c`` shifts the
-    function along x, and at ``c = 0`` the formula is the published function.
+    ``c_scale`` is the power of 10 nearest the width of the formula's interval on a log scale, so that ``c`` shifts
+    the function along x, and at ``c = 0`` the formula is the published function.
 
     A shift along x keeps the function's shape around its root; a shift of its values, ``f(x) - c``, would turn a
     multiple root into a simple one.
 
-    ``c_scale`` is the power of 10 nearest the width of the formula's interval ``[a, b]`` on a log scale, so the width
-    lies between about 0.32 and 3.2 times ``c_scale``, and the values of ``c`` that keep a root inside the interval span
-    a range whose length lies between about 0.3 and 3.
+    The width of the formula's interval ``[a, b]`` therefore lies between about 0.32 and 3.2 times ``c_scale``, and the
+    values of ``c`` that keep a root inside the interval span a range whose length lies between about 0.3 and 3.
 
     A power of 10 shows a reader that the scale's exact value does not matter: the benchmark suite pipeline calibrates
     the range of ``c`` of each test problem, whatever its scale.

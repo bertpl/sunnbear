@@ -25,8 +25,8 @@ class ModifiedAlefeldPotraShi1993Problem2(Formula):
     The formula moves each bound away from its pole, at ``n^2`` or ``(n + 1)^2``, to a distance of 1% of the published
     interval's width, rounded half up to 1 significant digit, such as ``[1.03, 3.97]`` for ``n = 1``.
 
-    ``c`` shifts x by the rule of category 1, with ``c_scale`` the width of the new interval rounded to the nearest
-    power of 10.
+    ``c`` shifts x by the rule of category 1, with ``c_scale`` the power of 10 nearest the width of the new interval
+    on a log scale.
 
     The published test problems do not satisfy the benchmark suite inclusion conditions, because each bound lies
     ``1e-9`` from a pole, so that a shift along x by more than ``1e-9`` crosses it.
