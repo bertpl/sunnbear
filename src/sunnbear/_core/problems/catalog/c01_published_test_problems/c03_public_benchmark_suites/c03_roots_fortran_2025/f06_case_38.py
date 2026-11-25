@@ -25,9 +25,7 @@ class RootsFortran2025Case38(Formula):
     location_in_publication = "root_tests.f90, case 38"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 10 \c"),),
-        expression=(
-            r"\tmp{u}^{5} - 61.0 \tmp{u}^{4} + 1368.0 \tmp{u}^{3} - 13548.0 \tmp{u}^{2} + 54256.0 " r"\tmp{u} - 42016.0"
-        ),
+        expression=r"\tmp{u}^{5} - 61 \tmp{u}^{4} + 1368 \tmp{u}^{3} - 13548 \tmp{u}^{2} + 54256 \tmp{u} - 42016",
         interval="[0, 10]",
         summary=(
             r"A quintic with 1 real root, a local maximum 2.5 above it, and complex roots $\x = 10 + 10 \c \pm 2i$ that"

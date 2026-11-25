@@ -26,7 +26,7 @@ class RootsFortran2025Case64(Formula):
     location_in_publication = "root_tests.f90, case 64"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
-        expression=r"\sin^{2}{\left(\tmp{u} \right)} - \tmp{u}^{2} + 1.0",
+        expression=r"\sin^{2}{\left(\tmp{u} \right)} - \tmp{u}^{2} + 1",
         interval="[-2, -1]",
         summary="A concave function, increasing over the interval, with 1 root.",
     )

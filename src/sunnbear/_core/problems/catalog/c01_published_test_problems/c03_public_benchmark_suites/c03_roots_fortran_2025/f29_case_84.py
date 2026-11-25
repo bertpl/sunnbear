@@ -34,8 +34,8 @@ class RootsFortran2025Case84(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(
-            r"\left(\left(\left(\tmp{u} \tmp{u} - 6.0\right) \tmp{u} - 8.0\right) \tmp{u} - 3.0\right) "
-            r"\tmp{u}^{4} - 1.0"
+            r"\left(\left(\left(\tmp{u} \tmp{u} - 6\right) \tmp{u} - 8\right) \tmp{u} - 3\right) "
+            r"\tmp{u}^{4} - 1"
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(

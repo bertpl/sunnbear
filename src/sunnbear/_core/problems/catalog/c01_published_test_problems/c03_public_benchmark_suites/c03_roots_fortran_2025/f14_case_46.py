@@ -28,8 +28,8 @@ class RootsFortran2025Case46(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 15 \c"),),
         expression=(
-            r"\sin{\left(\tmp{u} \cdot 10.0 \right)} + \sin{\left(\tmp{u} \cdot 2.0 \right)} + "
-            r"\arctan{\left(\frac{\tmp{u}}{3.0} \right)} \tmp{u}^{2} + e^{\tmp{u}} - 1.0"
+            r"\sin{\left(\tmp{u} \cdot 10 \right)} + \sin{\left(\tmp{u} \cdot 2 \right)} + "
+            r"\arctan{\left(\frac{\tmp{u}}{3} \right)} \tmp{u}^{2} + e^{\tmp{u}} - 1"
         ),
         interval="[-10, 5]",
         summary=(

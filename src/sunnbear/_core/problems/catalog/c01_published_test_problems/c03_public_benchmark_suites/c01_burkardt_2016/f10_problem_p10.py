@@ -33,7 +33,7 @@ class Burkardt2016ProblemP10(Formula):
     location_in_publication = "Problem p10"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\frac{20.0 \tmp{u}}{100.0 \tmp{u} \tmp{u} + 1.0}",
+        expression=r"\frac{20 \tmp{u}}{100 \tmp{u} \tmp{u} + 1}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A rational function with 1 root between a local minimum and a local maximum, both 0.1 from the root, "

@@ -29,9 +29,7 @@ class Burkardt2016ProblemP19(Formula):
     location_in_publication = "Problem p19"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
-        expression=(
-            r"\cos{\left(100.0 \tmp{u} \right)} - 4.0 \operatorname{erf}{\left(30.0 \tmp{u} - 10.0 " r"\right)}"
-        ),
+        expression=r"\cos{\left(100 \tmp{u} \right)} - 4 \operatorname{erf}{\left(30 \tmp{u} - 10 \right)}",
         interval="[0, 1]",
         summary=(
             "A cosine with about 16 periods plus a smooth step from 4 to $-4$, with its 1 root in the step, referred to"

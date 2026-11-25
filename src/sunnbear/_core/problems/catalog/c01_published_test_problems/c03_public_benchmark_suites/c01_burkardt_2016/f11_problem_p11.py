@@ -34,7 +34,7 @@ class Burkardt2016ProblemP11(Formula):
     location_in_publication = "Problem p11"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\frac{16.0 - \tmp{u}^{4}}{16.0 \tmp{u}^{4} + \param{epsilon}}",
+        expression=r"\frac{16 - \tmp{u}^{4}}{16 \tmp{u}^{4} + \param{epsilon}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A rational function with 1 root and a narrow peak of $1.6 \cdot 10^{6}$ that lies 2 below the root, "

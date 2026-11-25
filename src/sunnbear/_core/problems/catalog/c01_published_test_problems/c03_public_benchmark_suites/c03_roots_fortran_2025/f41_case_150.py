@@ -26,7 +26,7 @@ class RootsFortran2025Case150(Formula):
     location_in_publication = "root_tests.f90, case 150"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \c"),),
-        expression=r"e^{\left(\tmp{u} - 3.0\right)^{5}} - 1.0",
+        expression=r"e^{\left(\tmp{u} - 3\right)^{5}} - 1",
         interval="[2.6, 3.6]",
         summary=(
             "A function with a root of multiplicity 5, around which the function is exactly 0 in floating point on a "

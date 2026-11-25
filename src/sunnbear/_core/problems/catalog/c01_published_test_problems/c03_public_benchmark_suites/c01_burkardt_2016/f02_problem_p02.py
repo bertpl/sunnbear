@@ -35,7 +35,7 @@ class Burkardt2016ProblemP02(Formula):
     location_in_publication = "Problem p02"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"2.0 \tmp{u} - e^{- \tmp{u}}",
+        expression=r"2 \tmp{u} - e^{- \tmp{u}}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A line plus an exponential term, with 1 root, nearly straight above that root and steep far below that "

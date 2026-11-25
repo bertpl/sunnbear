@@ -27,7 +27,7 @@ class RootsFortran2025Case154(Formula):
     location_in_publication = "root_tests.f90, case 154"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 10 \c"),),
-        expression=r"\frac{2.0 \tmp{u}}{e^{5.0}} - 2.0 e^{- 5.0 \tmp{u}} + 1.0",
+        expression=r"\frac{2 \tmp{u}}{e^{5}} - 2 e^{- 5 \tmp{u}} + 1",
         interval="[0, 10]",
         summary="An increasing function that rises quickly through its root to about 1 and is then nearly flat.",
     )

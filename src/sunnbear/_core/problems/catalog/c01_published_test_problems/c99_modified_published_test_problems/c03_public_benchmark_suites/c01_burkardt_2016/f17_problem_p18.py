@@ -53,7 +53,7 @@ class ModifiedBurkardt2016ProblemP18(Formula):
     location_in_publication = "Problem p18"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"{10.0}^{14} \left(\tmp{u} - 1\right)^{7}",
+        expression=r"10^{14} \left(\tmp{u} - 1\right)^{7}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A function so flat at its root of multiplicity 7 that the function stays below $10^{-4}$ in magnitude on a"
@@ -61,9 +61,9 @@ class ModifiedBurkardt2016ProblemP18(Formula):
         ),
         notes=(
             (
-                r"The expression equals the published function, $${10.0}^{14} \left(1.0 \tmp{u}^{7} - 7.0 "
-                r"\tmp{u}^{6} + 21.0 \tmp{u}^{5} - 35.0 \tmp{u}^{4} + 35.0 \tmp{u}^{3} - 21.0 \tmp{u}^{2} "
-                r"+ 7.0 \tmp{u} - 1.0\right),$$ without the cancellation that makes the published function "
+                r"The expression equals the published function, $$10^{14} \left(\tmp{u}^{7} - 7 "
+                r"\tmp{u}^{6} + 21 \tmp{u}^{5} - 35 \tmp{u}^{4} + 35 \tmp{u}^{3} - 21 \tmp{u}^{2} "
+                r"+ 7 \tmp{u} - 1\right),$$ without the cancellation that makes the published function "
                 "exactly 0 at many x-values up to about 0.01 from the root."
             ),
             (

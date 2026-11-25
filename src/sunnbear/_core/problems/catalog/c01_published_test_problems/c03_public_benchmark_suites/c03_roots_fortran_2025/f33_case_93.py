@@ -33,7 +33,7 @@ class RootsFortran2025Case93(Formula):
     location_in_publication = "root_tests.f90, case 93–94"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\left(\tmp{u} - 10.0\right) \tmp{u} + 23.0 - \tmp{u}^{0.4}",
+        expression=r"\left(\tmp{u} - 10\right) \tmp{u} + 23 - \tmp{u}^{0.4}",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             r"A quadratic minus $\tmp{u}^{0.4}$, with 1 root on each published interval and an infinite slope where the"

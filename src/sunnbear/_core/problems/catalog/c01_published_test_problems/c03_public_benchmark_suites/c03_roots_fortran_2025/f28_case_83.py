@@ -24,7 +24,7 @@ class RootsFortran2025Case83(Formula):
     location_in_publication = "root_tests.f90, case 83"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 3 \c"),),
-        expression=r"\left(\tmp{u} - 1.0\right) \tmp{u}^{6} - 1.0",
+        expression=r"\left(\tmp{u} - 1\right) \tmp{u}^{6} - 1",
         interval="[0, 3]",
         summary=(
             "A polynomial of degree 7 with 1 simple root, steep above that root and within 0.06 of $-1$ from 1.26 to "

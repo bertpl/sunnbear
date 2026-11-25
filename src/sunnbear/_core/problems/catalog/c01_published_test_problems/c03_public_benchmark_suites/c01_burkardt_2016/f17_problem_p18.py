@@ -35,8 +35,8 @@ class Burkardt2016ProblemP18(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(
-            r"{10.0}^{14} \left(1.0 \tmp{u}^{7} - 7.0 \tmp{u}^{6} + 21.0 \tmp{u}^{5} - 35.0 \tmp{u}^{4} "
-            r"+ 35.0 \tmp{u}^{3} - 21.0 \tmp{u}^{2} + 7.0 \tmp{u} - 1.0\right)"
+            r"10^{14} \left(\tmp{u}^{7} - 7 \tmp{u}^{6} + 21 \tmp{u}^{5} - 35 \tmp{u}^{4} "
+            r"+ 35 \tmp{u}^{3} - 21 \tmp{u}^{2} + 7 \tmp{u} - 1\right)"
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(

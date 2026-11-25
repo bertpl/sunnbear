@@ -26,7 +26,7 @@ class RootsFortran2025Case68(Formula):
     location_in_publication = "root_tests.f90, case 68"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 1.1 \c"),),
-        expression=r"\tmp{u} - 3.0 \ln{\left(\tmp{u} \right)}",
+        expression=r"\tmp{u} - 3 \ln{\left(\tmp{u} \right)}",
         interval="[1, 2.1]",
         summary="A convex function, decreasing on the interval, with 1 simple root.",
     )

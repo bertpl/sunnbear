@@ -24,7 +24,7 @@ class RootsFortran2025Case13(Formula):
     location_in_publication = "root_tests.f90, case 13"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 5 \c"),),
-        expression=r"\tmp{u}^{3} - 2.0 \tmp{u} - \tmp{u} + 3.0",
+        expression=r"\tmp{u}^{3} - 2 \tmp{u} - \tmp{u} + 3",
         interval="[-3, 2]",
         summary=(
             "A cubic with 1 real root, left of both of the cubic's local extrema, and a local minimum whose value is "

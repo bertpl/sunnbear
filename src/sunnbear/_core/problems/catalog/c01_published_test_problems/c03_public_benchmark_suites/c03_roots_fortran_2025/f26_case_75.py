@@ -33,7 +33,7 @@ class RootsFortran2025Case75(Formula):
     location_in_publication = "root_tests.f90, case 75–78"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
-        expression=r"\left(\left(\tmp{u} \tmp{u} - 27.0\right) \tmp{u} - 54.0\right) \tmp{u} - 10.0",
+        expression=r"\left(\left(\tmp{u} \tmp{u} - 27\right) \tmp{u} - 54\right) \tmp{u} - 10",
         interval=r"[\param{a}, \param{b}]",
         summary=(
             "A quartic with 4 real roots, 1 on each of 4 adjacent intervals, and a local minimum between the lowest 2 "

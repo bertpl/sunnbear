@@ -40,7 +40,7 @@ class ModifiedBurkardt2016ProblemP06(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 19.9 \c"),),
         expression=(
-            r"e^{\tmp{u}} - 2.0 - \frac{1.0}{\left(10.0 \tmp{u}\right)^{2}} + \frac{2.0}{\left(100.0 "
+            r"e^{\tmp{u}} - 2 - \frac{1}{\left(10 \tmp{u}\right)^{2}} + \frac{2}{\left(100 "
             r"\tmp{u}\right)^{3}}"
         ),
         interval="[0.08, 20]",

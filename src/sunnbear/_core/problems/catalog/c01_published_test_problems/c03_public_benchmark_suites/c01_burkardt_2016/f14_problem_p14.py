@@ -35,8 +35,8 @@ class Burkardt2016ProblemP14(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - \param{c_scale} \c"),),
         expression=(
-            r"\frac{1.0}{\left(\tmp{u} - 0.3\right)^{2} + 0.01} + \frac{1.0}{\left(\tmp{u} - "
-            r"0.9\right)^{2} + 0.04} + 2.0 \tmp{u} - 5.2"
+            r"\frac{1}{\left(\tmp{u} - 0.3\right)^{2} + 0.01} + \frac{1}{\left(\tmp{u} - "
+            r"0.9\right)^{2} + 0.04} + 2 \tmp{u} - 5.2"
         ),
         interval=r"[\param{a}, \param{b}]",
         summary=(

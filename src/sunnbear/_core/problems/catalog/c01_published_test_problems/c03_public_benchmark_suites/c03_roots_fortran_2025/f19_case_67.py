@@ -27,7 +27,7 @@ class RootsFortran2025Case67(Formula):
     location_in_publication = "root_tests.f90, case 67"
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 2.1 \c"),),
-        expression=r"e^{\tmp{u}^{2} + 7.0 \tmp{u} - 30.0} - 1.0",
+        expression=r"e^{\tmp{u}^{2} + 7 \tmp{u} - 30} - 1",
         interval="[1, 3.1]",
         summary=(
             "An exponential minus 1, steep at its 1 root on the interval and already within $10^{-3}$ of $-1$ at 0.56 "

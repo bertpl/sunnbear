@@ -26,8 +26,8 @@ class RootsFortran2025Case39(Formula):
     presentation = FormulaPresentation(
         definitions=((r"\tmp{u}", r"\x - 10 \c"),),
         expression=(
-            r"\tmp{u}^{5} - 61.0 \tmp{u}^{4} + \frac{6801.0}{5.0} \tmp{u}^{3} - \frac{66531.0}{5.0} "
-            r"\tmp{u}^{2} + \frac{5205601.0}{100.0} \tmp{u} - \frac{4005001.0}{100.0}"
+            r"\tmp{u}^{5} - 61 \tmp{u}^{4} + \frac{6801}{5} \tmp{u}^{3} - \frac{66531}{5} "
+            r"\tmp{u}^{2} + \frac{5205601}{100} \tmp{u} - \frac{4005001}{100}"
         ),
         interval="[0, 10]",
         summary=(
