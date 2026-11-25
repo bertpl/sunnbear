@@ -19,8 +19,8 @@ computes ``2 ** 1.23`` from a paper or a suite file gets the same float.
 `POW10` do for positive values. A value authored as ``-10^0.3`` is exactly ``-(10 ** 0.3)``.
 
 **The notation matters only while a value is built.** Afterwards a value is written in its
-canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^2.0`` and
-``4.0`` are one value with one spelling.
+canonical spelling (see `ParamNotation`), which depends on the float alone: ``2^2`` and
+``4`` are one value with one spelling.
 
 Collapsing values that agree to `DEDUP_DIGITS` significant digits but are different floats is
 a separate pass, `deduplicate_param_tuples`, not part of equality: a tolerance in equality would
@@ -73,7 +73,9 @@ class ParamNotation(StrEnum):
 
     **Canonical spelling.** `spell_value_canonically` spells a valid value in every notation that
     can spell it under the validity rule and returns the shortest spelling, so the spelling depends
-    on the float alone, not on how it was authored: ``2^2.0`` and ``4.0`` both spell as ``4.0``.
+    on the float alone, not on how it was authored: ``2^2`` and ``4`` both spell as ``4``.
+
+    A spelling writes a whole-number argument without ``.0``, such as ``4`` or ``10^-5``, in every notation.
 
     A tie in length goes to the notation declared first below, so the decimal wins every tie.
 
@@ -144,7 +146,7 @@ class ParamNotation(StrEnum):
     def spell_value_canonically(cls, value: float) -> str:
         """Return the canonical spelling of `value`: its shortest valid spelling.
 
-        A tie in length goes to the notation declared first. ``-0.0`` spells as ``0.0``, since the two
+        A tie in length goes to the notation declared first. ``-0.0`` spells as ``0``, since the two
         are equal floats.
 
         Raises:
@@ -166,7 +168,6 @@ class ParamNotation(StrEnum):
 
         The LaTeX differs from the canonical spelling in these ways:
 
-        - a whole number drops its ``.0``: ``3.0`` gives ``3``;
         - a power puts its exponent in braces: ``10^0.3`` gives ``10^{0.3}``;
         - an exponent in e-notation becomes a power of 10, and a mantissa of 1 is left out: ``2.5e-05`` gives
           ``2.5 \cdot 10^{-5}``, and ``1e-05`` gives ``10^{-5}``;
@@ -179,16 +180,16 @@ class ParamNotation(StrEnum):
         sign, unsigned = ("-", spelling[1:]) if spelling.startswith("-") else ("", spelling)
         if "^" in unsigned:
             base, exponent = unsigned.split("^")
-            latex = f"{base}^{{{exponent.removesuffix('.0')}}}"
+            latex = f"{base}^{{{exponent}}}"
         elif "e" in unsigned:
             mantissa, exponent = unsigned.split("e")
             power = f"10^{{{int(exponent)}}}"
             if float(mantissa) == 1.0:
                 latex = power
             else:
-                latex = rf"{mantissa.removesuffix('.0')} \cdot {power}"
+                latex = rf"{mantissa} \cdot {power}"
         else:
-            latex = unsigned.removesuffix(".0")
+            latex = unsigned
         if sign:
             return f"({sign}{latex})"
         else:
@@ -248,13 +249,17 @@ class ParamNotation(StrEnum):
                 raise ValueError(f"{self._spell_rounded_argument(argument)} overflows to a non-finite value.") from exc
 
     def _spell_rounded_argument(self, argument: float) -> str:
-        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2`` or ``-10^0.3``."""
+        """Write an already rounded `argument` in this notation, e.g. ``0.4``, ``2^1.2``, ``-10^0.3`` or ``10^-5``.
+
+        The argument is written as its shortest round-trip form, without the ``.0`` of a whole number.
+        """
+        argument_text = repr(argument).removesuffix(".0")
         if self is ParamNotation.DECIMAL:
-            return repr(argument)
+            return argument_text
         elif self._power_sign > 0.0:
-            return f"{self._power_base}^{argument!r}"
+            return f"{self._power_base}^{argument_text}"
         else:
-            return f"-{self._power_base}^{argument!r}"
+            return f"-{self._power_base}^{argument_text}"
 
     @property
     def _power_base(self) -> int:
@@ -287,7 +292,7 @@ def deduplicate_param_tuples(
     error — ``10^0.5`` from a POW10 axis and ``3.16227766017`` from a DECIMAL
     axis, which exact float equality leaves as two.
 
-    Tuples whose floats are exactly equal, such as ``4.0`` and ``2^2.0``, are
+    Tuples whose floats are exactly equal, such as ``4`` and ``2^2``, are
     already one value; they collapse here too. The default `digits` is 2 less
     than `CANONICAL_DIGITS`; the comment at `DEDUP_DIGITS` explains why that
     margin suffices.

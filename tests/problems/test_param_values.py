@@ -34,7 +34,7 @@ def test_build_value_rejects_non_finite_argument(notation, non_finite_argument):
 
 
 @pytest.mark.parametrize(
-    "notation, spelling_pattern", [(ParamNotation.POW10, r"10\^400\.0"), (ParamNotation.NEG_POW10, r"-10\^400\.0")]
+    "notation, spelling_pattern", [(ParamNotation.POW10, r"10\^400"), (ParamNotation.NEG_POW10, r"-10\^400")]
 )
 def test_build_value_rejects_overflowing_power(notation, spelling_pattern):
     """A finite exponent can still overflow ``base ** exponent``, and the message spells the power."""
@@ -90,20 +90,20 @@ def test_parse_value_rejects_bad_tokens(token, match):
 @pytest.mark.parametrize(
     "value, expected",
     [
-        (2.0**2.0, "4.0"),  # authored as 2^2.0: the decimal is shorter
+        (2.0**2.0, "4"),  # authored as 2^2: the decimal is shorter
         (2.0**1.23, "2^1.23"),
         (10.0**-5.0, "1e-05"),
-        (2.0**10.0, "1024.0"),  # tie in length: the decimal wins
-        (1.0, "1.0"),
-        (2.0**-20.0, "2^-20.0"),
+        (2.0**10.0, "1024"),  # tie in length: the decimal wins
+        (1.0, "1"),
+        (2.0**-20.0, "2^-20"),
         (10.0**0.5, "10^0.5"),
         (0.3, "0.3"),
-        (-4.0, "-4.0"),  # -2^2.0 also spells it: the decimal is shorter
+        (-4.0, "-4"),  # -2^2 also spells it: the decimal is shorter
         (-(2.0**1.23), "-2^1.23"),
         (-(10.0**0.5), "-10^0.5"),
-        (-(10.0**4.0), "-10^4.0"),  # shorter than the decimal -10000.0
-        (-(10.0**3.0), "-1000.0"),  # tie in length: the decimal wins
-        (-0.0, "0.0"),
+        (-(10.0**4.0), "-10^4"),  # shorter than the decimal -10000
+        (-(10.0**3.0), "-1000"),  # tie in length: the decimal wins
+        (-0.0, "0"),
     ],
 )
 def test_spell_value_canonically_picks_the_shortest_valid_spelling(value, expected):
@@ -209,13 +209,13 @@ def test_deduplicate_keeps_distinct_tuples():
 @pytest.mark.parametrize(
     "value, expected",
     [
-        (3.0, "3"),  # a whole number drops its .0
+        (3.0, "3"),
         (0.5, "0.5"),
         (10**0.3, "10^{0.3}"),  # a power puts its exponent in braces
         (2**0.5, "2^{0.5}"),
         (2.5e-5, r"2.5 \cdot 10^{-5}"),  # e-notation becomes a power of 10
         (1e-5, "10^{-5}"),  # a mantissa of 1 is left out
-        (-0.125, "(-0.125)"),  # a negative value goes in parentheses
+        (-0.3, "(-0.3)"),  # a negative value goes in parentheses
         (-(10**0.3), "(-10^{0.3})"),
         (-1.0, "(-1)"),
     ],

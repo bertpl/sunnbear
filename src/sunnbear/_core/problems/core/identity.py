@@ -10,8 +10,8 @@ looking up the formula, and `from_string` can parse the text without consulting 
 registry. A formula without parameters renders as its number alone, e.g. ``f7.1``.
 
 Each value is written in its canonical spelling (`ParamNotation.spell_value_canonically`),
-which depends on the float alone: an id built from ``2^2.0`` and one built from ``4.0`` are
-equal and render alike, as ``p1=4.0``.
+which depends on the float alone: an id built from ``2^2`` and one built from ``4`` are
+equal and render alike, as ``p1=4``.
 
 `display()` is the only rendering, so equal ids have equal strings and the string can serve as a
 key; `from_string` parses it back to an equal id.

@@ -7,7 +7,7 @@ _RENDERED_IDS = [
     "f2.1.5[p1=2^1.2,p2=0.4]",
     "f7.1",
     "f2.1.1[p1=0.2]",
-    "f2.1.2[p1=5.0]",
+    "f2.1.2[p1=5]",
     "f2.1.1[p1=-0.4]",  # leading minus in a value
     "f2.1.5[p1=-0.4,p2=-1e-12]",  # negative values and scientific notation on both sides of the comma
     "f2.1.5[p1=-10^0.3,p2=-2^-1.5]",  # negatives of powers, with a negative exponent
@@ -40,17 +40,17 @@ def test_problem_id_renders_one_number_alike_however_it_was_authored():
     # --- act / assert -----------------
     assert from_decimal == from_pow2
     assert len({from_decimal, from_pow2}) == 1
-    assert str(from_decimal) == str(from_pow2) == repr(from_pow2) == from_pow2.display() == "f2.1.1[p1=4.0]"
+    assert str(from_decimal) == str(from_pow2) == repr(from_pow2) == from_pow2.display() == "f2.1.1[p1=4]"
 
 
 def test_problem_id_parses_an_authored_spelling_to_the_canonical_id():
     """A non-canonical spelling parses to an equal id, which renders canonically."""
     # --- act --------------------------
-    parsed = ProblemId.from_string("f2.1.1[p1=2^2.0]")
+    parsed = ProblemId.from_string("f2.1.1[p1=2^2]")
 
     # --- assert -----------------------
-    assert parsed == ProblemId.from_string("f2.1.1[p1=4.0]")
-    assert str(parsed) == "f2.1.1[p1=4.0]"
+    assert parsed == ProblemId.from_string("f2.1.1[p1=4]")
+    assert str(parsed) == "f2.1.1[p1=4]"
 
 
 def test_problem_id_needs_one_name_per_value():
@@ -88,7 +88,7 @@ def test_problem_id_equality_includes_param_names():
 
 def test_problem_id_equality_with_unrelated_type():
     """A `ProblemId` never equals its rendered string."""
-    assert ProblemId((2, 1, 1), ("p1",), (1.0,)) != "f2.1.1[p1=1.0]"
+    assert ProblemId((2, 1, 1), ("p1",), (1.0,)) != "f2.1.1[p1=1]"
 
 
 @pytest.mark.parametrize("text", _RENDERED_IDS)
@@ -115,7 +115,7 @@ def test_problem_id_ordering():
     ordered = sorted(ids)
 
     # --- assert -----------------------
-    assert [str(problem_id) for problem_id in ordered] == ["f2.1.1[p1=0.2]", "f2.1.1[p1=0.4]", "f2.1.2[p1=1.0]"]
+    assert [str(problem_id) for problem_id in ordered] == ["f2.1.1[p1=0.2]", "f2.1.1[p1=0.4]", "f2.1.2[p1=1]"]
 
 
 @pytest.mark.parametrize(

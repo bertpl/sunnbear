@@ -71,11 +71,11 @@ def test_the_pass_goes_in_edi_order_and_keeps_the_candidates_far_enough_from_eve
     # --- act --------------------------
     drops, nearest_kept_candidates, _ = _run_spacing(
         {
-            "f99.1[p=1.0]": (20.0, (0.6, 0.0)),  # p=1 lies at 0.6 from p=2
-            "f99.1[p=2.0]": (10.0, (0.0, 0.0)),  # the lowest EDI
-            "f99.1[p=3.0]": (50.0, (3.0, 0.0)),  # the highest EDI
-            "f99.1[p=4.0]": (30.0, (1.2, 0.0)),  # p=4 lies at 1.2 from p=2 and at 1.8 from p=3
-            "f99.1[p=5.0]": (40.0, (2.5, 0.0)),  # p=5 lies at 0.5 from p=3
+            "f99.1[p=1]": (20.0, (0.6, 0.0)),  # p=1 lies at 0.6 from p=2
+            "f99.1[p=2]": (10.0, (0.0, 0.0)),  # the lowest EDI
+            "f99.1[p=3]": (50.0, (3.0, 0.0)),  # the highest EDI
+            "f99.1[p=4]": (30.0, (1.2, 0.0)),  # p=4 lies at 1.2 from p=2 and at 1.8 from p=3
+            "f99.1[p=5]": (40.0, (2.5, 0.0)),  # p=5 lies at 0.5 from p=3
             "f99.2": (10.0, (0.0, 0.0)),
         },
         monkeypatch,
@@ -84,11 +84,11 @@ def test_the_pass_goes_in_edi_order_and_keeps_the_candidates_far_enough_from_eve
 
     # --- assert -----------------------
     dropped_problem_ids = [problem_id for problem_id, drop in drops.items() if drop is not None]
-    assert [str(problem_id) for problem_id in dropped_problem_ids] == ["f99.1[p=1.0]", "f99.1[p=5.0]"]
+    assert [str(problem_id) for problem_id in dropped_problem_ids] == ["f99.1[p=1]", "f99.1[p=5]"]
     assert all(drops[problem_id] == _NEAR_DUPLICATE for problem_id in dropped_problem_ids)
     assert {str(p): (str(n.problem_id), n.distance) for p, n in nearest_kept_candidates.items()} == {
-        "f99.1[p=1.0]": ("f99.1[p=2.0]", pytest.approx(0.6)),
-        "f99.1[p=5.0]": ("f99.1[p=3.0]", pytest.approx(0.5)),
+        "f99.1[p=1]": ("f99.1[p=2]", pytest.approx(0.6)),
+        "f99.1[p=5]": ("f99.1[p=3]", pytest.approx(0.5)),
     }
 
 
@@ -102,20 +102,20 @@ def test_the_first_and_the_last_candidate_are_kept_whatever_their_distance(monke
     # --- act --------------------------
     drops, nearest_kept_candidates, _ = _run_spacing(
         {
-            "f99.1[p=1.0]": (10.0, (0.0, 0.0)),
-            "f99.1[p=2.0]": (10.0, (0.3, 0.0)),  # p=2 lies at 0.3 from p=1 and at 0.1 from p=3
-            "f99.1[p=3.0]": (10.0, (0.2, 0.0)),
-            "f99.2[p=1.0]": (10.0, (0.0, 0.0)),
-            "f99.2[p=2.0]": (10.0, (0.0, 0.0)),
+            "f99.1[p=1]": (10.0, (0.0, 0.0)),
+            "f99.1[p=2]": (10.0, (0.3, 0.0)),  # p=2 lies at 0.3 from p=1 and at 0.1 from p=3
+            "f99.1[p=3]": (10.0, (0.2, 0.0)),
+            "f99.2[p=1]": (10.0, (0.0, 0.0)),
+            "f99.2[p=2]": (10.0, (0.0, 0.0)),
         },
         monkeypatch,
         target_n_kept_candidates=1,
     )
 
     # --- assert -----------------------
-    assert [str(problem_id) for problem_id, drop in drops.items() if drop is not None] == ["f99.1[p=2.0]"]
+    assert [str(problem_id) for problem_id, drop in drops.items() if drop is not None] == ["f99.1[p=2]"]
     assert {str(p): (str(n.problem_id), n.distance) for p, n in nearest_kept_candidates.items()} == {
-        "f99.1[p=2.0]": ("f99.1[p=3.0]", pytest.approx(0.1))
+        "f99.1[p=2]": ("f99.1[p=3]", pytest.approx(0.1))
     }
 
 
@@ -139,10 +139,10 @@ def test_the_stage_chooses_the_largest_min_distance_that_keeps_the_target(
     # --- act --------------------------
     drops, _, min_distance = _run_spacing(
         {
-            "f99.1[p=1.0]": (10.0, (0.0, 0.0)),
-            "f99.1[p=2.0]": (20.0, (0.05, 0.0)),
-            "f99.1[p=3.0]": (30.0, (0.5, 0.0)),
-            "f99.1[p=4.0]": (40.0, (5.0, 0.0)),
+            "f99.1[p=1]": (10.0, (0.0, 0.0)),
+            "f99.1[p=2]": (20.0, (0.05, 0.0)),
+            "f99.1[p=3]": (30.0, (0.5, 0.0)),
+            "f99.1[p=4]": (40.0, (5.0, 0.0)),
         },
         monkeypatch,
         target_n_kept_candidates=target_n_kept_candidates,
