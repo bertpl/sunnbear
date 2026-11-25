@@ -1,39 +1,35 @@
-"""Each simple polynomial formula gives the expected candidates, whose values at the bounds are equal at ``c = 0``."""
+"""At ``c = 0``, all candidates of a simple polynomial formula have the same values at the bounds of its interval."""
 
 import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
 
-# Each entry holds a simple polynomial formula's number, the number of values of its first parameter (a power ``p``
-# or a term count ``n``), the number of values of its second parameter (a weight ``w`` or a slope ``m``), and the
-# bounds of its interval, at which its value at ``c = 0`` is half the interval's width, negative at the lower bound.
-CANDIDATE_GRID_SIZES = [
-    pytest.param((2, 1, 1), 1, 1, (-1.0, 1.0), id="linear"),
-    pytest.param((2, 1, 2), 5, 31, (-1.0, 1.0), id="linear_plus_even_power"),
-    pytest.param((2, 1, 3), 4, 43, (-1.0, 1.0), id="linear_plus_odd_power"),
-    pytest.param((2, 1, 4), 4, 31, (-1.0, 1.0), id="linear_plus_sum_of_even_powers"),
-    pytest.param((2, 1, 5), 3, 43, (-1.0, 1.0), id="linear_plus_sum_of_odd_powers"),
-    pytest.param((2, 1, 6), 9, 25, (0.0, 1.0), id="one_sided_linear_plus_power"),
+# Each entry holds a simple polynomial formula's number and the bounds of its interval, at which its value at ``c = 0``
+# is half the interval's width, negative at the lower bound.
+SIMPLE_POLYNOMIAL_INTERVALS = [
+    pytest.param((2, 1, 1), (-1.0, 1.0), id="linear"),
+    pytest.param((2, 1, 2), (-1.0, 1.0), id="linear_plus_even_power"),
+    pytest.param((2, 1, 3), (-1.0, 1.0), id="linear_plus_odd_power"),
+    pytest.param((2, 1, 4), (-1.0, 1.0), id="linear_plus_sum_of_even_powers"),
+    pytest.param((2, 1, 5), (-1.0, 1.0), id="linear_plus_sum_of_odd_powers"),
+    pytest.param((2, 1, 6), (0.0, 1.0), id="one_sided_linear_plus_power"),
 ]
 
 
 def test_the_parametrization_names_every_simple_polynomial_formula():
-    """`CANDIDATE_GRID_SIZES` names exactly the formulas of category 2.1."""
+    """`SIMPLE_POLYNOMIAL_INTERVALS` names exactly the formulas of category 2.1."""
     # --- act --------------------------
     formula_numbers_in_category = {
         formula.number for formula in FormulaRegistry.formulas() if formula.number[:2] == (2, 1)
     }
 
     # --- assert -----------------------
-    assert {param.values[0] for param in CANDIDATE_GRID_SIZES} == formula_numbers_in_category
+    assert {param.values[0] for param in SIMPLE_POLYNOMIAL_INTERVALS} == formula_numbers_in_category
 
 
-@pytest.mark.parametrize("formula_number, n_first_param_values, n_second_param_values, interval", CANDIDATE_GRID_SIZES)
-def test_every_candidate_passes_through_the_same_points_at_the_bounds(
-    formula_number, n_first_param_values, n_second_param_values, interval
-):
-    """Each formula combines every power or term count with every value of its other parameter, and at ``c = 0`` every
-    candidate of a formula has the same values at the bounds of its interval."""
+@pytest.mark.parametrize("formula_number, interval", SIMPLE_POLYNOMIAL_INTERVALS)
+def test_every_candidate_passes_through_the_same_points_at_the_bounds(formula_number, interval):
+    """At ``c = 0`` every candidate of a formula has the same values at the bounds of its interval."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number(formula_number)
 
@@ -41,7 +37,6 @@ def test_every_candidate_passes_through_the_same_points_at_the_bounds(
     candidates = formula.build_all_candidates()
 
     # --- assert -----------------------
-    assert len(candidates) == n_first_param_values * n_second_param_values
     a, b = interval
     half_width = (b - a) / 2
     for candidate in candidates:

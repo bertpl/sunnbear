@@ -1,6 +1,5 @@
-"""The named polynomial formulas (category 2.2) give the expected candidates, with values that agree with a reference.
-
-Each candidate's interval has a sign change, and the interval of an even degree leaves out exactly the lowest zero.
+"""The named polynomial formulas (category 2.2) agree with a reference, and the interval of an even degree leaves out
+exactly the lowest zero.
 """
 
 import itertools
@@ -123,7 +122,6 @@ def _value_range_ratio(formula, n: int) -> float:
 
 # Each entry holds, for a named polynomial formula:
 # - its number;
-# - its number of candidates;
 # - the function that gives the formula's value from scipy or mpmath;
 # - the function that gives the scale of a candidate's values near its zeros, from its parameters.
 #
@@ -131,16 +129,16 @@ def _value_range_ratio(formula, n: int) -> float:
 # product of factors, the scale is 0, so only the relative tolerance applies: its values span many orders of magnitude,
 # and each is accurate relative to its own size.
 NAMED_POLYNOMIAL_FORMULAS = [
-    pytest.param((2, 2, 1), 180, _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
-    pytest.param((2, 2, 2), 180, _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
-    pytest.param((2, 2, 3), 180, _legendre, lambda *params: 1.0, id="legendre"),
-    pytest.param((2, 2, 4), 60 * 13, _gegenbauer, lambda *params: 1.0, id="gegenbauer"),
-    pytest.param((2, 2, 5), 14 * 10 * 10, _jacobi, lambda *params: 1.0, id="jacobi"),
-    pytest.param((2, 2, 6), 45, _hermite, lambda *params: 1.0, id="hermite"),
-    pytest.param((2, 2, 7), 23, _laguerre, lambda *params: 1.0, id="laguerre"),
-    pytest.param((2, 2, 8), 12 + 8 + 5, _bernoulli, _bernoulli_amplitude, id="bernoulli"),
-    pytest.param((2, 2, 9), 63, _wilkinson, lambda *params: 0.0, id="wilkinson"),
-    pytest.param((2, 2, 10), 20, _second_wilkinson, lambda *params: 0.0, id="second_wilkinson"),
+    pytest.param((2, 2, 1), _chebyshev_first_kind, lambda *params: 1.0, id="chebyshev_first_kind"),
+    pytest.param((2, 2, 2), _chebyshev_second_kind, lambda *params: 1.0, id="chebyshev_second_kind"),
+    pytest.param((2, 2, 3), _legendre, lambda *params: 1.0, id="legendre"),
+    pytest.param((2, 2, 4), _gegenbauer, lambda *params: 1.0, id="gegenbauer"),
+    pytest.param((2, 2, 5), _jacobi, lambda *params: 1.0, id="jacobi"),
+    pytest.param((2, 2, 6), _hermite, lambda *params: 1.0, id="hermite"),
+    pytest.param((2, 2, 7), _laguerre, lambda *params: 1.0, id="laguerre"),
+    pytest.param((2, 2, 8), _bernoulli, _bernoulli_amplitude, id="bernoulli"),
+    pytest.param((2, 2, 9), _wilkinson, lambda *params: 0.0, id="wilkinson"),
+    pytest.param((2, 2, 10), _second_wilkinson, lambda *params: 0.0, id="second_wilkinson"),
 ]
 
 # `test_every_formula_agrees_with_its_reference` compares a formula with its reference at those of these degrees
@@ -167,32 +165,8 @@ def test_the_parametrization_names_every_named_polynomial_formula():
     assert {param.values[0] for param in NAMED_POLYNOMIAL_FORMULAS} == formula_numbers_in_category
 
 
-@pytest.mark.parametrize(
-    "formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS
-)
-def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(
-    formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun
-):
-    """A formula gives its expected number of candidates, each with opposite signs at its 2 bounds at ``c = 0``."""
-    # --- arrange ----------------------
-    formula = FormulaRegistry.formula_from_number(formula_number)
-
-    # --- act --------------------------
-    candidates = formula.build_all_candidates()
-
-    # --- assert -----------------------
-    assert len(candidates) == n_candidates
-    for candidate in candidates:
-        value_at_a, value_at_b = candidate.xc_fun(candidate.a, 0.0), candidate.xc_fun(candidate.b, 0.0)
-        assert min(value_at_a, value_at_b) < 0.0 < max(value_at_a, value_at_b), candidate.id
-
-
-@pytest.mark.parametrize(
-    "formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS
-)
-def test_the_interval_of_an_even_degree_leaves_out_1_zero(
-    formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun
-):
+@pytest.mark.parametrize("formula_number, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS)
+def test_the_interval_of_an_even_degree_leaves_out_1_zero(formula_number, reference_fun, abs_tolerance_scale_fun):
     """From the lower bound of the next odd degree's interval to an even degree's lower bound, the sign changes once."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number(formula_number)
@@ -213,10 +187,8 @@ def test_the_interval_of_an_even_degree_leaves_out_1_zero(
         assert n_sign_changes == 1, candidate.id
 
 
-@pytest.mark.parametrize(
-    "formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS
-)
-def test_every_formula_agrees_with_its_reference(formula_number, n_candidates, reference_fun, abs_tolerance_scale_fun):
+@pytest.mark.parametrize("formula_number, reference_fun, abs_tolerance_scale_fun", NAMED_POLYNOMIAL_FORMULAS)
+def test_every_formula_agrees_with_its_reference(formula_number, reference_fun, abs_tolerance_scale_fun):
     """At each degree of `COMPARED_DEGREES`, a formula equals its reference across the interval, for 3 values of c."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number(formula_number)

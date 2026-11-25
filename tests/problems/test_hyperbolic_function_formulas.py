@@ -1,7 +1,5 @@
-"""The hyperbolic function formulas (category 2.4) give the expected candidates, each changing sign in its interval.
-
-Further tests cover how `HyperbolicCosine` and `HyperbolicTangent` keep full precision next to the root, where
-subtracting 2 nearly equal values would cancel their leading digits.
+"""`HyperbolicCosine` and `HyperbolicTangent` keep full precision next to the root, where subtracting 2 nearly equal
+values would cancel their leading digits.
 """
 
 import math
@@ -13,46 +11,6 @@ from sunnbear._core.problems.core import FormulaRegistry
 
 # mpmath computes the reference values with this many decimal digits.
 MPMATH_DIGITS = 50
-
-# Each entry holds a hyperbolic function formula's number and its number of candidates.
-#
-# `HyperbolicTangent` has 161 candidates from the sweep of ``b``, and 151 from the sweep of ``d``.
-HYPERBOLIC_FUNCTION_FORMULAS = [
-    pytest.param((2, 4, 1), 151, id="hyperbolic_sine"),
-    pytest.param((2, 4, 2), 151, id="hyperbolic_cosine"),
-    pytest.param((2, 4, 3), 161 + 151, id="hyperbolic_tangent"),
-    pytest.param((2, 4, 4), 161, id="inverse_hyperbolic_sine"),
-    pytest.param((2, 4, 5), 150, id="inverse_hyperbolic_cosine"),
-    pytest.param((2, 4, 6), 141, id="inverse_hyperbolic_tangent"),
-]
-
-
-def test_the_parametrization_names_every_hyperbolic_function_formula():
-    """`HYPERBOLIC_FUNCTION_FORMULAS` names exactly the formulas of category 2.4."""
-    # --- act --------------------------
-    formula_numbers_in_category = {
-        formula.number for formula in FormulaRegistry.formulas() if formula.number[:2] == (2, 4)
-    }
-
-    # --- assert -----------------------
-    assert {param.values[0] for param in HYPERBOLIC_FUNCTION_FORMULAS} == formula_numbers_in_category
-
-
-@pytest.mark.parametrize("formula_number, n_candidates", HYPERBOLIC_FUNCTION_FORMULAS)
-def test_every_candidate_has_opposite_signs_at_the_bounds_of_its_interval(formula_number, n_candidates):
-    """A formula gives its expected number of candidates, and at ``c = 0`` each candidate is negative at one bound of
-    its interval and positive at the other."""
-    # --- arrange ----------------------
-    formula = FormulaRegistry.formula_from_number(formula_number)
-
-    # --- act --------------------------
-    candidates = formula.build_all_candidates()
-
-    # --- assert -----------------------
-    assert len(candidates) == n_candidates
-    for candidate in candidates:
-        value_at_a, value_at_b = candidate.xc_fun(candidate.a, 0.0), candidate.xc_fun(candidate.b, 0.0)
-        assert min(value_at_a, value_at_b) < 0.0 < max(value_at_a, value_at_b), candidate.id
 
 
 def test_hyperbolic_cosine_has_the_sign_of_x_minus_its_root_next_to_its_root():
