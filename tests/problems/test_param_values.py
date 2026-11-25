@@ -98,9 +98,9 @@ def test_parse_value_rejects_bad_tokens(token, match):
         (-2e-4, "-2e-04"),
         (2.5e7, "2.5e+07"),
         (20000.0, "20000"),  # tie in length with 2e+04: repr's spelling wins
-        (0.001, "0.001"),  # tie in length with 1e-03
+        (0.001, "0.001"),  # tie in length with 10^-3: the decimal wins
         (160000.0, "160000"),  # shorter than 1.6e+05
-        (1e10, "10^10"),  # 1e+10 would tie with 10^10 and win as a decimal, so a power of 10 is not offered in it
+        (1e10, "10^10"),  # 1e+10 would tie with 10^10 and win as a decimal, so a power of 10 gets no e-notation
         (1e-4, "10^-4"),
         (-1e-4, "-10^-4"),
         (2.0**10.0, "1024"),  # tie in length: the decimal wins
