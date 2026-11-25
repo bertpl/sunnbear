@@ -6,13 +6,12 @@ from sunnbear._core.problems.core import (
     FormulaParam,
     FormulaPresentation,
     FormulaTestCase,
-    ParamGrid,
     ParamRecipe,
 )
 
-from .helpers import VALUE_RANGE_LIMIT_SUMMARY, interval_by_parity_latex, is_valid_degree
+from .helpers import degree_sweep_within_value_range_limit, interval_by_parity_latex, is_valid_degree
 
-# The sweep ends at the highest degree within the family's limit on the range of values, `VALUE_RANGE_EXPONENT_LIMIT`.
+# The sweep ends at the highest degree within the category's limit on the range of values, `VALUE_RANGE_EXPONENT_LIMIT`.
 HIGHEST_SWEPT_DEGREE = 63
 
 
@@ -81,20 +80,10 @@ class WilkinsonPolynomial(Formula):
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
         A higher degree mainly widens the range of values between the middle of the interval and its bounds, and a
-        wide range of values is not the purpose of this formula, so the sweep ends at the family's limit on the range
+        wide range of values is not the purpose of this formula, so the sweep ends at the category's limit on the range
         of values, `VALUE_RANGE_EXPONENT_LIMIT`.
         """
-        return (
-            ParamGrid.decimal(
-                "n",
-                1.0,
-                float(HIGHEST_SWEPT_DEGREE),
-                1.0,
-                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}, "
-                + VALUE_RANGE_LIMIT_SUMMARY
-                + ".",
-            ),
-        )
+        return (degree_sweep_within_value_range_limit(HIGHEST_SWEPT_DEGREE),)
 
     def is_param_tuple_valid(self, n: float) -> bool:
         """Check the parameter conditions listed in the presentation's `param_conditions`."""

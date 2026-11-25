@@ -121,17 +121,20 @@ class JacobiPolynomial(Formula):
         return jacobi_interval_bounds(n, alpha, beta)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipes that combine 7 odd and 7 even degrees with ``alpha`` and ``beta`` from -0.75 to 1.5.
+        """Return the recipes that combine odd and even degrees with ``alpha`` and ``beta`` from -0.75 to 1.5.
 
         The degrees are ``10^(0.5*i)``, for ``i`` from 0 to 6, rounded to the nearest odd and to the nearest even
-        integer, with a tie going to the larger integer, so 10 gives the odd degree 11. The step is 50 times that of
-        `JACOBI_DEGREE_ONLY_AXIS`, because each degree combines with 100 pairs of ``alpha`` and ``beta``. At this step
-        1 axis rounded to the nearest integer would give mostly even degrees, such as 10, 32, 100, 316 and 1000, so the
-        odd and the even degrees each get an axis, and each axis a recipe.
+        integer, with a tie going to the larger integer, so 10 gives the odd degree 11.
+
+        The step is 50 times that of `CHEBYSHEV_LEGENDRE_DEGREE_AXIS`, because each degree combines with 100 pairs of
+        ``alpha`` and ``beta``.
+
+        At this step 1 axis rounded to the nearest integer would give mostly even degrees, such as 10, 32, 100, 316 and
+        1000, so the odd and the even degrees each get an axis, and each axis a recipe.
 
         ``alpha`` and ``beta`` each go from -0.75 to 1.5 in steps of 0.25:
 
-        - -0.75 is the only value at which the amplitude shrinks toward a bound. It lies midway between
+        - The value -0.75 is the only one at which the amplitude shrinks toward a bound. It lies midway between
           `ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT` and -0.5, the value at which the amplitude stays the same.
         - The values end at 1.5, because the recipe of `GegenbauerPolynomial` ends at an ``alpha`` of 2, and that
           formula's ``alpha`` is 0.5 higher than the ``alpha`` and ``beta`` here.

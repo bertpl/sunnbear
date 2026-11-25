@@ -1,39 +1,42 @@
-"""This module holds what several named polynomial formulas share: the rules for degrees and intervals, and sweeps.
+"""This module holds what several named polynomial formulas share: degree and interval rules, and sweeps of the degree.
 
 Each polynomial orthogonal on ``[-1, 1]`` is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1
 rule gives the interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
 
 The formulas of those polynomials sweep their degree on a logarithmic scale, up to about 1000, where a recurrence over
-the degrees already takes about 1000 steps per evaluation. The resolution falls with the number of the formula's other
-parameters, so that a formula with more parameters does not produce far more parameter tuples:
+the degrees already takes about 1000 steps per evaluation. The step of the degree axis grows with the number of the
+formula's other parameters, so that a formula with more parameters does not produce far more parameter tuples:
 
-- the 3 formulas whose degree is their only parameter share `JACOBI_DEGREE_ONLY_AXIS`;
+- the formulas whose degree is their only parameter share `CHEBYSHEV_LEGENDRE_RECIPE`;
 - `GegenbauerPolynomial` and `JacobiPolynomial` each sweep a coarser axis of their own.
 """
 
 import math
 
-from sunnbear._core.problems.core import ParamAxis, ParamNotation, ParamRounding
+from sunnbear._core.problems.core import ParamAxis, ParamGrid, ParamNotation, ParamRounding
 
 # The axis rounds ``10^(0.01*i)``, for ``i`` from 0 to 300, to the nearest integer, and yields each degree once: every
-# degree up to about 40, and fewer above. At this resolution about half of the degrees are odd, so 1 axis gives odd
-# and even degrees alike. `JACOBI_DEGREE_ONLY_SUMMARY` describes the axis, so a change to the axis needs the same change
-# to the summary.
-JACOBI_DEGREE_ONLY_AXIS = ParamAxis("n", 0.0, 3.0, 0.01, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER)
-JACOBI_DEGREE_ONLY_SUMMARY = r"The degrees $\param{n}$ nearest to $10^{0.01 i}$, for $i$ from 0 to 300, each once."
-
-# A formula whose values grow quickly with the degree sweeps every degree from 1 up to the highest degree whose range
-# of values is at most ``10^VALUE_RANGE_EXPONENT_LIMIT``, so that the family's ranges of values stay modest; other
-# formulas cover extreme ranges of values. The range of values is the largest absolute value on the interval divided
-# by the lowest peak of the absolute value between 2 neighboring roots, at ``c = 0``. A shift by ``c`` changes the
-# values at the bounds, so the range at the ends of a calibrated range of ``c`` can exceed the limit.
+# degree up to about 40, and fewer above. At this step about half of the degrees are odd, so 1 axis gives odd and even
+# degrees alike.
 #
-# `VALUE_RANGE_LIMIT_SUMMARY` states the limit, to follow the degrees in such a recipe's summary.
-VALUE_RANGE_EXPONENT_LIMIT = 20
-VALUE_RANGE_LIMIT_SUMMARY = (
-    rf"the highest degree at which, for $\c = 0$, the largest absolute value on the interval is at most "
-    rf"$10^{{{VALUE_RANGE_EXPONENT_LIMIT}}}$ times the lowest peak of the absolute value between 2 neighboring roots"
+# The recipe's summary describes the axis, so a change to the axis needs the same change to the summary.
+CHEBYSHEV_LEGENDRE_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.01, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER)
+CHEBYSHEV_LEGENDRE_RECIPE = ParamGrid(
+    axes=(CHEBYSHEV_LEGENDRE_DEGREE_AXIS,),
+    summary=r"The degrees $\param{n}$ nearest to $10^{0.01 i}$, for $i$ from 0 to 300, each once.",
 )
+
+# A formula whose values grow quickly as the degree rises sweeps every degree from 1 up to the highest degree whose
+# range of values is at most ``10^VALUE_RANGE_EXPONENT_LIMIT``, so that the category's ranges of values stay modest;
+# other formulas cover extreme ranges of values. `SecondWilkinsonPolynomial` is the exception: its sweep ends at the
+# degree of Wilkinson's own second polynomial, beyond the limit.
+#
+# The range of values is the largest absolute value on the interval divided by the lowest peak of the absolute value
+# between 2 neighboring roots, at ``c = 0``.
+#
+# A shift by ``c`` changes the values at the bounds, so at the ends of the calibrated range of ``c`` the range of values
+# can exceed the limit.
+VALUE_RANGE_EXPONENT_LIMIT = 20
 
 
 def is_valid_degree(n: float) -> bool:
@@ -89,3 +92,17 @@ def jacobi_interval_bounds(n: float, alpha: float, beta: float) -> tuple[float, 
         theta_over_pi = (1.25 + beta / 2.0) / (n + (alpha + beta + 1.0) / 2.0)
         # The lower bound is -cos(theta), written as a sine so that theta = pi/2 gives exactly 0.
         return (math.sin(math.pi * (theta_over_pi - 0.5)), 1.0)
+
+
+def degree_sweep_within_value_range_limit(highest_swept_degree: int) -> ParamGrid:
+    """Return the recipe that sweeps every degree from 1 to `highest_swept_degree`, with a summary stating the limit.
+
+    `highest_swept_degree` is the highest degree whose range of values is within `VALUE_RANGE_EXPONENT_LIMIT`; the
+    tests check it.
+    """
+    summary = (
+        rf"The sweep of $\param{{n}}$ from 1 to {highest_swept_degree}, the highest degree at which, for $\c = 0$, the "
+        rf"largest absolute value on the interval is at most $10^{{{VALUE_RANGE_EXPONENT_LIMIT}}}$ times the lowest "
+        r"peak of the absolute value between 2 neighboring roots."
+    )
+    return ParamGrid.decimal("n", 1.0, float(highest_swept_degree), 1.0, summary=summary)

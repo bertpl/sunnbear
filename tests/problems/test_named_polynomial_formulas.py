@@ -100,12 +100,15 @@ def _bernoulli_amplitude(n: float, a: float, b: float) -> float:
 def _value_range(formula, n: int) -> float:
     """Return the range of values of a formula whose only parameter is the degree, at degree `n` and ``c = 0``.
 
-    `VALUE_RANGE_EXPONENT_LIMIT` defines the range of values: the largest absolute value on the interval divided by
-    the lowest peak of the absolute value between 2 neighboring roots.
+    The comment on `VALUE_RANGE_EXPONENT_LIMIT` in `helpers` defines the range of values: the largest absolute value on
+    the interval divided by the lowest peak of the absolute value between 2 neighboring roots.
 
     The x-values are 200 per root, spaced evenly and, for a positive lower bound, also evenly in ``log(x)``, so that
-    they also sample the roots of `SecondWilkinsonPolynomial`, which crowd toward its lower bound. An x-value at which
-    the function is exactly 0 is dropped, so that a root on the grid still separates its 2 neighboring peaks.
+    they also sample the roots of `SecondWilkinsonPolynomial`, which crowd toward its lower bound.
+
+    An x-value at which the function is exactly 0 is dropped, so that a root on the grid still separates its 2
+    neighboring peaks. The interval must hold at least 2 roots, so that at least 1 peak lies between 2 neighboring
+    roots.
     """
     a, b = formula.interval_bounds(float(n))
     n_x_values = 200 * (n + 1)
@@ -303,7 +306,7 @@ def test_the_interval_rule_holds_up_to_the_highest_valid_degree(formula_number, 
 def test_the_range_of_values_exceeds_its_limit_just_above_the_highest_degree_within_it(
     formula_number, highest_degree_within_limit
 ):
-    """At ``c = 0``, the range of values is within `VALUE_RANGE_EXPONENT_LIMIT` at a degree, and above it 1 degree on.
+    """At ``c = 0``, the range of values is within `VALUE_RANGE_EXPONENT_LIMIT` at a degree, and not at the next one.
 
     For the Second Wilkinson polynomial, the checked degree is the last one before its sweep exceeds the limit.
     """
