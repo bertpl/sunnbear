@@ -10,11 +10,12 @@ from sunnbear._core.problems.core import (
     FormulaTestCase,
     ParamAxis,
     ParamGrid,
+    ParamNotation,
     ParamRecipe,
+    ParamRounding,
 )
 
 from .helpers import (
-    JACOBI_DEGREE_SWEEPS,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -118,21 +119,24 @@ class GegenbauerPolynomial(Formula):
         return jacobi_interval_bounds(n, alpha - 0.5, alpha - 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipes that combine the odd and the even degrees with ``alpha`` from -0.4 to 2 in steps of 0.2.
+        """Return the recipe that combines 60 degrees with ``alpha`` from -0.4 to 2 in steps of 0.2.
 
-        The degrees are those of `JACOBI_DEGREE_SWEEPS`.
+        The degrees are ``10^(0.04*i)``, for ``i`` from 0 to 75, rounded to the nearest integer, each once. The step is
+        4 times that of `JACOBI_DEGREE_ONLY_AXIS`, because each degree combines with 13 values of ``alpha``. At this
+        step about half of the degrees are odd, so 1 axis gives odd and even degrees alike.
 
-        - The sweep starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
-        - The sweep ends at 2: at that ``alpha`` and a degree above 100, the amplitude in the middle of ``[-1, 1]`` is
-          already thousands of times lower than the value at the bounds. A higher ``alpha`` lowers that amplitude
-          further and gives no other kind of function.
+        - The sweep of ``alpha`` starts at -0.4, the lowest multiple of 0.2 above `ALPHA_EXCLUSIVE_LOWER_LIMIT`.
+        - The sweep of ``alpha`` ends at 2: at that ``alpha`` and a degree above 100, the amplitude in the middle of
+          ``[-1, 1]`` is already thousands of times lower than the value at the bounds. A higher ``alpha`` lowers that
+          amplitude further and gives no other kind of function.
         """
+        degree_axis = ParamAxis("n", 0.0, 3.0, 0.04, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER)
         alpha_axis = ParamAxis("alpha", -0.4, 2.0, 0.2)
-        alpha_summary = r", combined with $\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
-        return tuple(
-            ParamGrid(axes=(degree_axis, alpha_axis), summary=degree_summary + alpha_summary)
-            for degree_axis, degree_summary in JACOBI_DEGREE_SWEEPS
+        summary = (
+            r"The degrees $\param{n}$ nearest to $10^{0.04 i}$, for $i$ from 0 to 75, each once, combined with "
+            r"$\param{alpha}$ from $-0.4$ to 2 in steps of 0.2."
         )
+        return (ParamGrid(axes=(degree_axis, alpha_axis), summary=summary),)
 
     def is_param_tuple_valid(self, n: float, alpha: float) -> bool:
         """Check the parameter conditions listed in the presentation's `param_conditions`."""

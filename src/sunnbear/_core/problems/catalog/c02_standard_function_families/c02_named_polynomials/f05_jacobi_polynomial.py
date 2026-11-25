@@ -1,7 +1,5 @@
 """This formula is the Jacobi polynomial, divided by its value at 1, with ``x`` shifted by ``c``."""
 
-import itertools
-
 from sunnbear._core.problems.core import (
     EffectOfC,
     Formula,
@@ -9,12 +7,13 @@ from sunnbear._core.problems.core import (
     FormulaPresentation,
     FormulaTestCase,
     ParamAxis,
+    ParamGrid,
+    ParamNotation,
     ParamRecipe,
-    ParamTable,
+    ParamRounding,
 )
 
 from .helpers import (
-    JACOBI_DEGREE_SWEEPS,
     interval_by_parity_latex,
     is_valid_degree,
     jacobi_interval_bounds,
@@ -122,29 +121,40 @@ class JacobiPolynomial(Formula):
         return jacobi_interval_bounds(n, alpha, beta)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipes that combine the odd and the even degrees with 6 values of ``alpha`` and of ``beta``.
+        """Return the recipes that combine 7 odd and 7 even degrees with ``alpha`` and ``beta`` from -0.75 to 1.5.
 
-        The degrees are those of `JACOBI_DEGREE_SWEEPS`.
+        The degrees are ``10^(0.5*i)``, for ``i`` from 0 to 6, rounded to the nearest odd and to the nearest even
+        integer, with a tie going to the larger integer, so 10 gives the odd degree 11. The step is 50 times that of
+        `JACOBI_DEGREE_ONLY_AXIS`, because each degree combines with 100 pairs of ``alpha`` and ``beta``. At this step
+        1 axis rounded to the nearest integer would give mostly even degrees, such as 10, 32, 100, 316 and 1000, so the
+        odd and the even degrees each get an axis, and each axis a recipe.
 
-        Both parameters take -0.75 and the values from -0.5 to 1.5 in steps of 0.5:
+        ``alpha`` and ``beta`` each go from -0.75 to 1.5 in steps of 0.25:
 
-        - The value -0.75 is the only one at which the amplitude shrinks toward a bound. It lies midway between
+        - -0.75 is the only value at which the amplitude shrinks toward a bound. It lies midway between
           `ALPHA_BETA_EXCLUSIVE_LOWER_LIMIT` and -0.5, the value at which the amplitude stays the same.
         - The values end at 1.5, because the recipe of `GegenbauerPolynomial` ends at an ``alpha`` of 2, and that
           formula's ``alpha`` is 0.5 higher than the ``alpha`` and ``beta`` here.
         """
-        alpha_beta_values = (-0.75, *ParamAxis("alpha", -0.5, 1.5, 0.5).values())
+        alpha_axis = ParamAxis("alpha", -0.75, 1.5, 0.25)
+        beta_axis = ParamAxis("beta", -0.75, 1.5, 0.25)
         alpha_beta_summary = (
-            r", combined with $\param{alpha}$ and $\param{beta}$, each $-0.75$ or a value from $-0.5$ to 1.5 in "
-            "steps of 0.5."
+            r", with a tie going to the larger degree, combined with $\param{alpha}$ and $\param{beta}$, each from "
+            r"$-0.75$ to 1.5 in steps of 0.25."
+        )
+        degree_axes_with_summaries = (
+            (
+                ParamAxis("n", 0.0, 3.0, 0.5, ParamNotation.POW10, ParamRounding.NEAREST_ODD_INTEGER),
+                r"The odd degrees $\param{n}$ nearest to $10^{0.5 i}$, for $i$ from 0 to 6",
+            ),
+            (
+                ParamAxis("n", 0.0, 3.0, 0.5, ParamNotation.POW10, ParamRounding.NEAREST_EVEN_INTEGER),
+                r"The even degrees $\param{n}$ nearest to $10^{0.5 i}$, for $i$ from 0 to 6",
+            ),
         )
         return tuple(
-            ParamTable(
-                names=self.param_names,
-                rows=tuple(itertools.product(degree_axis.values(), alpha_beta_values, alpha_beta_values)),
-                summary=degree_summary + alpha_beta_summary,
-            )
-            for degree_axis, degree_summary in JACOBI_DEGREE_SWEEPS
+            ParamGrid(axes=(degree_axis, alpha_axis, beta_axis), summary=degree_summary + alpha_beta_summary)
+            for degree_axis, degree_summary in degree_axes_with_summaries
         )
 
     def is_param_tuple_valid(self, n: float, alpha: float, beta: float) -> bool:

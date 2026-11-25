@@ -10,9 +10,10 @@ from sunnbear._core.problems.core import (
     ParamRecipe,
 )
 
-from .helpers import interval_by_parity_latex, is_valid_degree
+from .helpers import VALUE_RANGE_LIMIT_SUMMARY, interval_by_parity_latex, is_valid_degree
 
-HIGHEST_SWEPT_DEGREE = 40
+# The sweep ends at the highest degree within the family's limit on the range of values, `VALUE_RANGE_EXPONENT_LIMIT`.
+HIGHEST_SWEPT_DEGREE = 63
 
 
 class WilkinsonPolynomial(Formula):
@@ -80,7 +81,8 @@ class WilkinsonPolynomial(Formula):
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
         A higher degree mainly widens the range of values between the middle of the interval and its bounds, and a
-        wide range of values is not the purpose of this formula.
+        wide range of values is not the purpose of this formula, so the sweep ends at the family's limit on the range
+        of values, `VALUE_RANGE_EXPONENT_LIMIT`.
         """
         return (
             ParamGrid.decimal(
@@ -88,7 +90,9 @@ class WilkinsonPolynomial(Formula):
                 1.0,
                 float(HIGHEST_SWEPT_DEGREE),
                 1.0,
-                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}.",
+                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}, "
+                + VALUE_RANGE_LIMIT_SUMMARY
+                + ".",
             ),
         )
 

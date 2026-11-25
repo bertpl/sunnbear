@@ -1,36 +1,38 @@
-"""This module holds the rule for a valid degree, LaTeX for intervals, and what the orthogonal polynomials share.
+"""This module holds what several named polynomial formulas share: the rules for degrees and intervals, and sweeps.
 
 Each polynomial orthogonal on ``[-1, 1]`` is a Jacobi polynomial ``P_n^(alpha, beta)`` up to a constant factor, so 1
 rule gives the interval of all of them, from the degree and the 2 parameters of that Jacobi polynomial.
+
+The formulas of those polynomials sweep their degree on a logarithmic scale, up to about 1000, where a recurrence over
+the degrees already takes about 1000 steps per evaluation. The resolution falls with the number of the formula's other
+parameters, so that a formula with more parameters does not produce far more parameter tuples:
+
+- the 3 formulas whose degree is their only parameter share `JACOBI_DEGREE_ONLY_AXIS`;
+- `GegenbauerPolynomial` and `JacobiPolynomial` each sweep a coarser axis of their own.
 """
 
 import math
 
 from sunnbear._core.problems.core import ParamAxis, ParamNotation, ParamRounding
 
-# Each of the formulas whose polynomials are orthogonal on ``[-1, 1]`` sweeps its degree on a logarithmic scale, with
-# 1 recipe for the odd and 1 for the even degrees, because an odd and an even degree differ in their intervals
-# (`jacobi_interval_bounds`).
+# The axis rounds ``10^(0.01*i)``, for ``i`` from 0 to 300, to the nearest integer, and yields each degree once: every
+# degree up to about 40, and fewer above. At this resolution about half of the degrees are odd, so 1 axis gives odd
+# and even degrees alike. `JACOBI_DEGREE_ONLY_SUMMARY` describes the axis, so a change to the axis needs the same change
+# to the summary.
+JACOBI_DEGREE_ONLY_AXIS = ParamAxis("n", 0.0, 3.0, 0.01, ParamNotation.POW10, ParamRounding.NEAREST_INTEGER)
+JACOBI_DEGREE_ONLY_SUMMARY = r"The degrees $\param{n}$ nearest to $10^{0.01 i}$, for $i$ from 0 to 300, each once."
+
+# A formula whose values grow quickly with the degree sweeps every degree from 1 up to the highest degree whose range
+# of values is at most ``10^VALUE_RANGE_EXPONENT_LIMIT``, so that the family's ranges of values stay modest; other
+# formulas cover extreme ranges of values. The range of values is the largest absolute value on the interval divided
+# by the lowest peak of the absolute value between 2 neighboring roots, at ``c = 0``. A shift by ``c`` changes the
+# values at the bounds, so the range at the ends of a calibrated range of ``c`` can exceed the limit.
 #
-# Each axis rounds ``10^(0.1*i)``, for ``i`` from 0 to 30, to the nearest odd or even integer; a tie goes to the
-# larger integer, so 1000 rounds to the odd degree 1001, and 1 to the even degree 2.
-#
-# The sweep ends at about 1000, where a recurrence over the degrees already takes about 1000 steps per evaluation.
-JACOBI_ODD_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_ODD_INTEGER)
-JACOBI_EVEN_DEGREE_AXIS = ParamAxis("n", 0.0, 3.0, 0.1, ParamNotation.POW10, ParamRounding.NEAREST_EVEN_INTEGER)
-# A recipe that sweeps 1 of the 2 axes starts its summary with that axis's summary constant, which has no final
-# period, so that the recipe can name its other parameters after that summary constant. Each summary constant
-# describes its axis, so a change to an axis needs the same change to its summary constant.
-JACOBI_ODD_DEGREE_SUMMARY = (
-    r"The odd degrees $\param{n}$ nearest to $10^{0.1 i}$, for $i$ from 0 to 30, with a tie going to the larger degree"
-)
-JACOBI_EVEN_DEGREE_SUMMARY = (
-    r"The even degrees $\param{n}$ nearest to $10^{0.1 i}$, for $i$ from 0 to 30, with a tie going to the larger degree"
-)
-# `JACOBI_DEGREE_SWEEPS` pairs each degree axis with its summary constant, so that a recipe takes the 2 together.
-JACOBI_DEGREE_SWEEPS = (
-    (JACOBI_ODD_DEGREE_AXIS, JACOBI_ODD_DEGREE_SUMMARY),
-    (JACOBI_EVEN_DEGREE_AXIS, JACOBI_EVEN_DEGREE_SUMMARY),
+# `VALUE_RANGE_LIMIT_SUMMARY` states the limit, to follow the degrees in such a recipe's summary.
+VALUE_RANGE_EXPONENT_LIMIT = 20
+VALUE_RANGE_LIMIT_SUMMARY = (
+    rf"the highest degree at which, for $\c = 0$, the largest absolute value on the interval is at most "
+    rf"$10^{{{VALUE_RANGE_EXPONENT_LIMIT}}}$ times the lowest peak of the absolute value between 2 neighboring roots"
 )
 
 

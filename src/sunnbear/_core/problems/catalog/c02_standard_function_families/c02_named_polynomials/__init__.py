@@ -18,9 +18,12 @@ The function's values at the bounds of the interval do change with ``c``, and th
 steps.
 
 The formulas of the polynomials that are orthogonal on ``[-1, 1]`` come first in the category. `helpers` holds what
-they share: the rule for their intervals, and the sweeps of their degrees, `JACOBI_DEGREE_SWEEPS`. Each of them but
-`ChebyshevFirstKindPolynomial` shifts ``x`` by ``c/n^2``, because its zeros next to the bounds lie about ``1/n^2``
-apart.
+they share: the rule for their intervals, and the sweep of the degree for those whose degree is their only parameter,
+`JACOBI_DEGREE_ONLY_AXIS`. Each of them but `ChebyshevFirstKindPolynomial` shifts ``x`` by ``c/n^2``, because its
+zeros next to the bounds lie about ``1/n^2`` apart.
+
+The formulas whose values grow quickly with the degree sweep it up to a limit on their range of values,
+`VALUE_RANGE_EXPONENT_LIMIT` in `helpers`, which their recipes' summaries state.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

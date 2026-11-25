@@ -12,11 +12,12 @@ from sunnbear._core.problems.core import (
     ParamRecipe,
 )
 
-from .helpers import interval_by_parity_latex, is_valid_degree
+from .helpers import VALUE_RANGE_LIMIT_SUMMARY, interval_by_parity_latex, is_valid_degree
 
 # Above this degree the value at the upper bound of the interval overflows.
 HIGHEST_VALID_DEGREE = 256
-HIGHEST_SWEPT_DEGREE = 20
+# The sweep ends at the highest degree within the family's limit on the range of values, `VALUE_RANGE_EXPONENT_LIMIT`.
+HIGHEST_SWEPT_DEGREE = 23
 
 
 class LaguerrePolynomial(Formula):
@@ -96,10 +97,8 @@ class LaguerrePolynomial(Formula):
         """Return the recipe that sweeps every degree from 1 to `HIGHEST_SWEPT_DEGREE`.
 
         A higher degree mainly widens the range of values between the 2 ends of the interval, and a wide range of
-        values is not the purpose of this formula.
-
-        The sweep ends where the range of values is about as wide as at the highest degree that the recipe of
-        `HermitePolynomial` sweeps.
+        values is not the purpose of this formula, so the sweep ends at the family's limit on the range of values,
+        `VALUE_RANGE_EXPONENT_LIMIT`.
         """
         return (
             ParamGrid.decimal(
@@ -107,7 +106,9 @@ class LaguerrePolynomial(Formula):
                 1.0,
                 float(HIGHEST_SWEPT_DEGREE),
                 1.0,
-                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}.",
+                summary=rf"The sweep of $\param{{n}}$ from 1 to {HIGHEST_SWEPT_DEGREE}, "
+                + VALUE_RANGE_LIMIT_SUMMARY
+                + ".",
             ),
         )
 
