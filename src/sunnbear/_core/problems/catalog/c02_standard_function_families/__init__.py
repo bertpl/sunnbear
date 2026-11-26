@@ -8,6 +8,7 @@ from . import (
     c03_power_functions,
     c04_hyperbolic_functions,
     c05_exponential_and_logarithm,
+    c06_trigonometric_functions,
 )
 
 
