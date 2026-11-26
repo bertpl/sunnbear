@@ -11,7 +11,7 @@ import pytest
 
 import sunnbear._core.problems.catalog as catalog
 from sunnbear._core.problems.core import Formula, FormulaRegistry
-from tests.problems.effect_of_c_check import follows_effect_of_c
+from tests.problems.helpers.effect_of_c_check import follows_effect_of_c
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
 _SHIPPED_FORMULAS = [

@@ -4,8 +4,7 @@ from sunnbear._core.problems.core import CandidateTestProblem, ProblemId
 from sunnbear._core.problems.core import (
     TestProblem as _TestProblem,  # The underscore alias keeps pytest from collecting the class.
 )
-
-from .example_formulas import ExampleCubic
+from tests.problems.helpers.example_formulas import ExampleCubic
 
 PROBLEM_ID = ProblemId((99, 801), ("p1",), (0.2,))
 
