@@ -273,7 +273,8 @@ class BenchmarkSuitesBuildDetails:
 
         These counts use each candidate's difficulty tier, which follows from its EDI alone. A suite's quotas count the
         tiers that `DifficultyTierAssignment.from_pool` assigned for that suite's selection, so a suite's counts differ
-        from its quotas when that assignment moved the EDI limits between tiers.
+        from its quotas when that assignment set the EDI limits between tiers elsewhere than the fixed limits of
+        `DifficultyTier`.
 
         Return ``None`` when suite selection did not finish.
         """

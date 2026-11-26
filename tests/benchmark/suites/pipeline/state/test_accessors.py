@@ -63,10 +63,7 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
     "suite_selection_details": (
         PipelineStageId.SUITE_SELECTION,
         lambda accessor, problem_ids: accessor.set_suite_selection_details(
-            {
-                "sb-2a": _selection_details("sb-2a", problem_ids[:2]),
-                "sb-1b": _selection_details("sb-1b", problem_ids[2:]),
-            }
+            [_selection_details("sb-2a", problem_ids[:2]), _selection_details("sb-1b", problem_ids[2:])]
         ),
     ),
 }

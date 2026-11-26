@@ -215,9 +215,11 @@ class SuiteSelectionDetails:
     Attributes:
         benchmark_suite: The selected suite.
         edi_range_by_tier: Per tier, the smallest and the largest EDI of the candidates assigned that tier, among all
-            the candidates eligible for the suite, not only the selected ones: for the largest suite of the b-series,
-            all candidates but those of the largest suite of the a-series. The ranges show where
-            `DifficultyTierAssignment.from_pool` moved the limits between tiers.
+            the candidates eligible for the suite, not only the selected ones. The candidates eligible for a suite are
+            those of the next larger suite of its series, or all candidates for a largest suite, except that the
+            largest suite of the b-series leaves out those of the largest suite of the a-series. The ranges show where
+            `DifficultyTierAssignment.from_pool` set the limits between tiers, which can differ from the fixed limits
+            of `DifficultyTier`.
         diversity: The diversity score of the suite's own test problems, which `compute_diversity_score` gives.
     """
 

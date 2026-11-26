@@ -1,7 +1,7 @@
 """`SuiteSelectionStage` selects the a-series and the b-series of benchmark suites from the candidates' fine features:
 
-- the size of the largest suites is the largest that the candidates fill twice, and the stage stops the pipeline below
-  the smallest size;
+- the size of the largest suites is the largest that is at most half the number of candidates, and the stage stops the
+  pipeline when the candidates are too few for 2 suites of the smallest size;
 - it stores each candidate's tier, selects 2 disjoint largest suites, and drops the other candidates;
 - where a tier has too few candidates for both largest suites, the largest suite of the b-series fills the rest of that
   tier's quota with candidates of a neighboring tier;
@@ -36,8 +36,8 @@ A, B, C, D = DifficultyTier
 # The stage runs no tasks in the pool, so the pool's processes never start. max-div runs 1 worker per worker of the
 # pool, and with 1 worker it warns that it gains nothing over a single solve, so the pool has 2 workers.
 _TWO_WORKER_POOL = WorkerPool(n_workers=2)
-# Each max-div worker runs this long per candidate of the selection's `CandidatePool`; with the pools of 128 to 256
-# candidates in these tests, that covers the start of the workers' processes and leaves time to meet every constraint
+# Each max-div worker runs this long per candidate of the selection's `CandidatePool`; with the pools of these tests,
+# that covers the start of the workers' processes and leaves time to meet every constraint
 # on a busy CI machine.
 _SEC_PER_CANDIDATE = 0.03
 # These are the ranges of each tier's EDIs, relative to `DEFAULT_N_BISECTION_FEVALS`; the EDIs differ within a tier,
@@ -103,7 +103,8 @@ def test_the_largest_suite_size_is_the_largest_that_the_candidates_fill_twice(
 
 
 def test_the_stage_stops_the_pipeline_below_2_suites_of_the_smallest_size():
-    """The stage stops the pipeline for 127 candidates, which fill no 2 suites of 64, and the message gives the 127."""
+    """The stage stops the pipeline for 127 candidates, fewer than 2 suites of 64 need, and the message gives the
+    127."""
     # --- arrange ----------------------
     problem_ids = example_problem_ids(127)
     state = build_state_before(PipelineStageId.SUITE_SELECTION, problem_ids, edis=dict.fromkeys(problem_ids, 5.0))
@@ -111,7 +112,7 @@ def test_the_stage_stops_the_pipeline_below_2_suites_of_the_smallest_size():
     # --- act / assert -----------------
     with pytest.raises(
         PipelineStopError,
-        match=r"^The candidates fill no 2 benchmark suites of 64 test problems or more: there are 127\.$",
+        match=r"^There are 127 candidates, fewer than the 128 that 2 benchmark suites of 64 test problems need\.$",
     ):
         state.run_stage(SuiteSelectionStage(_SEC_PER_CANDIDATE), worker_pool=_TWO_WORKER_POOL)
 
@@ -119,8 +120,8 @@ def test_the_stage_stops_the_pipeline_below_2_suites_of_the_smallest_size():
 @pytest.mark.only_with_numba_jit
 def test_the_stage_selects_2_disjoint_largest_suites_and_drops_the_other_candidates():
     """Of 160 candidates, 40 of each tier, the stage selects `sb-64a`, alias `sb-tiny`, and `sb-64b`, each with 16 of
-    each tier, and drops the other 32 as in no suite; each suite's diversity score is that of its own 64 test
-    problems."""
+    each tier, and drops the other 32 with the reason `not_in_any_suite`; each suite's diversity score is that of
+    its own 64 test problems."""
     # --- act --------------------------
     build_details = _select_suites({A: 40, B: 40, C: 40, D: 40}, SuiteSelectionStage(_SEC_PER_CANDIDATE))
 

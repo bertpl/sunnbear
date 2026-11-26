@@ -164,8 +164,8 @@ def _write_example_stage_information(
             )
             a_suite_size = len(problem_ids) // 2
             accessor.set_suite_selection_details(
-                {
-                    suite.name: SuiteSelectionDetails(benchmark_suite=suite, edi_range_by_tier={}, diversity=1.0)
+                [
+                    SuiteSelectionDetails(benchmark_suite=suite, edi_range_by_tier={}, diversity=1.0)
                     for suite in (
                         BenchmarkSuite(
                             name=f"sb-{a_suite_size}a", aliases=(), problem_ids=tuple(problem_ids[:a_suite_size])
@@ -176,6 +176,6 @@ def _write_example_stage_information(
                             problem_ids=tuple(problem_ids[a_suite_size:]),
                         ),
                     )
-                }
+                ]
             )
     state.finish_stage(stage_id)

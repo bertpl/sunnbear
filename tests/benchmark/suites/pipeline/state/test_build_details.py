@@ -82,18 +82,18 @@ def _finished_state() -> PipelineState:
     accessor = state.create_state_accessor(PipelineStageId.SUITE_SELECTION)
     accessor.set_difficulty_tiers({_PROBLEM_IDS[1]: DifficultyTier.A, _PROBLEM_IDS[4]: DifficultyTier.B})
     accessor.set_suite_selection_details(
-        {
-            "sb-1a": SuiteSelectionDetails(
+        [
+            SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)),
                 edi_range_by_tier={DifficultyTier.A: (5.0, 5.0), DifficultyTier.B: (10.0, 10.0)},
                 diversity=0.5,
             ),
-            "sb-1b": SuiteSelectionDetails(
+            SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)),
                 edi_range_by_tier={DifficultyTier.A: (6.0, 9.5), DifficultyTier.B: (10.0, 10.0)},
                 diversity=0.75,
             ),
-        }
+        ]
     )
     state.finish_stage(PipelineStageId.SUITE_SELECTION)
     return state

@@ -38,7 +38,7 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 @pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """In draft mode, the command writes each stage's manifest into the workspace with the given number of workers,
-    until suite selection stops the run, because the test's candidates fill no 2 benchmark suites. Fine
+    until suite selection stops the run, because the test's candidates are too few for 2 benchmark suites. Fine
     characterization runs at its draft fidelity.
 
     It prints 1 line per stage that ran to its end, in run order, with its counts of candidates, then validation's
@@ -58,9 +58,8 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     assert exc_info.value.code == 1
     [*printed_lines, stop_line] = capsys.readouterr().out.splitlines()
     stage_lines, rejection_lines = printed_lines[: len(_FINISHED_STAGE_IDS)], printed_lines[len(_FINISHED_STAGE_IDS) :]
-    assert stop_line.startswith(
-        f"{PipelineStageId.SUITE_SELECTION}: stopped: The candidates fill no 2 benchmark suites of 64"
-    )
+    assert stop_line.startswith(f"{PipelineStageId.SUITE_SELECTION}: stopped: There are ")
+    assert stop_line.endswith("fewer than the 128 that 2 benchmark suites of 64 test problems need.")
     assert [line.split(":")[0] for line in stage_lines] == _FINISHED_STAGE_IDS
     assert all(re.fullmatch(r"\w+: \d+ of \d+ candidates kept, in [0-9.]+ s", line) for line in stage_lines)
     # Validation rejects candidates of formulas 1.4.2.x, so the rejection lines start with 1 line that counts the

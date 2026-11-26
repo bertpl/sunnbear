@@ -14,7 +14,7 @@ The 2 characterization stages share `CharacterizationStateAccessor`, because the
 information.
 """
 
-from collections.abc import Collection, Mapping
+from collections.abc import Collection, Mapping, Sequence
 from typing import ClassVar
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS, CRange
@@ -241,10 +241,7 @@ class FineCharacterizationStateAccessor(CharacterizationStateAccessor):
 #  SuiteSelectionStateAccessor
 # ==================================================================================================
 class SuiteSelectionStateAccessor(PipelineStateAccessor):
-    """`SuiteSelectionStateAccessor` gives the candidate pool, and takes the difficulty tiers and every suite's details.
-
-    The candidate pool, a `CandidatePool`, holds the input candidates of max-div's selections.
-    """
+    """`SuiteSelectionStateAccessor` gives the candidate pool, and takes the tiers and the suites' selection details."""
 
     stage_id = PipelineStageId.SUITE_SELECTION
 
@@ -278,10 +275,10 @@ class SuiteSelectionStateAccessor(PipelineStateAccessor):
         self._check_covers(difficulty_tiers.keys(), self.remaining_problem_ids)
         self._storage.difficulty_tiers = self._restrict_to_remaining(difficulty_tiers)
 
-    def set_suite_selection_details(self, suite_selection_details: Mapping[str, SuiteSelectionDetails]) -> None:
+    def set_suite_selection_details(self, suite_selection_details: Sequence[SuiteSelectionDetails]) -> None:
         """Store the selection details of each suite, keyed by the suite's name.
 
-        The mapping lists the a-series' suites before the b-series', and within each series the suites from largest to
+        The sequence lists the a-series' suites before the b-series', and within each series the suites from largest to
         smallest. The stage calls this after it records its drops, so that the suites together hold the candidates
         that no stage has dropped.
 
@@ -290,11 +287,9 @@ class SuiteSelectionStateAccessor(PipelineStateAccessor):
         """
         self._check_not_written(is_written=self._storage.suite_selection_details is not None)
         self._check_covers(
-            {
-                problem_id
-                for details in suite_selection_details.values()
-                for problem_id in details.benchmark_suite.problem_ids
-            },
+            {problem_id for details in suite_selection_details for problem_id in details.benchmark_suite.problem_ids},
             self.remaining_problem_ids,
         )
-        self._storage.suite_selection_details = dict(suite_selection_details)
+        self._storage.suite_selection_details = {
+            details.benchmark_suite.name: details for details in suite_selection_details
+        }

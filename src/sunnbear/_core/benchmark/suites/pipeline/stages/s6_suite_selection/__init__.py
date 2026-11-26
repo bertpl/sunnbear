@@ -1,4 +1,4 @@
-"""Suite selection, the sixth and last stage of the benchmark suite pipeline, selects every benchmark suite.
+"""Suite selection, the sixth stage of the benchmark suite pipeline, selects every benchmark suite.
 
 `SuiteSelectionStage`, in `stage`, selects the largest suite of the a-series and of the b-series from all candidates,
 then selects each smaller suite of a series, of half the size, from the series' next larger suite, down to

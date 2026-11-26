@@ -23,13 +23,13 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 # Each series holds 1 suite per power of 2 from this size up to the size of its largest suite.
 SMALLEST_SUITE_SIZE = 64
-# The largest suite of each series holds at most this many test problems. `MAX_SUITE_SIZE` is `SMALLEST_SUITE_SIZE`
-# times a power of 2, so that every suite of a series, whose size is the largest suite's divided by a power of 2, has
-# whole quotas.
+# The largest suite of each series holds at most this many test problems. Every suite size is `SMALLEST_SUITE_SIZE`
+# times a power of 2, which keeps the quotas of every halving whole; `MAX_SUITE_SIZE` is such a size too, because the
+# size of the largest suites doubles from `SMALLEST_SUITE_SIZE` and could never reach another value.
 #
 # The suites of a run ship only when its largest suites have this size and every candidate of those 2 suites counts
-# toward the quota of its own difficulty tier. The suites of any other run are interim and never ship as benchmark
-# suites.
+# toward the quota of the difficulty tier of its EDI. The suites of any other run are interim and never ship as
+# benchmark suites.
 MAX_SUITE_SIZE = 1024
 # The suites of the primary series, the a-series, carry these aliases, by size; a run whose largest suites are smaller
 # than `MAX_SUITE_SIZE` produces no suite of the larger sizes, and so none of their aliases either.
@@ -58,22 +58,24 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     fine characterization stored, then selects the suites in 3 steps:
 
     - **the largest suites:** their size is the largest power of 2 from `SMALLEST_SUITE_SIZE` up to `MAX_SUITE_SIZE`
-      that the candidates fill twice. The largest suite of the primary series is selected from all candidates. The
-      largest suite of the secondary series is selected from the same candidates, by a selection of twice its size
-      that must hold the primary suite: the secondary suite is the half that the primary suite does not hold, so it
-      lies far from the primary suite and is diverse in itself;
+      that is at most half the number of candidates. The largest suite of the primary series is selected from all
+      candidates. The largest suite of the secondary series comes from a selection, from the same candidates, of twice
+      its size that must hold the largest primary suite; the secondary suite is the half of that selection outside the
+      primary suite, so it lies far from the primary suite and is diverse in itself;
     - **the drops:** the stage drops each candidate that neither largest suite holds; such a candidate is valid, but
       not kept;
     - **the halvings:** per series, each smaller suite is selected from the series' next larger suite.
 
     Every suite is selected by `select_diverse_problem_ids`, under the quotas of its size, with the tiers that
-    `DifficultyTierAssignment.from_pool` assigns anew to the candidates eligible for the suite: for the largest suite
-    of the secondary series, all candidates but those of the largest primary suite.
+    `DifficultyTierAssignment.from_pool` assigns, for that selection only, to the candidates eligible for the suite.
+    The candidates eligible for a suite are those that it is selected from; for the largest suite of the secondary
+    series, the candidates of the largest primary suite are not eligible.
 
-    The primary series selects first, so where a tier has too few candidates for both largest suites, the primary
-    suite still holds that tier's full quota, and the secondary suite fills the rest of that quota with candidates of
-    a neighboring tier. Each suite's diversity score is the score of its own test problems, by
-    `compute_diversity_score`.
+    The largest suite of the primary series is selected first, so where a tier has too few candidates for both largest
+    suites, the primary suite still holds that tier's full quota, and the secondary suite fills the rest of that quota
+    with candidates of a neighboring tier.
+
+    Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
     """
 
     stage_id = PipelineStageId.SUITE_SELECTION
@@ -95,7 +97,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         workers stay idle.
 
         Raises:
-            PipelineStopError: If the candidates fill no 2 suites of `SMALLEST_SUITE_SIZE`, or if a selection misses a
+            PipelineStopError: If there are fewer than `2*SMALLEST_SUITE_SIZE` candidates, or if a selection misses a
                 required candidate or a quota, as `select_diverse_problem_ids` describes.
         """
         # --- size and tiers ---------------------
@@ -137,9 +139,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
                     worker_pool=worker_pool,
                 )
                 all_selection_details.append(selection_details)
-        state_accessor.set_suite_selection_details(
-            {details.benchmark_suite.name: details for details in all_selection_details}
-        )
+        state_accessor.set_suite_selection_details(all_selection_details)
 
     # --------------------------------------------------------------------------
     #  Helpers
@@ -155,7 +155,8 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     ) -> SuiteSelectionDetails:
         """Return the details of a suite of `size` in the primary or secondary series, chosen from `candidate_pool`.
 
-        The suite holds the selected candidates that are not in `required_problem_ids`, which the selection holds too.
+        The selection also holds every candidate of `required_problem_ids`; the suite holds only the selected candidates
+        that are not required.
         """
         required_problem_id_set = set(required_problem_ids)
         selected_problem_ids, tier_assignment = select_diverse_problem_ids(
@@ -188,18 +189,18 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
 
     @staticmethod
     def _choose_largest_suite_size(n_candidates: int) -> int:
-        """Return the size of each series' largest suite, which `n_candidates` candidates fill twice.
+        """Return the size of each series' largest suite for `n_candidates` candidates.
 
-        The size is the largest power of 2 from `SMALLEST_SUITE_SIZE` up to `MAX_SUITE_SIZE` of which the candidates
-        fill 2 suites.
+        The size is the largest power of 2 from `SMALLEST_SUITE_SIZE` up to `MAX_SUITE_SIZE` that is at most half of
+        `n_candidates`.
 
         Raises:
-            PipelineStopError: If `n_candidates` candidates fill no 2 suites of `SMALLEST_SUITE_SIZE`.
+            PipelineStopError: If `n_candidates` is less than `2*SMALLEST_SUITE_SIZE`.
         """
         if n_candidates < 2 * SMALLEST_SUITE_SIZE:
             raise PipelineStopError(
-                f"The candidates fill no 2 benchmark suites of {SMALLEST_SUITE_SIZE} test problems or more: there are "
-                f"{n_candidates}."
+                f"There are {n_candidates} candidates, fewer than the {2 * SMALLEST_SUITE_SIZE} that 2 benchmark "
+                f"suites of {SMALLEST_SUITE_SIZE} test problems need."
             )
         else:
             largest_suite_size = SMALLEST_SUITE_SIZE

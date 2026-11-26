@@ -52,7 +52,7 @@ def select_diverse_problem_ids(
     sec_per_candidate: float,
     n_workers: int,
 ) -> tuple[tuple[ProblemId, ...], DifficultyTierAssignment]:
-    """Return max-div's most diverse selection that holds `required_problem_ids` and meets `quotas`, and its tiers.
+    """Return the most diverse selection that holds `required_problem_ids` and meets `quotas`, and the pool's tiers.
 
     `DifficultyTierAssignment.from_pool` assigns a tier to each candidate of `candidate_pool` that is not required.
     max-div searches, by the objective of this module, for a selection of the required candidates plus
@@ -65,7 +65,7 @@ def select_diverse_problem_ids(
     Args:
         candidate_pool: The candidates to select from.
         quotas: The quotas of the selection beyond the required candidates.
-        required_problem_ids: The candidates of `candidate_pool` that the selection must hold.
+        required_problem_ids: The candidates of `candidate_pool` that must be in the selection.
         seed: The seed of max-div's search.
         sec_per_candidate: The wall-clock time of max-div's search per candidate of `candidate_pool`. max-div searches
             with `n_workers` workers, in groups that share their best selections and merge as the search runs, so the
@@ -77,7 +77,7 @@ def select_diverse_problem_ids(
         assignment of the candidates of `candidate_pool` that are not required.
 
     Raises:
-        ValueError: If `candidate_pool` holds fewer candidates that are not required than `quotas.selection_size`, as
+        ValueError: If `candidate_pool` holds fewer than `quotas.selection_size` candidates that are not required, as
             `DifficultyTierAssignment.from_pool` describes.
         PipelineStopError: If the selection misses a required candidate, or misses a quota, as
             `DifficultyTierQuotas.check_selection` describes, because max-div treats its constraints as soft and
@@ -90,7 +90,7 @@ def select_diverse_problem_ids(
         quotas,
     )
 
-    # --- constraints ------------------------
+    # --- constraints ----------------------------
     # A required candidate has no assigned tier, so no tier's constraint counts it.
     assigned_tiers = [tier_assignment.assigned_tiers.get(problem_id) for problem_id in problem_ids]
     constraints = [
@@ -110,7 +110,7 @@ def select_diverse_problem_ids(
             )
         )
 
-    # --- search -----------------------------
+    # --- search ---------------------------------
     max_div_problem = _build_max_div_problem(
         candidate_pool, k=len(required_problem_id_set) + quotas.selection_size, constraints=constraints
     )
@@ -122,12 +122,13 @@ def select_diverse_problem_ids(
         .solve(verbosity=Verbosity.SILENT)
     )
 
-    # --- checks -----------------------------
+    # --- checks ---------------------------------
     selected_indices = sorted(solution.i_selected)
-    n_missed_required = len(required_problem_id_set - {problem_ids[idx] for idx in selected_indices})
-    if n_missed_required:
+    n_missing_required_candidates = len(required_problem_id_set - {problem_ids[idx] for idx in selected_indices})
+    if n_missing_required_candidates:
         raise PipelineStopError(
-            f"The selection misses {n_missed_required} of the {len(required_problem_id_set)} required candidates."
+            f"The selection misses {n_missing_required_candidates} of the {len(required_problem_id_set)} required "
+            "candidates."
         )
     quotas.check_selection([assigned_tiers[idx] for idx in selected_indices if assigned_tiers[idx] is not None])
     return tuple(problem_ids[idx] for idx in selected_indices), tier_assignment
@@ -139,7 +140,7 @@ def select_diverse_problem_ids(
 def compute_diversity_score(candidate_pool: CandidatePool) -> float:
     """Return the diversity score of all candidates of `candidate_pool`, by the objective of this module.
 
-    max-div scores the selection of every candidate without searching, so the score equals the score that
+    max-div scores the selection that holds all candidates without searching, so the score equals the score that
     `select_diverse_problem_ids`'s search assigns to a selection of exactly these candidates.
     """
     n_candidates = len(candidate_pool.feature_matrix.problem_ids)
