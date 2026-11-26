@@ -84,12 +84,12 @@ class CharacterizationResults:
         - ``edi``;
         - 1 per config, with its counts of incorrect solves.
         """
-        factory = DiversityFeatureFactory()
+        diversity_feature_factory = DiversityFeatureFactory()
         columns: dict[str, list[Any]] = {"problem_id": list(map(str, self.raw_feature_matrix.problem_ids))}
-        for name, values in zip(factory.feature_names, self.raw_feature_matrix.values.T, strict=True):
+        for name, values in zip(diversity_feature_factory.feature_names, self.raw_feature_matrix.values.T, strict=True):
             columns[name] = values.tolist()
         columns[_EDI_COLUMN_NAME] = [self.edis[problem_id] for problem_id in self.raw_feature_matrix.problem_ids]
-        for config_idx, solver_id in enumerate(factory.solver_ids):
+        for config_idx, solver_id in enumerate(diversity_feature_factory.solver_ids):
             columns[f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}"] = [
                 self.n_incorrect_solves_per_config[problem_id][config_idx]
                 for problem_id in self.raw_feature_matrix.problem_ids
@@ -122,17 +122,25 @@ class CharacterizationResults:
     def n_fevals_table(self) -> pl.DataFrame:
         """Return, per kept candidate and core solver config, the geometric mean of the config's ``n_fevals_eff``.
 
-        The columns are ``problem_id``, ``solver_id`` and ``geomean_n_fevals_eff``: the mean over the stage's Monte
-        Carlo solves of the candidate, in which an incorrect solve counts as its full budget of function evaluations.
+        The columns are:
+
+        - ``problem_id`` and ``solver_id``;
+        - ``geomean_n_fevals_eff``, the geometric mean of ``n_fevals_eff`` over the stage's Monte Carlo solves of the
+          candidate; ``n_fevals_eff`` counts an incorrect solve as its full budget of function evaluations.
+
         The rows follow the candidates' order, and within a candidate the order of `DiversityFeatureFactory.solver_ids`.
         """
-        factory = DiversityFeatureFactory()
+        diversity_feature_factory = DiversityFeatureFactory()
         problem_ids = self.raw_feature_matrix.problem_ids
         return pl.DataFrame(
             {
-                "problem_id": [str(problem_id) for problem_id in problem_ids for _ in factory.solver_ids],
-                "solver_id": [solver_id for _ in problem_ids for solver_id in factory.solver_ids],
-                "geomean_n_fevals_eff": factory.geomean_columns(self.raw_feature_matrix).ravel().tolist(),
+                "problem_id": [
+                    str(problem_id) for problem_id in problem_ids for _ in diversity_feature_factory.solver_ids
+                ],
+                "solver_id": [solver_id for _ in problem_ids for solver_id in diversity_feature_factory.solver_ids],
+                "geomean_n_fevals_eff": diversity_feature_factory.geomean_columns(self.raw_feature_matrix)
+                .ravel()
+                .tolist(),
             },
             schema={"problem_id": pl.String(), "solver_id": pl.String(), "geomean_n_fevals_eff": pl.Float64()},
         )
@@ -154,24 +162,24 @@ class CharacterizationResults:
             ValueError: If `json_values` records other solver ids than `DiversityFeatureFactory.solver_ids`, as for
                 results that another sunnbear version wrote.
         """
-        factory = DiversityFeatureFactory()
-        if tuple(json_values["solver_ids"]) != factory.solver_ids:
+        diversity_feature_factory = DiversityFeatureFactory()
+        if tuple(json_values["solver_ids"]) != diversity_feature_factory.solver_ids:
             raise ValueError(
                 f"The results were computed with the solver configs {json_values['solver_ids']}, not with "
-                f"{list(factory.solver_ids)}."
+                f"{list(diversity_feature_factory.solver_ids)}."
             )
         fidelity = FeatureFidelity[json_values["fidelity"]]
         problem_ids = [ProblemId.from_string(problem_id) for problem_id in table["problem_id"]]
         n_incorrect_solves_per_config = table.select(
-            f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}" for solver_id in factory.solver_ids
+            f"{_N_INCORRECT_SOLVES_PREFIX}{solver_id}" for solver_id in diversity_feature_factory.solver_ids
         ).rows()
         return cls(
             fidelity=fidelity,
             raw_feature_matrix=FeatureMatrix(
                 problem_ids=tuple(problem_ids),
-                values=table.select(factory.feature_names)
+                values=table.select(diversity_feature_factory.feature_names)
                 .to_numpy()
-                .reshape(len(problem_ids), len(factory.feature_names)),
+                .reshape(len(problem_ids), len(diversity_feature_factory.feature_names)),
             ),
             edis=dict(zip(problem_ids, table[_EDI_COLUMN_NAME].to_list(), strict=True)),
             n_incorrect_solves_per_config=dict(zip(problem_ids, n_incorrect_solves_per_config, strict=True)),

@@ -2,8 +2,9 @@
 
 - `PipelineState.create_build_details` refuses a finished stage that did not write its information;
 - the build details give only the information of the finished stages;
-- they count the drops and the incorrect solves, and give each config's geomean of evaluations per candidate;
-- they list the rejections per formula, and count each suite's tiers and give its quotas;
+- they count the drops and the incorrect solves, and give each config's geometric mean of function evaluations per
+  candidate;
+- they list the rejections per formula, and give each suite's number of test problems and quota per difficulty tier;
 - the build details that are read back from their own files equal the ones that wrote them;
 - they report the candidates that differ from those of the registered formulas.
 """
@@ -190,8 +191,8 @@ def test_the_build_details_count_each_configs_incorrect_solves():
     assert table.rows() == [("bisection", 192, 3, 3 / 192)]
 
 
-def test_the_build_details_give_each_configs_geomean_of_fevals_per_candidate():
-    """Over the 3 candidates that coarse characterization kept, the table gives 1 row per candidate and config, with
+def test_the_build_details_give_each_configs_geomean_of_n_fevals_eff_per_candidate():
+    """Over the candidates that coarse characterization kept, the table gives 1 row per candidate and config, with
     the value of that config's geomean feature."""
     # --- arrange ----------------------
     build_details = _distilled_state().create_build_details()

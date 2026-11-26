@@ -307,9 +307,11 @@ class BenchmarkSuitesBuildDetails:
 
         A tier's quota is the exact number of the suite's test problems that the tier must hold.
 
-        The rows are those of `suite_tier_counts`, in its order. The columns are ``suite_name``, ``size``, and 1 column
-        ``quota_<tier>`` per `DifficultyTier`, named with the tier's value in lower case and holding the quota that
-        `DifficultyTierQuotas` gives for the suite's size.
+        The rows are those of `suite_tier_counts`, in its order. The columns are:
+
+        - ``suite_name`` and ``size``;
+        - 1 column ``quota_<tier>`` per `DifficultyTier`, named with the tier's value in lower case and holding the
+          quota that `DifficultyTierQuotas` gives for the suite's size.
 
         Return ``None`` when core selection did not finish.
         """
