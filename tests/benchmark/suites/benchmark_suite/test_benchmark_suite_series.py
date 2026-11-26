@@ -1,5 +1,5 @@
 """`BenchmarkSuiteSeries` builds each suite of a size that it declares, with the suite's name, aliases and series id,
-and refuses a declaration that could give 2 suites the same name or a suite a size that no suite can have.
+and refuses a declaration that could give 2 suites the same name or that declares a size that no suite can have.
 
 The tests use an example series, so that a change to the built-in series leaves them as they are.
 """
@@ -21,11 +21,6 @@ _EXAMPLE_SERIES = BenchmarkSuiteSeries(
 )
 
 
-def _problem_ids(n_problems: int) -> list[ProblemId]:
-    """Return the ids of `n_problems` test problems of the formula numbered ``(99, 1)``."""
-    return [ProblemId.from_string(f"f99.1[p={idx + 1}]") for idx in range(n_problems)]
-
-
 @pytest.mark.parametrize(
     "size, name_expected, aliases_expected",
     [
@@ -33,10 +28,10 @@ def _problem_ids(n_problems: int) -> list[ProblemId]:
         pytest.param(1, "ex-1", (), id="without_aliases"),
     ],
 )
-def test_a_series_builds_its_suite_of_each_size(size, name_expected, aliases_expected):
+def test_the_series_builds_its_suite_of_each_size(size, name_expected, aliases_expected):
     """The suite of a declared size carries the series' id, the name of its size and that size's aliases."""
     # --- arrange ----------------------
-    problem_ids = _problem_ids(size)
+    problem_ids = [ProblemId.from_string(f"f99.1[p={idx + 1}]") for idx in range(size)]
 
     # --- act --------------------------
     suite = _EXAMPLE_SERIES.build_suite(problem_ids)
@@ -47,11 +42,11 @@ def test_a_series_builds_its_suite_of_each_size(size, name_expected, aliases_exp
     )
 
 
-def test_a_series_refuses_a_suite_of_a_size_that_it_does_not_declare():
+def test_the_series_refuses_a_suite_of_a_size_that_it_does_not_declare():
     """A suite of 3 test problems does not fit a series of the sizes 4, 2 and 1."""
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=r"^Series ex has no suite of 3 test problems; its sizes are \(4, 2, 1\)\.$"):
-        _EXAMPLE_SERIES.build_suite(_problem_ids(3))
+        _EXAMPLE_SERIES.build_suite([ProblemId.from_string(f"f99.1[p={idx + 1}]") for idx in range(3)])
 
 
 @pytest.mark.parametrize(
@@ -68,7 +63,7 @@ def test_a_series_refuses_a_suite_of_a_size_that_it_does_not_declare():
         ),
     ],
 )
-def test_a_series_refuses_an_invalid_declaration(changes, message_expected):
+def test_the_series_refuses_an_invalid_declaration(changes, message_expected):
     """A name format without ``{size}``, a size that is not a power of 2 or is declared twice, and aliases of an
     undeclared size are refused."""
     # --- act / assert -----------------

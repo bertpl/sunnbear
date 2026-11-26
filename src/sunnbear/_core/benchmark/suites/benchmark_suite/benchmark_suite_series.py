@@ -15,9 +15,9 @@ from .benchmark_suite import BenchmarkSuite
 class BenchmarkSuiteSeries:
     """A `BenchmarkSuiteSeries` declares a series of benchmark suites: its sizes, and the name and aliases per size.
 
-    A series holds at most 1 suite per size. It names its suites and gives them its `series_id`, but it states nothing
-    about how its suites are selected, such as whether a suite holds the series' smaller suites: the stage that selects
-    the suites decides that.
+    A series holds at most 1 suite per size. It names its suites and gives them its `series_id`. The suite selection
+    stage decides how the suites are selected, such as whether a suite holds the series' smaller suites; the series
+    states nothing about their selection.
 
     Attributes:
         series_id: The series' id, unique among the series, such as ``sb-a``.
@@ -27,7 +27,8 @@ class BenchmarkSuiteSeries:
         name_format: The format of each suite's name, with the suite's size as its only field, ``{size}``, such as
             ``sb-{size}a``.
         sizes: The size of each of the series' suites, each a power of 2.
-        aliases_by_size: The aliases of the suite of each size that has any, such as ``("sb-tiny",)``.
+        aliases_by_size: The aliases of each suite that has any, keyed by the suite's size, such as
+            ``{64: ("sb-tiny",)}``.
     """
 
     series_id: str
@@ -38,11 +39,14 @@ class BenchmarkSuiteSeries:
     aliases_by_size: Mapping[int, tuple[str, ...]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        """Refuse a declaration that could give 2 suites of the series the same name, or a size no suite can have.
+        """Refuse a declaration that could give 2 suites the same name, or that declares a size that no suite can have.
 
         Raises:
-            ValueError: If `name_format` has no field ``{size}``, a size is not a power of 2 or is declared twice, or
-                `aliases_by_size` holds a size that `sizes` does not declare.
+            ValueError: If the declaration has any of these defects:
+
+                - `name_format` has no field ``{size}``;
+                - a size is not a power of 2, or is declared twice;
+                - `aliases_by_size` holds a size that `sizes` does not declare.
         """
         undeclared_alias_sizes = sorted(set(self.aliases_by_size) - set(self.sizes))
         if "{size}" not in self.name_format:

@@ -13,9 +13,9 @@ from sunnbear._core.problems.core import ProblemId
 class BenchmarkSuite:
     """A `BenchmarkSuite` is a named selection of test problems to benchmark solvers on.
 
-    A suite belongs to 1 `BenchmarkSuiteSeries`, which builds it and gives it its name and aliases; `BUILT_IN_SERIES`
-    lists the series that sunnbear builds. A suite is known by its name and by each of its aliases. It stores them, so
-    that a suite read back from a file needs no lookup of its series.
+    A suite belongs to 1 `BenchmarkSuiteSeries`, which builds it and gives it its name and aliases. A suite is known by
+    its name and by each of its aliases. It stores them, so that a suite read back from a file needs no lookup of its
+    series.
 
     Attributes:
         series_id: The `series_id` of the suite's series, such as ``sb-a``.

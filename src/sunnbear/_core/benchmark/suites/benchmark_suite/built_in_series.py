@@ -1,8 +1,8 @@
 """This module declares the series of benchmark suites that sunnbear builds, 1 constant per series.
 
-`BUILT_IN_SERIES` lists every such series, in the order in which sunnbear lists their suites, and
-`BUILT_IN_SERIES_BY_ID` finds each by its `series_id`. A reader that lists the series or looks up a suite's series goes
-through these 2, so that a new series needs no change to the reader.
+`BUILT_IN_SERIES` lists every such series, in the order in which to present them, and `BUILT_IN_SERIES_BY_ID` finds
+each by its `series_id`. Code that lists the series or looks up a suite's series goes through `BUILT_IN_SERIES` and
+`BUILT_IN_SERIES_BY_ID`, so that a new series needs no change to that code.
 """
 
 from .benchmark_suite_series import BenchmarkSuiteSeries
@@ -26,7 +26,7 @@ SB_B_SERIES = BenchmarkSuiteSeries(
     readable_name="b-series",
     summary=(
         "The b-series is disjoint from the a-series and diversified with respect to it, so that a solver can be "
-        "calibrated on its test problems and benchmarked on those of the a-series."
+        "calibrated on the b-series' test problems and benchmarked on those of the a-series."
     ),
     name_format="sb-{size}b",
     sizes=(1024, 512, 256, 128, 64),

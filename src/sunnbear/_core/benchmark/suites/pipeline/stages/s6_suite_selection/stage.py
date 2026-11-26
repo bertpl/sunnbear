@@ -28,9 +28,9 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     """`SuiteSelectionStage` selects the suites of `SB_A_SERIES` and `SB_B_SERIES` from the candidates.
 
-    The stage selects 1 suite per size that a series declares, up to the size of the series' largest suite, and builds
-    each suite through its series. Each suite of a series holds every test problem of the series' smaller suites, and
-    the 2 series share no test problem.
+    The stage selects 1 suite per size that a series declares, up to the size of the largest suites, which the first
+    step below chooses, and builds each suite through its series. Each suite of a series holds every test problem of
+    the series' smaller suites, and the 2 series share no test problem.
 
     The stage stores each candidate's difficulty tier, which `CandidatePool.difficulty_tiers` derives from the EDI that
     fine characterization stored, then selects the suites in 3 steps:
@@ -47,6 +47,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
 
     Every suite is selected by `select_diverse_problem_ids`, under the quotas of its size, with the tiers that
     `DifficultyTierAssignment.from_pool` assigns, for that selection only, to the candidates eligible for the suite.
+
     The candidates eligible for a suite are those that it is selected from; for the largest suite of the b-series, the
     candidates of the largest suite of the a-series are not eligible.
 
@@ -57,8 +58,9 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
 
     The suites of a run ship only when its largest suites have the largest size that both series declare, and every
-    candidate of those 2 suites counts toward the quota of the difficulty tier of its EDI. The suites of any other run
-    are interim and never ship as benchmark suites.
+    candidate of those 2 suites counts toward the quota of the difficulty tier of its EDI.
+
+    The suites of any other run are interim and never ship as benchmark suites.
     """
 
     stage_id = PipelineStageId.SUITE_SELECTION
@@ -80,9 +82,8 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         workers stay idle.
 
         Raises:
-            PipelineStopError: If the candidates are fewer than 2 suites of the smallest size that both series declare
-                need, or if a selection misses a required candidate or a quota, as `select_diverse_problem_ids`
-                describes.
+            PipelineStopError: If there are fewer candidates than twice the smallest size that both series declare, or
+                if a selection misses a required candidate or a quota, as `select_diverse_problem_ids` describes.
         """
         # --- size and tiers ---------------------
         largest_suite_size = self._choose_largest_suite_size(len(state_accessor.remaining_problem_ids))
@@ -173,12 +174,12 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         Raises:
             PipelineStopError: If `n_candidates` is less than twice the smallest size that both series declare.
         """
-        shared_sizes = sorted(set(SB_A_SERIES.sizes) & set(SB_B_SERIES.sizes))
-        smallest_shared_size = shared_sizes[0]
-        if n_candidates < 2 * smallest_shared_size:
+        common_sizes = sorted(set(SB_A_SERIES.sizes) & set(SB_B_SERIES.sizes))
+        smallest_common_size = common_sizes[0]
+        if n_candidates < 2 * smallest_common_size:
             raise PipelineStopError(
-                f"There are {n_candidates} candidates, fewer than the {2 * smallest_shared_size} that 2 benchmark "
-                f"suites of {smallest_shared_size} test problems need."
+                f"There are {n_candidates} candidates, fewer than the {2 * smallest_common_size} that 2 benchmark "
+                f"suites of {smallest_common_size} test problems need."
             )
         else:
-            return max(size for size in shared_sizes if 2 * size <= n_candidates)
+            return max(size for size in common_sizes if 2 * size <= n_candidates)

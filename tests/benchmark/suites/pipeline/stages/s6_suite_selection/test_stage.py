@@ -67,16 +67,16 @@ def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails) -> None
     """
     edis = build_details.edis(PipelineStageId.FINE_CHARACTERIZATION)
     all_selection_details = list(build_details.suite_selection_details().values())
-    problem_ids_by_series = {"sb-a": set(), "sb-b": set()}
+    problem_ids_by_series_id = {"sb-a": set(), "sb-b": set()}
     for selection_details in all_selection_details:
         suite = selection_details.benchmark_suite
-        problem_ids_by_series[suite.series_id] |= set(suite.problem_ids)
+        problem_ids_by_series_id[suite.series_id] |= set(suite.problem_ids)
         tier_counts = {
             tier: sum(lower <= edis[p] <= upper for p in suite.problem_ids)
             for tier, (lower, upper) in selection_details.edi_range_by_tier.items()
         }
         assert tier_counts == DifficultyTierQuotas(len(suite.problem_ids)).quota_by_tier
-    assert not problem_ids_by_series["sb-a"] & problem_ids_by_series["sb-b"]
+    assert not problem_ids_by_series_id["sb-a"] & problem_ids_by_series_id["sb-b"]
     for selection_details, next_selection_details in pairwise(all_selection_details):
         suite, next_suite = selection_details.benchmark_suite, next_selection_details.benchmark_suite
         if suite.series_id == next_suite.series_id:
@@ -95,8 +95,8 @@ def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails) -> None
 def test_the_largest_suite_size_is_the_largest_that_the_candidates_fill_twice(
     n_candidates, largest_suite_size_expected
 ):
-    """The size of the largest suites is the largest size that both series declare and of which the candidates fill 2
-    suites."""
+    """The size of the largest suites is the largest size that both series declare and that is at most half the number
+    of candidates."""
     # --- act / assert -----------------
     assert SuiteSelectionStage._choose_largest_suite_size(n_candidates) == largest_suite_size_expected
 
