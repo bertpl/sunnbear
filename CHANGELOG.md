@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Select the largest benchmark suite of each series directly from all valid test problems in the internal benchmark suite pipeline, which no longer selects a shared suite first
+
 ### Deprecated
 
 ### Removed
