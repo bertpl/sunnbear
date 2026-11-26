@@ -13,9 +13,9 @@ from sunnbear._core.problems.core import FormulaRegistry
 # - `NearPolePower` (2.3.4) sweeps 81 powers at each of 6 distances from the pole to the lower bound, of which 63 pairs
 #   have no root inside the interval.
 # - `HyperbolicTangent` (2.4.3) has 161 candidates from the sweep of ``b``, and 151 from the sweep of ``d``.
-# - `Sine` (2.6.1) has 110 candidates from the sweep of a small ``b`` and 66 from the odd values of a large ``b``; both
+# - `Sine` (2.6.1) has 219 candidates from the sweep of a small ``b`` and 112 from the odd values of a large ``b``; both
 #   recipes hold ``b = 1``, which counts once. `InverseSine` (2.6.5) has 1 at ``d = 0`` and 300 from the sweep of ``d``.
-# - `InverseTangent` (2.6.6) has 601 candidates from the sweep of ``b`` and 301 from the sweep of ``d``; both sweeps
+# - `InverseTangent` (2.6.6) has 241 candidates from the sweep of ``b`` and 121 from the sweep of ``d``; both sweeps
 #   hold ``b = 2^30``, ``d = 1``, which counts once.
 CANDIDATE_COUNTS = [
     pytest.param((2, 1, 1), 1, id="linear"),
@@ -47,12 +47,12 @@ CANDIDATE_COUNTS = [
     pytest.param((2, 4, 6), 141, id="inverse_hyperbolic_tangent"),
     pytest.param((2, 5, 1), 151, id="exponential"),
     pytest.param((2, 5, 2), 150, id="logarithm"),
-    pytest.param((2, 6, 1), 110 + 66 - 1, id="sine"),
+    pytest.param((2, 6, 1), 219 + 112 - 1, id="sine"),
     pytest.param((2, 6, 2), 301, id="cosine"),
     pytest.param((2, 6, 3), 300, id="tangent_between_poles"),
-    pytest.param((2, 6, 4), 76, id="tangent_across_poles"),
+    pytest.param((2, 6, 4), 264, id="tangent_across_poles"),
     pytest.param((2, 6, 5), 1 + 300, id="inverse_sine"),
-    pytest.param((2, 6, 6), 601 + 301 - 1, id="inverse_tangent"),
+    pytest.param((2, 6, 6), 241 + 121 - 1, id="inverse_tangent"),
 ]
 
 

@@ -69,14 +69,14 @@ class TangentAcrossPoles(Formula):
         return (-(n + 0.5), n + 0.5)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the recipe of the integers ``n`` nearest to 2^(0.1*i), for i from 0 to 100.
+        """Return the recipe of the integers ``n`` nearest to 2^(0.02*i), for i from 0 to 500.
 
-        The recipe holds every ``n`` up to 18, then values that lie further apart as ``n`` grows.
+        The recipe holds every ``n`` up to 84, then values that lie further apart as ``n`` grows.
         """
         return (
             ParamGrid(
-                axes=(ParamAxis("n", 0.0, 10.0, 0.1, ParamNotation.POW2, ParamRounding.NEAREST_INTEGER),),
-                summary=r"The values of $\param{n}$ nearest to $2^{0.1 i}$, for $i$ from 0 to 100, each once.",
+                axes=(ParamAxis("n", 0.0, 10.0, 0.02, ParamNotation.POW2, ParamRounding.NEAREST_INTEGER),),
+                summary=r"The values of $\param{n}$ nearest to $2^{0.02 i}$, for $i$ from 0 to 500, each once.",
             ),
         )
 

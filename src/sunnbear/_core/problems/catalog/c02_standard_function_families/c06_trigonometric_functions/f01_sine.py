@@ -59,19 +59,19 @@ class Sine(Formula):
 
         - The sweep of a small ``b``: from 2^-10 to 2^0.9. The interval holds 1 root throughout, because the next zeros,
           at -2 and 2, stay outside; from ``b = 1`` on, it also holds both extrema next to that root.
-        - The odd values of a large ``b``: the odd integers nearest to 2^(0.1*i), for i from 1 to 100, which put both
+        - The odd values of a large ``b``: the odd integers nearest to 2^(0.05*i), for i from 1 to 200, which put both
           bounds on extrema.
           The values of ``c`` that keep the sign of the function at both bounds then reach their widest range,
           about ±1.47.
         """
         return (
             ParamGrid(
-                axes=(ParamAxis("b", -10.0, 0.9, 0.1, ParamNotation.POW2),),
+                axes=(ParamAxis("b", -10.0, 0.9, 0.05, ParamNotation.POW2),),
                 summary=r"The sweep of $\param{b}$ from $2^{-10}$ to $2^{0.9}$.",
             ),
             ParamGrid(
-                axes=(ParamAxis("b", 0.1, 10.0, 0.1, ParamNotation.POW2, ParamRounding.NEAREST_ODD_INTEGER),),
-                summary=r"The odd values of $\param{b}$ nearest to $2^{0.1 i}$, for $i$ from 1 to 100, each once.",
+                axes=(ParamAxis("b", 0.05, 10.0, 0.05, ParamNotation.POW2, ParamRounding.NEAREST_ODD_INTEGER),),
+                summary=r"The odd values of $\param{b}$ nearest to $2^{0.05 i}$, for $i$ from 1 to 200, each once.",
             ),
         )
 

@@ -109,13 +109,13 @@ class InverseTangent(Formula):
         """
         return (
             ParamGrid(
-                axes=(ParamAxis("b", -10.0, 50.0, 0.1, ParamNotation.POW2), ParamAxis("d", 1.0, 1.0, 1.0)),
+                axes=(ParamAxis("b", -10.0, 50.0, 0.25, ParamNotation.POW2), ParamAxis("d", 1.0, 1.0, 1.0)),
                 summary=r"The sweep of $\param{b}$ from $2^{-10}$ to $2^{50}$ at $\param{d} = 1$.",
             ),
             ParamGrid(
                 axes=(
                     ParamAxis("b", 30.0, 30.0, 1.0, ParamNotation.POW2),
-                    ParamAxis("d", -30.0, 0.0, 0.1, ParamNotation.POW2),
+                    ParamAxis("d", -30.0, 0.0, 0.25, ParamNotation.POW2),
                 ),
                 summary=r"The sweep of $\param{d}$ from $2^{-30}$ to 1 at $\param{b} = 2^{30}$.",
             ),

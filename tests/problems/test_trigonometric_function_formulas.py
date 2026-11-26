@@ -49,7 +49,7 @@ def test_inverse_tangent_at_d_equal_to_1_has_the_sign_of_x_minus_c_next_to_its_r
     candidates = [candidate for candidate in formula.build_all_candidates() if candidate.id.param_values[1] == 1.0]
 
     # --- act / assert -----------------
-    assert len(candidates) == 601  # the sweep of d ends at b = 2^30, d = 1, which the sweep of b holds too
+    assert len(candidates) == 241  # the sweep of d ends at b = 2^30, d = 1, which the sweep of b holds too
     for candidate in candidates:
         assert candidate.xc_fun(c, c) == 0.0, candidate.id
         assert candidate.xc_fun(math.nextafter(c, -math.inf), c) < 0.0, candidate.id
@@ -68,7 +68,7 @@ def test_inverse_tangent_keeps_full_precision_across_the_sweep_of_d():
     candidates = [candidate for candidate in formula.build_all_candidates() if candidate.b == 2.0**30]
 
     # --- act / assert -----------------
-    assert len(candidates) == 301
+    assert len(candidates) == 121
     with mpmath.workdps(MPMATH_DIGITS):
         for candidate in candidates:
             [_, d] = candidate.id.param_values
