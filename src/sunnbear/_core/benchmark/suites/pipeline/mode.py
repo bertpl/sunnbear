@@ -20,8 +20,11 @@ class PipelineMode(Enum):
 
     A setting belongs to the mode only when it sets how much work a stage does. The selection rules, such as the spacing
     stage's pass over a formula's candidates and the objective of `select_diverse_problem_ids`, are the same in every
-    mode. So is the number of candidates that `SpacingStage` aims to keep, although it sets the work of the stages after
-    spacing: a draft run then keeps about as many candidates for suite selection as a production run.
+    mode.
+
+    The number of candidates that `SpacingStage` aims to keep is the same in every mode too, so that a draft run keeps
+    about as many candidates for suite selection as a production run, even though that number sets how much work the
+    stages after spacing do.
 
     Attributes:
         coarse_characterization_stage_fidelity: The `FeatureFidelity` of `CoarseCharacterizationStage`.
