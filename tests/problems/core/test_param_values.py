@@ -241,3 +241,70 @@ def test_spell_value_in_latex_rejects_an_invalid_value():
     """A value that no notation spells is rejected, as by the canonical spelling."""
     with pytest.raises(ValueError, match="not a valid parameter value"):
         ParamNotation.spell_value_in_latex(0.1 + 0.2)
+
+
+# ==================================================================================================
+#  ParamNotation's texts for a reader
+# ==================================================================================================
+_IS_LOGARITHMIC_CASES = [
+    (ParamNotation.DECIMAL, False),
+    (ParamNotation.POW2, True),
+    (ParamNotation.POW10, True),
+    (ParamNotation.NEG_POW2, True),
+    (ParamNotation.NEG_POW10, True),
+]
+
+
+def test_is_logarithmic_cases_cover_every_notation():
+    """The cases of `test_is_logarithmic` name every notation."""
+    assert {notation for notation, _ in _IS_LOGARITHMIC_CASES} == set(ParamNotation)
+
+
+@pytest.mark.parametrize("notation, expected", _IS_LOGARITHMIC_CASES)
+def test_is_logarithmic(notation, expected):
+    """A power notation's grid of exponents is logarithmic, and a decimal's grid is not."""
+    assert notation.is_logarithmic is expected
+
+
+@pytest.mark.parametrize(
+    "notation, argument, expected",
+    [
+        (ParamNotation.DECIMAL, 0.4, "0.4"),
+        (ParamNotation.DECIMAL, -0.4, "-0.4"),  # a negative value gets no parentheses
+        (ParamNotation.DECIMAL, 0.1 + 0.2, "0.3"),  # the argument is rounded first
+        (ParamNotation.DECIMAL, 2e6, r"2 \cdot 10^{6}"),  # e-notation becomes a power of 10
+        (ParamNotation.DECIMAL, 1048576.0, "1048576"),  # a decimal stays a decimal, though 2^20 is shorter
+        (ParamNotation.POW2, 0.05, "2^{0.05}"),
+        (ParamNotation.POW10, -3.0, "10^{-3}"),
+        (ParamNotation.NEG_POW10, 0.3, "-10^{0.3}"),
+        (ParamNotation.POW10, 0.0, "1"),  # a power with exponent 0 or 1 is written as its value
+        (ParamNotation.POW10, 1.0, "10"),
+        (ParamNotation.POW2, 1.0, "2"),
+        (ParamNotation.NEG_POW2, 0.0, "-1"),
+        (ParamNotation.NEG_POW10, 1.0, "-10"),
+    ],
+)
+def test_spell_argument_in_latex(notation, argument, expected):
+    """A notation writes the value of an argument in LaTeX in that notation, and a power with exponent 0 or 1 as its
+    value."""
+    assert notation.spell_argument_in_latex(argument) == expected
+
+
+def test_spell_argument_in_latex_rejects_a_non_finite_argument():
+    """A non-finite argument is rejected, as when a value is built from it."""
+    with pytest.raises(ValueError, match="finite"):
+        ParamNotation.POW2.spell_argument_in_latex(float("nan"))
+
+
+@pytest.mark.parametrize(
+    "notation, step, expected",
+    [
+        (ParamNotation.DECIMAL, 0.2, "in steps of $0.2$"),
+        (ParamNotation.POW2, 0.05, "on a logarithmic scale, by factors of $2^{0.05}$"),
+        (ParamNotation.POW2, 1.0, "on a logarithmic scale, by factors of $2$"),
+        (ParamNotation.NEG_POW10, 0.2, "on a logarithmic scale, by factors of $10^{0.2}$"),  # the factor is positive
+    ],
+)
+def test_step_phrase(notation, step, expected):
+    """A decimal step adds to the value, and a step of a power notation multiplies it by a positive factor."""
+    assert notation.step_phrase(step) == expected

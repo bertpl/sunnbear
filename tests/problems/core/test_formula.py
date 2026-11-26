@@ -175,16 +175,18 @@ def test_latex_display_needs_a_presentation():
 #  Texts for a reader
 # ==================================================================================================
 def test_texts_for_a_reader_gather_every_text():
-    """A formula's texts for a reader are its meanings, its recipes' summaries and its presentation's texts."""
+    """A formula's texts for a reader are its meanings, its recipes' texts and its presentation's texts."""
     assert ExampleCubic().texts_for_a_reader() == (
         r"The sweep of $\param{p1}$ from 0 to 1.",
+        r"$0 \rightarrow 1$",
+        "All values from $0$ to $1$ in steps of $0.2$.",
         r"An example cubic, with 1 root for $\param{p1} \le 0$ and up to 3 roots for a larger $\param{p1}$.",
     )
 
 
 @pytest.mark.usefixtures("isolated_formula_registry")
 def test_texts_for_a_reader_without_a_presentation():
-    """A formula without a presentation has only its meanings and its recipes' summaries as texts for a reader."""
+    """A formula without a presentation has only its meanings and its recipes' texts as texts for a reader."""
     # --- arrange ----------------------
     params = (
         FormulaParam("m", latex_symbol="m", meaning="The slope of the line."),
@@ -193,4 +195,10 @@ def test_texts_for_a_reader_without_a_presentation():
     formula = _define_formula(params, None)()
 
     # --- act / assert -----------------
-    assert formula.texts_for_a_reader() == ("The slope of the line.",)
+    assert formula.texts_for_a_reader() == (
+        "The slope of the line.",
+        r"$-1 \rightarrow 1$",
+        "All values from $-1$ to $1$ in steps of $1$.",
+        r"$1 \rightarrow 2$",
+        "All values from $1$ to $2$ in steps of $1$.",
+    )

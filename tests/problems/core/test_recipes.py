@@ -30,6 +30,24 @@ def test_rounding_gives_the_nearest_integer_of_its_kind(rounding, value, expecte
     assert rounding.round_value(value) == expected
 
 
+_LATEX_OPERATOR_AND_PHRASE_CASES = [
+    (ParamRounding.NEAREST_INTEGER, r"\mathrm{round}", "rounded to the nearest integer"),
+    (ParamRounding.NEAREST_ODD_INTEGER, r"\mathrm{odd}", "rounded to the nearest odd integer"),
+    (ParamRounding.NEAREST_EVEN_INTEGER, r"\mathrm{even}", "rounded to the nearest even integer"),
+]
+
+
+def test_latex_operator_and_phrase_cases_cover_every_rounding():
+    """The cases of `test_rounding_latex_operator_and_phrase` name every rounding."""
+    assert {rounding for rounding, _, _ in _LATEX_OPERATOR_AND_PHRASE_CASES} == set(ParamRounding)
+
+
+@pytest.mark.parametrize("rounding, latex_operator, rounding_phrase", _LATEX_OPERATOR_AND_PHRASE_CASES)
+def test_rounding_latex_operator_and_phrase(rounding, latex_operator, rounding_phrase):
+    """Each rounding gives the operator of an axis's label and the phrase of its summary."""
+    assert (rounding.latex_operator, rounding.rounding_phrase) == (latex_operator, rounding_phrase)
+
+
 # ==================================================================================================
 #  ParamAxis
 # ==================================================================================================
@@ -467,3 +485,70 @@ def test_table_rejects_a_malformed_table(names, rows, message):
 def test_recipe_holds_its_summary(recipe, expected):
     """A grid or a table holds the summary that it is given, and None by default."""
     assert recipe.summary == expected
+
+
+# ==================================================================================================
+#  Texts for a reader
+# ==================================================================================================
+@pytest.mark.parametrize(
+    "axis, label, summary",
+    [
+        (
+            ParamAxis("b", 0.05, 10.0, 0.05, ParamNotation.POW2, ParamRounding.NEAREST_ODD_INTEGER),
+            r"$\mathrm{odd}(2^{0.05} \rightarrow 2^{10})$",
+            "All values from $2^{0.05}$ to $2^{10}$ on a logarithmic scale, by factors of $2^{0.05}$, rounded to the "
+            "nearest odd integer.",
+        ),
+        (
+            ParamAxis("n", 0.0, 3.0, 0.5, ParamNotation.POW10, ParamRounding.NEAREST_EVEN_INTEGER),
+            r"$\mathrm{even}(1 \rightarrow 10^{3})$",
+            "All values from $1$ to $10^{3}$ on a logarithmic scale, by factors of $10^{0.5}$, rounded to the nearest "
+            "even integer.",
+        ),
+        (
+            ParamAxis("w", -3.0, 1.0, 0.2, ParamNotation.POW10),
+            r"$10^{-3} \rightarrow 10$",
+            "All values from $10^{-3}$ to $10$ on a logarithmic scale, by factors of $10^{0.2}$.",
+        ),
+        (ParamAxis("p", -0.4, 2.0, 0.2), r"$-0.4 \rightarrow 2$", "All values from $-0.4$ to $2$ in steps of $0.2$."),
+        (ParamAxis("b", 30.0, 30.0, 1.0, ParamNotation.POW2), "$2^{30}$", "The single value $2^{30}$."),
+        # both grid points, 1 and 2^0.5, round to 1, so the axis has 1 value, written as that rounded value
+        (
+            ParamAxis("n", 0.0, 0.5, 0.5, ParamNotation.POW2, ParamRounding.NEAREST_INTEGER),
+            "$1$",
+            "The single value $1$.",
+        ),
+    ],
+)
+def test_axis_values_label_and_summary(axis, label, summary):
+    """An axis gives its `start`, `stop`, step and rounding in a label and a summary; an axis with 1 value gives only
+    that value."""
+    assert (axis.values_label, axis.values_summary) == (label, summary)
+
+
+@pytest.mark.parametrize("notation", list(ParamNotation))
+def test_axis_is_logarithmic_as_its_notation(notation):
+    """An axis is logarithmic exactly when its notation is."""
+    assert ParamAxis("p", 0.0, 1.0, 0.5, notation).is_logarithmic is notation.is_logarithmic
+
+
+@pytest.mark.parametrize(
+    "recipe, expected",
+    [
+        (
+            ParamGrid(axes=(ParamAxis("a", 0.0, 1.0, 0.5), ParamAxis("b", 1.0, 1.0, 1.0)), summary="The sweep."),
+            (
+                "The sweep.",
+                r"$0 \rightarrow 1$",
+                "All values from $0$ to $1$ in steps of $0.5$.",
+                "$1$",
+                "The single value $1$.",
+            ),
+        ),
+        (ParamTable(names=("n",), rows=((1.0,),), summary="The published values."), ("The published values.",)),
+        (ParamTable(names=("n",), rows=((1.0,),)), ()),
+    ],
+)
+def test_recipe_texts_for_a_reader(recipe, expected):
+    """A recipe's texts for a reader are its summary, if it has one, then each grid axis's label and summary."""
+    assert recipe.texts_for_a_reader() == expected

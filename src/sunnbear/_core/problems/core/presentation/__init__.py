@@ -21,7 +21,7 @@ A text is 1 of 2 kinds:
 - **LaTeX math:** each side of a definition, the expression and the interval. The whole text is math, with no ``$``.
 - **A text for a reader:** prose that marks its math as ``$…$`` inline and ``$$…$$`` for display, as mkdocs does. The
   texts for a reader are a presentation's summary, notes and parameter conditions, a parameter's meaning, a recipe's
-  summary and a category's description.
+  summary, a grid axis's values label and values summary, and a category's description.
 
 The LaTeX of both kinds uses this notation:
 

@@ -91,6 +91,32 @@ class ParamRounding(StrEnum):
             case _:
                 assert_never(self)
 
+    @property
+    def latex_operator(self) -> str:
+        r"""Return the LaTeX operator, such as ``\mathrm{odd}``, around `start` and `stop` in a rounded axis's label."""
+        match self:
+            case ParamRounding.NEAREST_INTEGER:
+                return r"\mathrm{round}"
+            case ParamRounding.NEAREST_ODD_INTEGER:
+                return r"\mathrm{odd}"
+            case ParamRounding.NEAREST_EVEN_INTEGER:
+                return r"\mathrm{even}"
+            case _:
+                assert_never(self)
+
+    @property
+    def rounding_phrase(self) -> str:
+        """Return the phrase that names this rounding, for use in a sentence for a reader."""
+        match self:
+            case ParamRounding.NEAREST_INTEGER:
+                return "rounded to the nearest integer"
+            case ParamRounding.NEAREST_ODD_INTEGER:
+                return "rounded to the nearest odd integer"
+            case ParamRounding.NEAREST_EVEN_INTEGER:
+                return "rounded to the nearest even integer"
+            case _:
+                assert_never(self)
+
 
 # ==================================================================================================
 #  ValuePositionRange
@@ -203,8 +229,73 @@ class ParamAxis:
         return tuple(value_position_ranges)
 
     # --------------------------------------------------------------------------
+    #  Texts for a reader
+    # --------------------------------------------------------------------------
+    @property
+    def is_logarithmic(self) -> bool:
+        """Return whether the axis's values lie on a logarithmic scale."""
+        return self.notation.is_logarithmic
+
+    @property
+    def values_label(self) -> str:
+        r"""Return a short text for a reader that gives the axis's values.
+
+        The text gives the axis's `start` and `stop`, written in the axis's notation, with an arrow between them; for an
+        axis with a rounding, the operator of that rounding encloses both, as in
+        ``$\mathrm{odd}(2^{0.05} \rightarrow 2^{10})$``.
+
+        A rounded axis's `start` and `stop` need not be values of the parameter: ``2^{0.05}`` is 1.035, and the values
+        of that axis start at 1.
+
+        An axis with 1 value gives that value alone.
+
+        The text names neither the parameter nor the number of values, and is in sunnbear's LaTeX notation, with its
+        math between dollar signs.
+        """
+        if len(self.values()) == 1:
+            return f"${self._latex_of_single_value}$"
+        else:
+            start_to_stop = rf"{self.notation.spell_argument_in_latex(self.start)} \rightarrow "
+            start_to_stop += self.notation.spell_argument_in_latex(self.stop)
+            if self.rounding is None:
+                return f"${start_to_stop}$"
+            else:
+                return f"${self.rounding.latex_operator}({start_to_stop})$"
+
+    @property
+    def values_summary(self) -> str:
+        """Return a sentence for a reader that gives the axis's values with their step and rounding.
+
+        An example: "All values from $2^{0.05}$ to $2^{10}$ on a logarithmic scale, by factors of $2^{0.05}$, rounded
+        to the nearest odd integer." An axis with 1 value gives "The single value $3$.". Like `values_label`, the
+        sentence gives the axis's `start` and `stop` and does not name the parameter.
+        """
+        if len(self.values()) == 1:
+            return f"The single value ${self._latex_of_single_value}$."
+        else:
+            start = self.notation.spell_argument_in_latex(self.start)
+            stop = self.notation.spell_argument_in_latex(self.stop)
+            summary = f"All values from ${start}$ to ${stop}$ {self.notation.step_phrase(self.step)}"
+            if self.rounding is None:
+                return f"{summary}."
+            else:
+                return f"{summary}, {self.rounding.rounding_phrase}."
+
+    # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
+    @property
+    def _latex_of_single_value(self) -> str:
+        """Return the LaTeX of the value of an axis with 1 value.
+
+        The value is the axis's `start`, written in the axis's notation; for a rounded axis, it is the axis's rounded
+        value, written as a decimal, because a rounded value need not be a power of the notation's base.
+        """
+        if self.rounding is None:
+            return self.notation.spell_argument_in_latex(self.start)
+        else:
+            return ParamNotation.DECIMAL.spell_argument_in_latex(self.values()[0])
+
     def _values_per_grid_point(self) -> tuple[float, ...]:
         """Return 1 value per grid point, repeated values included, rounded by the axis's `rounding` if it has one.
 
@@ -239,6 +330,13 @@ class ParamRecipe(ABC):
 
     summary: str | None = None
 
+    def texts_for_a_reader(self) -> tuple[str, ...]:
+        """Return the recipe's texts for a reader: its summary, if it has one."""
+        if self.summary is None:
+            return ()
+        else:
+            return (self.summary,)
+
     @abstractmethod
     def param_names(self) -> tuple[str, ...]:
         """Return the names of the recipe's parameters, in tuple position order."""
@@ -266,6 +364,11 @@ class ParamGrid(ParamRecipe):
     def param_names(self) -> tuple[str, ...]:
         """Return the axis names, in tuple position order."""
         return tuple(axis.param_name for axis in self.axes)
+
+    def texts_for_a_reader(self) -> tuple[str, ...]:
+        """Return the grid's texts for a reader: its summary, if it has one, then each axis's label and summary."""
+        axis_texts = (text for axis in self.axes for text in (axis.values_label, axis.values_summary))
+        return (*super().texts_for_a_reader(), *axis_texts)
 
     # --------------------------------------------------------------------------
     #  Coupled sweep
