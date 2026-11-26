@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add trigonometric functions to the standard function families of the test problems that the internal benchmark suite pipeline builds benchmark suites from
+
 ### Changed
 
 ### Deprecated
