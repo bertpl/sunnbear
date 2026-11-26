@@ -1,8 +1,8 @@
 """This module builds pipeline states on synthetic information, so that a test of 1 stage needs no earlier stage's work.
 
 `build_state_before` runs the state accessors of every stage before a given stage, writes example information through
-them, and returns the state, which then creates the given stage's accessor. `record_calls` records the information
-that a stage writes through 1 method of its accessor.
+them, and returns the state, which then creates the given stage's accessor; `build_finished_state` does the same for
+every stage. `record_calls` records the information that a stage writes through 1 method of its accessor.
 """
 
 from collections.abc import Mapping, Sequence
@@ -86,42 +86,36 @@ def build_state_before(
       `example_raw_feature_matrix`) with their block scales, the EDIs `edis` (by default 10 for each candidate), and
       no incorrect solve;
     - spacing: a minimum distance of 1, and no drop;
-    - core selection: each candidate's tier from its EDI, and a Core of every candidate, which no max-div run
-      selected.
+    - suite selection: each candidate's tier from its EDI, and 2 suites that no max-div run selected, with no EDI
+      ranges and a diversity score of 1: `sb-<size>a` holds the first half of the candidates, rounded down, and
+      `sb-<size>b` the others.
     """
     state = PipelineState()
     if raw_feature_matrix is None:
         raw_feature_matrix = example_raw_feature_matrix(problem_ids)
     edis = edis if edis is not None else dict.fromkeys(problem_ids, 10.0)
     for earlier_stage_id in list(PipelineStageId)[: list(PipelineStageId).index(stage_id)]:
-        accessor = state.create_state_accessor(earlier_stage_id)
-        match earlier_stage_id:
-            case PipelineStageId.CANDIDATE_GENERATION:
-                accessor.add_candidates(dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0)))
-            case PipelineStageId.CANDIDATE_VALIDATION:
-                accessor.set_c_ranges(dict.fromkeys(problem_ids, c_range))
-            case PipelineStageId.COARSE_CHARACTERIZATION | PipelineStageId.FINE_CHARACTERIZATION:
-                accessor.set_characterization_results(example_characterization_results(raw_feature_matrix, edis))
-            case PipelineStageId.SPACING:
-                accessor.set_spacing_min_distance(1.0)
-                accessor.set_nearest_kept_candidates({})
-            case PipelineStageId.CORE_SELECTION:
-                accessor.set_difficulty_tiers(
-                    {
-                        problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
-                        for problem_id, edi in edis.items()
-                    }
-                )
-                accessor.set_core_selection_details(
-                    SuiteSelectionDetails(
-                        benchmark_suite=BenchmarkSuite(
-                            name=f"sb-{len(problem_ids)}", aliases=(), problem_ids=tuple(problem_ids)
-                        ),
-                        edi_range_by_tier=None,
-                        diversity=None,
-                    )
-                )
-        state.finish_stage(earlier_stage_id)
+        _run_example_stage(state, earlier_stage_id, problem_ids, raw_feature_matrix, edis, c_range)
+    return state
+
+
+def build_finished_state(
+    problem_ids: Sequence[ProblemId], *, edis: Mapping[ProblemId, float] | None = None
+) -> PipelineState:
+    """Return a state in which every stage has run on `problem_ids` and kept them all.
+
+    The stages write the example information that `build_state_before` describes, with the EDIs `edis`.
+    """
+    last_stage_id = list(PipelineStageId)[-1]
+    state = build_state_before(last_stage_id, problem_ids, edis=edis)
+    _run_example_stage(
+        state,
+        last_stage_id,
+        problem_ids,
+        example_raw_feature_matrix(problem_ids),
+        edis if edis is not None else dict.fromkeys(problem_ids, 10.0),
+        _DEFAULT_C_RANGE,
+    )
     return state
 
 
@@ -140,3 +134,50 @@ def record_calls(monkeypatch: pytest.MonkeyPatch, accessor_cls: type, method_nam
 
     monkeypatch.setattr(accessor_cls, method_name, recording_method)
     return calls
+
+
+# ==================================================================================================
+#  Helpers
+# ==================================================================================================
+def _run_example_stage(
+    state: PipelineState,
+    stage_id: PipelineStageId,
+    problem_ids: Sequence[ProblemId],
+    raw_feature_matrix: FeatureMatrix,
+    edis: Mapping[ProblemId, float],
+    c_range: CRange,
+) -> None:
+    """Write the example information of the stage `stage_id` through its accessor, then finish the stage."""
+    accessor = state.create_state_accessor(stage_id)
+    match stage_id:
+        case PipelineStageId.CANDIDATE_GENERATION:
+            accessor.add_candidates(dict.fromkeys(problem_ids, IntervalBounds(a=-1.0, b=1.0)))
+        case PipelineStageId.CANDIDATE_VALIDATION:
+            accessor.set_c_ranges(dict.fromkeys(problem_ids, c_range))
+        case PipelineStageId.COARSE_CHARACTERIZATION | PipelineStageId.FINE_CHARACTERIZATION:
+            accessor.set_characterization_results(example_characterization_results(raw_feature_matrix, edis))
+        case PipelineStageId.SPACING:
+            accessor.set_spacing_min_distance(1.0)
+            accessor.set_nearest_kept_candidates({})
+        case PipelineStageId.SUITE_SELECTION:
+            accessor.set_difficulty_tiers(
+                {
+                    problem_id: DifficultyTier.from_edi(edi, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS)
+                    for problem_id, edi in edis.items()
+                }
+            )
+            n_a_suite = len(problem_ids) // 2
+            accessor.set_suite_selection_details(
+                {
+                    suite.name: SuiteSelectionDetails(benchmark_suite=suite, edi_range_by_tier={}, diversity=1.0)
+                    for suite in (
+                        BenchmarkSuite(name=f"sb-{n_a_suite}a", aliases=(), problem_ids=tuple(problem_ids[:n_a_suite])),
+                        BenchmarkSuite(
+                            name=f"sb-{len(problem_ids) - n_a_suite}b",
+                            aliases=(),
+                            problem_ids=tuple(problem_ids[n_a_suite:]),
+                        ),
+                    )
+                }
+            )
+    state.finish_stage(stage_id)

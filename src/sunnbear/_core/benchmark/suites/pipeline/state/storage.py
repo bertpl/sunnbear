@@ -42,11 +42,9 @@ class PipelineStateStorage:
         characterization_results: The results of each characterization stage, keyed by its `PipelineStageId`.
         spacing_min_distance: The minimum distance that spacing chose for its pass over each formula's candidates.
         nearest_kept_candidates: Spacing's nearest kept candidate of each candidate that it drops.
-        difficulty_tiers: Core selection's difficulty tier of each candidate that it receives.
-        core_selection_details: Core selection's `SuiteSelectionDetails` of the Core.
-        distilled_suite_selection_details: Distillation's `SuiteSelectionDetails` of each suite that it selects, keyed
-            by the suite's name, in the order that `DistillationStateAccessor.set_distilled_suite_selection_details`
-            states.
+        difficulty_tiers: Suite selection's difficulty tier of each candidate that it receives.
+        suite_selection_details: Suite selection's `SuiteSelectionDetails` of each suite that it selects, keyed by the
+            suite's name, in the order that `SuiteSelectionStateAccessor.set_suite_selection_details` states.
     """
 
     candidate_registry: CandidateRegistry = field(default_factory=CandidateRegistry)
@@ -56,8 +54,7 @@ class PipelineStateStorage:
     spacing_min_distance: float | None = None
     nearest_kept_candidates: dict[ProblemId, NearestKeptCandidate] | None = None
     difficulty_tiers: dict[ProblemId, DifficultyTier] | None = None
-    core_selection_details: SuiteSelectionDetails | None = None
-    distilled_suite_selection_details: dict[str, SuiteSelectionDetails] | None = None
+    suite_selection_details: dict[str, SuiteSelectionDetails] | None = None
 
     def unwritten_structure_names(self, stage_id: PipelineStageId) -> list[str]:
         """Return the names of the structures of the stage `stage_id` that the stage has not written yet."""
@@ -74,12 +71,9 @@ class PipelineStateStorage:
             PipelineStageId.FINE_CHARACTERIZATION: {
                 "characterization_results": PipelineStageId.FINE_CHARACTERIZATION in self.characterization_results
             },
-            PipelineStageId.CORE_SELECTION: {
+            PipelineStageId.SUITE_SELECTION: {
                 "difficulty_tiers": self.difficulty_tiers is not None,
-                "core_selection_details": self.core_selection_details is not None,
-            },
-            PipelineStageId.DISTILLATION: {
-                "distilled_suite_selection_details": self.distilled_suite_selection_details is not None,
+                "suite_selection_details": self.suite_selection_details is not None,
             },
         }
         is_written_by_name = is_written_by_name_per_stage[stage_id]
@@ -131,23 +125,16 @@ class PipelineStateStorage:
 
     def _json_contents(self) -> dict[str, Any]:
         """Return the structures that are not tables, and each characterization's solver ids and fidelity, as JSON."""
-        if self.core_selection_details is not None:
-            core_selection_details = self.core_selection_details.to_json_values()
+        if self.suite_selection_details is not None:
+            suite_selection_details = [details.to_json_values() for details in self.suite_selection_details.values()]
         else:
-            core_selection_details = None
-        if self.distilled_suite_selection_details is not None:
-            distilled_suite_selection_details = [
-                details.to_json_values() for details in self.distilled_suite_selection_details.values()
-            ]
-        else:
-            distilled_suite_selection_details = None
+            suite_selection_details = None
         return {
             "characterizations": {
                 stage_id.value: results.to_json_values() for stage_id, results in self.characterization_results.items()
             },
             "spacing_min_distance": self.spacing_min_distance,
-            "core_selection_details": core_selection_details,
-            "distilled_suite_selection_details": distilled_suite_selection_details,
+            "suite_selection_details": suite_selection_details,
         }
 
     @staticmethod
@@ -193,15 +180,11 @@ class PipelineStateStorage:
                     storage, name, dict(zip(problem_ids, map(build_value, table.iter_rows(named=True)), strict=True))
                 )
         storage.spacing_min_distance = json_contents["spacing_min_distance"]
-        if json_contents["core_selection_details"] is not None:
-            storage.core_selection_details = SuiteSelectionDetails.from_json_values(
-                json_contents["core_selection_details"]
+        if json_contents["suite_selection_details"] is not None:
+            suite_selection_details = map(
+                SuiteSelectionDetails.from_json_values, json_contents["suite_selection_details"]
             )
-        if json_contents["distilled_suite_selection_details"] is not None:
-            distilled_suite_selection_details = map(
-                SuiteSelectionDetails.from_json_values, json_contents["distilled_suite_selection_details"]
-            )
-            storage.distilled_suite_selection_details = {
-                details.benchmark_suite.name: details for details in distilled_suite_selection_details
+            storage.suite_selection_details = {
+                details.benchmark_suite.name: details for details in suite_selection_details
             }
         return storage

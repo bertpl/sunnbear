@@ -208,37 +208,30 @@ class NearestKeptCandidate:
 # ==================================================================================================
 @dataclass(frozen=True)
 class SuiteSelectionDetails:
-    """`SuiteSelectionDetails` records how core selection or distillation selected 1 suite.
+    """`SuiteSelectionDetails` records how suite selection selected 1 suite.
 
     These details are part of the build details of a pipeline run; a user of the suite needs only its `BenchmarkSuite`.
 
     Attributes:
         benchmark_suite: The selected suite.
         edi_range_by_tier: Per tier, the smallest and the largest EDI of the candidates assigned that tier, among all
-            the input candidates of the max-div run that selected the suite, not only the selected ones; the ranges
-            show where `DifficultyTierAssignment.from_pool` moved the limits between tiers.
-
-            ``None`` for a suite that no run selects, such as the largest suite of the b-series, which is the rest of
-            the Core.
-        diversity: The diversity score of that max-div run; ``None`` for a suite that no run selects.
+            the candidates that the suite was selected from, not only the selected ones; the ranges show where
+            `DifficultyTierAssignment.from_pool` moved the limits between tiers.
+        diversity: The diversity score of the suite's own test problems, which `compute_diversity_score` gives.
     """
 
     benchmark_suite: BenchmarkSuite
-    edi_range_by_tier: Mapping[DifficultyTier, tuple[float, float]] | None
-    diversity: float | None
+    edi_range_by_tier: Mapping[DifficultyTier, tuple[float, float]]
+    diversity: float
 
     def to_json_values(self) -> dict[str, Any]:
         """Return the details as JSON values, under the keys ``benchmark_suite``, ``edi_range_by_tier``, ``diversity``.
 
         Each tier's EDI range is a list of 2 numbers, keyed by the tier's value.
         """
-        if self.edi_range_by_tier is not None:
-            edi_range_by_tier = {tier.value: list(edi_range) for tier, edi_range in self.edi_range_by_tier.items()}
-        else:
-            edi_range_by_tier = None
         return {
             "benchmark_suite": self.benchmark_suite.to_json_values(),
-            "edi_range_by_tier": edi_range_by_tier,
+            "edi_range_by_tier": {tier.value: list(edi_range) for tier, edi_range in self.edi_range_by_tier.items()},
             "diversity": self.diversity,
         }
 
@@ -252,15 +245,11 @@ class SuiteSelectionDetails:
         Raises:
             ValueError: If an EDI range is keyed by a value that is not a `DifficultyTier`.
         """
-        if json_values["edi_range_by_tier"] is not None:
-            edi_range_by_tier = {
-                DifficultyTier(tier_value): (lower, upper)
-                for tier_value, (lower, upper) in json_values["edi_range_by_tier"].items()
-            }
-        else:
-            edi_range_by_tier = None
         return cls(
             benchmark_suite=BenchmarkSuite.from_json_values(json_values["benchmark_suite"]),
-            edi_range_by_tier=edi_range_by_tier,
+            edi_range_by_tier={
+                DifficultyTier(tier_value): (lower, upper)
+                for tier_value, (lower, upper) in json_values["edi_range_by_tier"].items()
+            },
             diversity=json_values["diversity"],
         )

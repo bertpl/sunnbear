@@ -17,12 +17,12 @@ from .difficulty_tier import DifficultyTier
 class DifficultyTierQuotas:
     """A `DifficultyTierQuotas` gives each tier the exact number of the selected candidates that count toward it.
 
-    Each tier's quota is `selection_size` times the tier's `core_share`. The candidates that count toward a tier are
+    Each tier's quota is `selection_size` times the tier's `quota_share`. The candidates that count toward a tier are
     those with that assigned tier, which `DifficultyTierAssignment` gives.
 
     Attributes:
         selection_size: The number of candidates of the selection; a positive multiple of the denominator of every
-            tier's `core_share`, so that every tier's quota is whole and at least 1.
+            tier's `quota_share`, so that every tier's quota is whole and at least 1.
     """
 
     selection_size: int
@@ -32,9 +32,9 @@ class DifficultyTierQuotas:
 
         Raises:
             ValueError: If `selection_size` is not a positive multiple of the denominator of every tier's
-                `core_share`.
+                `quota_share`.
         """
-        size_divisor = math.lcm(*(tier.core_share.denominator for tier in DifficultyTier))
+        size_divisor = math.lcm(*(tier.quota_share.denominator for tier in DifficultyTier))
         if self.selection_size <= 0 or self.selection_size % size_divisor != 0:
             raise ValueError(
                 f"A selection of {self.selection_size} candidates gives some tier a quota that is not a positive "
@@ -44,7 +44,7 @@ class DifficultyTierQuotas:
     @property
     def quota_by_tier(self) -> dict[DifficultyTier, int]:
         """Return each tier's quota, in the order of `DifficultyTier`."""
-        return {tier: int(self.selection_size * tier.core_share) for tier in DifficultyTier}
+        return {tier: int(self.selection_size * tier.quota_share) for tier in DifficultyTier}
 
     def check_selection(self, selected_assigned_tiers: Sequence[DifficultyTier]) -> None:
         """Stop the pipeline unless the selected candidates, given by their assigned tiers, meet every quota exactly.

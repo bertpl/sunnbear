@@ -3,7 +3,7 @@
 - `DifficultyTier.from_edi` buckets an EDI by its ratio to `n_bisection_fevals`;
 - each tier's EDI range starts where the range of the tier before it ends;
 - an EDI's ratio distance to a range is the factor by which the EDI lies outside the range;
-- each tier fills its fixed share of the Core.
+- each tier fills its fixed share of every benchmark suite.
 """
 
 from fractions import Fraction
@@ -54,7 +54,7 @@ def test_the_ratio_distance_is_the_factor_outside_the_range(edi, distance_expect
     assert DifficultyTier.C.edi_ratio_distance(edi, 40) == distance_expected
 
 
-def test_each_tier_fills_a_quarter_of_the_core():
-    """Each tier fills 1/4 of the Core."""
+def test_each_tier_fills_a_quarter_of_every_benchmark_suite():
+    """Each tier's quota is 1/4 of a benchmark suite."""
     # --- act / assert -----------------
-    assert [difficulty_tier.core_share for difficulty_tier in DifficultyTier] == [Fraction(1, 4)] * 4
+    assert [difficulty_tier.quota_share for difficulty_tier in DifficultyTier] == [Fraction(1, 4)] * 4

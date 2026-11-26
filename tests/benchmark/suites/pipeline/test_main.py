@@ -20,8 +20,8 @@ from sunnbear._core.benchmark.suites.pipeline.state import PipelineState
 from sunnbear._core.problems.core import FormulaRegistry
 
 _PIPELINE_PACKAGE = "sunnbear._core.benchmark.suites.pipeline"
-# Core selection stops the run of the first test, so these stages are the ones that run to their end.
-_FINISHED_STAGE_IDS = list(PipelineStageId)[:-2]
+# Suite selection stops the run of the first test, so these stages are the ones that run to their end.
+_FINISHED_STAGE_IDS = list(PipelineStageId)[:-1]
 
 
 def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> None:
@@ -38,8 +38,8 @@ def _run_pipeline_command(monkeypatch: pytest.MonkeyPatch, args: list[str]) -> N
 @pytest.mark.only_with_numba_jit
 def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeypatch, capsys):
     """In draft mode, the command writes each stage's manifest into the workspace with the given number of workers,
-    until core selection stops the run, because the test's candidates fill no Core. Fine characterization runs at its
-    draft fidelity.
+    until suite selection stops the run, because the test's candidates fill no 2 benchmark suites. Fine
+    characterization runs at its draft fidelity.
 
     It prints 1 line per stage that ran to its end, in run order, with its counts of candidates, then validation's
     rejections per formula, then the stop, and exits with status 1."""
@@ -58,7 +58,9 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
     assert exc_info.value.code == 1
     [*printed_lines, stop_line] = capsys.readouterr().out.splitlines()
     stage_lines, rejection_lines = printed_lines[: len(_FINISHED_STAGE_IDS)], printed_lines[len(_FINISHED_STAGE_IDS) :]
-    assert stop_line.startswith(f"{PipelineStageId.CORE_SELECTION}: stopped: The candidates fill no Core of 128")
+    assert stop_line.startswith(
+        f"{PipelineStageId.SUITE_SELECTION}: stopped: The candidates fill no 2 benchmark suites of 64"
+    )
     assert [line.split(":")[0] for line in stage_lines] == _FINISHED_STAGE_IDS
     assert all(re.fullmatch(r"\w+: \d+ of \d+ candidates kept, in [0-9.]+ s", line) for line in stage_lines)
     # Validation rejects candidates of formulas 1.4.2.x, so the rejection lines start with 1 line that counts the
@@ -80,7 +82,7 @@ def test_the_command_runs_every_stage_into_the_given_workspace(tmp_path, monkeyp
 
 def test_the_command_exits_normally_when_no_stage_stops_the_run(tmp_path, monkeypatch, capsys):
     """When every stage runs to its end, the command prints no stop and returns without an exit status; the test
-    replaces the run by one that ran no stage, because the shipped formulas take long to fill a Core."""
+    replaces the run by one that ran no stage, because the shipped formulas take long to fill the benchmark suites."""
     # --- arrange ----------------------
     monkeypatch.setattr(
         runner,

@@ -35,11 +35,11 @@ def _accessor(stage_id: PipelineStageId) -> PipelineStateAccessor:
 
 
 def _selection_details(name: str, problem_ids: list) -> SuiteSelectionDetails:
-    """Return the selection details of a suite of `problem_ids` that no max-div run selected."""
+    """Return the selection details of a suite of `problem_ids` that no max-div run selected, with no EDI ranges."""
     return SuiteSelectionDetails(
         benchmark_suite=BenchmarkSuite(name=name, aliases=(), problem_ids=tuple(problem_ids)),
-        edi_range_by_tier=None,
-        diversity=None,
+        edi_range_by_tier={},
+        diversity=1.0,
     )
 
 
@@ -57,16 +57,12 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
         ),
     ),
     "difficulty_tiers": (
-        PipelineStageId.CORE_SELECTION,
+        PipelineStageId.SUITE_SELECTION,
         lambda accessor, problem_ids: accessor.set_difficulty_tiers(dict.fromkeys(problem_ids, DifficultyTier.A)),
     ),
-    "core_selection_details": (
-        PipelineStageId.CORE_SELECTION,
-        lambda accessor, problem_ids: accessor.set_core_selection_details(_selection_details("sb-3", problem_ids)),
-    ),
-    "distilled_suite_selection_details": (
-        PipelineStageId.DISTILLATION,
-        lambda accessor, problem_ids: accessor.set_distilled_suite_selection_details(
+    "suite_selection_details": (
+        PipelineStageId.SUITE_SELECTION,
+        lambda accessor, problem_ids: accessor.set_suite_selection_details(
             {
                 "sb-2a": _selection_details("sb-2a", problem_ids[:2]),
                 "sb-1b": _selection_details("sb-1b", problem_ids[2:]),
@@ -187,12 +183,12 @@ def test_spacing_has_no_scaled_features_without_scales():
 
 
 def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier():
-    """Core selection's pool holds each candidate's scaled features and EDI from fine characterization, and the tier of
+    """Suite selection's pool holds each candidate's scaled features and EDI from fine characterization, and the tier of
     that EDI for `DEFAULT_N_BISECTION_FEVALS`, in the order of candidate generation."""
     # --- arrange ----------------------
     edis = dict(zip(_PROBLEM_IDS, [5.0, 30.0, 15.0], strict=True))
-    accessor = build_state_before(PipelineStageId.CORE_SELECTION, _PROBLEM_IDS, edis=edis).create_state_accessor(
-        PipelineStageId.CORE_SELECTION
+    accessor = build_state_before(PipelineStageId.SUITE_SELECTION, _PROBLEM_IDS, edis=edis).create_state_accessor(
+        PipelineStageId.SUITE_SELECTION
     )
 
     # --- act --------------------------
@@ -206,12 +202,12 @@ def test_the_candidate_pool_pairs_each_candidate_with_its_features_edi_and_tier(
 
 
 def test_the_candidate_pool_needs_the_scales():
-    """Core selection's accessor gives no pool after fine characterization kept 1 candidate only, which leaves fine
+    """Suite selection's accessor gives no pool after fine characterization kept 1 candidate only, which leaves fine
     characterization without scales."""
     # --- arrange ----------------------
     accessor_without_scales = build_state_before(
-        PipelineStageId.CORE_SELECTION, _PROBLEM_IDS[:1]
-    ).create_state_accessor(PipelineStageId.CORE_SELECTION)
+        PipelineStageId.SUITE_SELECTION, _PROBLEM_IDS[:1]
+    ).create_state_accessor(PipelineStageId.SUITE_SELECTION)
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="needs the scales of fine characterization"):

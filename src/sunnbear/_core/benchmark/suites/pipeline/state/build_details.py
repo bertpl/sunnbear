@@ -137,26 +137,19 @@ class BenchmarkSuitesBuildDetails:
         return self._copy_if_finished(PipelineStageId.SPACING, self._storage.nearest_kept_candidates)
 
     def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier] | None:
-        """Return core selection's difficulty tier of each candidate that core selection received.
+        """Return suite selection's difficulty tier of each candidate that suite selection received.
 
-        Return ``None`` when core selection did not finish.
+        Return ``None`` when suite selection did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.difficulty_tiers)
+        return self._copy_if_finished(PipelineStageId.SUITE_SELECTION, self._storage.difficulty_tiers)
 
-    def core_selection_details(self) -> SuiteSelectionDetails | None:
-        """Return core selection's `SuiteSelectionDetails` of the Core.
+    def suite_selection_details(self) -> dict[str, SuiteSelectionDetails] | None:
+        """Return suite selection's `SuiteSelectionDetails` of each suite, keyed by the suite's name.
 
-        Return ``None`` when core selection did not finish.
+        The suites follow the order that `SuiteSelectionStateAccessor.set_suite_selection_details` states. Return
+        ``None`` when suite selection did not finish.
         """
-        return self._copy_if_finished(PipelineStageId.CORE_SELECTION, self._storage.core_selection_details)
-
-    def distilled_suite_selection_details(self) -> dict[str, SuiteSelectionDetails] | None:
-        """Return distillation's `SuiteSelectionDetails` of each suite, keyed by the suite's name.
-
-        The suites follow the order that `DistillationStateAccessor.set_distilled_suite_selection_details` states.
-        Return ``None`` when distillation did not finish.
-        """
-        return self._copy_if_finished(PipelineStageId.DISTILLATION, self._storage.distilled_suite_selection_details)
+        return self._copy_if_finished(PipelineStageId.SUITE_SELECTION, self._storage.suite_selection_details)
 
     # --------------------------------------------------------------------------
     #  Tables
@@ -272,24 +265,24 @@ class BenchmarkSuitesBuildDetails:
     def suite_tier_counts(self) -> pl.DataFrame | None:
         """Return 1 row per selected suite, with its number of test problems per difficulty tier.
 
-        The rows list the Core, then the distilled suites in the order of `distilled_suite_selection_details`; they list
-        the Core alone when distillation did not finish. The columns are:
+        The rows follow the order of `suite_selection_details`. The columns are:
 
         - ``suite_name`` and ``size``;
         - 1 column ``n_candidates_<tier>`` per `DifficultyTier`, with the tier's value in lower case;
-        - ``diversity``, the diversity score of the max-div run that selected the suite, null for a suite that no run
-          selects.
+        - ``diversity``, the diversity score of the suite's own test problems.
 
-        Return ``None`` when core selection did not finish.
+        The counts are of difficulty tiers, which follow from the EDIs alone; a suite's quotas count assigned tiers, so
+        the 2 differ for a suite whose selection moved the limits between tiers.
+
+        Return ``None`` when suite selection did not finish.
         """
-        core_selection_details = self.core_selection_details()
+        suite_selection_details = self.suite_selection_details()
         difficulty_tiers = self.difficulty_tiers()
-        if core_selection_details is None or difficulty_tiers is None:
+        if suite_selection_details is None or difficulty_tiers is None:
             return None
         else:
-            all_selection_details = self._all_selection_details(core_selection_details)
             rows = []
-            for selection_details in all_selection_details:
+            for selection_details in suite_selection_details.values():
                 suite = selection_details.benchmark_suite
                 tier_counts = Counter(difficulty_tiers[problem_id] for problem_id in suite.problem_ids)
                 rows.append(
@@ -300,7 +293,7 @@ class BenchmarkSuitesBuildDetails:
                         "diversity": selection_details.diversity,
                     }
                 )
-            return pl.DataFrame(rows, schema_overrides={"diversity": pl.Float64()})
+            return pl.DataFrame(rows)
 
     def suite_tier_quotas(self) -> pl.DataFrame | None:
         """Return 1 row per selected suite, with its quota per difficulty tier.
@@ -313,15 +306,14 @@ class BenchmarkSuitesBuildDetails:
         - 1 column ``quota_<tier>`` per `DifficultyTier`, named with the tier's value in lower case and holding the
           quota that `DifficultyTierQuotas` gives for the suite's size.
 
-        Return ``None`` when core selection did not finish.
+        Return ``None`` when suite selection did not finish.
         """
-        core_selection_details = self.core_selection_details()
-        if core_selection_details is None:
+        suite_selection_details = self.suite_selection_details()
+        if suite_selection_details is None:
             return None
         else:
-            all_selection_details = self._all_selection_details(core_selection_details)
             rows = []
-            for selection_details in all_selection_details:
+            for selection_details in suite_selection_details.values():
                 size = len(selection_details.benchmark_suite.problem_ids)
                 quota_by_tier = DifficultyTierQuotas(selection_size=size).quota_by_tier
                 rows.append(
@@ -344,8 +336,7 @@ class BenchmarkSuitesBuildDetails:
         - ``run.json`` holds the ids of the finished stages, and the stage that stopped the run and why, or ``null``
           when no stage stopped it;
         - ``storage.json`` holds the information that is not per candidate: each characterization stage's fidelity and
-          solver ids, spacing's minimum distance, and the `SuiteSelectionDetails` of the Core and of each distilled
-          suite;
+          solver ids, spacing's minimum distance, and the `SuiteSelectionDetails` of each suite;
         - each structure of `PipelineStateStorage` that holds information per candidate is 1 Parquet table, named after
           the structure, with 1 row per candidate that the structure covers and the candidate's id in the column
           ``problem_id``. The table ``candidate_registry`` holds every candidate, with the stage and reason of its drop
@@ -404,10 +395,6 @@ class BenchmarkSuitesBuildDetails:
             return copy.deepcopy(information)
         else:
             return None
-
-    def _all_selection_details(self, core_selection_details: SuiteSelectionDetails) -> list[SuiteSelectionDetails]:
-        """Return the `SuiteSelectionDetails` of the Core, then those of the distilled suites in their order."""
-        return [core_selection_details, *(self.distilled_suite_selection_details() or {}).values()]
 
     # --------------------------------------------------------------------------
     #  Factory methods

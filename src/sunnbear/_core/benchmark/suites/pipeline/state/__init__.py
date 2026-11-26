@@ -20,12 +20,10 @@ from .accessors import (
     CandidateValidationStateAccessor,
     CharacterizationStateAccessor,
     CoarseCharacterizationStateAccessor,
-    CoreSelectionStateAccessor,
-    DistillationStateAccessor,
     FineCharacterizationStateAccessor,
     PipelineStateAccessor,
-    SelectionStateAccessor,
     SpacingStateAccessor,
+    SuiteSelectionStateAccessor,
 )
 from .build_details import BenchmarkSuitesBuildDetails
 from .candidate_registry import CandidateDrop, CandidateRegistry

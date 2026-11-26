@@ -31,6 +31,7 @@ from sunnbear._core.benchmark.suites.pipeline.state import (
 from sunnbear._core.problems.core import FormulaRegistry
 from tests.benchmark.suites.pipeline.example_formulas import define_formula_cls
 from tests.benchmark.suites.pipeline.example_states import (
+    build_finished_state,
     build_state_before,
     example_problem_ids,
     example_raw_feature_matrix,
@@ -46,9 +47,9 @@ def _characterize_with_bisection_only(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(DiversityFeatureFactory, "solver_ids", property(lambda self: ("bisection",)))
 
 
-def _distilled_state() -> PipelineState:
-    """Return a state in which every stage finished: validation rejected 2 candidates, spacing dropped 1, core
-    selection kept the 2 remaining ones in the Core `sb-2`, and distillation split it into `sb-1a` and `sb-1b`."""
+def _finished_state() -> PipelineState:
+    """Return a state in which every stage finished: validation rejected 2 candidates, spacing dropped 1, and suite
+    selection kept the 2 remaining ones in the suites `sb-1a` and `sb-1b`."""
     state = PipelineState()
     accessor = state.create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)
     accessor.add_candidates(dict.fromkeys(_PROBLEM_IDS, IntervalBounds(a=-1.0, b=1.0)))
@@ -78,18 +79,9 @@ def _distilled_state() -> PipelineState:
                 {_PROBLEM_IDS[2]: NearestKeptCandidate(problem_id=_PROBLEM_IDS[1], distance=0.5)}
             )
             state.finish_stage(PipelineStageId.SPACING)
-    accessor = state.create_state_accessor(PipelineStageId.CORE_SELECTION)
+    accessor = state.create_state_accessor(PipelineStageId.SUITE_SELECTION)
     accessor.set_difficulty_tiers({_PROBLEM_IDS[1]: DifficultyTier.A, _PROBLEM_IDS[4]: DifficultyTier.B})
-    accessor.set_core_selection_details(
-        SuiteSelectionDetails(
-            benchmark_suite=BenchmarkSuite(name="sb-2", aliases=(), problem_ids=(_PROBLEM_IDS[1], _PROBLEM_IDS[4])),
-            edi_range_by_tier={DifficultyTier.A: (5.0, 9.5), DifficultyTier.B: (10.0, 10.0)},
-            diversity=0.25,
-        )
-    )
-    state.finish_stage(PipelineStageId.CORE_SELECTION)
-    accessor = state.create_state_accessor(PipelineStageId.DISTILLATION)
-    accessor.set_distilled_suite_selection_details(
+    accessor.set_suite_selection_details(
         {
             "sb-1a": SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)),
@@ -98,12 +90,12 @@ def _distilled_state() -> PipelineState:
             ),
             "sb-1b": SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)),
-                edi_range_by_tier=None,
-                diversity=None,
+                edi_range_by_tier={DifficultyTier.A: (6.0, 9.5), DifficultyTier.B: (10.0, 10.0)},
+                diversity=0.75,
             ),
         }
     )
-    state.finish_stage(PipelineStageId.DISTILLATION)
+    state.finish_stage(PipelineStageId.SUITE_SELECTION)
     return state
 
 
@@ -121,15 +113,15 @@ def test_the_build_details_refuse_a_finished_stage_without_its_information(stage
 
 
 def test_the_build_details_hold_only_the_information_of_finished_stages():
-    """Core selection stored the difficulty tiers, then stopped the run, so the build details hold the stop, the
-    information of the stages before core selection, and none of core selection's."""
+    """Suite selection stored the difficulty tiers, then stopped the run, so the build details hold the stop, the
+    information of the stages before suite selection, and none of suite selection's."""
     # --- arrange ----------------------
     problem_ids = example_problem_ids(3)
-    state = build_state_before(PipelineStageId.CORE_SELECTION, problem_ids)
-    state.create_state_accessor(PipelineStageId.CORE_SELECTION).set_difficulty_tiers(
+    state = build_state_before(PipelineStageId.SUITE_SELECTION, problem_ids)
+    state.create_state_accessor(PipelineStageId.SUITE_SELECTION).set_difficulty_tiers(
         dict.fromkeys(problem_ids, DifficultyTier.A)
     )
-    stop = PipelineStop(stage_id=PipelineStageId.CORE_SELECTION, reason="too few candidates")
+    stop = PipelineStop(stage_id=PipelineStageId.SUITE_SELECTION, reason="too few candidates")
 
     # --- act --------------------------
     build_details = state.create_build_details(stop=stop)
@@ -147,7 +139,7 @@ def test_the_build_details_count_the_drops_per_formula_stage_and_reason():
     """The drop counts hold validation's 2 rejections and spacing's drop, in run order, and the candidate counts give
     per formula what each stage received and kept."""
     # --- act --------------------------
-    build_details = _distilled_state().create_build_details()
+    build_details = _finished_state().create_build_details()
 
     # --- assert -----------------------
     assert build_details.drop_counts().rows() == [
@@ -167,7 +159,7 @@ def test_the_build_details_give_each_stages_rejections_per_formula():
     """Validation's rejections are listed per formula, with its counts and its rejections per reason; spacing drops a
     valid candidate only, so it has no rejections."""
     # --- arrange ----------------------
-    build_details = _distilled_state().create_build_details()
+    build_details = _finished_state().create_build_details()
 
     # --- act --------------------------
     validation_rejections = build_details.rejections_per_formula(PipelineStageId.CANDIDATE_VALIDATION)
@@ -185,7 +177,7 @@ def test_the_build_details_count_each_configs_incorrect_solves():
     """Over the 3 candidates that coarse characterization kept, with 0, 1 and 2 incorrect solves of 64 each, the
     config has 3 incorrect solves of 192."""
     # --- act --------------------------
-    table = _distilled_state().create_build_details().incorrect_solves_table(PipelineStageId.COARSE_CHARACTERIZATION)
+    table = _finished_state().create_build_details().incorrect_solves_table(PipelineStageId.COARSE_CHARACTERIZATION)
 
     # --- assert -----------------------
     assert table.rows() == [("bisection", 192, 3, 3 / 192)]
@@ -195,7 +187,7 @@ def test_the_build_details_give_each_configs_geomean_of_n_fevals_eff_per_candida
     """Over the candidates that coarse characterization kept, the table gives 1 row per candidate and config, with
     the value of that config's geomean feature."""
     # --- arrange ----------------------
-    build_details = _distilled_state().create_build_details()
+    build_details = _finished_state().create_build_details()
     results = build_details.characterization_results(PipelineStageId.COARSE_CHARACTERIZATION)
 
     # --- act --------------------------
@@ -220,16 +212,24 @@ def test_the_build_details_give_no_n_fevals_table_for_a_stage_that_did_not_finis
 
 
 @pytest.mark.parametrize(
-    "stage_id, rows_expected",
+    "build_state, rows_expected",
     [
-        pytest.param(PipelineStageId.DISTILLATION, [("sb-4", 4, 1, 1, 1, 1)], id="core_selection_finished"),
-        pytest.param(PipelineStageId.CORE_SELECTION, None, id="core_selection_not_finished"),
+        pytest.param(
+            lambda: build_finished_state(example_problem_ids(8)),
+            [("sb-4a", 4, 1, 1, 1, 1), ("sb-4b", 4, 1, 1, 1, 1)],
+            id="suite_selection_finished",
+        ),
+        pytest.param(
+            lambda: build_state_before(PipelineStageId.SUITE_SELECTION, example_problem_ids(8)),
+            None,
+            id="suite_selection_not_finished",
+        ),
     ],
 )
-def test_the_build_details_give_each_suites_quota_per_tier(stage_id, rows_expected):
-    """A Core of 4 has a quota of 1 per tier; without a finished core selection there is no table."""
+def test_the_build_details_give_each_suites_quota_per_tier(build_state, rows_expected):
+    """A suite of 4 has a quota of 1 per tier; without a finished suite selection there is no table."""
     # --- act --------------------------
-    table = build_state_before(stage_id, example_problem_ids(4)).create_build_details().suite_tier_quotas()
+    table = build_state().create_build_details().suite_tier_quotas()
 
     # --- assert -----------------------
     if rows_expected is None:
@@ -238,37 +238,24 @@ def test_the_build_details_give_each_suites_quota_per_tier(stage_id, rows_expect
         assert table.rows() == rows_expected
 
 
-@pytest.mark.parametrize(
-    "build_state, rows_expected",
-    [
-        pytest.param(
-            _distilled_state,
-            [("sb-2", 2, 1, 1, 0.25), ("sb-1a", 1, 1, 0, 0.5), ("sb-1b", 1, 0, 1, None)],
-            id="distilled",
-        ),
-        pytest.param(
-            lambda: build_state_before(PipelineStageId.DISTILLATION, example_problem_ids(3)),
-            [("sb-3", 3, 0, 3, None)],
-            id="distillation_not_finished",
-        ),
-    ],
-)
-def test_the_build_details_count_each_suites_tiers(build_state, rows_expected):
-    """The Core's row comes first, then each distilled suite's, with its name, size, count per tier and diversity
-    score; without distillation's suites, the table holds the Core's row alone."""
+def test_the_build_details_count_each_suites_tiers():
+    """Each suite's row gives its name, size, count per tier and diversity score, in the order of the suites."""
     # --- act --------------------------
-    table = build_state().create_build_details().suite_tier_counts()
+    table = _finished_state().create_build_details().suite_tier_counts()
 
     # --- assert -----------------------
-    assert table.select("suite_name", "size", "n_candidates_a", "n_candidates_b", "diversity").rows() == rows_expected
+    assert table.select("suite_name", "size", "n_candidates_a", "n_candidates_b", "diversity").rows() == [
+        ("sb-1a", 1, 1, 0, 0.5),
+        ("sb-1b", 1, 0, 1, 0.75),
+    ]
 
 
 def test_the_build_details_rebuilt_from_their_files_equal_the_original():
     """Every read method returns the same value on the build details read back from their files as on the original
     ones."""
     # --- arrange ----------------------
-    build_details = _distilled_state().create_build_details(
-        stop=PipelineStop(stage_id=PipelineStageId.DISTILLATION, reason="example")
+    build_details = _finished_state().create_build_details(
+        stop=PipelineStop(stage_id=PipelineStageId.SUITE_SELECTION, reason="example")
     )
 
     # --- act --------------------------
@@ -312,7 +299,7 @@ def test_the_build_details_of_a_run_that_stopped_early_read_back_their_files(n_f
     assert read_back.c_ranges() == build_details.c_ranges()
     assert read_back.nearest_kept_candidates() is None
     assert read_back.edis(PipelineStageId.FINE_CHARACTERIZATION) is None
-    assert read_back.core_selection_details() is None
+    assert read_back.suite_selection_details() is None
     assert read_back.incorrect_solves_table(PipelineStageId.FINE_CHARACTERIZATION) is None
 
 

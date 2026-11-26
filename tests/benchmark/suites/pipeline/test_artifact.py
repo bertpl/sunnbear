@@ -25,7 +25,7 @@ def _artifact_and_cache_dirs_in_tmp(monkeypatch, tmp_path):
 def test_the_artifact_loads_the_build_details_that_were_saved():
     """The build details loaded from the artifact give the same files as the saved ones."""
     # --- arrange ----------------------
-    build_details = build_state_before(PipelineStageId.CORE_SELECTION, example_problem_ids(3)).create_build_details()
+    build_details = build_state_before(PipelineStageId.SUITE_SELECTION, example_problem_ids(3)).create_build_details()
     ArtifactStore.save(BenchmarkSuitesBuildDetailsDeclaration, build_details)
 
     # --- act --------------------------

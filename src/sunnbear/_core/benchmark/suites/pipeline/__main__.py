@@ -20,8 +20,8 @@ kept, and its run time. Then, for each such stage that rejected candidates as in
 - the stage's id, then the number of formulas with rejected candidates;
 - One line per such formula, with its counts of kept candidates and of rejections per reason.
 
-When a stage stops the run, for example because core selection finds too few candidates for the smallest Core of the
-benchmark suites, the command then prints that stage's id and the reason, and exits with status 1.
+When a stage stops the run, for example because suite selection finds too few candidates for 2 benchmark suites of the
+smallest size, the command then prints that stage's id and the reason, and exits with status 1.
 """
 
 import argparse

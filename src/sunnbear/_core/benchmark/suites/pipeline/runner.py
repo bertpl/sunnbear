@@ -29,10 +29,9 @@ from .stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
-    CoreSelectionStage,
-    DistillationStage,
     FineCharacterizationStage,
     SpacingStage,
+    SuiteSelectionStage,
 )
 from .state import BenchmarkSuitesBuildDetails, PipelineState
 
@@ -75,8 +74,7 @@ def run_pipeline(
         CoarseCharacterizationStage(fidelity=mode.coarse_characterization_stage_fidelity),
         SpacingStage(target_n_kept_candidates=mode.spacing_stage_target_n_kept_candidates),
         FineCharacterizationStage(fidelity=mode.fine_characterization_stage_fidelity),
-        CoreSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
-        DistillationStage(sec_per_candidate=mode.selection_sec_per_candidate),
+        SuiteSelectionStage(sec_per_candidate=mode.selection_sec_per_candidate),
     ]
     module_names = {type(formula).__module__ for formula in formulas} | {
         config.declaring_module_name for config in DiversityFeatureFactory().solver_configs

@@ -18,5 +18,4 @@ class PipelineStageId(StrEnum):
     COARSE_CHARACTERIZATION = "s3_coarse_characterization"
     SPACING = "s4_spacing"
     FINE_CHARACTERIZATION = "s5_fine_characterization"
-    CORE_SELECTION = "s6_core_selection"
-    DISTILLATION = "s7_distillation"
+    SUITE_SELECTION = "s6_suite_selection"

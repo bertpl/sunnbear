@@ -10,8 +10,8 @@ accessor reads and writes the `PipelineStateStorage` of the run, and is the cont
 - it takes its stage's drops, through `PipelineStateAccessor.reject` for an invalid candidate and
   `PipelineStateAccessor.drop` for a valid one that the stage does not keep.
 
-The 2 characterization stages share `CharacterizationStateAccessor`, and core selection and distillation share
-`SelectionStateAccessor`, because each pair reads and writes the same kind of information.
+The 2 characterization stages share `CharacterizationStateAccessor`, because they read and write the same kind of
+information.
 """
 
 from collections.abc import Collection, Mapping
@@ -238,10 +238,15 @@ class FineCharacterizationStateAccessor(CharacterizationStateAccessor):
 
 
 # ==================================================================================================
-#  SelectionStateAccessor
+#  SuiteSelectionStateAccessor
 # ==================================================================================================
-class SelectionStateAccessor(PipelineStateAccessor):
-    """`SelectionStateAccessor` gives the input candidates of max-div's selection, as a `CandidatePool`."""
+class SuiteSelectionStateAccessor(PipelineStateAccessor):
+    """`SuiteSelectionStateAccessor` gives the candidate pool, and takes the difficulty tiers and every suite's details.
+
+    The candidate pool, a `CandidatePool`, holds the input candidates of max-div's selections.
+    """
+
+    stage_id = PipelineStageId.SUITE_SELECTION
 
     def candidate_pool(self) -> CandidatePool:
         """Return the pool of the candidates that no stage has dropped.
@@ -261,15 +266,6 @@ class SelectionStateAccessor(PipelineStateAccessor):
                 scaled_feature_matrix, edis=results.edis, n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS
             )
 
-
-# ==================================================================================================
-#  CoreSelectionStateAccessor
-# ==================================================================================================
-class CoreSelectionStateAccessor(SelectionStateAccessor):
-    """`CoreSelectionStateAccessor` takes the candidates' difficulty tiers and the Core's details."""
-
-    stage_id = PipelineStageId.CORE_SELECTION
-
     def set_difficulty_tiers(self, difficulty_tiers: Mapping[ProblemId, DifficultyTier]) -> None:
         """Store the tier of each candidate that no stage has dropped.
 
@@ -282,48 +278,23 @@ class CoreSelectionStateAccessor(SelectionStateAccessor):
         self._check_covers(difficulty_tiers.keys(), self.remaining_problem_ids)
         self._storage.difficulty_tiers = self._restrict_to_remaining(difficulty_tiers)
 
-    def set_core_selection_details(self, core_selection_details: SuiteSelectionDetails) -> None:
-        """Store the selection details of the Core, whose suite holds the candidates that no stage has dropped.
-
-        The stage calls this after it records its drops.
-
-        Raises:
-            ValueError: If the details were stored before, or the Core does not hold exactly those candidates.
-        """
-        self._check_not_written(is_written=self._storage.core_selection_details is not None)
-        self._check_covers(core_selection_details.benchmark_suite.problem_ids, self.remaining_problem_ids)
-        self._storage.core_selection_details = core_selection_details
-
-
-# ==================================================================================================
-#  DistillationStateAccessor
-# ==================================================================================================
-class DistillationStateAccessor(SelectionStateAccessor):
-    """`DistillationStateAccessor` takes the selection details of the suites distilled from the Core.
-
-    The candidates that no stage has dropped are the Core's.
-    """
-
-    stage_id = PipelineStageId.DISTILLATION
-
-    def set_distilled_suite_selection_details(
-        self, distilled_suite_selection_details: Mapping[str, SuiteSelectionDetails]
-    ) -> None:
-        """Store the selection details of each distilled suite, keyed by the suite's name.
+    def set_suite_selection_details(self, suite_selection_details: Mapping[str, SuiteSelectionDetails]) -> None:
+        """Store the selection details of each suite, keyed by the suite's name.
 
         The mapping lists the a-series' suites before the b-series', and within each series the suites from largest to
-        smallest. Together they hold the candidates that no stage has dropped: the Core.
+        smallest. The stage calls this after it records its drops, so that the suites together hold the candidates
+        that no stage has dropped.
 
         Raises:
-            ValueError: If the details were stored before, or the suites together do not hold exactly the Core.
+            ValueError: If the details were stored before, or the suites together do not hold exactly those candidates.
         """
-        self._check_not_written(is_written=self._storage.distilled_suite_selection_details is not None)
+        self._check_not_written(is_written=self._storage.suite_selection_details is not None)
         self._check_covers(
             {
                 problem_id
-                for details in distilled_suite_selection_details.values()
+                for details in suite_selection_details.values()
                 for problem_id in details.benchmark_suite.problem_ids
             },
             self.remaining_problem_ids,
         )
-        self._storage.distilled_suite_selection_details = dict(distilled_suite_selection_details)
+        self._storage.suite_selection_details = dict(suite_selection_details)
