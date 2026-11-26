@@ -1,5 +1,9 @@
-"""The built-in series name their suites `sb-<size>a` and `sb-<size>b`, the a-series gives an alias to each of its
-sizes, and `BUILT_IN_SERIES_BY_ID` finds every built-in series by its id."""
+"""The built-in series meet these checks:
+
+- they name their suites `sb-<size>a` and `sb-<size>b`;
+- the a-series gives an alias to each of its sizes;
+- `BUILT_IN_SERIES_BY_ID` finds every built-in series by its id.
+"""
 
 import pytest
 
@@ -25,20 +29,21 @@ def test_the_built_in_series_name_their_suites(series, size, name_expected, alia
     problem_ids = [ProblemId.from_string(f"f99.1[p={idx + 1}]") for idx in range(size)]
 
     # --- act --------------------------
-    suite = series.build_suite(problem_ids)
+    suite = series.create_suite(problem_ids)
 
     # --- assert -----------------------
     assert (suite.series_id, suite.name, suite.aliases) == (series.series_id, name_expected, aliases_expected)
 
 
 def test_the_a_series_gives_an_alias_to_each_of_its_sizes():
-    """Each size of the a-series has its own aliases, so that every suite of the a-series has an alias."""
+    """Every size of the a-series has an entry in its `aliases_by_size`, so that every suite of the a-series has an
+    alias."""
     # --- act / assert -----------------
     assert set(SB_A_SERIES.aliases_by_size) == set(SB_A_SERIES.sizes)
 
 
 def test_the_lookup_by_series_id_finds_every_built_in_series():
-    """`BUILT_IN_SERIES_BY_ID` holds every built-in series under its own id, in the order of `BUILT_IN_SERIES`, so no 2
-    built-in series share an id."""
+    """`BUILT_IN_SERIES_BY_ID` holds every built-in series under its own id, in the order of `BUILT_IN_SERIES`, which
+    also shows that no 2 built-in series share an id."""
     # --- act / assert -----------------
     assert list(BUILT_IN_SERIES_BY_ID.items()) == [(series.series_id, series) for series in BUILT_IN_SERIES]

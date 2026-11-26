@@ -13,9 +13,9 @@ from sunnbear._core.problems.core import ProblemId
 class BenchmarkSuite:
     """A `BenchmarkSuite` is a named selection of test problems to benchmark solvers on.
 
-    A suite belongs to 1 `BenchmarkSuiteSeries`, which builds it and gives it its name and aliases. A suite is known by
-    its name and by each of its aliases. It stores them, so that a suite read back from a file needs no lookup of its
-    series.
+    A suite belongs to 1 `BenchmarkSuiteSeries`, which creates it and gives it its name and aliases. A suite is known by
+    its name and by each of its aliases. The suite stores its name and aliases, so that a suite read back from a file
+    needs no lookup of its series.
 
     Attributes:
         series_id: The `series_id` of the suite's series, such as ``sb-a``.
@@ -33,7 +33,7 @@ class BenchmarkSuite:
     #  Files
     # --------------------------------------------------------------------------
     def to_json_values(self) -> dict[str, Any]:
-        """Return the suite as JSON values: its ``series_id``, ``name``, ``aliases`` and ``problem_ids`` as strings."""
+        """Return the suite as JSON values, with its problem ids as strings."""
         return {
             "series_id": self.series_id,
             "name": self.name,

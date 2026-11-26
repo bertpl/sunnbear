@@ -6,7 +6,7 @@
 - where a tier has too few candidates for both largest suites, the largest suite of the b-series fills the rest of that
   tier's quota with candidates of a neighboring tier;
 - each series' smaller suites lie inside its larger ones, and every suite meets the quotas that the stage stores for it;
-- every suite carries its series' id, name and aliases;
+- every suite carries the id of its series, and the name and aliases that its series gives it;
 - every suite's diversity score is the score of its own test problems;
 - the stage records max-div's time per candidate and seed in its parameters.
 """
@@ -118,7 +118,7 @@ def test_the_stage_stops_the_pipeline_below_2_suites_of_the_smallest_size():
 
 @pytest.mark.only_with_numba_jit
 def test_the_stage_selects_2_disjoint_largest_suites_and_drops_the_other_candidates():
-    """Of 160 candidates, 40 of each tier, the stage selects `sb-64a`, alias `sb-tiny`, of the a-series and `sb-64b` of
+    """Of 160 candidates, 40 of each tier, the stage selects `sb-64a` of the a-series, alias `sb-tiny`, and `sb-64b` of
     the b-series, each with 16 of each tier, and drops the other 32 with the reason `not_in_any_suite`; each suite's
     diversity score is that of its own 64 test problems."""
     # --- act --------------------------

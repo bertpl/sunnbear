@@ -28,18 +28,21 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     """`SuiteSelectionStage` selects the suites of `SB_A_SERIES` and `SB_B_SERIES` from the candidates.
 
-    The stage selects 1 suite per size that a series declares, up to the size of the largest suites, which the first
-    step below chooses, and builds each suite through its series. Each suite of a series holds every test problem of
-    the series' smaller suites, and the 2 series share no test problem.
+    The stage selects 1 suite per size that a series declares, up to the size of the largest suites, and creates each
+    suite through its series. Each suite of a series holds every test problem of the series' smaller suites, and the 2
+    series share no test problem.
 
     The stage stores each candidate's difficulty tier, which `CandidatePool.difficulty_tiers` derives from the EDI that
     fine characterization stored, then selects the suites in 3 steps:
 
     - **the largest suites:** their size is the largest size that both series declare and that is at most half the
-      number of candidates. The largest suite of the a-series is selected from all candidates. The largest suite of
-      the b-series comes from a selection, from the same candidates, of twice its size that must hold the largest suite
-      of the a-series; the b-series' suite is the half of that selection outside the a-series' suite, so it lies far
-      from the a-series' suite and is diverse in itself;
+      number of candidates:
+
+      - the largest suite of the a-series is selected from all candidates;
+      - the largest suite of the b-series comes from a selection, from the same candidates, of twice its size that
+        must hold the largest suite of the a-series; the b-series' suite is the half of that selection outside the
+        a-series' suite, so it lies far from the a-series' suite and is diverse in itself;
+
     - **the drops:** the stage drops each candidate that neither largest suite holds; such a candidate is valid, but
       not kept;
     - **the smaller suites:** per series, the suite of each smaller size that the series declares, from the largest to
@@ -57,10 +60,9 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
 
     Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
 
-    The suites of a run ship only when its largest suites have the largest size that both series declare, and every
-    candidate of those 2 suites counts toward the quota of the difficulty tier of its EDI.
-
-    The suites of any other run are interim and never ship as benchmark suites.
+    The suites of a run ship only when the run's largest suites have the largest size that both series declare, and
+    every candidate of those 2 suites counts toward the quota of the difficulty tier of the candidate's EDI; the suites
+    of any other run are interim.
     """
 
     stage_id = PipelineStageId.SUITE_SELECTION
@@ -159,7 +161,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
             problem_id for problem_id in selected_problem_ids if problem_id not in required_problem_id_set
         ]
         return SuiteSelectionDetails(
-            benchmark_suite=series.build_suite(suite_problem_ids),
+            benchmark_suite=series.create_suite(suite_problem_ids),
             edi_range_by_tier=tier_assignment.edi_range_by_tier,
             diversity=compute_diversity_score(candidate_pool.subset(suite_problem_ids)),
         )

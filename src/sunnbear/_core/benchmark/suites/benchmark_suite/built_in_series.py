@@ -10,7 +10,10 @@ from .benchmark_suite_series import BenchmarkSuiteSeries
 SB_A_SERIES = BenchmarkSuiteSeries(
     series_id="sb-a",
     readable_name="a-series",
-    summary="The a-series holds the most diverse test problems that sunnbear selects, to benchmark solvers on.",
+    summary=(
+        "The a-series is the series to benchmark solvers on; it holds the most diverse test problems that sunnbear "
+        "selects."
+    ),
     name_format="sb-{size}a",
     sizes=(1024, 512, 256, 128, 64),
     aliases_by_size={

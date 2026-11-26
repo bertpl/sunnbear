@@ -1,7 +1,7 @@
-"""This package holds `BenchmarkSuite`, a named selection of test problems, and the series that build such suites.
+"""This package holds `BenchmarkSuite`, a named selection of test problems, and the series that create such suites.
 
 - `BenchmarkSuite` is a named selection of test problems to benchmark solvers on;
-- `BenchmarkSuiteSeries` declares a series of suites, 1 per size, and builds each of its suites;
+- `BenchmarkSuiteSeries` declares a series of suites, 1 per size, and creates each of its suites;
 - `built_in_series` declares the series that sunnbear builds, and lists them as `BUILT_IN_SERIES`.
 """
 
