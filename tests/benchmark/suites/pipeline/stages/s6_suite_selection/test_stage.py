@@ -3,9 +3,9 @@
 - the size of the largest suites is the largest that is at most half the number of candidates, and the stage stops the
   pipeline when the candidates are too few for 2 suites of the smallest size;
 - it stores each candidate's tier, selects 2 disjoint largest suites, and drops the other candidates;
-- where a tier has too few candidates for both largest suites, the largest suite of the b-series fills the rest of that
-  tier's quota with candidates of a neighboring tier;
-- each series' smaller suites lie inside its larger ones, and every suite meets the quotas that the stage stores for it;
+- where a tier has too few candidates for both largest suites, the largest suite of the b-series misses that tier's
+  quota, and its selection details record the miss;
+- each series' smaller suites lie inside its larger ones, and every suite meets its quotas when the candidates allow;
 - every suite carries the id of its series, and the name and aliases that its series gives it;
 - every suite's diversity score is the score of its own test problems;
 - the stage records max-div's time per candidate and seed in its parameters.
@@ -15,6 +15,7 @@ from collections import Counter
 from itertools import pairwise
 
 import numpy as np
+import polars as pl
 import pytest
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
@@ -22,7 +23,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, Pipel
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     CandidatePool,
     DifficultyTier,
-    DifficultyTierQuotas,
+    QuotaFulfillment,
     compute_diversity_score,
 )
 from sunnbear._core.benchmark.suites.pipeline.stages import SuiteSelectionStage
@@ -58,24 +59,26 @@ def _select_suites(tier_counts: dict[DifficultyTier, int], stage: SuiteSelection
     return state.create_build_details()
 
 
-def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails) -> None:
+def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails, *, is_every_quota_met: bool = True) -> None:
     """Check that the 2 series share no test problem, that each suite holds the next smaller one of its series, and
-    that each suite meets its quotas.
+    that each suite records a quota of a quarter per tier, which counts the suite's test problems of that tier.
 
-    A test problem counts toward the tier whose recorded EDI range holds its EDI; the EDIs of `_select_suites` are all
-    different, so the ranges do not overlap.
+    With `is_every_quota_met`, also check that every suite meets every quota.
     """
-    edis = build_details.edis(PipelineStageId.FINE_CHARACTERIZATION)
+    difficulty_tiers = build_details.difficulty_tiers()
     all_selection_details = list(build_details.suite_selection_details().values())
     problem_ids_by_series_id = {"sb-a": set(), "sb-b": set()}
     for selection_details in all_selection_details:
         suite = selection_details.benchmark_suite
         problem_ids_by_series_id[suite.series_id] |= set(suite.problem_ids)
-        tier_counts = {
-            tier: sum(lower <= edis[p] <= upper for p in suite.problem_ids)
-            for tier, (lower, upper) in selection_details.edi_range_by_tier.items()
-        }
-        assert tier_counts == DifficultyTierQuotas(len(suite.problem_ids)).quota_by_tier
+        tier_counts = Counter(difficulty_tiers[problem_id] for problem_id in suite.problem_ids)
+        quota_size = len(suite.problem_ids) // 4
+        assert selection_details.quota_fulfillments == tuple(
+            QuotaFulfillment(label=tier.value, min_count=quota_size, max_count=quota_size, n_selected=tier_counts[tier])
+            for tier in DifficultyTier
+        )
+        if is_every_quota_met:
+            assert all(fulfillment.is_met for fulfillment in selection_details.quota_fulfillments)
     assert not problem_ids_by_series_id["sb-a"] & problem_ids_by_series_id["sb-b"]
     for selection_details, next_selection_details in pairwise(all_selection_details):
         suite, next_suite = selection_details.benchmark_suite, next_selection_details.benchmark_suite
@@ -147,9 +150,9 @@ def test_the_stage_selects_2_disjoint_largest_suites_and_drops_the_other_candida
 
 @pytest.mark.only_with_numba_jit
 def test_the_b_series_carries_a_shortage_and_the_stage_records_its_parameters():
-    """Only 24 candidates are of tier D: `sb-64a` takes 16 of them, so `sb-64b` holds the other 8, and 8 candidates of
-    C with the highest EDIs count toward its quota of D; the stage's parameters record max-div's time per candidate and
-    seed."""
+    """Only 24 candidates are of tier D: `sb-64a` takes 16 of them and meets its quotas, so `sb-64b` holds the other 8
+    and misses its quota of D, which its selection details record; the stage's parameters record max-div's time per
+    candidate and seed."""
     # --- arrange ----------------------
     stage = SuiteSelectionStage(_SEC_PER_CANDIDATE)
 
@@ -157,12 +160,12 @@ def test_the_b_series_carries_a_shortage_and_the_stage_records_its_parameters():
     build_details = _select_suites({A: 40, B: 40, C: 56, D: 24}, stage)
 
     # --- assert -----------------------
-    assert build_details.suite_tier_counts().select(
-        "n_candidates_a", "n_candidates_b", "n_candidates_c", "n_candidates_d"
-    ).rows() == [(16, 16, 16, 16), (16, 16, 24, 8)]
-    b_suite_edi_range_of_d = build_details.suite_selection_details()["sb-64b"].edi_range_by_tier[D]
-    assert b_suite_edi_range_of_d[0] < D.edi_range(DEFAULT_N_BISECTION_FEVALS)[0]
-    _check_series_and_quotas(build_details)
+    all_selection_details = build_details.suite_selection_details()
+    assert all(fulfillment.is_met for fulfillment in all_selection_details["sb-64a"].quota_fulfillments)
+    b_suite_tier_counts = build_details.suite_tier_counts().filter(pl.col("suite_name") == "sb-64b")
+    assert b_suite_tier_counts.select("n_candidates_d").item() == 8
+    assert all(b_suite_tier_counts.select(f"n_candidates_{tier.lower()}").item() >= 16 for tier in "ABC")
+    _check_series_and_quotas(build_details, is_every_quota_met=False)
     assert stage.parameters == {"sec_per_candidate": _SEC_PER_CANDIDATE, "seed": stage.seed}
 
 

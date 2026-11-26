@@ -1,6 +1,7 @@
 """`SuiteSelectionStage` selects the suites of 2 disjoint series of benchmark suites: the a-series and the b-series."""
 
 from collections.abc import Collection
+from fractions import Fraction
 
 from sunnbear._core.benchmark.protocol import SeedPurpose, derive_seed
 from sunnbear._core.benchmark.suites.benchmark_suite import SB_A_SERIES, SB_B_SERIES, BenchmarkSuiteSeries
@@ -13,13 +14,27 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     DEFAULT_SELECTION_SEC_PER_CANDIDATE,
     CandidatePool,
-    DifficultyTierQuotas,
+    DifficultyTier,
+    DifficultyTierCandidateGroup,
+    ShareQuota,
     compute_diversity_score,
     select_diverse_problem_ids,
 )
 from sunnbear._core.benchmark.suites.pipeline.state import SuiteSelectionDetails, SuiteSelectionStateAccessor
 from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
+
+# Each difficulty tier holds exactly a quarter of every suite of the a-series and the b-series, so that each suite
+# spreads its test problems evenly over the range of difficulties; a candidate counts toward the quota of its own
+# difficulty tier.
+_DIFFICULTY_TIER_QUOTAS = tuple(
+    ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
+)
+# The quotas under which the stage selects the suites of each series, keyed by the series' id.
+_QUOTAS_BY_SERIES_ID = {
+    SB_A_SERIES.series_id: _DIFFICULTY_TIER_QUOTAS,
+    SB_B_SERIES.series_id: _DIFFICULTY_TIER_QUOTAS,
+}
 
 
 # ==================================================================================================
@@ -48,21 +63,19 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     - **the smaller suites:** per series, the suite of each smaller size that the series declares, from the largest to
       the smallest, is selected from the series' next larger suite.
 
-    Every suite is selected by `select_diverse_problem_ids`, under the quotas of its size, with the tiers that
-    `DifficultyTierAssignment.from_pool` assigns, for that selection only, to the candidates eligible for the suite.
-
-    The candidates eligible for a suite are those that it is selected from; for the largest suite of the b-series, the
-    candidates of the largest suite of the a-series are not eligible.
+    Every suite is selected by `select_diverse_problem_ids`, under the quotas that `_QUOTAS_BY_SERIES_ID` declares for
+    its series, among the candidates eligible for the suite: those that the suite is selected from, except that the
+    candidates of the largest suite of the a-series are not eligible for the largest suite of the b-series. The
+    a-series and the b-series give each difficulty tier exactly a quarter of every suite.
 
     The largest suite of the a-series is selected first, so where a tier has too few candidates for both largest
-    suites, the a-series' suite still holds that tier's full quota, and the b-series' suite fills the rest of that
-    quota with candidates of a neighboring tier.
+    suites, the a-series' suite still meets that tier's quota, and the b-series' suite misses it: max-div fills the
+    b-series' suite with candidates of the other tiers, and the suite's selection details record the miss.
 
     Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
 
     The suites of a run ship only when the run's largest suites have the largest size that both series declare, and
-    every candidate of those 2 suites counts toward the quota of the difficulty tier of the candidate's EDI; the suites
-    of any other run are interim.
+    every suite meets every quota; the suites of any other run are interim.
     """
 
     stage_id = PipelineStageId.SUITE_SELECTION
@@ -85,7 +98,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
 
         Raises:
             PipelineStopError: If there are fewer candidates than twice the smallest size that both series declare, or
-                if a selection misses a required candidate or a quota, as `select_diverse_problem_ids` describes.
+                if a selection misses a required candidate, as `select_diverse_problem_ids` describes.
         """
         # --- size and tiers ---------------------
         largest_suite_size = self._choose_largest_suite_size(len(state_accessor.remaining_problem_ids))
@@ -149,9 +162,10 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         that are not required.
         """
         required_problem_id_set = set(required_problem_ids)
-        selected_problem_ids, tier_assignment = select_diverse_problem_ids(
+        selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
             candidate_pool,
-            quotas=DifficultyTierQuotas(size),
+            selection_size=size,
+            quotas=_QUOTAS_BY_SERIES_ID[series.series_id],
             required_problem_ids=required_problem_id_set,
             seed=self.seed,
             sec_per_candidate=self.sec_per_candidate,
@@ -162,7 +176,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         ]
         return SuiteSelectionDetails(
             benchmark_suite=series.create_suite(suite_problem_ids),
-            edi_range_by_tier=tier_assignment.edi_range_by_tier,
+            quota_fulfillments=quota_fulfillments,
             diversity=compute_diversity_score(candidate_pool.subset(suite_problem_ids)),
         )
 

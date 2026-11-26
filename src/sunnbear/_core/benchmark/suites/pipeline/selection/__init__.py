@@ -1,23 +1,29 @@
-"""This package selects the pipeline's suites: the most diverse candidates under difficulty quotas.
+"""This package selects the pipeline's suites: the most diverse candidates under quotas on groups of candidates.
 
 Suite selection selects every benchmark suite of the pipeline with the parts below, so that every suite is selected by
 the same objective in the same feature space:
 
 - `DifficultyTier`, which buckets a candidate by its empirical difficulty index (EDI), in `difficulty_tier`;
-- `DifficultyTierQuotas`, the quota of each tier in 1 selection, in `difficulty_tier_quotas`;
 - `CandidatePool`, the input candidates of a selection, in `candidate_pool`;
-- `DifficultyTierAssignment`, which gives each candidate of a pool the tier whose quota it counts toward in 1
-  selection, in `difficulty_tier_assignment`;
-- `select_diverse_problem_ids`, which selects the most diverse candidates of a `CandidatePool` by max-div, under a
-  `DifficultyTierQuotas` and the tiers of a `DifficultyTierAssignment`, in `diverse_selection`;
+- `CandidateGroup`, a group of candidates that a quota counts, and `DifficultyTierCandidateGroup`, the candidates of
+  some difficulty tiers, in `candidate_group`;
+- `ShareQuota`, the smallest and the largest share of a selection that a group may hold, as a stage declares it, in
+  `share_quota`;
+- `CountQuota`, the same quota as the counts of 1 selection, in `count_quota`;
+- `QuotaFulfillment`, which records a quota's counts and the number of selected candidates that count toward it, in
+  `quota_fulfillment`;
+- `select_diverse_problem_ids`, which selects the most diverse candidates of a `CandidatePool` by max-div under
+  `ShareQuota`s, in `diverse_selection`;
 - `compute_diversity_score`, which scores a set of candidates by the objective of `select_diverse_problem_ids`, in
   `diverse_selection`.
 
 This package imports nothing from the packages `state` and `stages` beside it, which import from this package.
 """
 
+from .candidate_group import CandidateGroup, DifficultyTierCandidateGroup
 from .candidate_pool import CandidatePool
+from .count_quota import CountQuota
 from .difficulty_tier import DifficultyTier
-from .difficulty_tier_assignment import DifficultyTierAssignment
-from .difficulty_tier_quotas import DifficultyTierQuotas
 from .diverse_selection import DEFAULT_SELECTION_SEC_PER_CANDIDATE, compute_diversity_score, select_diverse_problem_ids
+from .quota_fulfillment import QuotaFulfillment
+from .share_quota import ShareQuota

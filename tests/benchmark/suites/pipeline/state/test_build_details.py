@@ -18,7 +18,7 @@ from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.benchmark_suite import BenchmarkSuite
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import DiversityFeatureFactory, FeatureFidelity
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, QuotaFulfillment
 from sunnbear._core.benchmark.suites.pipeline.state import (
     BenchmarkSuitesBuildDetails,
     CharacterizationResults,
@@ -87,14 +87,17 @@ def _finished_state() -> PipelineState:
                 benchmark_suite=BenchmarkSuite(
                     series_id="sb-a", name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)
                 ),
-                edi_range_by_tier={DifficultyTier.A: (5.0, 5.0), DifficultyTier.B: (10.0, 10.0)},
+                quota_fulfillments=(
+                    QuotaFulfillment(label="A", min_count=1, max_count=1, n_selected=1),
+                    QuotaFulfillment(label="B", min_count=0, max_count=0, n_selected=0),
+                ),
                 diversity=0.5,
             ),
             SuiteSelectionDetails(
                 benchmark_suite=BenchmarkSuite(
                     series_id="sb-b", name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)
                 ),
-                edi_range_by_tier={DifficultyTier.A: (6.0, 9.5), DifficultyTier.B: (10.0, 10.0)},
+                quota_fulfillments=(QuotaFulfillment(label="A", min_count=1, max_count=1, n_selected=0),),
                 diversity=0.75,
             ),
         ]
@@ -219,10 +222,15 @@ def test_the_build_details_give_no_n_fevals_table_for_a_stage_that_did_not_finis
     "build_state, rows_expected",
     [
         pytest.param(
-            lambda: build_finished_state(example_problem_ids(8)),
-            [("sb-4a", 4, 1, 1, 1, 1), ("sb-4b", 4, 1, 1, 1, 1)],
-            id="suite_selection_finished",
+            _finished_state,
+            [
+                ("sb-1a", "sb-a", "A", 1, 1, 1),
+                ("sb-1a", "sb-a", "B", 0, 0, 0),
+                ("sb-1b", "sb-b", "A", 1, 1, 0),
+            ],
+            id="suites_with_quotas",
         ),
+        pytest.param(lambda: build_finished_state(example_problem_ids(8)), [], id="suites_without_quotas"),
         pytest.param(
             lambda: build_state_before(PipelineStageId.SUITE_SELECTION, example_problem_ids(8)),
             None,
@@ -230,10 +238,11 @@ def test_the_build_details_give_no_n_fevals_table_for_a_stage_that_did_not_finis
         ),
     ],
 )
-def test_the_build_details_give_each_suites_quota_per_tier(build_state, rows_expected):
-    """A suite of 4 has a quota of 1 per tier; without a finished suite selection there is no table."""
+def test_the_build_details_count_each_suites_quotas(build_state, rows_expected):
+    """Each quota of each suite gives 1 row, with the quota's counts and the suite's number of test problems that count
+    toward it; a suite without quotas gives no row, and without a finished suite selection there is no table."""
     # --- act --------------------------
-    table = build_state().create_build_details().suite_tier_quotas()
+    table = build_state().create_build_details().suite_quota_counts()
 
     # --- assert -----------------------
     if rows_expected is None:

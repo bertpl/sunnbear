@@ -35,10 +35,10 @@ def _accessor(stage_id: PipelineStageId) -> PipelineStateAccessor:
 
 
 def _selection_details(series_id: str, name: str, problem_ids: list) -> SuiteSelectionDetails:
-    """Return the selection details of a suite of `problem_ids` that no max-div run selected, with no EDI ranges."""
+    """Return the selection details of a suite of `problem_ids` that no max-div run selected, with no quotas."""
     return SuiteSelectionDetails(
         benchmark_suite=BenchmarkSuite(series_id=series_id, name=name, aliases=(), problem_ids=tuple(problem_ids)),
-        edi_range_by_tier={},
+        quota_fulfillments=(),
         diversity=1.0,
     )
 

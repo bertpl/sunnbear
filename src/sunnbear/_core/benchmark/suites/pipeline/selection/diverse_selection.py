@@ -1,9 +1,9 @@
 """This module selects diverse candidates from a `CandidatePool` by max-div, and scores the diversity of candidates.
 
-`select_diverse_problem_ids` searches for the most diverse selection under tier quotas, and `compute_diversity_score`
-scores a given set of candidates. Both use 1 objective, which `_build_max_div_problem` defines: the geometric mean,
-with equal weights, of the geometric mean separation under each of 2 distances, where a selected candidate's
-separation is its distance to the nearest other selected candidate:
+`select_diverse_problem_ids` searches for the most diverse selection under quotas on groups of candidates, and
+`compute_diversity_score` scores a given set of candidates. Both use 1 objective, which `_build_max_div_problem`
+defines: the geometric mean, with equal weights, of the geometric mean separation under each of 2 distances, where a
+selected candidate's separation is its distance to the nearest other selected candidate:
 
 - the L1 distance between the scaled feature vectors, in which every feature block has a mean pairwise L1 distance
   of 1;
@@ -32,8 +32,8 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStopError
 from sunnbear._core.problems.core import ProblemId
 
 from .candidate_pool import CandidatePool
-from .difficulty_tier_assignment import DifficultyTierAssignment
-from .difficulty_tier_quotas import DifficultyTierQuotas
+from .quota_fulfillment import QuotaFulfillment
+from .share_quota import ShareQuota
 
 # Each max-div worker runs for this many seconds of wall-clock time per candidate of the `CandidatePool`, so that the
 # search time grows with the number of candidates to select from.
@@ -46,25 +46,31 @@ DEFAULT_SELECTION_SEC_PER_CANDIDATE = 0.2
 def select_diverse_problem_ids(
     candidate_pool: CandidatePool,
     *,
-    quotas: DifficultyTierQuotas,
+    selection_size: int,
+    quotas: Sequence[ShareQuota],
     required_problem_ids: Collection[ProblemId] = (),
     seed: int,
     sec_per_candidate: float,
     n_workers: int,
-) -> tuple[tuple[ProblemId, ...], DifficultyTierAssignment]:
-    """Return the most diverse selection that holds `required_problem_ids` and meets `quotas`, and the pool's tiers.
+) -> tuple[tuple[ProblemId, ...], tuple[QuotaFulfillment, ...]]:
+    """Return the most diverse selection that holds `required_problem_ids` and best meets `quotas`, with fulfillments.
 
-    `DifficultyTierAssignment.from_pool` assigns a tier to each candidate of `candidate_pool` that is not required.
-    max-div searches, by the objective of this module, for a selection of the required candidates plus
-    `quotas.selection_size` other candidates, under these constraints:
+    max-div searches, by the objective of this module, for a selection of the required candidates plus `selection_size`
+    other candidates, under these constraints:
 
-    - 1 per tier: the selection holds exactly the tier's quota of the candidates with that assigned tier;
-    - 1 more when there are required candidates: the selection holds all of them, so the quotas count only the
-      candidates that are not required.
+    - 1 per quota: the selection holds from the quota's smallest up to its largest count of the candidates of the
+      quota's group, with the counts that `ShareQuota.for_selection` gives for `selection_size`; a group holds only
+      candidates that are not required;
+    - 1 more when there are required candidates: the selection holds all of them.
+
+    max-div meets every constraint that can be met. When the quotas cannot all be met, for example because a group
+    holds fewer candidates than its quota's smallest count, max-div returns the selection that comes closest to them,
+    and the returned fulfillments show each quota that the selection misses.
 
     Args:
         candidate_pool: The candidates to select from.
-        quotas: The quotas of the selection beyond the required candidates.
+        selection_size: The number of selected candidates beyond the required ones, which the quotas' shares divide.
+        quotas: The quotas of the selection beyond the required candidates; empty for a selection without quotas.
         required_problem_ids: The candidates of `candidate_pool` that must be in the selection.
         seed: The seed of max-div's search.
         sec_per_candidate: The wall-clock time of max-div's search per candidate of `candidate_pool`. max-div searches
@@ -73,65 +79,77 @@ def select_diverse_problem_ids(
         n_workers: The number of max-div's worker processes.
 
     Returns:
-        The ids of the selected candidates, the required ones included, in the order of `candidate_pool`, and the tier
-        assignment of the candidates of `candidate_pool` that are not required.
+        The ids of the selected candidates, the required ones included, in the order of `candidate_pool`, and the
+        `QuotaFulfillment` of each quota, in the order of `quotas`.
 
     Raises:
-        ValueError: If `candidate_pool` holds fewer than `quotas.selection_size` candidates that are not required, as
-            `DifficultyTierAssignment.from_pool` describes.
-        PipelineStopError: If the selection misses a required candidate, or misses a quota, as
-            `DifficultyTierQuotas.check_selection` describes, because max-div treats its constraints as soft and
-            returns its best selection even when it breaks one.
+        ValueError: If `candidate_pool` holds fewer than `selection_size` candidates that are not required, or a share
+            of a quota is not a whole number of candidates, as `ShareQuota.for_selection` describes.
+        PipelineStopError: If the selection misses a required candidate.
     """
     problem_ids = candidate_pool.feature_matrix.problem_ids
     required_problem_id_set = set(required_problem_ids)
-    tier_assignment = DifficultyTierAssignment.from_pool(
-        candidate_pool.subset([problem_id for problem_id in problem_ids if problem_id not in required_problem_id_set]),
-        quotas,
+    other_pool = candidate_pool.subset(
+        [problem_id for problem_id in problem_ids if problem_id not in required_problem_id_set]
     )
-
-    # --- constraints ----------------------------
-    # A required candidate has no assigned tier, so no tier's constraint counts it.
-    assigned_tiers = [tier_assignment.assigned_tiers.get(problem_id) for problem_id in problem_ids]
-    constraints = [
-        Constraint(
-            int_set={idx for idx, assigned_tier in enumerate(assigned_tiers) if assigned_tier is tier},
-            min_count=quota,
-            max_count=quota,
+    n_other_candidates = len(other_pool.feature_matrix.problem_ids)
+    if n_other_candidates < selection_size:
+        raise ValueError(
+            f"A pool of {n_other_candidates} candidates that are not required cannot fill a selection of "
+            f"{selection_size}."
         )
-        for tier, quota in quotas.quota_by_tier.items()
-    ]
-    if required_problem_id_set:
-        constraints.append(
-            Constraint(
-                int_set={idx for idx, problem_id in enumerate(problem_ids) if problem_id in required_problem_id_set},
-                min_count=len(required_problem_id_set),
-                max_count=len(required_problem_id_set),
+    else:
+        count_quotas = [quota.for_selection(other_pool, selection_size=selection_size) for quota in quotas]
+
+        # --- constraints ------------------------
+        row_by_problem_id = candidate_pool.feature_matrix.row_index_by_problem_id
+        constraints = []
+        for count_quota in count_quotas:
+            # max-div refuses a constraint on no candidates, or one whose smallest count exceeds its candidates. No
+            # selection holds more of a group's candidates than the group has, so lowering the smallest count to the
+            # group's size, or leaving out a group without candidates, changes no selection that meets the quota, and
+            # max-div returns the selection that comes closest to the quotas.
+            if count_quota.problem_ids:
+                constraints.append(
+                    Constraint(
+                        int_set={row_by_problem_id[problem_id] for problem_id in count_quota.problem_ids},
+                        min_count=min(count_quota.min_count, len(count_quota.problem_ids)),
+                        max_count=count_quota.max_count,
+                    )
+                )
+        if required_problem_id_set:
+            constraints.append(
+                Constraint(
+                    int_set={row_by_problem_id[problem_id] for problem_id in required_problem_id_set},
+                    min_count=len(required_problem_id_set),
+                    max_count=len(required_problem_id_set),
+                )
             )
+
+        # --- search -----------------------------
+        max_div_problem = _build_max_div_problem(
+            candidate_pool, k=len(required_problem_id_set) + selection_size, constraints=constraints
+        )
+        solution = (
+            ParallelMaxDivSolverBuilder(max_div_problem)
+            .with_seed(seed)
+            .with_workers(seconds(len(problem_ids) * sec_per_candidate), n_workers=n_workers)
+            .build()
+            .solve(verbosity=Verbosity.SILENT)
         )
 
-    # --- search ---------------------------------
-    max_div_problem = _build_max_div_problem(
-        candidate_pool, k=len(required_problem_id_set) + quotas.selection_size, constraints=constraints
-    )
-    solution = (
-        ParallelMaxDivSolverBuilder(max_div_problem)
-        .with_seed(seed)
-        .with_workers(seconds(len(problem_ids) * sec_per_candidate), n_workers=n_workers)
-        .build()
-        .solve(verbosity=Verbosity.SILENT)
-    )
-
-    # --- checks ---------------------------------
-    selected_indices = sorted(solution.i_selected)
-    n_missing_required_candidates = len(required_problem_id_set - {problem_ids[idx] for idx in selected_indices})
-    if n_missing_required_candidates:
-        raise PipelineStopError(
-            f"The selection misses {n_missing_required_candidates} of the {len(required_problem_id_set)} required "
-            "candidates."
-        )
-    quotas.check_selection([assigned_tiers[idx] for idx in selected_indices if assigned_tiers[idx] is not None])
-    return tuple(problem_ids[idx] for idx in selected_indices), tier_assignment
+        # --- check and fulfillments -------------
+        selected_problem_ids = tuple(problem_ids[idx] for idx in sorted(solution.i_selected))
+        n_missing_required_candidates = len(required_problem_id_set - set(selected_problem_ids))
+        if n_missing_required_candidates:
+            raise PipelineStopError(
+                f"The selection misses {n_missing_required_candidates} of the {len(required_problem_id_set)} required "
+                "candidates."
+            )
+        else:
+            return selected_problem_ids, tuple(
+                count_quota.fulfillment(selected_problem_ids) for count_quota in count_quotas
+            )
 
 
 # ==================================================================================================

@@ -1,12 +1,15 @@
 """These tests check the diverse selection of `CandidatePool` candidates by max-div:
 
-- `select_diverse_problem_ids` stops the pipeline when max-div's selection misses a quota or a required candidate;
-- with required candidates, its selection holds all of them, and the others, to which it assigns the tiers, meet the
-  quotas;
+- `select_diverse_problem_ids` records a quota that max-div's selection misses, and stops the pipeline when the
+  selection misses a required candidate;
+- with required candidates, its selection holds all of them, and the others meet the quotas;
+- when a group holds fewer candidates than its quota, max-div returns a full selection that comes closest to the quotas;
+- it refuses a pool too small for the selection;
 - `compute_diversity_score` gives the geometric mean of the candidates' separations under both distances;
 - the distance over the feature columns is the L1 distance that leaves the EDI column out.
 """
 
+from fractions import Fraction
 from types import SimpleNamespace
 
 import numpy as np
@@ -16,13 +19,21 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStopError
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureMatrix
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     CandidatePool,
-    DifficultyTierQuotas,
+    DifficultyTier,
+    DifficultyTierCandidateGroup,
+    QuotaFulfillment,
+    ShareQuota,
     compute_diversity_score,
     select_diverse_problem_ids,
 )
 from sunnbear._core.benchmark.suites.pipeline.selection.diverse_selection import l1_distance_over_leading_columns
 from sunnbear._core.stats import l1_distances_to
 from tests.benchmark.suites.pipeline.example_states import example_problem_ids
+
+# Each tier holds exactly a quarter of the selection, as in the benchmark suites of the a-series and the b-series.
+_QUARTER_PER_TIER = tuple(
+    ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
+)
 
 
 class _FirstCandidatesSolverBuilder:
@@ -61,23 +72,32 @@ def _example_pool(edis: list[float], *, seed: int) -> CandidatePool:
     )
 
 
-def test_a_selection_that_misses_a_quota_stops_the_pipeline(monkeypatch):
-    """A stand-in for max-div's solver selects the first 16 of 32 candidates, all of tier A, so the check after the
-    selection stops the pipeline.
+def test_a_selection_that_misses_a_quota_records_the_miss(monkeypatch):
+    """A stand-in for max-div's solver selects the first 16 of 28 candidates, all of tier A, so the fulfillments record
+    16 candidates of A and none of the other tiers; no candidate is of tier D, so its quota has no constraint.
 
-    With 1 constraint per tier on disjoint sets, max-div itself refuses a constraint that it cannot meet, so only a
-    stand-in reaches the check.
+    max-div itself returns a selection that meets every quota that can be met, so only a stand-in returns this one.
     """
     # --- arrange ----------------------
     monkeypatch.setattr(
         "sunnbear._core.benchmark.suites.pipeline.selection.diverse_selection.ParallelMaxDivSolverBuilder",
         _FirstCandidatesSolverBuilder,
     )
-    pool = _example_pool([5.0] * 16 + [15.0] * 4 + [30.0] * 4 + [60.0] * 4 + [120.0] * 4, seed=5)
+    pool = _example_pool([5.0] * 16 + [15.0] * 6 + [30.0] * 6, seed=5)
 
-    # --- act / assert -----------------
-    with pytest.raises(PipelineStopError, match=r"unmet quotas: A: 16 of 4; B: 0 of 4; C: 0 of 4; D: 0 of 4\."):
-        select_diverse_problem_ids(pool, quotas=DifficultyTierQuotas(16), seed=1, sec_per_candidate=0.05, n_workers=2)
+    # --- act --------------------------
+    selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
+        pool, selection_size=16, quotas=_QUARTER_PER_TIER, seed=1, sec_per_candidate=0.05, n_workers=2
+    )
+
+    # --- assert -----------------------
+    assert selected_problem_ids == pool.feature_matrix.problem_ids[:16]
+    assert [(f.label, f.n_selected, f.is_met) for f in quota_fulfillments] == [
+        ("A", 16, False),
+        ("B", 0, False),
+        ("C", 0, False),
+        ("D", 0, False),
+    ]
 
 
 def test_a_selection_that_misses_a_required_candidate_stops_the_pipeline(monkeypatch):
@@ -95,7 +115,8 @@ def test_a_selection_that_misses_a_required_candidate_stops_the_pipeline(monkeyp
     with pytest.raises(PipelineStopError, match=r"^The selection misses 8 of the 8 required candidates\.$"):
         select_diverse_problem_ids(
             pool,
-            quotas=DifficultyTierQuotas(16),
+            selection_size=16,
+            quotas=_QUARTER_PER_TIER,
             required_problem_ids=required_problem_ids,
             seed=1,
             sec_per_candidate=0.05,
@@ -106,7 +127,7 @@ def test_a_selection_that_misses_a_required_candidate_stops_the_pipeline(monkeyp
 @pytest.mark.only_with_numba_jit
 def test_a_selection_with_required_candidates_holds_them_and_meets_the_quotas_over_the_others():
     """Of 64 candidates, 16 are required and the other 48 hold 12 of each tier; max-div's selection holds the 16
-    required candidates and 4 of each tier of the others."""
+    required candidates and 4 of each tier of the others, so every quota is met."""
     # --- arrange ----------------------
     rng = np.random.default_rng(seed=7)
     edis = [*rng.uniform(4.0, 80.0, size=16), *(edi for edi in (5.0, 15.0, 30.0, 60.0) for _ in range(12))]
@@ -114,9 +135,10 @@ def test_a_selection_with_required_candidates_holds_them_and_meets_the_quotas_ov
     required_problem_ids = pool.feature_matrix.problem_ids[:16]
 
     # --- act --------------------------
-    selected_problem_ids, tier_assignment = select_diverse_problem_ids(
+    selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
         pool,
-        quotas=DifficultyTierQuotas(16),
+        selection_size=16,
+        quotas=_QUARTER_PER_TIER,
         required_problem_ids=required_problem_ids,
         seed=1,
         sec_per_candidate=0.05,
@@ -126,9 +148,47 @@ def test_a_selection_with_required_candidates_holds_them_and_meets_the_quotas_ov
     # --- assert -----------------------
     assert len(selected_problem_ids) == 32
     assert set(required_problem_ids) <= set(selected_problem_ids)
-    assert set(tier_assignment.assigned_tiers) == set(pool.feature_matrix.problem_ids[16:])
-    other_tiers = [tier_assignment.assigned_tiers[p] for p in selected_problem_ids if p not in required_problem_ids]
-    assert sorted(other_tiers) == sorted(tier for tier in tier_assignment.quotas.quota_by_tier for _ in range(4))
+    assert quota_fulfillments == tuple(
+        QuotaFulfillment(label=tier.value, min_count=4, max_count=4, n_selected=4) for tier in DifficultyTier
+    )
+
+
+@pytest.mark.only_with_numba_jit
+def test_a_group_with_too_few_candidates_misses_its_quota_and_the_selection_stays_full():
+    """Only 3 of 39 candidates are of tier D, under a quota of 4 in a selection of 16; max-div selects all 3 of them,
+    and fills the other 13 places from the other tiers, each with at least its quota of 4."""
+    # --- arrange ----------------------
+    pool = _example_pool([5.0] * 12 + [15.0] * 12 + [30.0] * 12 + [60.0] * 3, seed=9)
+
+    # --- act --------------------------
+    selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
+        pool, selection_size=16, quotas=_QUARTER_PER_TIER, seed=1, sec_per_candidate=0.05, n_workers=2
+    )
+
+    # --- assert -----------------------
+    n_selected_by_label = {fulfillment.label: fulfillment.n_selected for fulfillment in quota_fulfillments}
+    assert len(selected_problem_ids) == 16
+    assert n_selected_by_label["D"] == 3
+    assert all(n_selected_by_label[label] >= 4 for label in "ABC")
+    assert sum(n_selected_by_label.values()) == 16
+
+
+def test_a_pool_too_small_for_the_selection_is_refused():
+    """A pool of 20 candidates, 8 of them required, leaves 12 for a selection of 16."""
+    # --- arrange ----------------------
+    pool = _example_pool([5.0] * 20, seed=5)
+
+    # --- act / assert -----------------
+    with pytest.raises(ValueError, match=r"^A pool of 12 candidates that are not required cannot fill a selection"):
+        select_diverse_problem_ids(
+            pool,
+            selection_size=16,
+            quotas=(),
+            required_problem_ids=pool.feature_matrix.problem_ids[:8],
+            seed=1,
+            sec_per_candidate=0.05,
+            n_workers=2,
+        )
 
 
 @pytest.mark.only_with_numba_jit
