@@ -1,5 +1,5 @@
-"""These tests assert that every built-in solver states a readable name and whether it brackets, and that every
-built-in config states a readable name and a summary."""
+"""Every built-in solver states a readable name and whether it brackets, and every built-in config states a
+readable name and a summary."""
 
 import pytest
 

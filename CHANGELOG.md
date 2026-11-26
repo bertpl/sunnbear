@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `Solver.readable_name` and `SolverConfig.readable_name`, the readable names of solvers and solver configs; `SolverConfig.summary`, a sentence that says what a built-in config is; and `Solver.is_bracketing`
+- Add `Solver.readable_name`, `Solver.is_bracketing`, `SolverConfig.readable_name` and `SolverConfig.summary`, a sentence that says what a config is
 
 ### Changed
 
