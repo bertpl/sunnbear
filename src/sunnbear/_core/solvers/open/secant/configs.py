@@ -12,4 +12,14 @@ class SecantConfigsDeclaration(SolverConfigsDeclaration):
     interval, so its results do not reliably characterize the test problems.
     """
 
-    configs = (SolverConfig(solver_cls=Secant, role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (
+        SolverConfig(
+            solver_cls=Secant,
+            role=SolverRole.BUILTIN_SECONDARY,
+            readable_name="Secant",
+            summary=(
+                "The secant method in the form of SciPy's newton without a derivative: an open method, whose "
+                "iterates may leave the initial interval."
+            ),
+        ),
+    )

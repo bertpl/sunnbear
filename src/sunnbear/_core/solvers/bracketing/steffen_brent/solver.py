@@ -81,6 +81,8 @@ class SteffenBrent(Solver):
     """
 
     name = "steffen_brent"
+    readable_name = "Steffen-Brent"
+    is_bracketing = True
     version = 4
 
     def _solve(self, state: SolveState) -> float:

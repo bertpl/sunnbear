@@ -98,7 +98,12 @@ def test_configs_are_sorted_by_solver_id_and_solver_classes_are_unique():
     `SolverConfigRegistry.solver_classes` lists each solver class once, in that order."""
     # --- arrange ----------------------
     configs = tuple(
-        SolverConfig(solver_cls=WeightedSplitSolver, role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": weight})
+        SolverConfig(
+            solver_cls=WeightedSplitSolver,
+            role=SolverRole.USER_ACTIVE,
+            solver_kwargs={"weight": weight},
+            readable_name="Weighted split",
+        )
         for weight in (0.75, 0.25)
     )
     define_configs_declaration({"configs": configs})
@@ -177,7 +182,9 @@ def test_config_from_id_rejects_an_unknown_id():
 def test_duplicate_solver_id_is_rejected():
     """Declaring a config with the ``solver_id`` of a registered config raises ``ValueError``."""
     # --- arrange ----------------------
-    namespace = {"configs": (SolverConfig(solver_cls=Bisection, role=SolverRole.USER_ACTIVE),)}
+    namespace = {
+        "configs": (SolverConfig(solver_cls=Bisection, role=SolverRole.USER_ACTIVE, readable_name="Bisection"),)
+    }
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="Duplicate solver_id 'bisection'"):
@@ -192,7 +199,10 @@ def test_second_baseline_is_rejected():
         "__module__": "sunnbear.hypothetical_solvers",
         "configs": (
             SolverConfig(
-                solver_cls=WeightedSplitSolver, role=SolverRole.BUILTIN_BASELINE, solver_kwargs={"weight": 0.5}
+                solver_cls=WeightedSplitSolver,
+                role=SolverRole.BUILTIN_BASELINE,
+                solver_kwargs={"weight": 0.5},
+                readable_name="Weighted split",
             ),
         ),
     }

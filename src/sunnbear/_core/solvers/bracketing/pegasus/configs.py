@@ -12,4 +12,15 @@ class PegasusConfigsDeclaration(SolverConfigsDeclaration):
     falsi family among the core configs.
     """
 
-    configs = (SolverConfig(solver_cls=Pegasus, role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (
+        SolverConfig(
+            solver_cls=Pegasus,
+            role=SolverRole.BUILTIN_SECONDARY,
+            readable_name="Pegasus",
+            summary=(
+                "The Pegasus method of Dowell and Jarratt (1972): regula falsi that multiplies the function value "
+                r"of an interval bound that it keeps twice in a row by $f_{\text{previous}} / (f_{\text{previous}} "
+                r"+ f_{\text{new}})$."
+            ),
+        ),
+    )

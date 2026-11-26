@@ -103,6 +103,8 @@ class Ford(BracketingSolver[FordState]):
     """
 
     name = "ford"
+    readable_name = "Ford"
+    is_bracketing = True
     version = 1
     state_cls = FordState
 

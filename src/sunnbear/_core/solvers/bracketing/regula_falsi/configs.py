@@ -12,4 +12,15 @@ class RegulaFalsiConfigsDeclaration(SolverConfigsDeclaration):
     problems reliably.
     """
 
-    configs = (SolverConfig(solver_cls=RegulaFalsi, role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (
+        SolverConfig(
+            solver_cls=RegulaFalsi,
+            role=SolverRole.BUILTIN_SECONDARY,
+            readable_name="Regula Falsi",
+            summary=(
+                "The classic regula falsi method, which evaluates the zero of the secant through the 2 interval "
+                "bounds in every iteration, without any modification against its stall on a convex or concave "
+                "function."
+            ),
+        ),
+    )

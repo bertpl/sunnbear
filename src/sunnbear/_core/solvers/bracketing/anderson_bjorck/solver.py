@@ -108,6 +108,8 @@ class AndersonBjorck(BracketingSolver[AndersonBjorckState]):
     """
 
     name = "anderson_bjorck"
+    readable_name = "Anderson-Björck"
+    is_bracketing = True
     version = 4
     state_cls = AndersonBjorckState
 

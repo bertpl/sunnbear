@@ -19,12 +19,36 @@ class FordConfigsDeclaration(SolverConfigsDeclaration):
 
     configs = (
         SolverConfig(
-            solver_cls=Ford, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_1}
+            solver_cls=Ford,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": FordVariant.METHOD_1},
+            readable_name="Ford (Method 1)",
+            summary=(
+                "Method 1 of Ford (1997): regula falsi that multiplies the function value of an interval bound "
+                "that it keeps twice in a row by a ratio of 2 slopes, whose denominator is the slope at the "
+                "oldest of the last 3 iterates of the quadratic through them."
+            ),
         ),
         SolverConfig(
-            solver_cls=Ford, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_3}
+            solver_cls=Ford,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": FordVariant.METHOD_3},
+            readable_name="Ford (Method 3)",
+            summary=(
+                "Method 3 of Ford (1997): regula falsi that multiplies the function value of an interval bound "
+                "that it keeps twice in a row by a ratio of 2 slopes, whose denominator is the slope of the "
+                "secant through the oldest and the newest of the last 3 iterates."
+            ),
         ),
         SolverConfig(
-            solver_cls=Ford, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": FordVariant.METHOD_4}
+            solver_cls=Ford,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": FordVariant.METHOD_4},
+            readable_name="Ford (Method 4)",
+            summary=(
+                "Method 4 of Ford (1997): regula falsi that multiplies the function value of an interval bound "
+                "that it keeps twice in a row by a ratio of 2 slopes, whose denominator is the slope of the "
+                "secant through the oldest 2 of the last 3 iterates."
+            ),
         ),
     )

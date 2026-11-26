@@ -77,6 +77,8 @@ class ModABSafeguarded(Solver):
     """
 
     name = "modab_safeguarded"
+    readable_name = "modAB, safeguarded"
+    is_bracketing = True
     version = 1
 
     # The method's 2 constants, the preprint's B and M, are class attributes, so that the test suite can override them

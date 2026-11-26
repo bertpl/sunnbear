@@ -116,6 +116,8 @@ class Brent(Solver):
     """
 
     name = "brent"
+    readable_name = "Brent"
+    is_bracketing = True
     version = 2
 
     def __init__(self, *, variant: BrentVariant) -> None:

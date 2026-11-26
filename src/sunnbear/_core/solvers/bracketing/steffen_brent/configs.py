@@ -12,4 +12,11 @@ class SteffenBrentConfigsDeclaration(SolverConfigsDeclaration):
     tests it on 2 functions only.
     """
 
-    configs = (SolverConfig(solver_cls=SteffenBrent, role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (
+        SolverConfig(
+            solver_cls=SteffenBrent,
+            role=SolverRole.BUILTIN_SECONDARY,
+            readable_name="Steffen-Brent",
+            summary=("The modified Brent method of Steffen et al. (2025), as the article's Algorithm 2."),
+        ),
+    )

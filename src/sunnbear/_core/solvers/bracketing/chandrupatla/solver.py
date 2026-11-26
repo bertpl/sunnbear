@@ -60,6 +60,8 @@ class Chandrupatla(Solver):
     """
 
     name = "chandrupatla"
+    readable_name = "Chandrupatla"
+    is_bracketing = True
     version = 2
 
     def _solve(self, state: SolveState) -> float:

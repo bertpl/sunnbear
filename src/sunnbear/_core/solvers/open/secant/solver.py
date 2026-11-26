@@ -50,6 +50,8 @@ class Secant(Solver):
     """
 
     name = "secant"
+    readable_name = "Secant"
+    is_bracketing = False
     version = 2
 
     def _solve(self, state: SolveState) -> float:

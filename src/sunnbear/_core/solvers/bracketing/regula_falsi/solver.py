@@ -29,6 +29,8 @@ class RegulaFalsi(BracketingSolver):
     """
 
     name = "regula_falsi"
+    readable_name = "Regula Falsi"
+    is_bracketing = True
     version = 1
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:

@@ -16,6 +16,24 @@ class TOMS748ConfigsDeclaration(SolverConfigsDeclaration):
     """
 
     configs = (
-        SolverConfig(solver_cls=TOMS748, role=SolverRole.BUILTIN_CORE, solver_kwargs={"k": 1}),
-        SolverConfig(solver_cls=TOMS748, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"k": 2}),
+        SolverConfig(
+            solver_cls=TOMS748,
+            role=SolverRole.BUILTIN_CORE,
+            solver_kwargs={"k": 1},
+            readable_name="TOMS 748 (k=1)",
+            summary=(
+                "Algorithm 4.1 of Alefeld, Potra and Shi (1995), the case $k = 1$ of its Algorithm 5.7, as the "
+                "article states it."
+            ),
+        ),
+        SolverConfig(
+            solver_cls=TOMS748,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"k": 2},
+            readable_name="TOMS 748 (k=2)",
+            summary=(
+                "Algorithm 4.2 of Alefeld, Potra and Shi (1995), the case $k = 2$ of its Algorithm 5.7, as the "
+                "article states it."
+            ),
+        ),
     )

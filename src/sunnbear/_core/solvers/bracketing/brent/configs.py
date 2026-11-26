@@ -19,9 +19,22 @@ class BrentConfigsDeclaration(SolverConfigsDeclaration):
 
     configs = (
         SolverConfig(
-            solver_cls=Brent, role=SolverRole.BUILTIN_CORE, solver_kwargs={"variant": BrentVariant.INVERSE_QUADRATIC}
+            solver_cls=Brent,
+            role=SolverRole.BUILTIN_CORE,
+            solver_kwargs={"variant": BrentVariant.INVERSE_QUADRATIC},
+            readable_name="Brent",
+            summary=(
+                "Brent's method, as the Algol 60 procedure zero of Brent (1971), with inverse quadratic interpolation."
+            ),
         ),
         SolverConfig(
-            solver_cls=Brent, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": BrentVariant.HYPERBOLIC}
+            solver_cls=Brent,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": BrentVariant.HYPERBOLIC},
+            readable_name="Brent (hyperbolic)",
+            summary=(
+                "Brent's method with hyperbolic interpolation in place of inverse quadratic interpolation, as "
+                "SciPy's brenth."
+            ),
         ),
     )

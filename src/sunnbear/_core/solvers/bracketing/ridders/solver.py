@@ -76,6 +76,8 @@ class Ridders(Solver):
     """
 
     name = "ridders"
+    readable_name = "Ridders"
+    is_bracketing = True
     version = 2
 
     def __init__(self, *, variant: RiddersVariant) -> None:
