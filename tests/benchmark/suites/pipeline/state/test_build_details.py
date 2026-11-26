@@ -2,7 +2,9 @@
 
 - `PipelineState.create_build_details` refuses a finished stage that did not write its information;
 - the build details give only the information of the finished stages;
-- they count the drops and the incorrect solves, list the rejections per formula, and count each suite's tiers;
+- they count the drops and the incorrect solves, and give each config's geometric mean of function evaluations per
+  candidate;
+- they list the rejections per formula, and give each suite's number of test problems and quota per difficulty tier;
 - the build details that are read back from their own files equal the ones that wrote them;
 - they report the candidates that differ from those of the registered formulas.
 """
@@ -187,6 +189,53 @@ def test_the_build_details_count_each_configs_incorrect_solves():
 
     # --- assert -----------------------
     assert table.rows() == [("bisection", 192, 3, 3 / 192)]
+
+
+def test_the_build_details_give_each_configs_geomean_of_n_fevals_eff_per_candidate():
+    """Over the candidates that coarse characterization kept, the table gives 1 row per candidate and config, with
+    the value of that config's geomean feature."""
+    # --- arrange ----------------------
+    build_details = _distilled_state().create_build_details()
+    results = build_details.characterization_results(PipelineStageId.COARSE_CHARACTERIZATION)
+
+    # --- act --------------------------
+    table = build_details.n_fevals_table(PipelineStageId.COARSE_CHARACTERIZATION)
+
+    # --- assert -----------------------
+    assert table.rows() == [
+        (str(problem_id), "bisection", results.raw_feature_matrix.values[idx, 0])
+        for idx, problem_id in enumerate(results.raw_feature_matrix.problem_ids)
+    ]
+
+
+def test_the_build_details_give_no_n_fevals_table_for_a_stage_that_did_not_finish():
+    """A characterization stage that did not finish has no table."""
+    # --- arrange ----------------------
+    build_details = build_state_before(
+        PipelineStageId.FINE_CHARACTERIZATION, example_problem_ids(3)
+    ).create_build_details()
+
+    # --- act / assert -----------------
+    assert build_details.n_fevals_table(PipelineStageId.FINE_CHARACTERIZATION) is None
+
+
+@pytest.mark.parametrize(
+    "stage_id, rows_expected",
+    [
+        pytest.param(PipelineStageId.DISTILLATION, [("sb-4", 4, 1, 1, 1, 1)], id="core_selection_finished"),
+        pytest.param(PipelineStageId.CORE_SELECTION, None, id="core_selection_not_finished"),
+    ],
+)
+def test_the_build_details_give_each_suites_quota_per_tier(stage_id, rows_expected):
+    """A Core of 4 has a quota of 1 per tier; without a finished core selection there is no table."""
+    # --- act --------------------------
+    table = build_state_before(stage_id, example_problem_ids(4)).create_build_details().suite_tier_quotas()
+
+    # --- assert -----------------------
+    if rows_expected is None:
+        assert table is None
+    else:
+        assert table.rows() == rows_expected
 
 
 @pytest.mark.parametrize(

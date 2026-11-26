@@ -69,10 +69,15 @@ class DiversityFeatureFactory:
         return tuple(config.solver_id for config in self.solver_configs)
 
     @property
+    def geomean_feature_names(self) -> tuple[str, ...]:
+        """Return the names of the features that hold the configs' geometric means of ``n_fevals_eff``, in order."""
+        return tuple(f"{FeatureBlock.SOLVERS}_geomean_{solver_id}" for solver_id in self.solver_ids)
+
+    @property
     def feature_names(self) -> tuple[str, ...]:
         """Return the feature names, in the order of the features, each starting with its `FeatureBlock` value."""
         return (
-            *(f"{FeatureBlock.SOLVERS}_geomean_{solver_id}" for solver_id in self.solver_ids),
+            *self.geomean_feature_names,
             *(f"{FeatureBlock.SOLVERS}_gpq_{round(100 * level):02d}" for level in SOLVERS_GPQ_LEVELS),
             *(f"{FeatureBlock.SNUFFLED}_{prop.value}" for prop in SNUFFLED_PROPERTIES),
         )
@@ -147,6 +152,11 @@ class DiversityFeatureFactory:
         for block, block_slice in self._block_slices.items():
             values[:, block_slice] /= block_scales.scale_per_block[block]
         return FeatureMatrix(problem_ids=raw_feature_matrix.problem_ids, values=values)
+
+    def geomean_columns(self, raw_feature_matrix: FeatureMatrix) -> np.ndarray:
+        """Return the geomean features of `raw_feature_matrix`, 1 column per config in the order of `solver_ids`."""
+        column_idxs = [self.feature_names.index(name) for name in self.geomean_feature_names]
+        return raw_feature_matrix.values[:, column_idxs]
 
     # --------------------------------------------------------------------------
     #  Helpers

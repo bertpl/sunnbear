@@ -82,6 +82,12 @@ def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_1_name_per_propert
 
 
 @pytest.mark.usefixtures("patched_solver_ids")
+def test_the_geomean_names_are_the_first_feature_names_in_the_order_of_the_configs():
+    """The names of the geomean features are the first feature names, 1 per config, in config order."""
+    assert _FACTORY.geomean_feature_names == _FACTORY.feature_names[:2]
+
+
+@pytest.mark.usefixtures("patched_solver_ids")
 def test_the_raw_features_are_geomeans_gpqs_over_all_solves_and_property_means():
     """The raw features are the geometric mean of each config's column, the gpq at each level over all solves
     together, and the mean of each property, all in natural units."""

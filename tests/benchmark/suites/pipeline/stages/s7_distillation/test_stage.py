@@ -94,6 +94,7 @@ def test_the_series_split_a_core_of_128_into_2_suites_of_64():
         (16, 16),
         (16, 16),
     ]
+    assert build_details.suite_tier_quotas().select("quota_a", "quota_d").rows() == [(32, 32), (16, 16), (16, 16)]
     assert all_selection_details["sb-64a"].diversity > 0.0
     assert (all_selection_details["sb-64b"].edi_range_by_tier, all_selection_details["sb-64b"].diversity) == (
         None,

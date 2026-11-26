@@ -29,7 +29,7 @@ import polars as pl
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, DifficultyTierQuotas
 from sunnbear._core.problems.core import FormulaRegistry, ProblemId
 
 from .candidate_registry import CandidateDrop
@@ -257,6 +257,18 @@ class BenchmarkSuitesBuildDetails:
         else:
             return results.incorrect_solves_table()
 
+    def n_fevals_table(self, stage_id: PipelineStageId) -> pl.DataFrame | None:
+        """Return each core solver config's geometric mean of ``n_fevals_eff`` per candidate that `stage_id` kept.
+
+        The columns are those of `CharacterizationResults.n_fevals_table`. Return ``None`` for a stage that did not
+        finish.
+        """
+        results = self.characterization_results(stage_id)
+        if results is None:
+            return None
+        else:
+            return results.n_fevals_table()
+
     def suite_tier_counts(self) -> pl.DataFrame | None:
         """Return 1 row per selected suite, with its number of test problems per difficulty tier.
 
@@ -275,7 +287,7 @@ class BenchmarkSuitesBuildDetails:
         if core_selection_details is None or difficulty_tiers is None:
             return None
         else:
-            all_selection_details = [core_selection_details, *(self.distilled_suite_selection_details() or {}).values()]
+            all_selection_details = self._all_selection_details(core_selection_details)
             rows = []
             for selection_details in all_selection_details:
                 suite = selection_details.benchmark_suite
@@ -289,6 +301,37 @@ class BenchmarkSuitesBuildDetails:
                     }
                 )
             return pl.DataFrame(rows, schema_overrides={"diversity": pl.Float64()})
+
+    def suite_tier_quotas(self) -> pl.DataFrame | None:
+        """Return 1 row per selected suite, with its quota per difficulty tier.
+
+        A tier's quota is the exact number of the suite's test problems that the tier must hold.
+
+        The rows are those of `suite_tier_counts`, in its order. The columns are:
+
+        - ``suite_name`` and ``size``;
+        - 1 column ``quota_<tier>`` per `DifficultyTier`, named with the tier's value in lower case and holding the
+          quota that `DifficultyTierQuotas` gives for the suite's size.
+
+        Return ``None`` when core selection did not finish.
+        """
+        core_selection_details = self.core_selection_details()
+        if core_selection_details is None:
+            return None
+        else:
+            all_selection_details = self._all_selection_details(core_selection_details)
+            rows = []
+            for selection_details in all_selection_details:
+                size = len(selection_details.benchmark_suite.problem_ids)
+                quota_by_tier = DifficultyTierQuotas(selection_size=size).quota_by_tier
+                rows.append(
+                    {
+                        "suite_name": selection_details.benchmark_suite.name,
+                        "size": size,
+                        **{f"quota_{tier.value.lower()}": quota for tier, quota in quota_by_tier.items()},
+                    }
+                )
+            return pl.DataFrame(rows)
 
     # --------------------------------------------------------------------------
     #  Files
@@ -361,6 +404,10 @@ class BenchmarkSuitesBuildDetails:
             return copy.deepcopy(information)
         else:
             return None
+
+    def _all_selection_details(self, core_selection_details: SuiteSelectionDetails) -> list[SuiteSelectionDetails]:
+        """Return the `SuiteSelectionDetails` of the Core, then those of the distilled suites in their order."""
+        return [core_selection_details, *(self.distilled_suite_selection_details() or {}).values()]
 
     # --------------------------------------------------------------------------
     #  Factory methods
