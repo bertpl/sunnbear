@@ -123,17 +123,16 @@ class CharacterizationResults:
         """Return, per kept candidate and core solver config, the geometric mean of the config's ``n_fevals_eff``.
 
         The columns are ``problem_id``, ``solver_id`` and ``geomean_n_fevals_eff``: the mean over the stage's Monte
-        Carlo solves of the candidate, in which an incorrect solve counts as its budget. The rows follow the candidates'
-        order, and within a candidate the order of `DiversityFeatureFactory.solver_ids`.
+        Carlo solves of the candidate, in which an incorrect solve counts as its full budget of function evaluations.
+        The rows follow the candidates' order, and within a candidate the order of `DiversityFeatureFactory.solver_ids`.
         """
         factory = DiversityFeatureFactory()
-        column_idxs = [factory.feature_names.index(name) for name in factory.geomean_feature_names]
         problem_ids = self.raw_feature_matrix.problem_ids
         return pl.DataFrame(
             {
                 "problem_id": [str(problem_id) for problem_id in problem_ids for _ in factory.solver_ids],
                 "solver_id": [solver_id for _ in problem_ids for solver_id in factory.solver_ids],
-                "geomean_n_fevals_eff": self.raw_feature_matrix.values[:, column_idxs].ravel().tolist(),
+                "geomean_n_fevals_eff": factory.geomean_columns(self.raw_feature_matrix).ravel().tolist(),
             },
             schema={"problem_id": pl.String(), "solver_id": pl.String(), "geomean_n_fevals_eff": pl.Float64()},
         )

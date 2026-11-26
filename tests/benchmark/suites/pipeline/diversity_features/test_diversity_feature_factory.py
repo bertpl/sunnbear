@@ -83,7 +83,7 @@ def test_the_names_hold_1_geomean_per_config_9_gpq_levels_and_1_name_per_propert
 
 @pytest.mark.usefixtures("patched_solver_ids")
 def test_the_geomean_names_are_the_first_feature_names_in_the_order_of_the_configs():
-    """The names of the geomean features are those of the first features, 1 per config in its order."""
+    """The names of the geomean features are the first feature names, 1 per config, in config order."""
     assert _FACTORY.geomean_feature_names == _FACTORY.feature_names[:2]
 
 

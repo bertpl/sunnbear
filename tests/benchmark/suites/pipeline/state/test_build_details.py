@@ -2,8 +2,8 @@
 
 - `PipelineState.create_build_details` refuses a finished stage that did not write its information;
 - the build details give only the information of the finished stages;
-- they count the drops and the incorrect solves, give each config's geomean of evaluations per candidate, list
-  the rejections per formula, and count each suite's tiers and give its quotas;
+- they count the drops and the incorrect solves, and give each config's geomean of evaluations per candidate;
+- they list the rejections per formula, and count each suite's tiers and give its quotas;
 - the build details that are read back from their own files equal the ones that wrote them;
 - they report the candidates that differ from those of the registered formulas.
 """
@@ -207,7 +207,7 @@ def test_the_build_details_give_each_configs_geomean_of_fevals_per_candidate():
     ]
 
 
-def test_the_build_details_give_no_fevals_table_for_a_stage_that_did_not_finish():
+def test_the_build_details_give_no_n_fevals_table_for_a_stage_that_did_not_finish():
     """A characterization stage that did not finish has no table."""
     # --- arrange ----------------------
     build_details = build_state_before(
