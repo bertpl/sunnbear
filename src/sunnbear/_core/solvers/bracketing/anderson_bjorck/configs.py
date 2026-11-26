@@ -12,4 +12,15 @@ class AndersonBjorckConfigsDeclaration(SolverConfigsDeclaration):
     falsi family among the core configs.
     """
 
-    configs = (SolverConfig(solver_cls=AndersonBjorck, role=SolverRole.BUILTIN_SECONDARY),)
+    configs = (
+        SolverConfig(
+            solver_cls=AndersonBjorck,
+            role=SolverRole.BUILTIN_SECONDARY,
+            readable_name="Anderson-Björck",
+            summary=(
+                "The method of Anderson and Björck (1973): regula falsi that multiplies the function value of an "
+                r"interval bound that it keeps twice in a row by $1 - f_{\text{new}} / f_{\text{previous}}$, or by "
+                "0.5 where that is not positive."
+            ),
+        ),
+    )

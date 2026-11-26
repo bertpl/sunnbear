@@ -39,7 +39,12 @@ def test_solver_id_lists_init_arguments_sorted_by_name(solver_kwargs, solver_id_
     """A config's ``solver_id`` is the solver name followed by its init arguments, sorted by name whatever their order
     in ``solver_kwargs``."""
     # --- act --------------------------
-    config = SolverConfig(solver_cls=WeightedSplitSolver, role=SolverRole.USER_ACTIVE, solver_kwargs=solver_kwargs)
+    config = SolverConfig(
+        solver_cls=WeightedSplitSolver,
+        role=SolverRole.USER_ACTIVE,
+        solver_kwargs=solver_kwargs,
+        readable_name="Weighted split",
+    )
 
     # --- assert -----------------------
     assert config.solver_id == solver_id_expected
@@ -49,7 +54,10 @@ def test_instantiate_passes_the_init_arguments():
     """`SolverConfig.instantiate` builds an instance of the config's solver class from its ``solver_kwargs``."""
     # --- arrange ----------------------
     config = SolverConfig(
-        solver_cls=WeightedSplitSolver, role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.25, "n_warmup": 3}
+        solver_cls=WeightedSplitSolver,
+        role=SolverRole.USER_ACTIVE,
+        solver_kwargs={"weight": 0.25, "n_warmup": 3},
+        readable_name="Weighted split",
     )
 
     # --- act --------------------------
@@ -66,9 +74,17 @@ def test_every_config_of_a_declaration_is_registered_with_its_own_solver_class_a
     declare configs of 2 solver classes, and with the subclass's module, which a benchmark worker imports."""
     # --- arrange ----------------------
     configs = (
-        SolverConfig(solver_cls=WeightedSplitSolver, role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.25}),
         SolverConfig(
-            solver_cls=_RenamedWeightedSplitSolver, role=SolverRole.USER_OTHER, solver_kwargs={"weight": 0.75}
+            solver_cls=WeightedSplitSolver,
+            role=SolverRole.USER_ACTIVE,
+            solver_kwargs={"weight": 0.25},
+            readable_name="Weighted split",
+        ),
+        SolverConfig(
+            solver_cls=_RenamedWeightedSplitSolver,
+            role=SolverRole.USER_OTHER,
+            solver_kwargs={"weight": 0.75},
+            readable_name="Renamed weighted split",
         ),
     )
 
@@ -104,7 +120,9 @@ def test_malformed_config_is_rejected_when_built(solver_cls, solver_kwargs, mess
     not fit that class or cannot be written as text by `solver_id`, raises ``TypeError`` that names the defect."""
     # --- act / assert -----------------
     with pytest.raises(TypeError, match=message):
-        SolverConfig(solver_cls=solver_cls, role=SolverRole.USER_ACTIVE, solver_kwargs=solver_kwargs)
+        SolverConfig(
+            solver_cls=solver_cls, role=SolverRole.USER_ACTIVE, solver_kwargs=solver_kwargs, readable_name="Example"
+        )
 
 
 @pytest.mark.usefixtures("isolated_solver_config_registry")
@@ -117,7 +135,10 @@ def test_malformed_config_is_rejected_when_built(solver_cls, solver_kwargs, mess
             {
                 "configs": [
                     SolverConfig(
-                        solver_cls=WeightedSplitSolver, role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.5}
+                        solver_cls=WeightedSplitSolver,
+                        role=SolverRole.USER_ACTIVE,
+                        solver_kwargs={"weight": 0.5},
+                        readable_name="Weighted split",
                     )
                 ]
             },
@@ -140,7 +161,12 @@ def test_a_malformed_declaration_registers_none_of_its_configs():
     registered."""
     # --- arrange ----------------------
     configs = (
-        SolverConfig(solver_cls=WeightedSplitSolver, role=SolverRole.USER_ACTIVE, solver_kwargs={"weight": 0.5}),
+        SolverConfig(
+            solver_cls=WeightedSplitSolver,
+            role=SolverRole.USER_ACTIVE,
+            solver_kwargs={"weight": 0.5},
+            readable_name="Weighted split",
+        ),
         {"weight": 0.75},
     )
 
@@ -157,7 +183,16 @@ def test_a_malformed_declaration_registers_none_of_its_configs():
 def test_builtin_only_role_outside_sunnbear_is_rejected(role):
     """Declaring a config outside the sunnbear package with a built-in-only role raises ``ValueError``."""
     # --- arrange ----------------------
-    namespace = {"configs": (SolverConfig(solver_cls=WeightedSplitSolver, role=role, solver_kwargs={"weight": 0.5}),)}
+    namespace = {
+        "configs": (
+            SolverConfig(
+                solver_cls=WeightedSplitSolver,
+                role=role,
+                solver_kwargs={"weight": 0.5},
+                readable_name="Weighted split",
+            ),
+        )
+    }
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="reserved for configs inside the sunnbear package"):
@@ -171,7 +206,12 @@ def test_builtin_only_role_inside_sunnbear_is_accepted():
     namespace = {
         "__module__": "sunnbear.hypothetical_solvers",
         "configs": (
-            SolverConfig(solver_cls=WeightedSplitSolver, role=SolverRole.BUILTIN_CORE, solver_kwargs={"weight": 0.5}),
+            SolverConfig(
+                solver_cls=WeightedSplitSolver,
+                role=SolverRole.BUILTIN_CORE,
+                solver_kwargs={"weight": 0.5},
+                readable_name="Weighted split",
+            ),
         ),
     }
 

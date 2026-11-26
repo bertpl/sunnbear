@@ -34,7 +34,7 @@ _SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 # ==================================================================================================
 @dataclass(frozen=True, kw_only=True, eq=False)
 class SolverConfig:
-    """`SolverConfig` describes one configured solver: its solver class, that class's init arguments, and a role.
+    """`SolverConfig` describes 1 configured solver: a solver class with fixed init arguments, its role, its texts.
 
     A config is declared in the ``configs`` of a `SolverConfigsDeclaration` subclass. Defining that subclass registers a
     copy of each config, with ``declaring_module_name`` set.
@@ -45,6 +45,11 @@ class SolverConfig:
             is reserved for configs declared inside the sunnbear package.
         solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str, or a
             `StrEnum` member.
+        readable_name: The config's short name for a reader, such as "TOMS 748 (k=1)", unique among the built-in
+            configs. The name need not explain the config: `summary` explains the config.
+        summary: One sentence that tells a reader exactly what the config is, in sunnbear's LaTeX notation
+            (`LatexTemplate`), with its math as ``$…$``. Every built-in config has one; a config declared outside
+            sunnbear may leave it ``None``.
         declaring_module_name: The module of the declaring `SolverConfigsDeclaration` subclass, which a benchmark worker
             imports to register the config in its own process.
     """
@@ -52,7 +57,9 @@ class SolverConfig:
     # Solver[Any], because each solver class fixes its own state type; a bare Solver means Solver[SolveState].
     solver_cls: type[Solver[Any]]
     role: SolverRole
+    readable_name: str
     solver_kwargs: Mapping[str, object] = field(default_factory=dict)
+    summary: str | None = None
     declaring_module_name: str = field(init=False, repr=False)
 
     def __post_init__(self) -> None:

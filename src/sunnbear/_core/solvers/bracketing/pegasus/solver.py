@@ -70,6 +70,8 @@ class Pegasus(BracketingSolver[PegasusState]):
     """
 
     name = "pegasus"
+    readable_name = "Pegasus"
+    is_bracketing = True
     version = 2
     state_cls = PegasusState
 

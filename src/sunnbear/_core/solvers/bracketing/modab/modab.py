@@ -84,6 +84,8 @@ class ModAB(Solver):
     """
 
     name = "modab"
+    readable_name = "modAB"
+    is_bracketing = True
     version = 3
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the authors' C# code

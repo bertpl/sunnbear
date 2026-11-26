@@ -130,6 +130,8 @@ class TOMS748(Solver):
     """
 
     name = "toms748"
+    readable_name = "TOMS 748"
+    is_bracketing = True
     version = 3
 
     # The paper's constants are mu of Algorithms 4.1 and 4.2, and lambda and macheps of the subroutine bracket of

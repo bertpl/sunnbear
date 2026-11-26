@@ -12,4 +12,15 @@ class ChandrupatlaConfigsDeclaration(SolverConfigsDeclaration):
     converges slowly, and Chandrupatla's method switches to bisection while Brent's method keeps interpolating.
     """
 
-    configs = (SolverConfig(solver_cls=Chandrupatla, role=SolverRole.BUILTIN_CORE),)
+    configs = (
+        SolverConfig(
+            solver_cls=Chandrupatla,
+            role=SolverRole.BUILTIN_CORE,
+            readable_name="Chandrupatla",
+            summary=(
+                "Chandrupatla's method (Chandrupatla, 1997), as the BASIC listing of its article: inverse "
+                "quadratic interpolation where the article shows it to be well conditioned, and bisection "
+                "everywhere else."
+            ),
+        ),
+    )

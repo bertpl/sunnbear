@@ -145,6 +145,8 @@ class CARF(Solver):
     """
 
     name = "carf"
+    readable_name = "CARF"
+    is_bracketing = True
     version = 3
 
     def _solve(self, state: SolveState) -> float:  # noqa: C901 — helpers would break the step-by-step match with the paper's description

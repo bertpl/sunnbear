@@ -12,4 +12,14 @@ class IllinoisConfigsDeclaration(SolverConfigsDeclaration):
     characterize the test problems.
     """
 
-    configs = (SolverConfig(solver_cls=Illinois, role=SolverRole.BUILTIN_CORE),)
+    configs = (
+        SolverConfig(
+            solver_cls=Illinois,
+            role=SolverRole.BUILTIN_CORE,
+            readable_name="Illinois",
+            summary=(
+                "The Illinois method of Dowell and Jarratt (1971): regula falsi that halves the function value of "
+                "an interval bound that it keeps twice in a row."
+            ),
+        ),
+    )

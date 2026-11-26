@@ -54,6 +54,8 @@ class Illinois(BracketingSolver[IllinoisState]):
     """
 
     name = "illinois"
+    readable_name = "Illinois"
+    is_bracketing = True
     version = 2
     state_cls = IllinoisState
 

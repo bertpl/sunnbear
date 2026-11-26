@@ -49,6 +49,8 @@ class Bisection(BracketingSolver):
     """
 
     name = "bisection"
+    readable_name = "Bisection"
+    is_bracketing = True
     version = 1
 
     def _next_x(self, state: SolveState, interval: Interval) -> float:

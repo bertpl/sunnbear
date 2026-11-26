@@ -117,6 +117,8 @@ class Ellithy(Solver):
     """
 
     name = "ellithy"
+    readable_name = "Ellithy"
+    is_bracketing = True
     version = 1
 
     # These are the 2 constants of the article's step delta = _DELTA_FACTOR * max(1, |x_FP|) + _DELTA_OFFSET. They are

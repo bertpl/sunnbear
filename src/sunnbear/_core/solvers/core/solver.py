@@ -41,6 +41,12 @@ class Solver(ABC, Generic[StateT]):
         name: Canonical identifier fragment, e.g. ``"bisection"``; with
             `version` and the init arguments, the name identifies a solver in
             benchmark results.
+        readable_name: The solver's name for a reader, such as ``"TOMS 748"``.
+        is_bracketing: Whether the solver keeps an interval around a root;
+            false for an open solver, whose iterates may leave the initial
+            interval. A concrete solver sets it or inherits it from a solver
+            class that does; `BracketingSolver` does not set it, because a
+            solver with its own loop, such as `Brent`, can bracket too.
         version: Bumped on any behavior change, so results from different
             versions of one solver are never combined unknowingly.
         state_cls: The `SolveState` class that `solve` instantiates. A `BracketingSolver` subclass that carries
@@ -50,6 +56,8 @@ class Solver(ABC, Generic[StateT]):
     """
 
     name: ClassVar[str]
+    readable_name: ClassVar[str]
+    is_bracketing: ClassVar[bool]
     version: ClassVar[int]
     state_cls: ClassVar[type[SolveState]] = SolveState
 

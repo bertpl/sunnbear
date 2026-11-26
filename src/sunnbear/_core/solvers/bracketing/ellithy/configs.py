@@ -22,15 +22,41 @@ class EllithyConfigsDeclaration(SolverConfigsDeclaration):
 
     configs = (
         SolverConfig(
-            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.BF}
+            solver_cls=Ellithy,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": EllithyVariant.BF},
+            readable_name="Ellithy Opt.BF",
+            summary=(
+                "Opt.BF of Ellithy (2026): each iteration bisects the interval, then takes a false-position step."
+            ),
         ),
         SolverConfig(
-            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.BFMS}
+            solver_cls=Ellithy,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": EllithyVariant.BFMS},
+            readable_name="Ellithy Opt.BFMS",
+            summary=(
+                "Opt.BFMS of Ellithy (2026): each iteration bisects the interval, takes a false-position step, "
+                "then a modified-secant step."
+            ),
         ),
         SolverConfig(
-            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.TF}
+            solver_cls=Ellithy,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": EllithyVariant.TF},
+            readable_name="Ellithy Opt.TF",
+            summary=(
+                "Opt.TF of Ellithy (2026): each iteration trisects the interval, then takes a false-position step."
+            ),
         ),
         SolverConfig(
-            solver_cls=Ellithy, role=SolverRole.BUILTIN_SECONDARY, solver_kwargs={"variant": EllithyVariant.TFMS}
+            solver_cls=Ellithy,
+            role=SolverRole.BUILTIN_SECONDARY,
+            solver_kwargs={"variant": EllithyVariant.TFMS},
+            readable_name="Ellithy Opt.TFMS",
+            summary=(
+                "Opt.TFMS of Ellithy (2026): each iteration trisects the interval, takes a false-position step, "
+                "then a modified-secant step."
+            ),
         ),
     )

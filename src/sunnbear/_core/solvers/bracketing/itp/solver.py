@@ -72,6 +72,8 @@ class ITP(BracketingSolver[ITPState]):
     """
 
     name = "itp"
+    readable_name = "ITP"
+    is_bracketing = True
     version = 2
     state_cls = ITPState
 
