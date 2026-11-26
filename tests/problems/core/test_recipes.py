@@ -30,20 +30,20 @@ def test_rounding_gives_the_nearest_integer_of_its_kind(rounding, value, expecte
     assert rounding.round_value(value) == expected
 
 
-_ROUNDING_TEXT_CASES = [
+_LATEX_OPERATOR_AND_PHRASE_CASES = [
     (ParamRounding.NEAREST_INTEGER, r"\mathrm{round}", "rounded to the nearest integer"),
     (ParamRounding.NEAREST_ODD_INTEGER, r"\mathrm{odd}", "rounded to the nearest odd integer"),
     (ParamRounding.NEAREST_EVEN_INTEGER, r"\mathrm{even}", "rounded to the nearest even integer"),
 ]
 
 
-def test_rounding_text_cases_cover_every_rounding():
-    """The cases of `test_rounding_names_itself_for_a_reader` name every rounding."""
-    assert {rounding for rounding, _, _ in _ROUNDING_TEXT_CASES} == set(ParamRounding)
+def test_latex_operator_and_phrase_cases_cover_every_rounding():
+    """The cases of `test_rounding_latex_operator_and_phrase` name every rounding."""
+    assert {rounding for rounding, _, _ in _LATEX_OPERATOR_AND_PHRASE_CASES} == set(ParamRounding)
 
 
-@pytest.mark.parametrize("rounding, latex_operator, rounding_phrase", _ROUNDING_TEXT_CASES)
-def test_rounding_names_itself_for_a_reader(rounding, latex_operator, rounding_phrase):
+@pytest.mark.parametrize("rounding, latex_operator, rounding_phrase", _LATEX_OPERATOR_AND_PHRASE_CASES)
+def test_rounding_latex_operator_and_phrase(rounding, latex_operator, rounding_phrase):
     """Each rounding gives the operator of an axis's label and the phrase of its summary."""
     assert (rounding.latex_operator, rounding.rounding_phrase) == (latex_operator, rounding_phrase)
 

@@ -93,7 +93,7 @@ class ParamRounding(StrEnum):
 
     @property
     def latex_operator(self) -> str:
-        r"""Return the LaTeX operator that wraps the ends of an axis with this rounding, such as ``\mathrm{odd}``."""
+        r"""Return the LaTeX operator, such as ``\mathrm{odd}``, around `start` and `stop` in a rounded axis's label."""
         match self:
             case ParamRounding.NEAREST_INTEGER:
                 return r"\mathrm{round}"
@@ -106,10 +106,7 @@ class ParamRounding(StrEnum):
 
     @property
     def rounding_phrase(self) -> str:
-        """Return the phrase that names this rounding, for use in a sentence for a reader.
-
-        An example: "rounded to the nearest integer".
-        """
+        """Return the phrase that names this rounding, for use in a sentence for a reader."""
         match self:
             case ParamRounding.NEAREST_INTEGER:
                 return "rounded to the nearest integer"
@@ -236,17 +233,19 @@ class ParamAxis:
     # --------------------------------------------------------------------------
     @property
     def is_logarithmic(self) -> bool:
-        """Return whether the axis's values lie on a logarithmic scale: whether its notation's grid is logarithmic."""
+        """Return whether the axis's values lie on a logarithmic scale."""
         return self.notation.is_logarithmic
 
     @property
     def values_label(self) -> str:
         r"""Return a short text for a reader that gives the axis's values.
 
-        The text joins the axis's `start` and `stop`, written in its notation, by an arrow, and wraps them in the
-        operator of its rounding, if it has one, as in ``$\mathrm{odd}(2^{0.05} \rightarrow 2^{10})$``. A rounded axis's
-        `start` and `stop` need not be values of the parameter: ``2^{0.05}`` is 1.035, and the values of that axis start
-        at 1.
+        The text gives the axis's `start` and `stop`, written in the axis's notation, with an arrow between them; for an
+        axis with a rounding, the operator of that rounding encloses both, as in
+        ``$\mathrm{odd}(2^{0.05} \rightarrow 2^{10})$``.
+
+        A rounded axis's `start` and `stop` need not be values of the parameter: ``2^{0.05}`` is 1.035, and the values
+        of that axis start at 1.
 
         An axis with 1 value gives that value alone.
 
@@ -256,12 +255,12 @@ class ParamAxis:
         if len(self.values()) == 1:
             return f"${self._latex_of_single_value}$"
         else:
-            ends = rf"{self.notation.spell_argument_in_latex(self.start)} \rightarrow "
-            ends += self.notation.spell_argument_in_latex(self.stop)
+            start_to_stop = rf"{self.notation.spell_argument_in_latex(self.start)} \rightarrow "
+            start_to_stop += self.notation.spell_argument_in_latex(self.stop)
             if self.rounding is None:
-                return f"${ends}$"
+                return f"${start_to_stop}$"
             else:
-                return f"${self.rounding.latex_operator}({ends})$"
+                return f"${self.rounding.latex_operator}({start_to_stop})$"
 
     @property
     def values_summary(self) -> str:
@@ -289,8 +288,8 @@ class ParamAxis:
     def _latex_of_single_value(self) -> str:
         """Return the LaTeX of the value of an axis with 1 value.
 
-        The value is the axis's `start` in its notation, or, for a rounded axis, its rounded value as a decimal, because
-        a rounded value need not be a power of the notation's base.
+        The value is the axis's `start`, written in the axis's notation; for a rounded axis, it is the axis's rounded
+        value, written as a decimal, because a rounded value need not be a power of the notation's base.
         """
         if self.rounding is None:
             return self.notation.spell_argument_in_latex(self.start)
