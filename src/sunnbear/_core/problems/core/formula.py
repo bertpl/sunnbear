@@ -282,13 +282,13 @@ class Formula(FormulaTaxonomyNode, ABC):
     #  LaTeX of the presentation
     # --------------------------------------------------------------------------
     def texts_for_a_reader(self) -> tuple[str, ...]:
-        """Return its texts for a reader: its parameters' meanings, its recipes' summaries, its presentation's texts."""
+        """Return its texts for a reader: its parameters' meanings, its recipes' texts, its presentation's texts."""
         meanings = [param.meaning for param in self.params if param.meaning is not None]
-        summaries = [recipe.summary for recipe in self.recipes() if recipe.summary is not None]
+        recipe_texts = [text for recipe in self.recipes() for text in recipe.texts_for_a_reader()]
         if self.presentation is not None:
-            return (*meanings, *summaries, *self.presentation.texts_for_a_reader)
+            return (*meanings, *recipe_texts, *self.presentation.texts_for_a_reader)
         else:
-            return (*meanings, *summaries)
+            return (*meanings, *recipe_texts)
 
     def latex_with_symbols(self, text: str) -> str:
         r"""Return `text`, in sunnbear's LaTeX notation, with each placeholder replaced by its parameter's symbol.
