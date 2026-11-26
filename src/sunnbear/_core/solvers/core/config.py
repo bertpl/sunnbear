@@ -34,7 +34,7 @@ _SOLVER_KWARG_VALUE_TYPES = (bool, int, float, str)
 # ==================================================================================================
 @dataclass(frozen=True, kw_only=True, eq=False)
 class SolverConfig:
-    """`SolverConfig` describes one configured solver: its solver class and init arguments, its role, and its names.
+    """`SolverConfig` describes 1 configured solver: solver class, init arguments, role, readable name and summary.
 
     A config is declared in the ``configs`` of a `SolverConfigsDeclaration` subclass. Defining that subclass registers a
     copy of each config, with ``declaring_module_name`` set.
@@ -46,9 +46,9 @@ class SolverConfig:
         solver_kwargs: The init arguments passed to ``solver_cls``; each value is a bool, int, float, or str, or a
             `StrEnum` member.
         readable_name: The config's short name for a reader, such as "TOMS 748 (k=1)"; it need not explain the config,
-            which `summary` does. A config that follows its source as written carries its solver's `readable_name`.
-        summary: 1 sentence for a reader that says exactly what the config is, in sunnbear's LaTeX notation, with its
-            math as ``$…$``. None by default; the tests require it of every built-in config.
+            which `summary` does.
+        summary: One sentence that tells a reader exactly what the config is, in sunnbear's LaTeX notation
+            (`LatexTemplate`), with its math as ``$…$``. The tests require it of every built-in config.
         declaring_module_name: The module of the declaring `SolverConfigsDeclaration` subclass, which a benchmark worker
             imports to register the config in its own process.
     """

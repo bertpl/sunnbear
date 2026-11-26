@@ -42,9 +42,9 @@ class Solver(ABC, Generic[StateT]):
             `version` and the init arguments, the name identifies a solver in
             benchmark results.
         readable_name: The solver's name for a reader, such as ``"TOMS 748"``.
-        is_bracketing: Whether the solver keeps an interval around a root, as a
-            bracketing solver does; false for an open solver, whose iterates may
-            leave the initial interval.
+        is_bracketing: Whether the solver keeps an interval around a root;
+            false for an open solver, whose iterates may leave the initial
+            interval.
         version: Bumped on any behavior change, so results from different
             versions of one solver are never combined unknowingly.
         state_cls: The `SolveState` class that `solve` instantiates. A `BracketingSolver` subclass that carries
