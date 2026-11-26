@@ -69,10 +69,15 @@ class DiversityFeatureFactory:
         return tuple(config.solver_id for config in self.solver_configs)
 
     @property
+    def geomean_feature_names(self) -> tuple[str, ...]:
+        """Return the names of the features of each config's geometric mean of ``n_fevals_eff``, in config order."""
+        return tuple(f"{FeatureBlock.SOLVERS}_geomean_{solver_id}" for solver_id in self.solver_ids)
+
+    @property
     def feature_names(self) -> tuple[str, ...]:
         """Return the feature names, in the order of the features, each starting with its `FeatureBlock` value."""
         return (
-            *(f"{FeatureBlock.SOLVERS}_geomean_{solver_id}" for solver_id in self.solver_ids),
+            *self.geomean_feature_names,
             *(f"{FeatureBlock.SOLVERS}_gpq_{round(100 * level):02d}" for level in SOLVERS_GPQ_LEVELS),
             *(f"{FeatureBlock.SNUFFLED}_{prop.value}" for prop in SNUFFLED_PROPERTIES),
         )
