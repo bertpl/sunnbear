@@ -30,17 +30,22 @@ def test_rounding_gives_the_nearest_integer_of_its_kind(rounding, value, expecte
     assert rounding.round_value(value) == expected
 
 
-@pytest.mark.parametrize(
-    "rounding, latex_operator, summary_phrase",
-    [
-        (ParamRounding.NEAREST_INTEGER, r"\mathrm{round}", "rounded to the nearest integer"),
-        (ParamRounding.NEAREST_ODD_INTEGER, r"\mathrm{odd}", "rounded to the nearest odd integer"),
-        (ParamRounding.NEAREST_EVEN_INTEGER, r"\mathrm{even}", "rounded to the nearest even integer"),
-    ],
-)
-def test_rounding_names_itself_for_a_reader(rounding, latex_operator, summary_phrase):
+_ROUNDING_TEXT_CASES = [
+    (ParamRounding.NEAREST_INTEGER, r"\mathrm{round}", "rounded to the nearest integer"),
+    (ParamRounding.NEAREST_ODD_INTEGER, r"\mathrm{odd}", "rounded to the nearest odd integer"),
+    (ParamRounding.NEAREST_EVEN_INTEGER, r"\mathrm{even}", "rounded to the nearest even integer"),
+]
+
+
+def test_rounding_text_cases_cover_every_rounding():
+    """The cases of `test_rounding_names_itself_for_a_reader` name every rounding."""
+    assert {rounding for rounding, _, _ in _ROUNDING_TEXT_CASES} == set(ParamRounding)
+
+
+@pytest.mark.parametrize("rounding, latex_operator, rounding_phrase", _ROUNDING_TEXT_CASES)
+def test_rounding_names_itself_for_a_reader(rounding, latex_operator, rounding_phrase):
     """Each rounding gives the operator of an axis's label and the phrase of its summary."""
-    assert (rounding.latex_operator, rounding.summary_phrase) == (latex_operator, summary_phrase)
+    assert (rounding.latex_operator, rounding.rounding_phrase) == (latex_operator, rounding_phrase)
 
 
 # ==================================================================================================
@@ -507,7 +512,7 @@ def test_recipe_holds_its_summary(recipe, expected):
         ),
         (ParamAxis("p", -0.4, 2.0, 0.2), r"$-0.4 \rightarrow 2$", "All values from $-0.4$ to $2$ in steps of $0.2$."),
         (ParamAxis("b", 30.0, 30.0, 1.0, ParamNotation.POW2), "$2^{30}$", "The single value $2^{30}$."),
-        # both grid points, 1 and 2^0.5, round to 1, so the axis has 1 value, written after the rounding
+        # both grid points, 1 and 2^0.5, round to 1, so the axis has 1 value, written as that rounded value
         (
             ParamAxis("n", 0.0, 0.5, 0.5, ParamNotation.POW2, ParamRounding.NEAREST_INTEGER),
             "$1$",
@@ -516,8 +521,8 @@ def test_recipe_holds_its_summary(recipe, expected):
     ],
 )
 def test_axis_values_label_and_summary(axis, label, summary):
-    """An axis gives its declared ends, step and rounding in a label and a summary, and an axis with 1 value its
-    value."""
+    """An axis gives its `start`, `stop`, step and rounding in a label and a summary; an axis with 1 value gives only
+    that value."""
     assert (axis.values_label, axis.values_summary) == (label, summary)
 
 
@@ -527,22 +532,23 @@ def test_axis_is_logarithmic_as_its_notation(notation):
     assert ParamAxis("p", 0.0, 1.0, 0.5, notation).is_logarithmic is notation.is_logarithmic
 
 
-def test_grid_texts_for_a_reader_hold_its_summary_then_each_axis_label_and_summary():
-    """A grid's texts for a reader are its summary, then each axis's label and summary, in axis order."""
-    # --- arrange ----------------------
-    grid = ParamGrid(axes=(ParamAxis("a", 0.0, 1.0, 0.5), ParamAxis("b", 1.0, 1.0, 1.0)), summary="The sweep.")
-
-    # --- act / assert -----------------
-    assert grid.texts_for_a_reader() == (
-        "The sweep.",
-        r"$0 \rightarrow 1$",
-        "All values from $0$ to $1$ in steps of $0.5$.",
-        "$1$",
-        "The single value $1$.",
-    )
-
-
-@pytest.mark.parametrize("summary, expected", [("The published values.", ("The published values.",)), (None, ())])
-def test_table_texts_for_a_reader_hold_only_its_summary(summary, expected):
-    """A table has no axes, so its texts for a reader are its summary, if it has one."""
-    assert ParamTable(names=("n",), rows=((1.0,),), summary=summary).texts_for_a_reader() == expected
+@pytest.mark.parametrize(
+    "recipe, expected",
+    [
+        (
+            ParamGrid(axes=(ParamAxis("a", 0.0, 1.0, 0.5), ParamAxis("b", 1.0, 1.0, 1.0)), summary="The sweep."),
+            (
+                "The sweep.",
+                r"$0 \rightarrow 1$",
+                "All values from $0$ to $1$ in steps of $0.5$.",
+                "$1$",
+                "The single value $1$.",
+            ),
+        ),
+        (ParamTable(names=("n",), rows=((1.0,),), summary="The published values."), ("The published values.",)),
+        (ParamTable(names=("n",), rows=((1.0,),)), ()),
+    ],
+)
+def test_recipe_texts_for_a_reader(recipe, expected):
+    """A recipe's texts for a reader are its summary, if it has one, then each grid axis's label and summary."""
+    assert recipe.texts_for_a_reader() == expected

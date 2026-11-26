@@ -105,8 +105,11 @@ class ParamRounding(StrEnum):
                 assert_never(self)
 
     @property
-    def summary_phrase(self) -> str:
-        """Return the phrase of a sentence for a reader that names this rounding: "rounded to the nearest integer"."""
+    def rounding_phrase(self) -> str:
+        """Return the phrase that names this rounding, for use in a sentence for a reader.
+
+        An example: "rounded to the nearest integer".
+        """
         match self:
             case ParamRounding.NEAREST_INTEGER:
                 return "rounded to the nearest integer"
@@ -240,10 +243,12 @@ class ParamAxis:
     def values_label(self) -> str:
         r"""Return a short text for a reader that gives the axis's values.
 
-        The text joins the declared ends, in the axis's notation, by an arrow, and wraps them in the operator of the
-        axis's rounding, as in ``$\mathrm{odd}(2^{0.05} \rightarrow 2^{10})$``. A rounded axis's declared ends need
-        not be values of the parameter: ``2^{0.05}`` is 1.035, and the values of that axis start at 1. An axis with 1
-        value gives that value alone.
+        The text joins the axis's `start` and `stop`, written in its notation, by an arrow, and wraps them in the
+        operator of its rounding, if it has one, as in ``$\mathrm{odd}(2^{0.05} \rightarrow 2^{10})$``. A rounded axis's
+        `start` and `stop` need not be values of the parameter: ``2^{0.05}`` is 1.035, and the values of that axis start
+        at 1.
+
+        An axis with 1 value gives that value alone.
 
         The text names neither the parameter nor the number of values, and is in sunnbear's LaTeX notation, with its
         math between dollar signs.
@@ -264,7 +269,7 @@ class ParamAxis:
 
         An example: "All values from $2^{0.05}$ to $2^{10}$ on a logarithmic scale, by factors of $2^{0.05}$, rounded
         to the nearest odd integer." An axis with 1 value gives "The single value $3$.". Like `values_label`, the
-        sentence gives the declared ends and does not name the parameter.
+        sentence gives the axis's `start` and `stop` and does not name the parameter.
         """
         if len(self.values()) == 1:
             return f"The single value ${self._latex_of_single_value}$."
@@ -275,14 +280,18 @@ class ParamAxis:
             if self.rounding is None:
                 return f"{summary}."
             else:
-                return f"{summary}, {self.rounding.summary_phrase}."
+                return f"{summary}, {self.rounding.rounding_phrase}."
 
     # --------------------------------------------------------------------------
     #  Helpers
     # --------------------------------------------------------------------------
     @property
     def _latex_of_single_value(self) -> str:
-        """Return the LaTeX of the value of an axis with 1 value: its start in its notation, or the rounded value."""
+        """Return the LaTeX of the value of an axis with 1 value.
+
+        The value is the axis's `start` in its notation, or, for a rounded axis, its rounded value as a decimal, because
+        a rounded value need not be a power of the notation's base.
+        """
         if self.rounding is None:
             return self.notation.spell_argument_in_latex(self.start)
         else:

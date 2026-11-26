@@ -248,16 +248,15 @@ class ParamNotation(StrEnum):
     def spell_argument_in_latex(self, argument: float) -> str:
         r"""Return the value of `argument` written in LaTeX in this notation, as a text for a reader shows it.
 
-        The value keeps this notation, where `spell_value_in_latex` picks the shortest spelling:
+        Unlike `spell_value_in_latex`, which picks the shortest spelling, the value keeps this notation:
 
         - a decimal argument is written as a decimal, with e-notation as a power of 10: ``0.4`` gives ``0.4``,
           ``2e+06`` gives ``2 \cdot 10^{6}``;
         - a power puts its exponent in braces: ``0.05`` gives ``2^{0.05}`` in `POW2` and ``-10^{0.3}`` for ``0.3`` in
           `NEG_POW10`;
-        - a power with exponent 0 or 1 is written as its value, as sunnbear's sentences write it: ``1``, ``2``, ``10``,
-          or their negatives.
+        - a power with exponent 0 or 1 is written as its value: ``1``, ``2``, ``10``, or their negatives.
 
-        A negative value gets no parentheses: a text for a reader writes it alone, not after an operator.
+        A negative value gets no parentheses: a text for a reader writes a negative value alone, not after an operator.
 
         Raises:
             ValueError: If `argument` is not finite.
@@ -272,11 +271,11 @@ class ParamNotation(StrEnum):
             return self._write_spelling_in_latex(self._spell_rounded_argument(argument))
 
     def step_phrase(self, step: float) -> str:
-        r"""Return the phrase of a sentence for a reader that gives a grid's `step` in this notation.
+        r"""Return the phrase that gives a grid's `step` in this notation, for use in a sentence for a reader.
 
         On a logarithmic scale, a step multiplies the value, so the phrase names a factor: ``on a logarithmic scale, by
-        factors of $2^{0.05}$`` for a `POW2` step of 0.05, or of a `NEG_POW2` step, whose values are negative. A decimal
-        step adds to the value: ``in steps of $0.2$``.
+        factors of $2^{0.05}$`` for a step of 0.05 in `POW2`, and also in `NEG_POW2`: its values are negative, but the
+        factor between them is positive. A decimal step adds to the value: ``in steps of $0.2$``.
         """
         if self.is_logarithmic:
             return f"on a logarithmic scale, by factors of ${self._unsigned_notation.spell_argument_in_latex(step)}$"
@@ -290,8 +289,7 @@ class ParamNotation(StrEnum):
     def _write_spelling_in_latex(spelling: str) -> str:
         r"""Write a `spelling` in LaTeX: a power's exponent in braces, e-notation as a power of 10, the sign kept.
 
-        ``-10^0.3`` gives ``-10^{0.3}``, ``2.5e-05`` gives ``2.5 \cdot 10^{-5}``, and ``1e-05`` gives ``10^{-5}``, with
-        no mantissa of 1.
+        A mantissa of 1 is left out: ``1e-05`` gives ``10^{-5}``.
         """
         sign, unsigned = ("-", spelling[1:]) if spelling.startswith("-") else ("", spelling)
         if "^" in unsigned:
@@ -310,7 +308,10 @@ class ParamNotation(StrEnum):
 
     @property
     def _unsigned_notation(self) -> "ParamNotation":
-        """Return the notation of the positive powers of this notation's base: `POW2` for `NEG_POW2`, for example."""
+        """Return the notation of the positive powers of this notation's base, such as `POW2` for `NEG_POW2`.
+
+        Any other notation returns itself.
+        """
         match self:
             case ParamNotation.NEG_POW2:
                 return ParamNotation.POW2
