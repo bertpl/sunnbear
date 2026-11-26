@@ -6,6 +6,7 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId
 from sunnbear._core.benchmark.suites.pipeline.diversity_features import FeatureFidelity
 from sunnbear._core.benchmark.suites.pipeline.mode import PipelineMode
 from sunnbear._core.benchmark.suites.pipeline.runner import run_pipeline
+from sunnbear._core.benchmark.suites.pipeline.stages import DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES
 from sunnbear._core.problems.core import FormulaRegistry
 
 
@@ -14,7 +15,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     """On example formula 99.802, the pipeline in draft mode runs the stages in run order on the formula's candidates:
 
     - every candidate that no stage drops reaches fine characterization;
-    - spacing runs with draft mode's target number of kept candidates;
+    - spacing runs with its default target number of kept candidates, as in production mode;
     - coarse and fine characterization run at their draft fidelities, as their manifests record.
 
     Suite selection then stops the run, because the candidates are too few for 2 benchmark suites of 64, so suite
@@ -45,9 +46,7 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     n_candidates = sum(len(formula.build_all_candidates()) for formula in formulas)
     assert manifests[0].n_candidates_out == n_candidates
     assert manifests[2].parameters == {"fidelity": FeatureFidelity.COARSE_DRAFT.name}
-    assert manifests[3].parameters == {
-        "target_n_kept_candidates": PipelineMode.DRAFT.spacing_stage_target_n_kept_candidates
-    }
+    assert manifests[3].parameters == {"target_n_kept_candidates": DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES}
     assert manifests[4].parameters == {"fidelity": FeatureFidelity.FINE_DRAFT.name}
     drops = [
         result.build_details.drop_of(candidate.id)

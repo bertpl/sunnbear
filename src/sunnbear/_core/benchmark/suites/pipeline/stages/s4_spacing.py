@@ -24,9 +24,9 @@ if TYPE_CHECKING:
 # 1/1000 of the mean distance, at which only nearly identical candidates are dropped, to 10 times the mean distance.
 SPACING_MIN_DISTANCE_OPTIONS = tuple(10.0 ** (exponent_in_tenths / 10) for exponent_in_tenths in range(-30, 11))
 
-# Fine characterization and the selection stages run on every candidate that spacing keeps, and fine characterization
-# takes far longer per candidate than coarse characterization, so the target number of kept candidates sets the cost of
-# the stages after spacing.
+# Fine characterization and suite selection run on every candidate that spacing keeps, and fine characterization takes
+# far longer per candidate than coarse characterization, so the target number of kept candidates sets the cost of the
+# stages after spacing.
 DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES = 16_384
 
 
