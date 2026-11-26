@@ -9,8 +9,9 @@ the same objective in the same feature space:
 - `DifficultyTierAssignment`, which gives each candidate of a pool the tier whose quota it counts toward in 1
   selection, in `difficulty_tier_assignment`;
 - `select_diverse_problem_ids`, which selects the most diverse candidates of a `CandidatePool` by max-div, under a
-  `DifficultyTierAssignment`, in `diverse_selection`, and `compute_diversity_score`, which scores a set of candidates by
-  the same objective.
+  `DifficultyTierQuotas` and the tiers of a `DifficultyTierAssignment`, in `diverse_selection`;
+- `compute_diversity_score`, which scores a set of candidates by the objective of `select_diverse_problem_ids`, in
+  `diverse_selection`.
 
 This package imports nothing from the packages `state` and `stages` beside it, which import from this package.
 """

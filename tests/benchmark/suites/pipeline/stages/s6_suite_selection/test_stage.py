@@ -3,7 +3,8 @@
 - the size of the largest suites is the largest that the candidates fill twice, and the stage stops the pipeline below
   the smallest size;
 - it stores each candidate's tier, selects 2 disjoint largest suites, and drops the other candidates;
-- where a tier runs short, the largest suite of the b-series carries the whole shortage;
+- where a tier has too few candidates for both largest suites, the largest suite of the b-series fills the rest of that
+  tier's quota with candidates of a neighboring tier;
 - each series' smaller suites lie inside its larger ones, and every suite meets the quotas that the stage stores for it;
 - every suite's diversity score is the score of its own test problems;
 - the stage records max-div's time per candidate and seed in its parameters;
@@ -27,7 +28,6 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
 from sunnbear._core.benchmark.suites.pipeline.stages import MAX_SUITE_SIZE, SMALLEST_SUITE_SIZE, SuiteSelectionStage
 from sunnbear._core.benchmark.suites.pipeline.stages.s6_suite_selection.stage import _PRIMARY_SERIES_ALIASES
 from sunnbear._core.benchmark.suites.pipeline.state import BenchmarkSuitesBuildDetails
-from sunnbear._core.problems.core import ProblemId
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
 
@@ -36,7 +36,7 @@ A, B, C, D = DifficultyTier
 # The stage runs no tasks in the pool, so the pool's processes never start. max-div runs 1 worker per worker of the
 # pool, and with 1 worker it warns that it gains nothing over a single solve, so the pool has 2 workers.
 _TWO_WORKER_POOL = WorkerPool(n_workers=2)
-# Each max-div worker runs this long per candidate of the pool it selects from; with the pools of 128 to 256
+# Each max-div worker runs this long per candidate of the selection's `CandidatePool`; with the pools of 128 to 256
 # candidates in these tests, that covers the start of the workers' processes and leaves time to meet every constraint
 # on a busy CI machine.
 _SEC_PER_CANDIDATE = 0.03
@@ -57,16 +57,6 @@ def _select_suites(tier_counts: dict[DifficultyTier, int], stage: SuiteSelection
     state = build_state_before(PipelineStageId.SUITE_SELECTION, problem_ids, edis=edis)
     state.run_stage(stage, worker_pool=_TWO_WORKER_POOL)
     return state.create_build_details()
-
-
-def _candidate_pool(build_details: BenchmarkSuitesBuildDetails, problem_ids: tuple[ProblemId, ...]) -> CandidatePool:
-    """Return the pool of the candidates `problem_ids`, with the scaled features and EDIs of fine characterization."""
-    results = build_details.characterization_results(PipelineStageId.FINE_CHARACTERIZATION)
-    return CandidatePool.from_feature_matrix(
-        results.build_scaled_feature_matrix(problem_ids),
-        edis=results.edis,
-        n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS,
-    )
 
 
 def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails) -> None:
@@ -144,8 +134,13 @@ def test_the_stage_selects_2_disjoint_largest_suites_and_drops_the_other_candida
     drops = [build_details.drop_of(problem_id) for problem_id in build_details.problem_ids]
     assert Counter(drop.reason for drop in drops if drop is not None) == {"not_in_any_suite": 32}
     assert build_details.suite_tier_counts().select("n_candidates_a", "n_candidates_d").rows() == [(16, 16), (16, 16)]
+    results = build_details.characterization_results(PipelineStageId.FINE_CHARACTERIZATION)
     for selection_details in all_selection_details.values():
-        suite_pool = _candidate_pool(build_details, selection_details.benchmark_suite.problem_ids)
+        suite_pool = CandidatePool.from_feature_matrix(
+            results.build_scaled_feature_matrix(selection_details.benchmark_suite.problem_ids),
+            edis=results.edis,
+            n_bisection_fevals=DEFAULT_N_BISECTION_FEVALS,
+        )
         assert selection_details.diversity == compute_diversity_score(suite_pool) > 0.0
     _check_series_and_quotas(build_details)
 

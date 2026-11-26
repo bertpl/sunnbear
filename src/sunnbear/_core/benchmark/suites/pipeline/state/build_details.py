@@ -271,8 +271,9 @@ class BenchmarkSuitesBuildDetails:
         - 1 column ``n_candidates_<tier>`` per `DifficultyTier`, with the tier's value in lower case;
         - ``diversity``, the diversity score of the suite's own test problems.
 
-        The counts are of difficulty tiers, which follow from the EDIs alone; a suite's quotas count assigned tiers, so
-        the 2 differ for a suite whose selection moved the limits between tiers.
+        These counts use each candidate's difficulty tier, which follows from its EDI alone. A suite's quotas count the
+        tiers that `DifficultyTierAssignment.from_pool` assigned for that suite's selection, so a suite's counts differ
+        from its quotas when that assignment moved the EDI limits between tiers.
 
         Return ``None`` when suite selection did not finish.
         """

@@ -21,8 +21,9 @@ class DifficultyTierQuotas:
     those with that assigned tier, which `DifficultyTierAssignment` gives.
 
     Attributes:
-        selection_size: The number of candidates of the selection; a positive multiple of the denominator of every
-            tier's `quota_share`, so that every tier's quota is whole and at least 1.
+        selection_size: The number of the selected candidates that count toward the quotas, which leaves out any
+            required candidates; a positive multiple of the denominator of every tier's `quota_share`, so that every
+            tier's quota is whole and at least 1.
     """
 
     selection_size: int

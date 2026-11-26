@@ -91,11 +91,8 @@ def build_state_before(
       `sb-<size>b` the others.
     """
     state = PipelineState()
-    if raw_feature_matrix is None:
-        raw_feature_matrix = example_raw_feature_matrix(problem_ids)
-    edis = edis if edis is not None else dict.fromkeys(problem_ids, 10.0)
     for earlier_stage_id in list(PipelineStageId)[: list(PipelineStageId).index(stage_id)]:
-        _run_example_stage(state, earlier_stage_id, problem_ids, raw_feature_matrix, edis, c_range)
+        _write_example_stage_information(state, earlier_stage_id, problem_ids, raw_feature_matrix, edis, c_range)
     return state
 
 
@@ -108,14 +105,7 @@ def build_finished_state(
     """
     last_stage_id = list(PipelineStageId)[-1]
     state = build_state_before(last_stage_id, problem_ids, edis=edis)
-    _run_example_stage(
-        state,
-        last_stage_id,
-        problem_ids,
-        example_raw_feature_matrix(problem_ids),
-        edis if edis is not None else dict.fromkeys(problem_ids, 10.0),
-        _DEFAULT_C_RANGE,
-    )
+    _write_example_stage_information(state, last_stage_id, problem_ids, None, edis, _DEFAULT_C_RANGE)
     return state
 
 
@@ -139,15 +129,21 @@ def record_calls(monkeypatch: pytest.MonkeyPatch, accessor_cls: type, method_nam
 # ==================================================================================================
 #  Helpers
 # ==================================================================================================
-def _run_example_stage(
+def _write_example_stage_information(
     state: PipelineState,
     stage_id: PipelineStageId,
     problem_ids: Sequence[ProblemId],
-    raw_feature_matrix: FeatureMatrix,
-    edis: Mapping[ProblemId, float],
+    raw_feature_matrix: FeatureMatrix | None,
+    edis: Mapping[ProblemId, float] | None,
     c_range: CRange,
 ) -> None:
-    """Write the example information of the stage `stage_id` through its accessor, then finish the stage."""
+    """Write the example information of the stage `stage_id` through its accessor, then finish the stage.
+
+    `raw_feature_matrix` and `edis` default as `build_state_before` describes.
+    """
+    if raw_feature_matrix is None:
+        raw_feature_matrix = example_raw_feature_matrix(problem_ids)
+    edis = edis if edis is not None else dict.fromkeys(problem_ids, 10.0)
     accessor = state.create_state_accessor(stage_id)
     match stage_id:
         case PipelineStageId.CANDIDATE_GENERATION:
@@ -166,16 +162,18 @@ def _run_example_stage(
                     for problem_id, edi in edis.items()
                 }
             )
-            n_a_suite = len(problem_ids) // 2
+            a_suite_size = len(problem_ids) // 2
             accessor.set_suite_selection_details(
                 {
                     suite.name: SuiteSelectionDetails(benchmark_suite=suite, edi_range_by_tier={}, diversity=1.0)
                     for suite in (
-                        BenchmarkSuite(name=f"sb-{n_a_suite}a", aliases=(), problem_ids=tuple(problem_ids[:n_a_suite])),
                         BenchmarkSuite(
-                            name=f"sb-{len(problem_ids) - n_a_suite}b",
+                            name=f"sb-{a_suite_size}a", aliases=(), problem_ids=tuple(problem_ids[:a_suite_size])
+                        ),
+                        BenchmarkSuite(
+                            name=f"sb-{len(problem_ids) - a_suite_size}b",
                             aliases=(),
-                            problem_ids=tuple(problem_ids[n_a_suite:]),
+                            problem_ids=tuple(problem_ids[a_suite_size:]),
                         ),
                     )
                 }

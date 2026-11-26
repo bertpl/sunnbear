@@ -14,7 +14,7 @@ separate tier from 2 to 4 would hold few candidates: of the core solver configs,
 `n_bisection_fevals` evaluations, and Ridders at most about twice that.
 
 Every max-div selection of a benchmark suite has 1 quota per tier, a fixed share of the suite's size.
-`DifficultyTier.quota_share` gives the shares, equal for every tier.
+`DifficultyTier.quota_share` gives the shares.
 """
 
 from enum import StrEnum

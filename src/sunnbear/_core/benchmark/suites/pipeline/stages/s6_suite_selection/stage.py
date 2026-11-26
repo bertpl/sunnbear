@@ -13,7 +13,6 @@ from sunnbear._core.benchmark.suites.pipeline.core import (
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     DEFAULT_SELECTION_SEC_PER_CANDIDATE,
     CandidatePool,
-    DifficultyTierAssignment,
     DifficultyTierQuotas,
     compute_diversity_score,
     select_diverse_problem_ids,
@@ -24,11 +23,12 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 
 # Each series holds 1 suite per power of 2 from this size up to the size of its largest suite.
 SMALLEST_SUITE_SIZE = 64
-# The largest suite of each series holds at most this many test problems. It is `SMALLEST_SUITE_SIZE` times a power of
-# 2, so that every suite of a series, whose size is the largest suite's divided by a power of 2, has whole quotas.
+# The largest suite of each series holds at most this many test problems. `MAX_SUITE_SIZE` is `SMALLEST_SUITE_SIZE`
+# times a power of 2, so that every suite of a series, whose size is the largest suite's divided by a power of 2, has
+# whole quotas.
 #
-# Only the suites of a run whose largest suites have this size, and in whose 2 largest suites every candidate counts
-# toward its own difficulty tier's quota, ship; the suites of any other run are interim: they never ship as benchmark
+# The suites of a run ship only when its largest suites have this size and every candidate of those 2 suites counts
+# toward the quota of its own difficulty tier. The suites of any other run are interim and never ship as benchmark
 # suites.
 MAX_SUITE_SIZE = 1024
 # The suites of the primary series, the a-series, carry these aliases, by size; a run whose largest suites are smaller
@@ -46,7 +46,7 @@ _PRIMARY_SERIES_ALIASES = {
 #  SuiteSelectionStage
 # ==================================================================================================
 class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
-    """`SuiteSelectionStage` selects 2 series of suites from the candidates: the primary and the secondary series.
+    """`SuiteSelectionStage` selects 2 series of suites from the candidates: the a-series and the b-series.
 
     Each series holds 1 suite per power of 2 from `SMALLEST_SUITE_SIZE` up to the size of its largest suite, and each
     of its suites holds every test problem of the series' smaller suites. The 2 series share no test problem.
@@ -67,9 +67,13 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     - **the halvings:** per series, each smaller suite is selected from the series' next larger suite.
 
     Every suite is selected by `select_diverse_problem_ids`, under the quotas of its size, with the tiers that
-    `DifficultyTierAssignment.from_pool` assigns anew to the candidates that the suite is selected from. The primary
-    series selects first, so where the candidates of a tier run short, the secondary series carries the whole
-    shortage. Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
+    `DifficultyTierAssignment.from_pool` assigns anew to the candidates eligible for the suite: for the largest suite
+    of the secondary series, all candidates but those of the largest primary suite.
+
+    The primary series selects first, so where a tier has too few candidates for both largest suites, the primary
+    suite still holds that tier's full quota, and the secondary suite fills the rest of that quota with candidates of
+    a neighboring tier. Each suite's diversity score is the score of its own test problems, by
+    `compute_diversity_score`.
     """
 
     stage_id = PipelineStageId.SUITE_SELECTION
@@ -112,12 +116,12 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         )
 
         # --- drops ------------------------------
-        suite_problem_ids = {
+        kept_problem_id_set = {
             *largest_primary_details.benchmark_suite.problem_ids,
             *largest_secondary_details.benchmark_suite.problem_ids,
         }
         for problem_id in state_accessor.remaining_problem_ids:
-            if problem_id not in suite_problem_ids:
+            if problem_id not in kept_problem_id_set:
                 state_accessor.drop(problem_id, "not_in_any_suite")
 
         # --- halvings ---------------------------
@@ -151,21 +155,12 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     ) -> SuiteSelectionDetails:
         """Return the details of a suite of `size` in the primary or secondary series, chosen from `candidate_pool`.
 
-        The suite is chosen from the candidates of `candidate_pool` that are not in `required_problem_ids`, by a
-        selection that holds the required candidates too; the suite holds the selected candidates that are not required.
+        The suite holds the selected candidates that are not in `required_problem_ids`, which the selection holds too.
         """
         required_problem_id_set = set(required_problem_ids)
-        selectable_problem_ids = [
-            problem_id
-            for problem_id in candidate_pool.feature_matrix.problem_ids
-            if problem_id not in required_problem_id_set
-        ]
-        tier_assignment = DifficultyTierAssignment.from_pool(
-            candidate_pool.subset(selectable_problem_ids), DifficultyTierQuotas(size)
-        )
-        selected_problem_ids = select_diverse_problem_ids(
+        selected_problem_ids, tier_assignment = select_diverse_problem_ids(
             candidate_pool,
-            tier_assignment=tier_assignment,
+            quotas=DifficultyTierQuotas(size),
             required_problem_ids=required_problem_id_set,
             seed=self.seed,
             sec_per_candidate=self.sec_per_candidate,
@@ -208,7 +203,6 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
             )
         else:
             largest_suite_size = SMALLEST_SUITE_SIZE
-            # The size doubles while 2 suites of the doubled size still fit in the candidates.
             while 2 * largest_suite_size <= MAX_SUITE_SIZE and 2 * (2 * largest_suite_size) <= n_candidates:
                 largest_suite_size *= 2
             return largest_suite_size
