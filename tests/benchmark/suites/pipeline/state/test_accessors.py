@@ -34,10 +34,10 @@ def _accessor(stage_id: PipelineStageId) -> PipelineStateAccessor:
     return build_state_before(stage_id, _PROBLEM_IDS).create_state_accessor(stage_id)
 
 
-def _selection_details(name: str, problem_ids: list) -> SuiteSelectionDetails:
+def _selection_details(series_id: str, name: str, problem_ids: list) -> SuiteSelectionDetails:
     """Return the selection details of a suite of `problem_ids` that no max-div run selected, with no EDI ranges."""
     return SuiteSelectionDetails(
-        benchmark_suite=BenchmarkSuite(name=name, aliases=(), problem_ids=tuple(problem_ids)),
+        benchmark_suite=BenchmarkSuite(series_id=series_id, name=name, aliases=(), problem_ids=tuple(problem_ids)),
         edi_range_by_tier={},
         diversity=1.0,
     )
@@ -63,7 +63,10 @@ _WRITES_OF_EACH_CANDIDATE: dict[str, tuple[PipelineStageId, Callable[[PipelineSt
     "suite_selection_details": (
         PipelineStageId.SUITE_SELECTION,
         lambda accessor, problem_ids: accessor.set_suite_selection_details(
-            [_selection_details("sb-2a", problem_ids[:2]), _selection_details("sb-1b", problem_ids[2:])]
+            [
+                _selection_details("sb-a", "sb-2a", problem_ids[:2]),
+                _selection_details("sb-b", "sb-1b", problem_ids[2:]),
+            ]
         ),
     ),
 }

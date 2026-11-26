@@ -278,9 +278,9 @@ class SuiteSelectionStateAccessor(PipelineStateAccessor):
     def set_suite_selection_details(self, suite_selection_details: Sequence[SuiteSelectionDetails]) -> None:
         """Store the selection details of each suite, keyed by the suite's name.
 
-        The sequence lists the a-series' suites before the b-series', and within each series the suites from largest to
-        smallest. The stage calls this after it records its drops, so that the suites together hold the candidates
-        that no stage has dropped.
+        The sequence lists the suites series by series, in the order of `BUILT_IN_SERIES`, and within each series from
+        the largest suite to the smallest. The stage calls this after it records its drops, so that the suites together
+        hold the candidates that no stage has dropped.
 
         Raises:
             ValueError: If the details were stored before, or the suites together do not hold exactly those candidates.

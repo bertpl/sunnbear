@@ -168,9 +168,13 @@ def _write_example_stage_information(
                     SuiteSelectionDetails(benchmark_suite=suite, edi_range_by_tier={}, diversity=1.0)
                     for suite in (
                         BenchmarkSuite(
-                            name=f"sb-{a_suite_size}a", aliases=(), problem_ids=tuple(problem_ids[:a_suite_size])
+                            series_id="sb-a",
+                            name=f"sb-{a_suite_size}a",
+                            aliases=(),
+                            problem_ids=tuple(problem_ids[:a_suite_size]),
                         ),
                         BenchmarkSuite(
+                            series_id="sb-b",
                             name=f"sb-{len(problem_ids) - a_suite_size}b",
                             aliases=(),
                             problem_ids=tuple(problem_ids[a_suite_size:]),

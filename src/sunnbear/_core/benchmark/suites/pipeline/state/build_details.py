@@ -267,7 +267,7 @@ class BenchmarkSuitesBuildDetails:
 
         The rows follow the order of `suite_selection_details`. The columns are:
 
-        - ``suite_name`` and ``size``;
+        - ``suite_name``, ``series_id`` and ``size``;
         - 1 column ``n_candidates_<tier>`` per `DifficultyTier`, with the tier's value in lower case;
         - ``diversity``, the diversity score of the suite's own test problems.
 
@@ -290,6 +290,7 @@ class BenchmarkSuitesBuildDetails:
                 rows.append(
                     {
                         "suite_name": suite.name,
+                        "series_id": suite.series_id,
                         "size": len(suite.problem_ids),
                         **{f"n_candidates_{tier.value.lower()}": tier_counts[tier] for tier in DifficultyTier},
                         "diversity": selection_details.diversity,

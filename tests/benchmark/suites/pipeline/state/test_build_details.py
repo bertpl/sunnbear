@@ -84,12 +84,16 @@ def _finished_state() -> PipelineState:
     accessor.set_suite_selection_details(
         [
             SuiteSelectionDetails(
-                benchmark_suite=BenchmarkSuite(name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)),
+                benchmark_suite=BenchmarkSuite(
+                    series_id="sb-a", name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)
+                ),
                 edi_range_by_tier={DifficultyTier.A: (5.0, 5.0), DifficultyTier.B: (10.0, 10.0)},
                 diversity=0.5,
             ),
             SuiteSelectionDetails(
-                benchmark_suite=BenchmarkSuite(name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)),
+                benchmark_suite=BenchmarkSuite(
+                    series_id="sb-b", name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)
+                ),
                 edi_range_by_tier={DifficultyTier.A: (6.0, 9.5), DifficultyTier.B: (10.0, 10.0)},
                 diversity=0.75,
             ),
@@ -239,14 +243,15 @@ def test_the_build_details_give_each_suites_quota_per_tier(build_state, rows_exp
 
 
 def test_the_build_details_count_each_suites_tiers():
-    """Each suite's row gives its name, size, count per tier and diversity score, in the order of the suites."""
+    """Each suite's row gives its name, series id, size, count per tier and diversity score, in the order of the
+    suites."""
     # --- act --------------------------
     table = _finished_state().create_build_details().suite_tier_counts()
 
     # --- assert -----------------------
-    assert table.select("suite_name", "size", "n_candidates_a", "n_candidates_b", "diversity").rows() == [
-        ("sb-1a", 1, 1, 0, 0.5),
-        ("sb-1b", 1, 0, 1, 0.75),
+    assert table.select("suite_name", "series_id", "size", "n_candidates_a", "n_candidates_b", "diversity").rows() == [
+        ("sb-1a", "sb-a", 1, 1, 0, 0.5),
+        ("sb-1b", "sb-b", 1, 0, 1, 0.75),
     ]
 
 
