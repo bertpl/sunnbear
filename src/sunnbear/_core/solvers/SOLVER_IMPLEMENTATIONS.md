@@ -276,6 +276,7 @@ A reader must be able to compare each solver with its source step by step:
 - **each solver keeps its source's variable names and symbols**, and writes 1 long method where splitting it into helpers would make it harder to compare with its source
 - **duplication across solvers is accepted**, for solver classes, state classes and tests alike; code reviews that ask to merge near-duplicate solver code are answered by this section
 - **only the framework in `core` is shared**, such as `Solver`, `SolveState`, and the code that implements the shared choices of section IV
+- **each solver class declares its readable name and whether it brackets a root**, and **each config its readable name and a summary sentence**; the tests check that every built-in solver and config has them
 
 ### VI.b. Validation & Provenance
 
