@@ -220,7 +220,7 @@ invalid-method-override = "ignore"
 # "ned" is the first name of Ned Ganchovski, whose code THIRD_PARTY_NOTICES.md covers.
 # "trough" is a water trough in a textbook exercise of data/literature_test_problems/.
 # "annote" is a field of CSL-JSON, the data model of the publications' items; it appears in the copy of the CSL-JSON
-# schema in tests/problems/csl_schema/.
+# schema in tests/problems/catalog/csl_schema/.
 ignore-words-list = "annote,intoto,ned,trough"
 
 [tool.pytest.ini_options]

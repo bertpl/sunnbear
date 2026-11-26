@@ -2,8 +2,7 @@ import pytest
 
 from sunnbear._core.problems.core import FormulaCategory
 from sunnbear._core.problems.core.taxonomy import FormulaTaxonomyNode
-
-from .example_taxonomy_nodes import define_category_cls, define_formula_cls
+from tests.problems.helpers.example_taxonomy_nodes import define_category_cls, define_formula_cls
 
 
 # ==================================================================================================

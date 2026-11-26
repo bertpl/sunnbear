@@ -10,7 +10,7 @@ from sunnbear._core.problems.core import (
     ParamGrid,
     ParamRecipe,
 )
-from tests.problems.example_formulas import ExampleCubic
+from tests.problems.helpers.example_formulas import ExampleCubic
 
 
 def _define_formula(declared_params: tuple[FormulaParam, ...], declared_presentation: FormulaPresentation | None):

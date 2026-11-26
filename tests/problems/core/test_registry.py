@@ -14,9 +14,8 @@ from sunnbear._core.problems.core import (
     Publication,
 )
 from sunnbear._core.problems.core.exceptions import InvalidParamsError, UnknownFormulaError
-
-from .example_formulas import ExampleCubic, ExampleOddPower
-from .example_taxonomy_nodes import define_category_cls, define_formula_cls
+from tests.problems.helpers.example_formulas import ExampleCubic, ExampleOddPower
+from tests.problems.helpers.example_taxonomy_nodes import define_category_cls, define_formula_cls
 
 
 # ==================================================================================================

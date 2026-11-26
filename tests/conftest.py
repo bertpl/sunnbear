@@ -29,7 +29,7 @@ from sunnbear._core.utils.class_origin import is_sunnbear_module
 from sunnbear.solvers import SolverConfigRegistry
 
 # Importing the module registers the example formulas that the tests of the framework use, in every test process.
-from tests.problems import example_formulas  # noqa: F401
+from tests.problems.helpers import example_formulas  # noqa: F401
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def isolated_formula_registry(monkeypatch):
     registered after the test.
 
     The copy holds only sunnbear's own formulas. It leaves out the example formulas of
-    `tests.problems.example_formulas`, so that a test is free to define formulas or subcategories under the
+    `tests.problems.helpers.example_formulas`, so that a test is free to define formulas or subcategories under the
     user-defined category.
     """
     sunnbear_formulas = {

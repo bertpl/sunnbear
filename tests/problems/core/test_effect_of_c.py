@@ -1,8 +1,8 @@
 import pytest
 
 from sunnbear._core.problems.core import EffectOfC
-from tests.problems.effect_of_c_check import follows_effect_of_c
-from tests.problems.example_formulas import ExampleCubic, ExampleOddPower
+from tests.problems.helpers.effect_of_c_check import follows_effect_of_c
+from tests.problems.helpers.example_formulas import ExampleCubic, ExampleOddPower
 
 
 def test_every_member_has_a_sentence():
