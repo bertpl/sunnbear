@@ -26,7 +26,7 @@ def test_a_dropped_candidate_keeps_its_entry_with_its_drop():
     assert registry.remaining_problem_ids == (problem_ids[0], problem_ids[2])
     assert (registry.drop_of(problem_ids[0]), registry.drop_of(problem_ids[1])) == (None, _DROP)
     assert registry.problem_ids_dropped_by(PipelineStageId.SPACING) == (problem_ids[1],)
-    assert registry.problem_ids_dropped_by(PipelineStageId.CORE_SELECTION) == ()
+    assert registry.problem_ids_dropped_by(PipelineStageId.SUITE_SELECTION) == ()
 
 
 @pytest.mark.parametrize("is_added_before", [False, True], ids=["repeated_in_1_call", "added_before"])

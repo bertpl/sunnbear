@@ -10,5 +10,4 @@ from .s2_candidate_validation import MAX_BOUND_TO_WIDTH_RATIO, CandidateValidati
 from .s3_coarse_characterization import CoarseCharacterizationStage
 from .s4_spacing import DEFAULT_SPACING_TARGET_N_KEPT_CANDIDATES, SPACING_MIN_DISTANCE_OPTIONS, SpacingStage
 from .s5_fine_characterization import FineCharacterizationStage
-from .s6_core_selection import CoreSelectionStage
-from .s7_distillation import SMALLEST_SUITE_SIZE, DistillationStage
+from .s6_suite_selection import MAX_SUITE_SIZE, SMALLEST_SUITE_SIZE, SuiteSelectionStage

@@ -7,9 +7,9 @@ from sunnbear._core.benchmark.suites.pipeline.core import PipelineStage, Pipelin
 from sunnbear._core.benchmark.suites.pipeline.state import (
     CandidateDrop,
     CandidateGenerationStateAccessor,
-    DistillationStateAccessor,
     IntervalBounds,
     PipelineState,
+    SuiteSelectionStateAccessor,
 )
 from sunnbear._core.benchmark.suites.pipeline.state.pipeline_state import _ACCESSOR_CLASSES
 from sunnbear._core.utils.worker_pool import WorkerPool
@@ -17,18 +17,18 @@ from tests.benchmark.suites.pipeline.example_states import build_state_before, e
 
 
 def test_the_state_creates_each_stages_accessor_in_run_order():
-    """The first accessor is candidate generation's; once every stage before distillation has finished, the state
-    creates distillation's accessor, and records the stages that finished."""
+    """The first accessor is candidate generation's; once every stage before suite selection has finished, the state
+    creates suite selection's accessor, and records the stages that finished."""
     # --- arrange ----------------------
-    state = build_state_before(PipelineStageId.DISTILLATION, example_problem_ids(4))
+    state = build_state_before(PipelineStageId.SUITE_SELECTION, example_problem_ids(4))
 
     # --- act --------------------------
     first_accessor = PipelineState().create_state_accessor(PipelineStageId.CANDIDATE_GENERATION)
-    last_accessor = state.create_state_accessor(PipelineStageId.DISTILLATION)
+    last_accessor = state.create_state_accessor(PipelineStageId.SUITE_SELECTION)
 
     # --- assert -----------------------
     assert type(first_accessor) is CandidateGenerationStateAccessor
-    assert type(last_accessor) is DistillationStateAccessor
+    assert type(last_accessor) is SuiteSelectionStateAccessor
     assert state.finished_stage_ids == tuple(PipelineStageId)[:-1]
 
 

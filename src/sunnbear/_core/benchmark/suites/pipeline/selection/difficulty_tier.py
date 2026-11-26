@@ -13,8 +13,8 @@ D spans a factor 4, where B and C each span a factor 2, because an EDI above twi
 separate tier from 2 to 4 would hold few candidates: of the core solver configs, ITP spends at most about
 `n_bisection_fevals` evaluations, and Ridders at most about twice that.
 
-Every max-div selection, of the Core and of the distilled suites, has 1 quota per tier, a fixed share of the
-selection's size. `DifficultyTier.core_share` gives the shares, equal for every tier.
+Every max-div selection of a benchmark suite has 1 quota per tier, a fixed share of the suite's size.
+`DifficultyTier.quota_share` gives the shares.
 """
 
 from enum import StrEnum
@@ -37,9 +37,9 @@ class DifficultyTier(StrEnum):
     D = "D"
 
     @property
-    def core_share(self) -> Fraction:
-        """Return the fraction of the candidates of every selection that count toward the tier's quota."""
-        return _CORE_SHARES[self]
+    def quota_share(self) -> Fraction:
+        """Return the fraction of the test problems of every benchmark suite that count toward the tier's quota."""
+        return _QUOTA_SHARES[self]
 
     def edi_range(self, n_bisection_fevals: int) -> tuple[float, float]:
         """Return the tier's range of the EDI, `(lower, upper)`, for solves with `n_bisection_fevals`.
@@ -73,7 +73,7 @@ _EDI_RATIO_RANGES = {
     DifficultyTier.C: (1 / 2, 1),
     DifficultyTier.D: (1, 4),
 }
-_CORE_SHARES = {
+_QUOTA_SHARES = {
     DifficultyTier.A: Fraction(1, 4),
     DifficultyTier.B: Fraction(1, 4),
     DifficultyTier.C: Fraction(1, 4),

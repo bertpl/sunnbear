@@ -10,11 +10,10 @@ from .accessors import (
     CandidateGenerationStateAccessor,
     CandidateValidationStateAccessor,
     CoarseCharacterizationStateAccessor,
-    CoreSelectionStateAccessor,
-    DistillationStateAccessor,
     FineCharacterizationStateAccessor,
     PipelineStateAccessor,
     SpacingStateAccessor,
+    SuiteSelectionStateAccessor,
 )
 from .build_details import BenchmarkSuitesBuildDetails
 from .candidate_registry import CandidateDrop
@@ -28,8 +27,7 @@ _ACCESSOR_CLASSES: dict[PipelineStageId, type[PipelineStateAccessor]] = {
         CoarseCharacterizationStateAccessor,
         SpacingStateAccessor,
         FineCharacterizationStateAccessor,
-        CoreSelectionStateAccessor,
-        DistillationStateAccessor,
+        SuiteSelectionStateAccessor,
     )
 }
 

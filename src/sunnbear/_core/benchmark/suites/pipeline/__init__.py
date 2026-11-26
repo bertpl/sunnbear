@@ -37,9 +37,8 @@ from .stages import (
     CandidateGenerationStage,
     CandidateValidationStage,
     CoarseCharacterizationStage,
-    CoreSelectionStage,
-    DistillationStage,
     FineCharacterizationStage,
     SpacingStage,
+    SuiteSelectionStage,
 )
 from .state import PipelineState

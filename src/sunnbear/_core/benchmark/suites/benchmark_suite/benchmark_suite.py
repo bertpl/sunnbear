@@ -15,7 +15,6 @@ class BenchmarkSuite:
 
     A suite is known by its name and by each of its aliases. The suites that sunnbear builds are:
 
-    - `sb-<size>`, such as `sb-2048`: the Core, from which every other one of these suites is selected;
     - the a-series, `sb-<size>a`: the highest-quality selection of benchmark suites;
     - the b-series, `sb-<size>b`: the b-series shares no test problem with the a-series, so it is an independent series
       of benchmark suites, which may be of lower quality.

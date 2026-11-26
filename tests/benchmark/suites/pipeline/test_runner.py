@@ -17,8 +17,8 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     - spacing runs with draft mode's target number of kept candidates;
     - coarse and fine characterization run at their draft fidelities, as their manifests record.
 
-    Core selection then stops the run, because 4 candidates fill no Core, so neither core selection nor distillation
-    writes a manifest.
+    Suite selection then stops the run, because the candidates are too few for 2 benchmark suites of 64, so suite
+    selection writes no manifest.
     """
     # --- arrange ----------------------
     # The example formula 99.802 has few candidates, so the pipeline runs fast on it.
@@ -37,11 +37,11 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
 
     # --- assert -----------------------
     manifests = result.manifests
-    assert [manifest.stage_id for manifest in manifests] == list(PipelineStageId)[:-2]
+    assert [manifest.stage_id for manifest in manifests] == list(PipelineStageId)[:-1]
     stop = result.build_details.stop
     assert stop is not None
-    assert stop.stage_id == PipelineStageId.CORE_SELECTION
-    assert stop.reason.startswith("The candidates fill no Core of 128 or more")
+    assert stop.stage_id == PipelineStageId.SUITE_SELECTION
+    assert stop.reason.endswith("fewer than the 128 that 2 benchmark suites of 64 test problems need.")
     n_candidates = sum(len(formula.build_all_candidates()) for formula in formulas)
     assert manifests[0].n_candidates_out == n_candidates
     assert manifests[2].parameters == {"fidelity": FeatureFidelity.COARSE_DRAFT.name}
@@ -56,5 +56,5 @@ def test_the_pipeline_runs_every_stage_on_the_candidates_of_the_given_formulas(t
     ]
     assert drops.count(None) == manifests[4].n_candidates_out > 0
     assert sorted(path.name for path in (tmp_path / "manifests").iterdir()) == [
-        f"{stage_id}.json" for stage_id in list(PipelineStageId)[:-2]
+        f"{stage_id}.json" for stage_id in list(PipelineStageId)[:-1]
     ]
