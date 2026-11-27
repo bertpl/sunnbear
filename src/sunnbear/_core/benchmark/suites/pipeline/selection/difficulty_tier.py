@@ -12,13 +12,9 @@ configs. Relative to `n_bisection_fevals`, the evaluation count that bisection s
 D spans a factor 4, where B and C each span a factor 2, because an EDI above twice `n_bisection_fevals` is rare, so a
 separate tier from 2 to 4 would hold few candidates: of the core solver configs, ITP spends at most about
 `n_bisection_fevals` evaluations, and Ridders at most about twice that.
-
-Every max-div selection of a benchmark suite has 1 quota per tier, a fixed share of the suite's size.
-`DifficultyTier.quota_share` gives the shares.
 """
 
 from enum import StrEnum
-from fractions import Fraction
 
 
 # ==================================================================================================
@@ -36,11 +32,6 @@ class DifficultyTier(StrEnum):
     C = "C"
     D = "D"
 
-    @property
-    def quota_share(self) -> Fraction:
-        """Return the fraction of the test problems of every benchmark suite that count toward the tier's quota."""
-        return _QUOTA_SHARES[self]
-
     def edi_range(self, n_bisection_fevals: int) -> tuple[float, float]:
         """Return the tier's range of the EDI, `(lower, upper)`, for solves with `n_bisection_fevals`.
 
@@ -48,11 +39,6 @@ class DifficultyTier(StrEnum):
         """
         lower_ratio, upper_ratio = _EDI_RATIO_RANGES[self]
         return lower_ratio * n_bisection_fevals, upper_ratio * n_bisection_fevals
-
-    def edi_ratio_distance(self, edi: float, n_bisection_fevals: int) -> float:
-        """Return the factor by which `edi` lies below or above the tier's EDI range, or 1 when the range holds it."""
-        lower, upper = self.edi_range(n_bisection_fevals)
-        return max(lower / edi, edi / upper, 1.0)
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -72,10 +58,4 @@ _EDI_RATIO_RANGES = {
     DifficultyTier.B: (1 / 4, 1 / 2),
     DifficultyTier.C: (1 / 2, 1),
     DifficultyTier.D: (1, 4),
-}
-_QUOTA_SHARES = {
-    DifficultyTier.A: Fraction(1, 4),
-    DifficultyTier.B: Fraction(1, 4),
-    DifficultyTier.C: Fraction(1, 4),
-    DifficultyTier.D: Fraction(1, 4),
 }

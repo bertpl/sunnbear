@@ -12,7 +12,7 @@ Each consumer builds what it needs from the read methods, which return:
 - each finished stage's information, most of it keyed by `ProblemId`;
 - each dropped candidate's `CandidateDrop`: the stage that dropped it, and why;
 - tables that count the drops and the incorrect solves, list the rejections per formula, and count each suite's test
-  problems per difficulty tier.
+  problems per difficulty tier and per quota.
 
 The build details convert themselves to files and back, and say whether they still fit the installed sunnbear's test
 problems.
@@ -29,7 +29,7 @@ import polars as pl
 
 from sunnbear._core.benchmark.protocol import CRange
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStop
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier, DifficultyTierQuotas
+from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
 from sunnbear._core.problems.core import FormulaRegistry, ProblemId
 
 from .candidate_registry import CandidateDrop
@@ -271,11 +271,6 @@ class BenchmarkSuitesBuildDetails:
         - 1 column ``n_candidates_<tier>`` per `DifficultyTier`, with the tier's value in lower case;
         - ``diversity``, the diversity score of the suite's own test problems.
 
-        These counts use each candidate's difficulty tier, which follows from its EDI alone. A suite's quotas count the
-        tiers that `DifficultyTierAssignment.from_pool` assigned for that suite's selection, so a suite's counts differ
-        from its quotas when that assignment set the EDI limits between tiers elsewhere than the fixed limits of
-        `DifficultyTier`.
-
         Return ``None`` when suite selection did not finish.
         """
         suite_selection_details = self.suite_selection_details()
@@ -298,16 +293,17 @@ class BenchmarkSuitesBuildDetails:
                 )
             return pl.DataFrame(rows)
 
-    def suite_tier_quotas(self) -> pl.DataFrame | None:
-        """Return 1 row per selected suite, with its quota per difficulty tier.
+    def suite_quota_counts(self) -> pl.DataFrame | None:
+        """Return 1 row per suite and quota, with how many of the suite's test problems count toward the quota.
 
-        A tier's quota is the exact number of the suite's test problems that the tier must hold.
+        The rows follow the order of `suite_selection_details`, and within a suite the order of its quotas; a suite
+        selected without quotas has no row. The columns are:
 
-        The rows are those of `suite_tier_counts`, in its order. The columns are:
-
-        - ``suite_name`` and ``size``;
-        - 1 column ``quota_<tier>`` per `DifficultyTier`, named with the tier's value in lower case and holding the
-          quota that `DifficultyTierQuotas` gives for the suite's size.
+        - ``suite_name`` and ``series_id``;
+        - ``group_label``, the label of the quota's group of candidates;
+        - ``min_count`` and ``max_count``, the smallest number of the suite's test problems that must count toward the
+          quota, and the largest number that may;
+        - ``n_selected_in_group``, the number of the suite's test problems that count toward the quota.
 
         Return ``None`` when suite selection did not finish.
         """
@@ -315,18 +311,25 @@ class BenchmarkSuitesBuildDetails:
         if suite_selection_details is None:
             return None
         else:
-            rows = []
-            for selection_details in suite_selection_details.values():
-                size = len(selection_details.benchmark_suite.problem_ids)
-                quota_by_tier = DifficultyTierQuotas(selection_size=size).quota_by_tier
-                rows.append(
+            return pl.DataFrame(
+                [
                     {
                         "suite_name": selection_details.benchmark_suite.name,
-                        "size": size,
-                        **{f"quota_{tier.value.lower()}": quota for tier, quota in quota_by_tier.items()},
+                        "series_id": selection_details.benchmark_suite.series_id,
+                        **dataclasses.asdict(fulfillment),
                     }
-                )
-            return pl.DataFrame(rows)
+                    for selection_details in suite_selection_details.values()
+                    for fulfillment in selection_details.quota_fulfillments
+                ],
+                schema={
+                    "suite_name": pl.String(),
+                    "series_id": pl.String(),
+                    "group_label": pl.String(),
+                    "min_count": pl.Int64(),
+                    "max_count": pl.Int64(),
+                    "n_selected_in_group": pl.Int64(),
+                },
+            )
 
     # --------------------------------------------------------------------------
     #  Files

@@ -6,7 +6,7 @@ uses that type.
 """
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from functools import cached_property
 from typing import Any, NamedTuple, Self
 
@@ -19,7 +19,7 @@ from sunnbear._core.benchmark.suites.pipeline.diversity_features import (
     FeatureFidelity,
     FeatureMatrix,
 )
-from sunnbear._core.benchmark.suites.pipeline.selection import DifficultyTier
+from sunnbear._core.benchmark.suites.pipeline.selection import QuotaFulfillment
 from sunnbear._core.problems.core import ProblemId
 
 # In a characterization's table of raw features, each config's column of incorrect solves is named with this prefix and
@@ -214,27 +214,20 @@ class SuiteSelectionDetails:
 
     Attributes:
         benchmark_suite: The selected suite.
-        edi_range_by_tier: Per tier, the smallest and the largest EDI of the candidates assigned that tier, among all
-            the candidates eligible for the suite, not only the selected ones. The candidates eligible for a suite are
-            those of the next larger suite of its series, or all candidates for a largest suite, except that the
-            largest suite of the b-series leaves out those of the largest suite of the a-series. The ranges show where
-            `DifficultyTierAssignment.from_pool` set the limits between tiers, which can differ from the fixed limits
-            of `DifficultyTier`.
+        quota_fulfillments: The `QuotaFulfillment` of each of the suite's quotas; empty for a suite selected without
+            quotas.
         diversity: The diversity score of the suite's own test problems, which `compute_diversity_score` gives.
     """
 
     benchmark_suite: BenchmarkSuite
-    edi_range_by_tier: Mapping[DifficultyTier, tuple[float, float]]
+    quota_fulfillments: tuple[QuotaFulfillment, ...]
     diversity: float
 
     def to_json_values(self) -> dict[str, Any]:
-        """Return the details as JSON values, under the keys ``benchmark_suite``, ``edi_range_by_tier``, ``diversity``.
-
-        Each tier's EDI range is a list of 2 numbers, keyed by the tier's value.
-        """
+        """Return the details as JSON values, 1 key per attribute."""
         return {
             "benchmark_suite": self.benchmark_suite.to_json_values(),
-            "edi_range_by_tier": {tier.value: list(edi_range) for tier, edi_range in self.edi_range_by_tier.items()},
+            "quota_fulfillments": [asdict(fulfillment) for fulfillment in self.quota_fulfillments],
             "diversity": self.diversity,
         }
 
@@ -243,16 +236,11 @@ class SuiteSelectionDetails:
     # --------------------------------------------------------------------------
     @classmethod
     def from_json_values(cls, json_values: dict[str, Any]) -> Self:
-        """Return the details that the output of `to_json_values` holds.
-
-        Raises:
-            ValueError: If an EDI range is keyed by a value that is not a `DifficultyTier`.
-        """
+        """Return the details that the output of `to_json_values` holds."""
         return cls(
             benchmark_suite=BenchmarkSuite.from_json_values(json_values["benchmark_suite"]),
-            edi_range_by_tier={
-                DifficultyTier(tier_value): (lower, upper)
-                for tier_value, (lower, upper) in json_values["edi_range_by_tier"].items()
-            },
+            quota_fulfillments=tuple(
+                QuotaFulfillment(**fulfillment_values) for fulfillment_values in json_values["quota_fulfillments"]
+            ),
             diversity=json_values["diversity"],
         )

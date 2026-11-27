@@ -86,8 +86,8 @@ def build_state_before(
       `example_raw_feature_matrix`) with their block scales, the EDIs `edis` (by default 10 for each candidate), and
       no incorrect solve;
     - spacing: a minimum distance of 1, and no drop;
-    - suite selection: each candidate's tier from its EDI, and 2 suites that no max-div run selected, with no EDI
-      ranges and a diversity score of 1: `sb-<size>a` holds the first half of the candidates, rounded down, and
+    - suite selection: each candidate's tier from its EDI, and 2 suites that no max-div run selected, with no quotas
+      and a diversity score of 1: `sb-<size>a` holds the first half of the candidates, rounded down, and
       `sb-<size>b` the others.
     """
     state = PipelineState()
@@ -165,7 +165,7 @@ def _write_example_stage_information(
             a_suite_size = len(problem_ids) // 2
             accessor.set_suite_selection_details(
                 [
-                    SuiteSelectionDetails(benchmark_suite=suite, edi_range_by_tier={}, diversity=1.0)
+                    SuiteSelectionDetails(benchmark_suite=suite, quota_fulfillments=(), diversity=1.0)
                     for suite in (
                         BenchmarkSuite(
                             series_id="sb-a",

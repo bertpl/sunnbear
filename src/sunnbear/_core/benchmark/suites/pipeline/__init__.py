@@ -6,8 +6,8 @@ information on the candidates that no stage before it dropped, and drops candida
 - `core` holds the framework: what a stage is, its id, its manifest, and the workspace that stores the manifests;
 - `snuffled_analysis` runs snuffled's analysis of a test problem, for every stage that needs one;
 - `diversity_features` computes the candidates' diversity features and their empirical difficulty index (EDI);
-- `selection` selects the pipeline's suites, each the most diverse candidates under difficulty quotas, from the
-  candidates' feature vectors;
+- `selection` selects the pipeline's suites, each the most diverse candidates under quotas on groups of candidates,
+  from the candidates' feature vectors;
 - `state` holds the state of a run, which each stage reaches only through its own state accessor;
 - `stages` holds the stages, 1 module or subpackage per stage, whose names sort in run order;
 - `BenchmarkSuitesBuildDetailsDeclaration` declares the build details of a run over the shipped test problems as a
