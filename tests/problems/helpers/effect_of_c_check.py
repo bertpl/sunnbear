@@ -18,8 +18,12 @@ The check runs in these steps:
   do, so each residual must count relative to the difference at its x-value;
 - it accepts the way when every residual, relative to its difference in c, stays within `_RESIDUAL_RTOL`.
 
-Where too few x-values give a difference well above float64 rounding error, as for a flat function or one whose values
-are very large, the check cannot decide and returns None.
+The check runs these steps at each scale of `_STEP_SCALES`, from the largest down, and accepts the way at the first
+scale at which the fit holds: a function whose structure, such as a ripple or a tooth, is finer than the largest steps
+gives differences that the way's form cannot fit, and fits only at smaller steps.
+
+Where too few x-values give a difference well above float64 rounding error at every scale, as for a flat function or
+one whose values are very large, the check cannot decide and returns None.
 """
 
 import math
@@ -45,23 +49,44 @@ _MIN_SIGNIFICANT_ULPS = 1e4
 _RESIDUAL_RTOL = 1e-4
 # _MIN_X_VALUES is the smallest number of x-values with significant differences that the check needs to decide.
 _MIN_X_VALUES = 4
+# _STEP_SCALES multiply _X_STEP_FRACTION and _C_STEP, 1 scale per pass of the check, from the largest down.
+_STEP_SCALES = (1.0, 1e-2, 1e-4)
 
 
 def follows_effect_of_c(candidate: CandidateTestProblem, effect_of_c: EffectOfC) -> bool | None:
     """Return whether `candidate`'s function applies ``c`` as `effect_of_c` says, judged across its interval.
 
     Returns:
-        True or False, or None where fewer than `_MIN_X_VALUES` x-values give significant differences.
+        True at the first scale of `_STEP_SCALES` at which the fit holds; otherwise False where the check decides at
+        any scale, and None where fewer than `_MIN_X_VALUES` x-values give significant differences at every scale.
     """
+    is_decided = False
+    for step_scale in _STEP_SCALES:
+        result = _follows_effect_of_c_at_step_scale(candidate, effect_of_c, step_scale)
+        if result is True:
+            return True
+        elif result is False:
+            is_decided = True
+    if is_decided:
+        return False
+    else:
+        return None
+
+
+def _follows_effect_of_c_at_step_scale(
+    candidate: CandidateTestProblem, effect_of_c: EffectOfC, step_scale: float
+) -> bool | None:
+    """Return the check's verdict with its steps in x and c multiplied by `step_scale`, or None if it cannot decide."""
     # --- differences at each x-value ------------
     a, b = candidate.a, candidate.b
-    h_x = _X_STEP_FRACTION * (b - a)
+    h_x = step_scale * _X_STEP_FRACTION * (b - a)
+    h_c = step_scale * _C_STEP
     rows = []
     for fraction in _X_FRACTIONS:
         x = a + fraction * (b - a)
         try:
             f = candidate.xc_fun(x, 0.0)
-            difference_c = _significant_difference(candidate.xc_fun(x, _C_STEP), candidate.xc_fun(x, -_C_STEP))
+            difference_c = _significant_difference(candidate.xc_fun(x, h_c), candidate.xc_fun(x, -h_c))
             difference_x = _significant_difference(candidate.xc_fun(x + h_x, 0.0), candidate.xc_fun(x - h_x, 0.0))
         except (ArithmeticError, ValueError):
             continue

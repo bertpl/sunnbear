@@ -20,7 +20,18 @@ _SHIPPED_FORMULAS = [
 _SHIPPED_CATEGORIES = [
     category for category in FormulaRegistry.categories() if type(category).__module__.startswith(_CATALOG_PREFIX)
 ]
-_FORMULAS_TO_CHECK_FOR_C = [formula for formula in _SHIPPED_FORMULAS if formula.number[0] != 1]
+# The formulas whose functions are constant between their jumps. `follows_effect_of_c` cannot judge such a function by
+# its derivatives, so the tests of each of these formulas' families check instead where ``c`` moves its jumps.
+_PIECEWISE_CONSTANT_FORMULA_NUMBERS = frozenset({(2, 7, 1), (2, 7, 2), (2, 7, 4)})
+# A formula counts as piecewise constant when its first candidate takes at most this many values at
+# _N_X_VALUES_FOR_PIECEWISE_CONSTANT x-values across its interval, at c = 0.
+_MAX_VALUES_OF_PIECEWISE_CONSTANT = 8
+_N_X_VALUES_FOR_PIECEWISE_CONSTANT = 1001
+_FORMULAS_TO_CHECK_FOR_C = [
+    formula
+    for formula in _SHIPPED_FORMULAS
+    if formula.number[0] != 1 and formula.number not in _PIECEWISE_CONSTANT_FORMULA_NUMBERS
+]
 
 
 # ==================================================================================================
@@ -173,3 +184,22 @@ def test_formula_applies_c_as_declared(formula):
     judged = [result for result in results if result is not None]
     assert judged
     assert all(judged)
+
+
+def test_the_piecewise_constant_formulas_are_those_whose_first_candidate_takes_few_values():
+    """`_PIECEWISE_CONSTANT_FORMULA_NUMBERS` holds exactly the formulas outside category 1 whose first candidate takes
+    at most `_MAX_VALUES_OF_PIECEWISE_CONSTANT` values at c = 0, so that the test of how a formula applies ``c`` skips
+    no other formula."""
+    # --- act --------------------------
+    piecewise_constant = set()
+    for formula in _SHIPPED_FORMULAS:
+        if formula.number[0] != 1:
+            candidate = formula.build_all_candidates()[0]
+            n_steps = _N_X_VALUES_FOR_PIECEWISE_CONSTANT - 1
+            x_values = [candidate.a + (candidate.b - candidate.a) * i / n_steps for i in range(n_steps + 1)]
+            n_distinct_values = len({candidate.xc_fun(x, 0.0) for x in x_values})
+            if n_distinct_values <= _MAX_VALUES_OF_PIECEWISE_CONSTANT:
+                piecewise_constant.add(formula.number)
+
+    # --- assert -----------------------
+    assert piecewise_constant == _PIECEWISE_CONSTANT_FORMULA_NUMBERS
