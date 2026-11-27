@@ -1,16 +1,16 @@
 {
   "archive": {
-    "sha256": "1a7bae1c5a80f4a4b1cb18455d9ce2753928a0ea8c5c27998d855ed6af4a2f5a",
-    "size_bytes": 2369501,
-    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-5d546ec4/benchmark_suites_build_details.tar.zst"
+    "sha256": "4b2e84d39b8dbf0dde1a209a32b8a6a2e8ff7ddddc838b0e884ddd7477010773",
+    "size_bytes": 2396182,
+    "url": "https://github.com/bertpl/sunnbear/releases/download/data-benchmark_suites_build_details-1ad25db7/benchmark_suites_build_details.tar.zst"
   },
-  "build_date": "2026-11-26",
+  "build_date": "2026-11-27",
   "built_with": {
     "max-div": "0.21.8",
     "snuffled": "0.1.11",
-    "sunnbear": "0.4.15"
+    "sunnbear": "0.4.15+dev"
   },
-  "content_hash": "5d546ec42c004552c02174a37df301996dfb6131dc43f85c7d5f6e1c787ed894",
+  "content_hash": "1ad25db7aed0ea6b689a778e197a84e3a9b9b37205564ebbf0c5fe5d708151a1",
   "files": [
     {
       "path": "c_ranges.parquet",
@@ -19,13 +19,13 @@
     },
     {
       "path": "candidate_registry.parquet",
-      "sha256": "2be177c5bbaa87f99041805688b1b6a77d6ef248c6339c2f4b6dc454bcabf1a7",
-      "size_bytes": 26327
+      "sha256": "aed03542383ddef32c55585b11fcccbfb7980b2cacfd134bddea85645867f68d",
+      "size_bytes": 25904
     },
     {
       "path": "difficulty_tiers.parquet",
-      "sha256": "b1ec7b0bbd67794da66b18f28b793ba6b6f4acbf8e015de40a87c7100b37c94a",
-      "size_bytes": 21358
+      "sha256": "62981f8b14b4bcbf9dee83616588edeffc3216e9318b425f440fa35980a4e6fe",
+      "size_bytes": 21022
     },
     {
       "path": "interval_bounds.parquet",
@@ -34,8 +34,8 @@
     },
     {
       "path": "nearest_kept_candidates.parquet",
-      "sha256": "621495170a3ae3749f173183a73e557f247741221a6e735663578e5a55eac967",
-      "size_bytes": 6991
+      "sha256": "2f1209d901a9adb6fd9520fd7880503ec27c04bc0006bc471f918297cdebde41",
+      "size_bytes": 2375
     },
     {
       "path": "run.json",
@@ -49,13 +49,13 @@
     },
     {
       "path": "s5_fine_characterization_raw_features.parquet",
-      "sha256": "fb2ae62223c916987ddfa5ab453a9b6651677011e51250b22f56bdfb964112ff",
-      "size_bytes": 1227411
+      "sha256": "073fa25eb3c5ee4f16f3e778842f5b7d945bac12e186da8a5627c7888fe915bd",
+      "size_bytes": 1261257
     },
     {
       "path": "storage.json",
-      "sha256": "74e39d8da3ef20262017b56e20775c3edc3135892dbfb96b95ca8db09befca2b",
-      "size_bytes": 139541
+      "sha256": "f0e6bc751a62343fc0fbce108c0defc7f6285fb2e37e12729eea6c6dfd440530",
+      "size_bytes": 141995
     }
   ],
   "generated_by": {
