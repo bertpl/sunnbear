@@ -80,7 +80,7 @@ class FormulaCategoryCandidateGroup(CandidateGroup):
     formula's own category.
 
     Attributes:
-        category: The formula category whose formulas, at any depth, the group holds.
+        category: The group holds the candidates whose formulas lie at any depth below this category.
     """
 
     category: type[FormulaCategory]

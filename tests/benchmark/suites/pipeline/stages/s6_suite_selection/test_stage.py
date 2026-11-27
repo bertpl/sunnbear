@@ -1,14 +1,14 @@
 """`SuiteSelectionStage` selects the built-in series of benchmark suites from the candidates' fine features:
 
-- the size of the largest suites of disjoint series is the largest at which their suites fit into the candidates, and
-  the stage stops the pipeline when the candidates are too few for 2 suites of the smallest size of the a-series and
-  the b-series;
+- the size of the largest suites of disjoint series is the largest size that each series declares and that,
+  multiplied by the number of series, is at most the number of candidates, and the stage stops the pipeline when the
+  candidates are too few for 2 suites of the smallest size of the a-series and the b-series;
 - it stores each candidate's tier, selects 2 disjoint largest suites of the a-series and the b-series, and drops the
   other candidates;
 - the pub-series selects its suites from the candidates of category 1 alone, and the stage does not drop the
-  candidates of its largest suite;
-- where a tier has too few candidates for both largest suites, the largest suite of the b-series misses that tier's
-  quota, and its selection details record that the suite misses the quota;
+  candidates of the pub-series' largest suite;
+- where a tier has too few candidates for the largest suites of both the a-series and the b-series, the largest suite
+  of the b-series misses that tier's quota, and its selection details record that the suite misses the quota;
 - each series' smaller suites lie inside its larger ones, and every suite meets its quotas when the candidates allow;
 - every suite carries the id of its series, and the name and aliases that its series gives it;
 - every suite's diversity score is the score of its own test problems;
@@ -67,7 +67,7 @@ def _select_suites(
     tiers = [tier for tier, count in tier_counts.items() for _ in range(count)]
     published_tiers = [tier for tier, count in (published_tier_counts or {}).items() for _ in range(count)]
     problem_ids = example_problem_ids(len(tiers)) + example_problem_ids(
-        len(published_tiers), category_number=1, formula_number=900
+        len(published_tiers), category_number=1, formula_index=900
     )
     tiers += published_tiers
     rng = np.random.default_rng(seed=4)
@@ -137,8 +137,9 @@ def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails, *, is_e
 def test_the_largest_suite_size_is_the_largest_at_which_the_disjoint_suites_fit(
     disjoint_series, n_candidates, largest_suite_size_expected
 ):
-    """The size of the largest suites of disjoint series is the largest size that each of them declares and at which
-    1 suite per series fits into the candidates, or None when not even the smallest size fits."""
+    """The size of the largest suites of disjoint series is the largest size that each of them declares and that,
+    multiplied by the number of series, is at most the number of candidates, or None when even the smallest such size
+    is too large."""
     # --- act / assert -----------------
     assert (
         SuiteSelectionStage._choose_largest_suite_size(n_candidates, disjoint_series=disjoint_series)

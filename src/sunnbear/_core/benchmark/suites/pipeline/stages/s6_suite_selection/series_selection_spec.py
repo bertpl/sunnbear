@@ -11,10 +11,9 @@ from sunnbear._core.benchmark.suites.pipeline.selection import CandidateGroup, S
 # ==================================================================================================
 @dataclass(frozen=True)
 class SeriesSelectionSpec:
-    """A `SeriesSelectionSpec` holds the candidates and the quotas of the selections of 1 series of benchmark suites.
+    """A `SeriesSelectionSpec` holds a series of benchmark suites, with the candidate group and quotas of its suites.
 
     Attributes:
-        series: The series whose suites the spec describes.
         candidate_group: Each suite of the series holds only members of this group; None allows every candidate.
         quotas: The quotas of every suite of the series; empty for a series without quotas.
     """

@@ -37,7 +37,7 @@ from tests.benchmark.suites.pipeline.example_states import (
     example_raw_feature_matrix,
 )
 
-_PROBLEM_IDS = [*example_problem_ids(3, formula_number=1), *example_problem_ids(2, formula_number=2)]
+_PROBLEM_IDS = [*example_problem_ids(3, formula_index=1), *example_problem_ids(2, formula_index=2)]
 
 
 @pytest.fixture(autouse=True)

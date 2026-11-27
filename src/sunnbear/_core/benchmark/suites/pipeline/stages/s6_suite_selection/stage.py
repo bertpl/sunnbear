@@ -34,14 +34,14 @@ from .series_selection_spec import SeriesSelectionSpec
 _DIFFICULTY_TIER_QUOTAS = tuple(
     ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
 )
-_SB_A_SERIES_SPEC = SeriesSelectionSpec(series=SB_A_SERIES, quotas=_DIFFICULTY_TIER_QUOTAS)
-_SB_B_SERIES_SPEC = SeriesSelectionSpec(series=SB_B_SERIES, quotas=_DIFFICULTY_TIER_QUOTAS)
-# The pub-series holds the published test problems, of category 1, alone. It has no quotas, because category 1 holds
-# too few candidates of the harder difficulty tiers to spread a suite of 512 evenly over the 4 tiers.
+_SB_A_SERIES_SELECTION_SPEC = SeriesSelectionSpec(series=SB_A_SERIES, quotas=_DIFFICULTY_TIER_QUOTAS)
+_SB_B_SERIES_SELECTION_SPEC = SeriesSelectionSpec(series=SB_B_SERIES, quotas=_DIFFICULTY_TIER_QUOTAS)
+# The pub-series holds only the published test problems, which form category 1. It has no quotas, because category 1
+# holds too few candidates of the harder difficulty tiers to spread the series' largest suite evenly over all tiers.
 _PUB_CANDIDATE_GROUP = FormulaCategoryCandidateGroup(category=PublishedTestProblems)
-_PUB_SERIES_SPEC = SeriesSelectionSpec(series=PUB_SERIES, candidate_group=_PUB_CANDIDATE_GROUP)
+_PUB_SERIES_SELECTION_SPEC = SeriesSelectionSpec(series=PUB_SERIES, candidate_group=_PUB_CANDIDATE_GROUP)
 # The stage stores the suites of each series in the order of these specs, which is the order of `BUILT_IN_SERIES`.
-_SERIES_SELECTION_SPECS = (_SB_A_SERIES_SPEC, _SB_B_SERIES_SPEC, _PUB_SERIES_SPEC)
+_SERIES_SELECTION_SPECS = (_SB_A_SERIES_SELECTION_SPEC, _SB_B_SERIES_SELECTION_SPEC, _PUB_SERIES_SELECTION_SPEC)
 
 
 # ==================================================================================================
@@ -52,7 +52,9 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
 
     The stage selects 1 suite per size that a series declares, up to the size of the series' largest suite, and
     creates each suite through its series. Each suite of a series holds every test problem of the series' smaller
-    suites. The a-series and the b-series share no test problem, and the pub-series may share test problems with both.
+    suites.
+
+    The a-series and the b-series share no test problem, and the pub-series may share test problems with both.
 
     The stage stores each candidate's difficulty tier, which `CandidatePool.difficulty_tiers` derives from the EDI that
     fine characterization stored, then selects the suites in 3 steps:
@@ -66,9 +68,10 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         must hold the largest suite of the a-series; the b-series' suite is the half of that selection outside the
         a-series' suite, so it lies far from the a-series' suite and is diverse in itself;
       - the largest suite of the pub-series is selected only from the candidates of category 1, the published test
-        problems, and has the largest size that the series declares and that is at most the number of those
-        candidates; the a-series and the b-series do not affect the pub-series. With fewer candidates of category 1
-        than its smallest size, the pub-series has no suite;
+        problems, independently of the a-series and the b-series;
+      - the largest suite of the pub-series has the largest size that the pub-series declares and that is at most the
+        number of candidates of category 1; with fewer such candidates than the pub-series' smallest size, the
+        pub-series has no suite;
 
     - **the drops:** the stage drops each candidate that no largest suite holds; such a candidate is valid, but not
       kept;
@@ -78,8 +81,9 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     Every suite is selected by `select_diverse_problem_ids` under the quotas of its series' `SeriesSelectionSpec`, and
     only from the members of that spec's candidate group, if it has one.
 
-    The largest suite of the a-series is selected first, so where a tier has too few candidates for both largest
-    suites, the a-series' suite meets that tier's quota, and the b-series' suite misses it.
+    The largest suite of the a-series is selected first, so where a tier has too few candidates for the largest suites
+    of both the a-series and the b-series, the a-series' suite meets that tier's quota, and the b-series' suite misses
+    it.
 
     max-div then fills the b-series' suite with candidates of other tiers, and the suite's selection details record
     that it misses the quota.
@@ -132,13 +136,16 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
 
         # --- largest suites ---------------------
         largest_a_series_details = self._select_suite_details(
-            candidate_pool, series_selection_spec=_SB_A_SERIES_SPEC, size=largest_sb_suite_size, worker_pool=worker_pool
+            candidate_pool,
+            series_selection_spec=_SB_A_SERIES_SELECTION_SPEC,
+            size=largest_sb_suite_size,
+            worker_pool=worker_pool,
         )
         largest_details_by_series_id = {
             SB_A_SERIES.series_id: largest_a_series_details,
             SB_B_SERIES.series_id: self._select_suite_details(
                 candidate_pool,
-                series_selection_spec=_SB_B_SERIES_SPEC,
+                series_selection_spec=_SB_B_SERIES_SELECTION_SPEC,
                 size=largest_sb_suite_size,
                 required_problem_ids=largest_a_series_details.benchmark_suite.problem_ids,
                 worker_pool=worker_pool,
@@ -147,7 +154,7 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         if largest_pub_suite_size is not None:
             largest_details_by_series_id[PUB_SERIES.series_id] = self._select_suite_details(
                 candidate_pool,
-                series_selection_spec=_PUB_SERIES_SPEC,
+                series_selection_spec=_PUB_SERIES_SELECTION_SPEC,
                 size=largest_pub_suite_size,
                 worker_pool=worker_pool,
             )
@@ -194,8 +201,9 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
     ) -> SuiteSelectionDetails:
         """Return the details of the suite of `size` in the series of `series_selection_spec`, from `candidate_pool`.
 
-        The suite holds only members of the spec's candidate group, under the spec's quotas. The selection also holds
-        every candidate of `required_problem_ids`; the suite holds only the selected candidates that are not required.
+        The suite is selected under the spec's quotas, only from the members of the spec's candidate group. The
+        selection also holds every candidate of `required_problem_ids`, each of which must be a member of the spec's
+        candidate group; the suite holds only the selected candidates that are not required.
         """
         required_problem_id_set = set(required_problem_ids)
         candidate_group = series_selection_spec.candidate_group
@@ -226,8 +234,9 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
         """Return the size of the largest suite of each series of `disjoint_series` for `n_candidates` candidates.
 
         The largest suites of `disjoint_series` share no candidate, so their size is the largest size that each of
-        these series declares and at which 1 suite per series fits into `n_candidates`: for 2 series, at most half of
-        `n_candidates`. Return None when not even the smallest such size fits.
+        these series declares and that, multiplied by the number of series, is at most `n_candidates`: for 2 series, at
+        most half of `n_candidates`. Return None when even the smallest size that each of these series declares is too
+        large.
         """
         common_sizes = set.intersection(*(set(series.sizes) for series in disjoint_series))
         fitting_sizes = [size for size in common_sizes if len(disjoint_series) * size <= n_candidates]
