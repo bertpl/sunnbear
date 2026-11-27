@@ -8,7 +8,8 @@
 - each series' smaller suites lie inside its larger ones, and every suite meets its quotas when the candidates allow;
 - every suite carries the id of its series, and the name and aliases that its series gives it;
 - every suite's diversity score is the score of its own test problems;
-- the stage records max-div's time per candidate and seed in its parameters.
+- the stage records max-div's time per candidate and seed in its parameters;
+- the stage declares the quotas of every built-in series.
 """
 
 from collections import Counter
@@ -19,6 +20,7 @@ import polars as pl
 import pytest
 
 from sunnbear._core.benchmark.protocol import DEFAULT_N_BISECTION_FEVALS
+from sunnbear._core.benchmark.suites.benchmark_suite import BUILT_IN_SERIES
 from sunnbear._core.benchmark.suites.pipeline.core import PipelineStageId, PipelineStopError
 from sunnbear._core.benchmark.suites.pipeline.selection import (
     CandidatePool,
@@ -27,6 +29,7 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
     compute_diversity_score,
 )
 from sunnbear._core.benchmark.suites.pipeline.stages import SuiteSelectionStage
+from sunnbear._core.benchmark.suites.pipeline.stages.s6_suite_selection.stage import _QUOTAS_BY_SERIES_ID
 from sunnbear._core.benchmark.suites.pipeline.state import BenchmarkSuitesBuildDetails
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
@@ -190,3 +193,9 @@ def test_each_series_nests_its_suites():
         ("sb-64b", ()),
     ]
     _check_series_and_quotas(build_details)
+
+
+def test_the_stage_declares_quotas_for_every_built_in_series():
+    """`_QUOTAS_BY_SERIES_ID` declares the quotas of every built-in series, and of no other series."""
+    # --- act / assert -----------------
+    assert set(_QUOTAS_BY_SERIES_ID) == {series.series_id for series in BUILT_IN_SERIES}

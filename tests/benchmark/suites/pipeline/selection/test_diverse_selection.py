@@ -30,8 +30,7 @@ from sunnbear._core.benchmark.suites.pipeline.selection.diverse_selection import
 from sunnbear._core.stats import l1_distances_to
 from tests.benchmark.suites.pipeline.example_states import example_problem_ids
 
-# Each tier holds exactly a quarter of the selection.
-_QUARTER_PER_TIER = tuple(
+_DIFFICULTY_TIER_QUOTAS = tuple(
     ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
 )
 
@@ -87,7 +86,7 @@ def test_a_selection_that_misses_a_quota_records_the_miss(monkeypatch):
 
     # --- act --------------------------
     selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
-        pool, selection_size=16, quotas=_QUARTER_PER_TIER, seed=1, sec_per_candidate=0.05, n_workers=2
+        pool, selection_size=16, quotas=_DIFFICULTY_TIER_QUOTAS, seed=1, sec_per_candidate=0.05, n_workers=2
     )
 
     # --- assert -----------------------
@@ -114,7 +113,7 @@ def test_a_selection_that_misses_a_required_candidate_stops_the_pipeline(monkeyp
         select_diverse_problem_ids(
             pool,
             selection_size=16,
-            quotas=_QUARTER_PER_TIER,
+            quotas=_DIFFICULTY_TIER_QUOTAS,
             required_problem_ids=required_problem_ids,
             seed=1,
             sec_per_candidate=0.05,
@@ -136,7 +135,7 @@ def test_a_selection_with_required_candidates_holds_them_and_meets_the_quotas_ov
     selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
         pool,
         selection_size=16,
-        quotas=_QUARTER_PER_TIER,
+        quotas=_DIFFICULTY_TIER_QUOTAS,
         required_problem_ids=required_problem_ids,
         seed=1,
         sec_per_candidate=0.05,
@@ -161,7 +160,7 @@ def test_a_group_with_too_few_candidates_misses_its_quota_and_the_selection_stay
 
     # --- act --------------------------
     selected_problem_ids, quota_fulfillments = select_diverse_problem_ids(
-        pool, selection_size=16, quotas=_QUARTER_PER_TIER, seed=1, sec_per_candidate=0.05, n_workers=2
+        pool, selection_size=16, quotas=_DIFFICULTY_TIER_QUOTAS, seed=1, sec_per_candidate=0.05, n_workers=2
     )
 
     # --- assert -----------------------
@@ -173,7 +172,8 @@ def test_a_group_with_too_few_candidates_misses_its_quota_and_the_selection_stay
 
 
 def test_a_pool_too_small_for_the_selection_is_refused():
-    """A pool of 20 candidates, 8 of them required, leaves 12 for a selection of 16."""
+    """A pool of 20 candidates, 8 of them required, leaves 12 for a selection of 16, and `select_diverse_problem_ids`
+    refuses it."""
     # --- arrange ----------------------
     pool = _example_pool([5.0] * 20, seed=5)
 

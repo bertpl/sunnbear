@@ -301,8 +301,8 @@ class BenchmarkSuitesBuildDetails:
 
         - ``suite_name`` and ``series_id``;
         - ``group_label``, the label of the quota's group of candidates;
-        - ``min_count`` and ``max_count``, the smallest and the largest number of the suite's test problems that may
-          count toward the quota;
+        - ``min_count`` and ``max_count``, the smallest number of the suite's test problems that must count toward the
+          quota, and the largest number that may;
         - ``n_selected_in_group``, the number of the suite's test problems that count toward the quota.
 
         Return ``None`` when suite selection did not finish.
@@ -316,10 +316,7 @@ class BenchmarkSuitesBuildDetails:
                     {
                         "suite_name": selection_details.benchmark_suite.name,
                         "series_id": selection_details.benchmark_suite.series_id,
-                        "group_label": fulfillment.group_label,
-                        "min_count": fulfillment.min_count,
-                        "max_count": fulfillment.max_count,
-                        "n_selected_in_group": fulfillment.n_selected_in_group,
+                        **dataclasses.asdict(fulfillment),
                     }
                     for selection_details in suite_selection_details.values()
                     for fulfillment in selection_details.quota_fulfillments

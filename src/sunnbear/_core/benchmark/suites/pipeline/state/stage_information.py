@@ -239,6 +239,8 @@ class SuiteSelectionDetails:
         """Return the details that the output of `to_json_values` holds."""
         return cls(
             benchmark_suite=BenchmarkSuite.from_json_values(json_values["benchmark_suite"]),
-            quota_fulfillments=tuple(QuotaFulfillment(**values) for values in json_values["quota_fulfillments"]),
+            quota_fulfillments=tuple(
+                QuotaFulfillment(**fulfillment_values) for fulfillment_values in json_values["quota_fulfillments"]
+            ),
             diversity=json_values["diversity"],
         )

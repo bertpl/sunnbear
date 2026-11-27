@@ -14,10 +14,10 @@ from .count_quota import CountQuota
 # ==================================================================================================
 @dataclass(frozen=True)
 class ShareQuota:
-    """A `ShareQuota` gives a group of candidates the smallest and the largest share of a selection that it may hold.
+    """A `ShareQuota` gives a group the smallest and the largest share of a selection that the group may hold.
 
-    The shares hold for every size of selection, so a stage declares a series' quotas once for all its suites, and
-    `for_selection` turns each quota into the counts of 1 selection.
+    The shares apply to every size of selection, so a stage declares a series' quotas once for all its suites, and
+    `to_count_quota` turns each quota into the counts of 1 selection.
 
     Attributes:
         group: The group of candidates that count toward the quota.
@@ -41,7 +41,7 @@ class ShareQuota:
                 f"they are {self.min_share} and {self.max_share}."
             )
 
-    def for_selection(self, candidate_pool: CandidatePool, *, selection_size: int) -> CountQuota:
+    def to_count_quota(self, candidate_pool: CandidatePool, *, selection_size: int) -> CountQuota:
         """Return the quota's counts for a selection of `selection_size` candidates from `candidate_pool`.
 
         Raises:

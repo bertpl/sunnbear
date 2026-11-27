@@ -30,8 +30,6 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 _DIFFICULTY_TIER_QUOTAS = tuple(
     ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
 )
-# `_QUOTAS_BY_SERIES_ID` maps a series' id to the series' quotas, under which the stage selects each suite of the
-# series.
 _QUOTAS_BY_SERIES_ID = {
     SB_A_SERIES.series_id: _DIFFICULTY_TIER_QUOTAS,
     SB_B_SERIES.series_id: _DIFFICULTY_TIER_QUOTAS,
@@ -65,13 +63,17 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
       the smallest, is selected from the series' next larger suite.
 
     Every suite is selected by `select_diverse_problem_ids`, under the quotas that `_QUOTAS_BY_SERIES_ID` declares for
-    its series, from the candidates eligible for the suite. The candidates eligible for a suite are all candidates for
-    a largest suite, and the candidates of the series' next larger suite for a smaller suite, except that the
-    candidates of the largest suite of the a-series are not eligible for the largest suite of the b-series.
+    its series, from the candidates eligible for the suite:
+
+    - **a largest suite:** all candidates, except that the candidates of the largest suite of the a-series are not
+      eligible for the largest suite of the b-series;
+    - **a smaller suite:** the candidates of the series' next larger suite.
 
     The largest suite of the a-series is selected first, so where a tier has too few candidates for both largest
-    suites, the a-series' suite meets that tier's quota, and the b-series' suite misses it: max-div fills the b-series'
-    suite with candidates of other tiers, and its selection details record that the suite misses the quota.
+    suites, the a-series' suite meets that tier's quota, and the b-series' suite misses it.
+
+    max-div then fills the b-series' suite with candidates of other tiers, and the suite's selection details record
+    that it misses the quota.
 
     Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
 

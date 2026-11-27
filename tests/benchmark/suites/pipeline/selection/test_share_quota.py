@@ -38,7 +38,7 @@ def test_the_counts_of_a_selection_are_its_shares_of_the_size(quota, min_count_e
     )
 
     # --- act --------------------------
-    count_quota = quota.for_selection(pool, selection_size=64)
+    count_quota = quota.to_count_quota(pool, selection_size=64)
 
     # --- assert -----------------------
     assert count_quota == CountQuota(
@@ -60,7 +60,7 @@ def test_a_share_that_gives_no_whole_number_of_candidates_is_refused():
 
     # --- act / assert -----------------
     with pytest.raises(ValueError, match=r"give no whole number of candidates in a selection of 6\.$"):
-        ShareQuota.exactly(_GROUP_OF_D, Fraction(1, 4)).for_selection(pool, selection_size=6)
+        ShareQuota.exactly(_GROUP_OF_D, Fraction(1, 4)).to_count_quota(pool, selection_size=6)
 
 
 @pytest.mark.parametrize(

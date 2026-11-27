@@ -1,5 +1,5 @@
 """`CountQuota` counts the selected candidates of its group in its fulfillment, and becomes a max-div constraint whose
-smallest count is at most the size of its group."""
+smallest count is at most the size of its group, or no constraint for a group without candidates."""
 
 import pytest
 
@@ -39,3 +39,12 @@ def test_the_constraint_lowers_the_smallest_count_to_the_group_size(min_count, m
 
     # --- assert -----------------------
     assert (set(constraint.int_set), constraint.min_count, constraint.max_count) == ({0, 1, 2}, min_count_expected, 6)
+
+
+def test_a_group_without_candidates_gives_no_constraint():
+    """A quota whose group holds no candidates has no max-div constraint."""
+    # --- arrange ----------------------
+    count_quota = CountQuota(group_label="D", member_ids=frozenset(), min_count=1, max_count=2)
+
+    # --- act / assert -----------------
+    assert count_quota.to_constraint({}) is None

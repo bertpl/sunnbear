@@ -55,24 +55,24 @@ def select_diverse_problem_ids(
     sec_per_candidate: float,
     n_workers: int,
 ) -> tuple[tuple[ProblemId, ...], tuple[QuotaFulfillment, ...]]:
-    """Return the most diverse selection with `required_problem_ids` that best meets `quotas`, and how it meets each.
+    """Return the most diverse selection with `required_problem_ids` that best meets `quotas`, and its fulfillments.
 
     max-div searches, by the objective of this module, for a selection of the required candidates plus `selection_size`
     other candidates, under these constraints:
 
-    - 1 per quota: the selection holds at least the quota's smallest count and at most its largest count of the
-      candidates of the quota's group, with the counts that `ShareQuota.for_selection` gives for `selection_size`; a
+    - One per quota: the selection holds at least the quota's smallest count and at most its largest count of the
+      candidates of the quota's group, with the counts that `ShareQuota.to_count_quota` gives for `selection_size`; a
       group holds only candidates that are not required;
-    - 1 more when there are required candidates: the selection holds all of them.
+    - One more when there are required candidates: the selection holds all of them.
 
     max-div meets every constraint that can be met. When the quotas cannot all be met, for example because a group
     holds fewer candidates than its quota's smallest count, max-div returns the selection that comes closest to them,
-    and the returned fulfillments show each quota that the selection misses.
+    and the returned `QuotaFulfillment`s show each quota that the selection misses.
 
     Args:
         candidate_pool: The candidates to select from.
-        selection_size: The number of selected candidates beyond the required ones; each quota's shares of it must be
-            whole numbers of candidates.
+        selection_size: The number of selected candidates beyond the required ones; each quota's shares of
+            `selection_size` must be whole numbers of candidates.
         quotas: The quotas of the selection beyond the required candidates; empty for a selection without quotas.
         required_problem_ids: The candidates of `candidate_pool` that must be in the selection.
         seed: The seed of max-div's search.
@@ -87,7 +87,7 @@ def select_diverse_problem_ids(
 
     Raises:
         ValueError: If `candidate_pool` holds fewer than `selection_size` candidates that are not required, or a share
-            of a quota is not a whole number of candidates, as `ShareQuota.for_selection` describes.
+            of a quota is not a whole number of candidates, as `ShareQuota.to_count_quota` describes.
         PipelineStopError: If the selection misses a required candidate.
     """
     problem_ids = candidate_pool.feature_matrix.problem_ids
@@ -102,14 +102,14 @@ def select_diverse_problem_ids(
             f"{selection_size}."
         )
     else:
-        count_quotas = [quota.for_selection(non_required_pool, selection_size=selection_size) for quota in quotas]
+        count_quotas = [quota.to_count_quota(non_required_pool, selection_size=selection_size) for quota in quotas]
 
         # --- constraints ------------------------
         row_index_by_problem_id = candidate_pool.feature_matrix.row_index_by_problem_id
-        # A group without candidates has nothing to select and gets no constraint, because max-div refuses a
-        # constraint on no candidates; its fulfillment still records whether the selection meets its quota.
         constraints = [
-            count_quota.to_constraint(row_index_by_problem_id) for count_quota in count_quotas if count_quota.member_ids
+            constraint
+            for count_quota in count_quotas
+            if (constraint := count_quota.to_constraint(row_index_by_problem_id)) is not None
         ]
         if required_problem_id_set:
             constraints.append(
