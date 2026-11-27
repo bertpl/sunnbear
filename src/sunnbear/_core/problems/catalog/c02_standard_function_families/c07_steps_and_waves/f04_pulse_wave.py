@@ -19,7 +19,9 @@ from sunnbear._core.problems.core import (
 class PulseWave(Formula):
     """`PulseWave` is ``p(x - c)`` on ``[-(1 - d)/2, n + d/2]``, with the pulse wave ``p`` of duty cycle ``d``.
 
-    ``p(u)`` is ``1 - d`` where ``u - floor(u) < d`` and ``-d`` elsewhere, so its mean over a period is 0. It jumps up
+    ``p(u)`` is ``1 - d`` where ``u - floor(u) < d`` and ``-d`` elsewhere, so its mean over a period is 0.
+
+    It jumps up
     at each integer and down at each ``k + d``, and takes no value 0, so every sign change lies at a jump, where the
     function has no root. At ``d = 1/2`` it is half the square wave.
 
@@ -80,8 +82,8 @@ class PulseWave(Formula):
         """Return 2 recipes: one that sweeps ``d`` at ``n = 2^20``, and one that sweeps ``n`` at ``d = 2^-8``.
 
         - The sweep of ``d``: from 2^-9 to 1/2. At ``d = 2^-10`` the c-range would be narrower than validation allows.
-          At ``n = 2^20``, the core solver configs spend their evaluations in the pattern that differs most from the
-          one on the Heaviside step at the same ``d``.
+          ``n = 2^20`` is the ``n`` at which the core solver configs spend their evaluations least like they do on the
+          Heaviside step at the same ``d``.
         - The sweep of ``n``: from 1 to 2^20, the ``n`` of the sweep of ``d``, so that the 2 sweeps meet there.
         """
         return (

@@ -15,6 +15,7 @@ import mpmath
 import pytest
 
 from sunnbear._core.problems.core import FormulaRegistry
+from tests.problems.helpers.piecewise_constant_formulas import PIECEWISE_CONSTANT_FORMULA_NUMBERS
 
 # mpmath computes the reference values with this many decimal digits.
 MPMATH_DIGITS = 50
@@ -23,11 +24,11 @@ MPMATH_DIGITS = 50
 # ==================================================================================================
 #  Jumps
 # ==================================================================================================
-# Each entry holds a formula's number and 2 functions of the candidate's parameter values: the position of the jump that
-# ``c`` moves, also a function of ``c``, and the largest ``abs(c)`` that the test uses, within every candidate's
-# c-range. The jump is the step of `HeavisideStep`, the step of `FloorFunction` at which the sign changes, and the
-# up-jump of `PulseWave` at 0; the pulse wave's c-range is about ``d/2`` wide on each side, the others' are wider than
-# 0.3.
+# Each entry holds a formula's number and 2 functions of the candidate's parameter values:
+# - the position of the jump that ``c`` moves, also a function of ``c``: the step of `HeavisideStep`, the step of
+#   `FloorFunction` at which the sign changes, and the up-jump of `PulseWave` at 0;
+# - the largest ``abs(c)`` that the test uses, within every candidate's c-range: the pulse wave's c-range is about
+#   ``d/2`` wide on each side, the others' are wider than 0.3.
 JUMP_POSITIONS = [
     pytest.param((2, 7, 1), lambda param_values, c: c, lambda param_values: 0.3, id="heaviside_step"),
     pytest.param((2, 7, 2), lambda param_values, c: param_values[0] * c, lambda param_values: 0.3, id="floor_function"),
@@ -52,6 +53,16 @@ def test_c_moves_the_jump_and_the_function_takes_no_value_0_beside_it(formula_nu
             assert candidate.xc_fun(math.nextafter(x_jump, -math.inf), c) < 0.0, (candidate.id, c)
             assert candidate.xc_fun(math.nextafter(x_jump, math.inf), c) > 0.0, (candidate.id, c)
             assert candidate.xc_fun(x_jump, c) != 0.0, (candidate.id, c)
+
+
+def test_the_jump_test_covers_exactly_the_piecewise_constant_formulas():
+    """`JUMP_POSITIONS` holds exactly the formulas of `PIECEWISE_CONSTANT_FORMULA_NUMBERS`, whose effect of ``c`` the
+    catalog's test of how a formula applies ``c`` skips."""
+    # --- act --------------------------
+    formula_numbers = {param.values[0] for param in JUMP_POSITIONS}
+
+    # --- assert -----------------------
+    assert formula_numbers == PIECEWISE_CONSTANT_FORMULA_NUMBERS
 
 
 def _x_values_between_sign_changes_of_the_pulse_wave(candidate, n):
@@ -135,8 +146,10 @@ def test_fourier_partial_sum_at_level_0_has_1_root():
 # ==================================================================================================
 # Each entry holds a formula's number and its gain in the plain form, which overflows for a high order beyond 1.
 PLAIN_GAINS = [
-    pytest.param((2, 7, 6), lambda u, n: 1.0 / math.sqrt(1.0 + u ** (2 * n)), id="butterworth"),
-    pytest.param((2, 7, 7), lambda u, n: 1.0 / math.sqrt(1.0 + math.cosh(n * math.acosh(u)) ** 2), id="chebyshev"),
+    pytest.param((2, 7, 6), lambda u, n: 1.0 / math.sqrt(1.0 + u ** (2 * n)), id="butterworth_filter_gain"),
+    pytest.param(
+        (2, 7, 7), lambda u, n: 1.0 / math.sqrt(1.0 + math.cosh(n * math.acosh(u)) ** 2), id="chebyshev_filter_gain"
+    ),
 ]
 
 
@@ -155,7 +168,7 @@ def test_filter_gain_beyond_the_cutoff_agrees_with_its_plain_form(formula_number
 
 @pytest.mark.parametrize("formula_number", [(2, 7, 6), (2, 7, 7)])
 def test_filter_gain_is_minus_d_far_beyond_the_cutoff_at_its_highest_order(formula_number):
-    """At the highest order of its sweep of the order, the filter gain is exactly ``-d`` at the upper bound, where its
+    """At the highest order among its candidates, the filter gain is exactly ``-d`` at the upper bound, where its
     plain form would overflow."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number(formula_number)
@@ -181,22 +194,22 @@ USUAL_SMOOTHSTEPS = [
 
 @pytest.mark.parametrize("n, usual_smoothstep", USUAL_SMOOTHSTEPS)
 def test_smoothstep_agrees_with_its_usual_form(n, usual_smoothstep):
-    """The Bernstein form of `Smoothstep`, at the level 0, agrees with the usual form of orders 0, 1 and 2 to within a
-    relative 1e-12."""
+    """The Bernstein form of `Smoothstep`, at the level 0, agrees with the usual form of each order in
+    `USUAL_SMOOTHSTEPS` to within a relative 1e-12."""
     # --- arrange ----------------------
     smoothstep_n = FormulaRegistry.formula_from_number((2, 7, 8)).bind_xc_fun((float(n), 4.0, 0.0))
 
     # --- act / assert -----------------
     for x in (1e-6 - 0.5, -0.4, -0.25, 0.0, 0.2, 0.499):
-        # The formula's argument, as it computes it from x at c = 0.
+        # At c = 0, the formula's argument t is x + 1/2.
         t = x + 0.5
         assert smoothstep_n(x, 0.0) == pytest.approx(usual_smoothstep(t), rel=1e-12, abs=0.0), x
 
 
 @pytest.mark.parametrize("n", [1, 16, 1024])
 def test_smoothstep_is_symmetric_about_its_middle(n):
-    """``S_n(1 - t) = 1 - S_n(t)`` to within 1e-12 for orders up to 2^10, so the sum of the Bernstein form keeps its
-    precision at a high order."""
+    """``S_n(1 - t) = 1 - S_n(t)`` to within 1e-12 at each order of the parametrization, so the sum of the Bernstein
+    form keeps its precision at a high order."""
     # --- arrange ----------------------
     smoothstep_n = FormulaRegistry.formula_from_number((2, 7, 8)).bind_xc_fun((float(n), 4.0, 0.0))
 

@@ -20,8 +20,10 @@ class SquareWaveFourierPartialSum(Formula):
     """`SquareWaveFourierPartialSum` is ``S_n(x - c) - d`` on ``[-1/2, 1/2]``.
 
     ``S_n(u) = (4/pi)*sum(k = 0 … n-1) sin((2*k + 1)*pi*u)/(2*k + 1)`` is the Fourier series of the square wave
-    ``sign(sin(pi*u))`` cut off after ``n`` terms. The slope of ``S_n`` at the root at 0 is ``4*n``; next to the square
-    wave's jump at 0 it overshoots 1 by about 9 % of that jump, to about 1.18, and then ripples about 1 (the Gibbs
+    ``sign(sin(pi*u))`` cut off after ``n`` terms.
+
+    The slope of ``S_n`` at the root at 0 is ``4*n``; next to the square
+    wave's jump at 0, ``S_n`` overshoots 1 by about 9 % of that jump, to about 1.18, and then ripples about 1 (the Gibbs
     phenomenon). On ``(0, 1)`` every partial sum is positive.
 
     - ``n`` is an integer of at least 1, the number of terms. Each evaluation sums them, so its cost grows with ``n``.
@@ -79,7 +81,8 @@ class SquareWaveFourierPartialSum(Formula):
         - The sweep of ``n``: from 1 to 2^12. Each evaluation sums ``n`` terms, so the sweep ends where an evaluation
           costs 2^12 sines.
         - The sweep of ``d``: from 0.01 to 0.99, at ``n = 2^10``, where an evaluation costs a quarter of the sines at
-          the end of the sweep of ``n``; ``d = 0`` lies in the sweep of ``n``, and 0.99 stays below ``S_n(1/2)``.
+          the end of the sweep of ``n``. The sweep starts at 0.01 because ``d = 0`` is already in the sweep of ``n``,
+          and it ends at 0.99, which stays below ``S_n(1/2)``.
         """
         return (
             ParamGrid(
@@ -101,8 +104,8 @@ class SquareWaveFourierPartialSum(Formula):
     def is_param_tuple_valid(self, n: float, d: float) -> bool:
         """Check the parameter conditions listed in the presentation's `param_conditions`."""
         if n >= 1.0 and n == math.floor(n) and d >= 0.0:
-            value_at_half = (4.0 / math.pi) * sum((-1.0) ** k / (2 * k + 1) for k in range(int(n)))
-            return d < value_at_half
+            value_at_upper_bound = (4.0 / math.pi) * sum((-1.0) ** k / (2 * k + 1) for k in range(int(n)))
+            return d < value_at_upper_bound
         else:
             return False
 

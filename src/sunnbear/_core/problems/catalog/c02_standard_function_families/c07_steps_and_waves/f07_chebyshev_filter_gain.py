@@ -23,7 +23,9 @@ class ChebyshevFilterGain(Formula):
     frequency ``u`` relative to its cutoff; the filter of type II is usually called the inverse Chebyshev filter.
 
     ``T_n`` is the Chebyshev polynomial of the 1st kind, which is ``cos(n*acos(u))`` on ``[0, 1]`` and
-    ``cosh(n*acosh(u))`` beyond 1. On ``[0, 1]``, ``G_n`` ripples ``n`` times between ``1/sqrt(2)`` and 1; beyond 1 it
+    ``cosh(n*acosh(u))`` beyond 1.
+
+    On ``[0, 1]``, ``G_n`` ripples ``n`` times between ``1/sqrt(2)`` and 1; beyond 1 it
     falls faster than the Butterworth filter's gain of the same order, over a width of about ``1/n^2``. ``G_n`` is even,
     so the interval starts at 0 and leaves out the mirror image of the root.
 
@@ -61,8 +63,8 @@ class ChebyshevFilterGain(Formula):
         ),
         interval="[0, 2]",
         summary=(
-            "The gain of the Chebyshev filter, which ripples with equal heights and then falls in a steep step, with "
-            "the root in the step or its tail or, at a level within the ripples, with many roots among them."
+            "The gain of the Chebyshev filter, which ripples with equal heights and then falls in a steep step; the "
+            "root lies in the step or its tail, or, at a level within the ripples, many roots lie among the ripples."
         ),
         notes=(
             (
@@ -86,9 +88,9 @@ class ChebyshevFilterGain(Formula):
     def parametrized_fun(x: float, c: float, n: float, d: float) -> float:
         """Evaluate ``G_n(x - c) - d``, in the form that never overflows.
 
-        Beyond the cutoff, it computes ``G_n`` as ``2*v/sqrt(1 + 6*v^2 + v^4)`` with ``v = exp(-n*acosh(u))``. For a
-        large ``n``, ``v`` underflows to 0 where ``cosh(n*acosh(u))`` would overflow, and plain Python, unlike
-        numba-compiled code, raises on that overflow.
+        Beyond the cutoff, the function computes ``G_n`` as ``2*v/sqrt(1 + 6*v^2 + v^4)`` with
+        ``v = exp(-n*acosh(u))``. For a large ``n``, ``v`` underflows to 0 where ``cosh(n*acosh(u))`` would overflow,
+        and plain Python, unlike numba-compiled code, raises on that overflow.
         """
         u = abs(x - c)
         if u <= 1.0:
@@ -106,11 +108,11 @@ class ChebyshevFilterGain(Formula):
         """Return 3 recipes: one that sweeps ``n`` at ``d = 1/2``, and 2 that sweep ``d`` below and within the ripples.
 
         - The sweep of ``n``: from 1 to 2^20. From about 2^20 on, the step, about ``1/n^2`` wide, is narrower than the
-          benchmark's ``xtol``, so every solver sees the Heaviside step at ``d = 1/2``.
+          benchmark's ``xtol``, so every solver behaves as it does on the Heaviside step at ``d = 1/2``.
         - The sweep of ``d`` below the ripples, at ``n = 2^16``: from 2^-19 to 1/2. Below 2^-19 the core solver
           configs spend about as many evaluations at every ``d``.
         - The sweep of ``d`` within the ripples, at ``n = 65``: from 0.71 to 0.99. An odd ``n`` keeps the function
-          positive at 0. At a larger ``n``, the c-range of a level close to 1 would be narrower than validation allows,
+          positive at 0. At a larger ``n``, a level close to 1 would give a c-range narrower than validation allows,
           because each bound lies within 1 ripple of a root.
         """
         return (

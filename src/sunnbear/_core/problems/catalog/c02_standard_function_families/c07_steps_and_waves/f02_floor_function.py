@@ -24,10 +24,11 @@ class FloorFunction(Formula):
     that step.
 
     ``n`` is an integer of at least 1: the number of further steps on each side of the step at which the sign
-    changes. The bounds lie halfway along a step. Across many steps, the function is close to the line ``x - n*c``, so
-    an interpolating solver first finds the right step in a few evaluations and then meets the jump; the more steps, the
-    more of bisection's halvings the search for the right step saves. At ``n = 0`` the formula would be the Heaviside
-    step at ``d = 1/2``.
+    changes. The bounds lie halfway along a step. At ``n = 0`` the formula would be the Heaviside step at ``d = 1/2``.
+
+    Across many steps, the function is close to the line ``x - n*c``, so an interpolating solver first finds the right
+    step in a few evaluations and then meets the jump. The more steps there are, the more halvings bisection needs to
+    reach the right step, so the more halvings this search saves.
 
     ``c`` shifts x by ``n*c``, so the c-range is close to the same for every ``n``, and the step of the sign change lies
     at ``x = n*c``.

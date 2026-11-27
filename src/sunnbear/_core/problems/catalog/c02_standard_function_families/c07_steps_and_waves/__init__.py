@@ -4,8 +4,8 @@ The steps and waves give behaviors absent from the other families:
 
 - a sign change at a jump between 2 finite levels, where the function has no root;
 - many jumps in 1 interval, alone or between roots on linear ramps;
-- a smooth step whose steepness a parameter sets, up to a step in float64, with ripples, an overshoot or exactly
-  constant plateaus beside it.
+- a smooth step with a parameter that sets its steepness, up to a steepness at which float64 cannot tell it from a
+  jump, with ripples, an overshoot or exactly constant plateaus beside it.
 
 A formula with a level ``d`` subtracts ``d`` from its function: ``d`` sets where the root lies between the 2 plateaus
 or, at a jump, the ratio of the 2 levels beside the jump.
@@ -15,9 +15,9 @@ Every formula shifts ``x`` by a multiple of ``c``:
 - **`FloorFunction` and `Smoothstep` scale the shift by ``n`` or ``b``,** the parameter that sets the interval's
   width, so that their c-ranges barely depend on it.
 - **The others shift ``x`` by ``c`` itself.** The interval of `HeavisideStep`, `SquareWaveFourierPartialSum`,
-  `ButterworthFilterGain` and `ChebyshevFilterGain` does not grow with a parameter; `SawtoothWave` and `PulseWave` are
-  periodic, so their c-ranges are set by the distance from a bound to the nearest sign change, which is less than 1
-  period at every ``n``.
+  `ButterworthFilterGain` and `ChebyshevFilterGain` does not grow with a parameter. `SawtoothWave` and `PulseWave` are
+  periodic, so the distance from a bound to the nearest sign change, which sets their c-ranges, stays below 1 period
+  at every ``n`` and does not grow with it.
 """
 
 from sunnbear._core.problems.core import FormulaCategory

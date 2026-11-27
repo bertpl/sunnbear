@@ -113,9 +113,10 @@ class Smoothstep(Formula):
         The fixed values are ``n = 1``, ``b = 2^10`` and ``d = 1/2``.
 
         - The sweep of ``b``: from 1/2 to 2^40. From about 2^40 on, the step is narrower than the benchmark's ``xtol``,
-          so every solver sees the Heaviside step at ``d = 1/2``. Its grid is coarser than the other sweeps' grids,
-          because over ``b`` the core solver configs spend their evaluations in about the same pattern as on
-          `ButterworthFilterGain` over its order, so a finer grid would repeat that formula's candidates.
+          so every solver behaves as it does on the Heaviside step at ``d = 1/2``. Its grid is coarser than the other
+          sweeps' grids, because over ``b`` the core solver configs spend their evaluations in about the same pattern
+          as on `ButterworthFilterGain` over its order, so a finer grid would add candidates that behave like those of
+          `ButterworthFilterGain`.
         - The sweep of ``n``, in 2 grids: ``n = 0``, the clamped line, and the integers from 1 to 2^10. Each
           evaluation sums ``n + 1`` terms, so the sweep ends where an evaluation sums 1025 terms.
         - The sweep of ``d``: from 2^-40 to 1/2. Below 2^-40, the core solver configs spend their evaluations in about

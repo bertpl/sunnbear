@@ -18,10 +18,12 @@ The check runs in these steps:
   do, so each residual must count relative to the difference at its x-value;
 - it accepts the way when every residual, relative to its difference in c, stays within `_RESIDUAL_RTOL`.
 
-The check runs these steps at each scale of `_STEP_SCALES`, from the largest down, and accepts the way at the first
-scale at which every residual stays within `_RESIDUAL_RTOL`. A function with a structure finer than the largest
-difference steps, such as a ripple or a tooth, gives differences that the way's form cannot fit at those steps, but can
-at smaller ones.
+The check repeats this procedure with the step sizes of its central differences multiplied by each scale of
+`_STEP_SCALES`, from the largest down, and accepts the way at the first scale at which every residual stays within
+`_RESIDUAL_RTOL`.
+
+A function with a structure finer than the largest step sizes, such as a ripple or a tooth, gives differences that the
+way's form cannot fit at those step sizes, but can at smaller ones.
 
 Where too few x-values give a difference well above float64 rounding error at every scale, as for a flat function or
 one whose values are very large, the check cannot decide and returns None.
@@ -58,9 +60,10 @@ def follows_effect_of_c(candidate: CandidateTestProblem, effect_of_c: EffectOfC)
     """Return whether `candidate`'s function applies ``c`` as `effect_of_c` says, judged across its interval.
 
     Returns:
-        True if every residual stays within `_RESIDUAL_RTOL` at any scale of `_STEP_SCALES`; otherwise False if at
-        least 1 scale decides, and None if fewer than `_MIN_X_VALUES` x-values give significant differences at every
-        scale.
+        True if every residual stays within `_RESIDUAL_RTOL` at any scale of `_STEP_SCALES`. Otherwise:
+
+        - False if at least 1 scale decides;
+        - None if fewer than `_MIN_X_VALUES` x-values give significant differences at every scale.
     """
     is_decided = False
     for step_scale in _STEP_SCALES:

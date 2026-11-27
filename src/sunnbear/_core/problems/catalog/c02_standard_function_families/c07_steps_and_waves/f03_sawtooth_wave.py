@@ -20,7 +20,9 @@ class SawtoothWave(Formula):
     """`SawtoothWave` is ``s(x - c)`` on ``[-(n + 1/4), n + 1/4]``, with the sawtooth wave ``s``.
 
     ``s(u) = u - floor(u + 1/2)`` rises with slope 1 from -1/2 to 1/2 on each tooth, and jumps back down to -1/2 at
-    each half-integer. The interval holds the ``2*n + 1`` roots at the integers from ``-n`` to ``n``, and the ``2*n``
+    each half-integer.
+
+    The interval holds the ``2*n + 1`` roots at the integers from ``-n`` to ``n``, and the ``2*n``
     jumps between them, where the function changes sign too, without a root. The interval's bounds lie halfway between
     a root and the next jump, where the function is -1/4 and 1/4.
 
@@ -63,7 +65,7 @@ class SawtoothWave(Formula):
         """Return the recipe of the integers ``n`` nearest to 2^(0.1*i), for i from 0 to 200.
 
         The sweep ends at the round value 2^20: from about there on, a bisection midpoint lands exactly on a root at a
-        few of the benchmark's tuples for many values of ``n``, and validation rejects those values.
+        few tuples of the benchmark's tuple set for many values of ``n``, and validation rejects those values.
         """
         return (
             ParamGrid(

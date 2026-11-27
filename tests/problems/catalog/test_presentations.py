@@ -7,11 +7,13 @@ The tests of how category 1's formulas apply ``c`` live with the survey of publi
 the rule of category 1 for the size of the shift.
 """
 
+import numpy as np
 import pytest
 
 import sunnbear._core.problems.catalog as catalog
 from sunnbear._core.problems.core import Formula, FormulaRegistry
 from tests.problems.helpers.effect_of_c_check import follows_effect_of_c
+from tests.problems.helpers.piecewise_constant_formulas import PIECEWISE_CONSTANT_FORMULA_NUMBERS
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
 _SHIPPED_FORMULAS = [
@@ -20,18 +22,14 @@ _SHIPPED_FORMULAS = [
 _SHIPPED_CATEGORIES = [
     category for category in FormulaRegistry.categories() if type(category).__module__.startswith(_CATALOG_PREFIX)
 ]
-# The formulas whose functions are constant between their jumps. `follows_effect_of_c` cannot judge such a function by
-# its derivatives, so `test_c_moves_the_jump_and_the_function_takes_no_value_0_beside_it` checks instead where ``c``
-# moves their jumps.
-_PIECEWISE_CONSTANT_FORMULA_NUMBERS = frozenset({(2, 7, 1), (2, 7, 2), (2, 7, 4)})
 # A formula counts as piecewise constant when its first candidate takes at most this many values at
-# _N_X_VALUES_FOR_PIECEWISE_CONSTANT x-values across its interval, at c = 0.
-_MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT = 8
-_N_X_VALUES_FOR_PIECEWISE_CONSTANT = 1001
+# _N_X_VALUES_TO_DETECT_PIECEWISE_CONSTANT_FORMULA x-values across its interval, at c = 0.
+_MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT_FORMULA = 8
+_N_X_VALUES_TO_DETECT_PIECEWISE_CONSTANT_FORMULA = 1001
 _FORMULAS_TO_CHECK_FOR_C = [
     formula
     for formula in _SHIPPED_FORMULAS
-    if formula.number[0] != 1 and formula.number not in _PIECEWISE_CONSTANT_FORMULA_NUMBERS
+    if formula.number[0] != 1 and formula.number not in PIECEWISE_CONSTANT_FORMULA_NUMBERS
 ]
 
 
@@ -188,19 +186,18 @@ def test_formula_applies_c_as_declared(formula):
 
 
 def test_the_piecewise_constant_formulas_are_those_whose_first_candidate_takes_few_values():
-    """`_PIECEWISE_CONSTANT_FORMULA_NUMBERS` holds exactly the formulas outside category 1 whose first candidate takes
-    at most `_MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT` values at c = 0, so that `test_formula_applies_c_as_declared`
-    skips no other formula."""
+    """`PIECEWISE_CONSTANT_FORMULA_NUMBERS` holds exactly the formulas outside category 1 whose first candidate takes at
+    most `_MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT_FORMULA` values at c = 0, so that
+    `test_formula_applies_c_as_declared` skips no other formula."""
     # --- act --------------------------
     piecewise_constant_formula_numbers = set()
     for formula in _SHIPPED_FORMULAS:
         if formula.number[0] != 1:
             candidate = formula.build_all_candidates()[0]
-            n_intervals = _N_X_VALUES_FOR_PIECEWISE_CONSTANT - 1
-            x_values = [candidate.a + (candidate.b - candidate.a) * i / n_intervals for i in range(n_intervals + 1)]
-            n_distinct_values = len({candidate.xc_fun(x, 0.0) for x in x_values})
-            if n_distinct_values <= _MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT:
+            x_values = np.linspace(candidate.a, candidate.b, _N_X_VALUES_TO_DETECT_PIECEWISE_CONSTANT_FORMULA)
+            n_distinct_values = len({candidate.xc_fun(float(x), 0.0) for x in x_values})
+            if n_distinct_values <= _MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT_FORMULA:
                 piecewise_constant_formula_numbers.add(formula.number)
 
     # --- assert -----------------------
-    assert piecewise_constant_formula_numbers == _PIECEWISE_CONSTANT_FORMULA_NUMBERS
+    assert piecewise_constant_formula_numbers == PIECEWISE_CONSTANT_FORMULA_NUMBERS
