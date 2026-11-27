@@ -30,7 +30,8 @@ from sunnbear._core.utils.worker_pool import WorkerPool
 _DIFFICULTY_TIER_QUOTAS = tuple(
     ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
 )
-# The quotas under which the stage selects the suites of each series, keyed by the series' id.
+# `_QUOTAS_BY_SERIES_ID` maps a series' id to the series' quotas, under which the stage selects each suite of the
+# series.
 _QUOTAS_BY_SERIES_ID = {
     SB_A_SERIES.series_id: _DIFFICULTY_TIER_QUOTAS,
     SB_B_SERIES.series_id: _DIFFICULTY_TIER_QUOTAS,
@@ -64,13 +65,13 @@ class SuiteSelectionStage(PipelineStage[SuiteSelectionStateAccessor]):
       the smallest, is selected from the series' next larger suite.
 
     Every suite is selected by `select_diverse_problem_ids`, under the quotas that `_QUOTAS_BY_SERIES_ID` declares for
-    its series, among the candidates eligible for the suite: those that the suite is selected from, except that the
-    candidates of the largest suite of the a-series are not eligible for the largest suite of the b-series. The
-    a-series and the b-series give each difficulty tier exactly a quarter of every suite.
+    its series, from the candidates eligible for the suite. The candidates eligible for a suite are all candidates for
+    a largest suite, and the candidates of the series' next larger suite for a smaller suite, except that the
+    candidates of the largest suite of the a-series are not eligible for the largest suite of the b-series.
 
     The largest suite of the a-series is selected first, so where a tier has too few candidates for both largest
-    suites, the a-series' suite still meets that tier's quota, and the b-series' suite misses it: max-div fills the
-    b-series' suite with candidates of the other tiers, and the suite's selection details record the miss.
+    suites, the a-series' suite meets that tier's quota, and the b-series' suite misses it: max-div fills the b-series'
+    suite with candidates of other tiers, and its selection details record that the suite misses the quota.
 
     Each suite's diversity score is the score of its own test problems, by `compute_diversity_score`.
 

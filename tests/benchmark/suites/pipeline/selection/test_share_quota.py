@@ -42,8 +42,8 @@ def test_the_counts_of_a_selection_are_its_shares_of_the_size(quota, min_count_e
 
     # --- assert -----------------------
     assert count_quota == CountQuota(
-        label="D",
-        problem_ids=frozenset({problem_ids[1], problem_ids[3]}),
+        group_label="D",
+        member_ids=frozenset({problem_ids[1], problem_ids[3]}),
         min_count=min_count_expected,
         max_count=max_count_expected,
     )

@@ -1,9 +1,11 @@
 """This module selects diverse candidates from a `CandidatePool` by max-div, and scores the diversity of candidates.
 
 `select_diverse_problem_ids` searches for the most diverse selection under quotas on groups of candidates, and
-`compute_diversity_score` scores a given set of candidates. Both use 1 objective, which `_build_max_div_problem`
-defines: the geometric mean, with equal weights, of the geometric mean separation under each of 2 distances, where a
-selected candidate's separation is its distance to the nearest other selected candidate:
+`compute_diversity_score` scores a given set of candidates.
+
+Both use 1 objective, which `_build_max_div_problem` defines: the geometric mean, with equal weights, of the geometric
+mean separation under each of 2 distances, where a selected candidate's separation is its distance to the nearest
+other selected candidate:
 
 - the L1 distance between the scaled feature vectors, in which every feature block has a mean pairwise L1 distance
   of 1;
@@ -53,14 +55,14 @@ def select_diverse_problem_ids(
     sec_per_candidate: float,
     n_workers: int,
 ) -> tuple[tuple[ProblemId, ...], tuple[QuotaFulfillment, ...]]:
-    """Return the most diverse selection that holds `required_problem_ids` and best meets `quotas`, with fulfillments.
+    """Return the most diverse selection with `required_problem_ids` that best meets `quotas`, and how it meets each.
 
     max-div searches, by the objective of this module, for a selection of the required candidates plus `selection_size`
     other candidates, under these constraints:
 
-    - 1 per quota: the selection holds from the quota's smallest up to its largest count of the candidates of the
-      quota's group, with the counts that `ShareQuota.for_selection` gives for `selection_size`; a group holds only
-      candidates that are not required;
+    - 1 per quota: the selection holds at least the quota's smallest count and at most its largest count of the
+      candidates of the quota's group, with the counts that `ShareQuota.for_selection` gives for `selection_size`; a
+      group holds only candidates that are not required;
     - 1 more when there are required candidates: the selection holds all of them.
 
     max-div meets every constraint that can be met. When the quotas cannot all be met, for example because a group
@@ -69,7 +71,8 @@ def select_diverse_problem_ids(
 
     Args:
         candidate_pool: The candidates to select from.
-        selection_size: The number of selected candidates beyond the required ones, which the quotas' shares divide.
+        selection_size: The number of selected candidates beyond the required ones; each quota's shares of it must be
+            whole numbers of candidates.
         quotas: The quotas of the selection beyond the required candidates; empty for a selection without quotas.
         required_problem_ids: The candidates of `candidate_pool` that must be in the selection.
         seed: The seed of max-div's search.
@@ -89,38 +92,29 @@ def select_diverse_problem_ids(
     """
     problem_ids = candidate_pool.feature_matrix.problem_ids
     required_problem_id_set = set(required_problem_ids)
-    other_pool = candidate_pool.subset(
+    non_required_pool = candidate_pool.subset(
         [problem_id for problem_id in problem_ids if problem_id not in required_problem_id_set]
     )
-    n_other_candidates = len(other_pool.feature_matrix.problem_ids)
-    if n_other_candidates < selection_size:
+    n_non_required_candidates = len(non_required_pool.feature_matrix.problem_ids)
+    if n_non_required_candidates < selection_size:
         raise ValueError(
-            f"A pool of {n_other_candidates} candidates that are not required cannot fill a selection of "
+            f"A pool of {n_non_required_candidates} candidates that are not required cannot fill a selection of "
             f"{selection_size}."
         )
     else:
-        count_quotas = [quota.for_selection(other_pool, selection_size=selection_size) for quota in quotas]
+        count_quotas = [quota.for_selection(non_required_pool, selection_size=selection_size) for quota in quotas]
 
         # --- constraints ------------------------
-        row_by_problem_id = candidate_pool.feature_matrix.row_index_by_problem_id
-        constraints = []
-        for count_quota in count_quotas:
-            # max-div refuses a constraint on no candidates, or one whose smallest count exceeds its candidates. No
-            # selection holds more of a group's candidates than the group has, so lowering the smallest count to the
-            # group's size, or leaving out a group without candidates, changes no selection that meets the quota, and
-            # max-div returns the selection that comes closest to the quotas.
-            if count_quota.problem_ids:
-                constraints.append(
-                    Constraint(
-                        int_set={row_by_problem_id[problem_id] for problem_id in count_quota.problem_ids},
-                        min_count=min(count_quota.min_count, len(count_quota.problem_ids)),
-                        max_count=count_quota.max_count,
-                    )
-                )
+        row_index_by_problem_id = candidate_pool.feature_matrix.row_index_by_problem_id
+        # A group without candidates has nothing to select and gets no constraint, because max-div refuses a
+        # constraint on no candidates; its fulfillment still records whether the selection meets its quota.
+        constraints = [
+            count_quota.to_constraint(row_index_by_problem_id) for count_quota in count_quotas if count_quota.member_ids
+        ]
         if required_problem_id_set:
             constraints.append(
                 Constraint(
-                    int_set={row_by_problem_id[problem_id] for problem_id in required_problem_id_set},
+                    int_set={row_index_by_problem_id[problem_id] for problem_id in required_problem_id_set},
                     min_count=len(required_problem_id_set),
                     max_count=len(required_problem_id_set),
                 )

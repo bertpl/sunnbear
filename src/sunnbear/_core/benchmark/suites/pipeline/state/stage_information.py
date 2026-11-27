@@ -6,7 +6,7 @@ uses that type.
 """
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from functools import cached_property
 from typing import Any, NamedTuple, Self
 
@@ -214,8 +214,8 @@ class SuiteSelectionDetails:
 
     Attributes:
         benchmark_suite: The selected suite.
-        quota_fulfillments: The `QuotaFulfillment` of each quota that the suite was selected under; empty for a suite
-            selected without quotas.
+        quota_fulfillments: The `QuotaFulfillment` of each of the suite's quotas; empty for a suite selected without
+            quotas.
         diversity: The diversity score of the suite's own test problems, which `compute_diversity_score` gives.
     """
 
@@ -227,7 +227,7 @@ class SuiteSelectionDetails:
         """Return the details as JSON values, 1 key per attribute."""
         return {
             "benchmark_suite": self.benchmark_suite.to_json_values(),
-            "quota_fulfillments": [fulfillment.to_json_values() for fulfillment in self.quota_fulfillments],
+            "quota_fulfillments": [asdict(fulfillment) for fulfillment in self.quota_fulfillments],
             "diversity": self.diversity,
         }
 
@@ -239,6 +239,6 @@ class SuiteSelectionDetails:
         """Return the details that the output of `to_json_values` holds."""
         return cls(
             benchmark_suite=BenchmarkSuite.from_json_values(json_values["benchmark_suite"]),
-            quota_fulfillments=tuple(map(QuotaFulfillment.from_json_values, json_values["quota_fulfillments"])),
+            quota_fulfillments=tuple(QuotaFulfillment(**values) for values in json_values["quota_fulfillments"]),
             diversity=json_values["diversity"],
         )

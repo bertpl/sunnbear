@@ -88,8 +88,8 @@ def _finished_state() -> PipelineState:
                     series_id="sb-a", name="sb-1a", aliases=("sb-single",), problem_ids=(_PROBLEM_IDS[1],)
                 ),
                 quota_fulfillments=(
-                    QuotaFulfillment(label="A", min_count=1, max_count=1, n_selected=1),
-                    QuotaFulfillment(label="B", min_count=0, max_count=0, n_selected=0),
+                    QuotaFulfillment(group_label="A", min_count=1, max_count=1, n_selected_in_group=1),
+                    QuotaFulfillment(group_label="B", min_count=0, max_count=0, n_selected_in_group=0),
                 ),
                 diversity=0.5,
             ),
@@ -97,7 +97,9 @@ def _finished_state() -> PipelineState:
                 benchmark_suite=BenchmarkSuite(
                     series_id="sb-b", name="sb-1b", aliases=(), problem_ids=(_PROBLEM_IDS[4],)
                 ),
-                quota_fulfillments=(QuotaFulfillment(label="A", min_count=1, max_count=1, n_selected=0),),
+                quota_fulfillments=(
+                    QuotaFulfillment(group_label="A", min_count=1, max_count=1, n_selected_in_group=0),
+                ),
                 diversity=0.75,
             ),
         ]

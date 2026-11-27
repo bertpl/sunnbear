@@ -4,7 +4,7 @@
   selection misses a required candidate;
 - with required candidates, its selection holds all of them, and the others meet the quotas;
 - when a group holds fewer candidates than its quota, max-div returns a full selection that comes closest to the quotas;
-- it refuses a pool too small for the selection;
+- `select_diverse_problem_ids` refuses a pool too small for the selection;
 - `compute_diversity_score` gives the geometric mean of the candidates' separations under both distances;
 - the distance over the feature columns is the L1 distance that leaves the EDI column out.
 """
@@ -30,7 +30,7 @@ from sunnbear._core.benchmark.suites.pipeline.selection.diverse_selection import
 from sunnbear._core.stats import l1_distances_to
 from tests.benchmark.suites.pipeline.example_states import example_problem_ids
 
-# Each tier holds exactly a quarter of the selection, as in the benchmark suites of the a-series and the b-series.
+# Each tier holds exactly a quarter of the selection.
 _QUARTER_PER_TIER = tuple(
     ShareQuota.exactly(DifficultyTierCandidateGroup(tiers=(tier,)), Fraction(1, 4)) for tier in DifficultyTier
 )
@@ -92,12 +92,10 @@ def test_a_selection_that_misses_a_quota_records_the_miss(monkeypatch):
 
     # --- assert -----------------------
     assert selected_problem_ids == pool.feature_matrix.problem_ids[:16]
-    assert [(f.label, f.n_selected, f.is_met) for f in quota_fulfillments] == [
-        ("A", 16, False),
-        ("B", 0, False),
-        ("C", 0, False),
-        ("D", 0, False),
-    ]
+    assert quota_fulfillments == tuple(
+        QuotaFulfillment(group_label=label, min_count=4, max_count=4, n_selected_in_group=n_selected_in_group)
+        for label, n_selected_in_group in (("A", 16), ("B", 0), ("C", 0), ("D", 0))
+    )
 
 
 def test_a_selection_that_misses_a_required_candidate_stops_the_pipeline(monkeypatch):
@@ -149,7 +147,8 @@ def test_a_selection_with_required_candidates_holds_them_and_meets_the_quotas_ov
     assert len(selected_problem_ids) == 32
     assert set(required_problem_ids) <= set(selected_problem_ids)
     assert quota_fulfillments == tuple(
-        QuotaFulfillment(label=tier.value, min_count=4, max_count=4, n_selected=4) for tier in DifficultyTier
+        QuotaFulfillment(group_label=tier.value, min_count=4, max_count=4, n_selected_in_group=4)
+        for tier in DifficultyTier
     )
 
 
@@ -166,7 +165,7 @@ def test_a_group_with_too_few_candidates_misses_its_quota_and_the_selection_stay
     )
 
     # --- assert -----------------------
-    n_selected_by_label = {fulfillment.label: fulfillment.n_selected for fulfillment in quota_fulfillments}
+    n_selected_by_label = {f.group_label: f.n_selected_in_group for f in quota_fulfillments}
     assert len(selected_problem_ids) == 16
     assert n_selected_by_label["D"] == 3
     assert all(n_selected_by_label[label] >= 4 for label in "ABC")

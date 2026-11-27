@@ -294,16 +294,16 @@ class BenchmarkSuitesBuildDetails:
             return pl.DataFrame(rows)
 
     def suite_quota_counts(self) -> pl.DataFrame | None:
-        """Return 1 row per selected suite and quota, with the quota's counts and the suite's test problems toward it.
+        """Return 1 row per suite and quota, with how many of the suite's test problems count toward the quota.
 
         The rows follow the order of `suite_selection_details`, and within a suite the order of its quotas; a suite
         selected without quotas has no row. The columns are:
 
         - ``suite_name`` and ``series_id``;
-        - ``label``, the label of the quota's group of candidates;
+        - ``group_label``, the label of the quota's group of candidates;
         - ``min_count`` and ``max_count``, the smallest and the largest number of the suite's test problems that may
           count toward the quota;
-        - ``n_selected``, the number of the suite's test problems that count toward the quota.
+        - ``n_selected_in_group``, the number of the suite's test problems that count toward the quota.
 
         Return ``None`` when suite selection did not finish.
         """
@@ -316,10 +316,10 @@ class BenchmarkSuitesBuildDetails:
                     {
                         "suite_name": selection_details.benchmark_suite.name,
                         "series_id": selection_details.benchmark_suite.series_id,
-                        "label": fulfillment.label,
+                        "group_label": fulfillment.group_label,
                         "min_count": fulfillment.min_count,
                         "max_count": fulfillment.max_count,
-                        "n_selected": fulfillment.n_selected,
+                        "n_selected_in_group": fulfillment.n_selected_in_group,
                     }
                     for selection_details in suite_selection_details.values()
                     for fulfillment in selection_details.quota_fulfillments
@@ -327,10 +327,10 @@ class BenchmarkSuitesBuildDetails:
                 schema={
                     "suite_name": pl.String(),
                     "series_id": pl.String(),
-                    "label": pl.String(),
+                    "group_label": pl.String(),
                     "min_count": pl.Int64(),
                     "max_count": pl.Int64(),
-                    "n_selected": pl.Int64(),
+                    "n_selected_in_group": pl.Int64(),
                 },
             )
 

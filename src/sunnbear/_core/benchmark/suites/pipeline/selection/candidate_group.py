@@ -1,4 +1,6 @@
-"""`CandidateGroup` is a group of candidates that a quota counts; `DifficultyTierCandidateGroup` is its first kind.
+"""`CandidateGroup` is a group of candidates whose selected members a quota counts.
+
+`DifficultyTierCandidateGroup` groups the candidates by difficulty tier.
 
 A group decides from each candidate alone whether the candidate belongs to it, so a candidate's membership does not
 depend on the other candidates of a selection.
@@ -17,10 +19,7 @@ from .difficulty_tier import DifficultyTier
 #  CandidateGroup
 # ==================================================================================================
 class CandidateGroup(ABC):
-    """A `CandidateGroup` is a group of candidates, known by its label, that a quota counts.
-
-    Each subclass is 1 kind of group, with its own rule for which candidates belong to it.
-    """
+    """A `CandidateGroup` is a group of candidates, known by its label, that a quota counts."""
 
     @property
     @abstractmethod

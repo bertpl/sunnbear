@@ -5,13 +5,13 @@ the same objective in the same feature space:
 
 - `DifficultyTier`, which buckets a candidate by its empirical difficulty index (EDI), in `difficulty_tier`;
 - `CandidatePool`, the input candidates of a selection, in `candidate_pool`;
-- `CandidateGroup`, a group of candidates that a quota counts, and `DifficultyTierCandidateGroup`, the candidates of
-  some difficulty tiers, in `candidate_group`;
+- `CandidateGroup`, a group of candidates whose selected members a quota counts, and `DifficultyTierCandidateGroup`,
+  the candidates of some difficulty tiers, in `candidate_group`;
 - `ShareQuota`, the smallest and the largest share of a selection that a group may hold, as a stage declares it, in
   `share_quota`;
-- `CountQuota`, the same quota as the counts of 1 selection, in `count_quota`;
-- `QuotaFulfillment`, which records a quota's counts and the number of selected candidates that count toward it, in
-  `quota_fulfillment`;
+- `CountQuota`, a `ShareQuota` turned into the smallest and the largest count of 1 selection, in `count_quota`;
+- `QuotaFulfillment`, which records a quota's smallest and largest count and the number of selected candidates that
+  count toward it, in `quota_fulfillment`;
 - `select_diverse_problem_ids`, which selects the most diverse candidates of a `CandidatePool` by max-div under
   `ShareQuota`s, in `diverse_selection`;
 - `compute_diversity_score`, which scores a set of candidates by the objective of `select_diverse_problem_ids`, in
