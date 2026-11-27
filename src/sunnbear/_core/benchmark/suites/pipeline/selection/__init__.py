@@ -5,8 +5,9 @@ the same objective in the same feature space:
 
 - `DifficultyTier`, which buckets a candidate by its empirical difficulty index (EDI), in `difficulty_tier`;
 - `CandidatePool`, the input candidates of a selection, in `candidate_pool`;
-- `CandidateGroup`, a labeled group of candidates for a quota, and `DifficultyTierCandidateGroup`, the candidates of
-  some difficulty tiers, in `candidate_group`;
+- `CandidateGroup`, a labeled group of candidates for a quota, with `DifficultyTierCandidateGroup`, the candidates of
+  some difficulty tiers, and `FormulaCategoryCandidateGroup`, the candidates whose formulas lie below 1 formula
+  category, in `candidate_group`;
 - `ShareQuota`, the smallest and the largest share of a selection that a group may hold, as a stage declares it, in
   `share_quota`;
 - `CountQuota`, a `ShareQuota` turned into the smallest and the largest count of 1 selection, in `count_quota`;
@@ -20,7 +21,7 @@ the same objective in the same feature space:
 This package imports nothing from the packages `state` and `stages` beside it, which import from this package.
 """
 
-from .candidate_group import CandidateGroup, DifficultyTierCandidateGroup
+from .candidate_group import CandidateGroup, DifficultyTierCandidateGroup, FormulaCategoryCandidateGroup
 from .candidate_pool import CandidatePool
 from .count_quota import CountQuota
 from .difficulty_tier import DifficultyTier

@@ -1,6 +1,6 @@
 """The built-in series meet these checks:
 
-- they name their suites `sb-<size>a` and `sb-<size>b`;
+- they name their suites `sb-<size>a`, `sb-<size>b` and `pub-<size>`;
 - the a-series gives an alias to each of its sizes;
 - `BUILT_IN_SERIES_BY_ID` finds every built-in series by its id.
 """
@@ -10,6 +10,7 @@ import pytest
 from sunnbear._core.benchmark.suites.benchmark_suite import (
     BUILT_IN_SERIES,
     BUILT_IN_SERIES_BY_ID,
+    PUB_SERIES,
     SB_A_SERIES,
     SB_B_SERIES,
 )
@@ -21,10 +22,11 @@ from sunnbear._core.problems.core import ProblemId
     [
         pytest.param(SB_A_SERIES, 1024, "sb-1024a", ("sb-large",), id="a_series"),
         pytest.param(SB_B_SERIES, 64, "sb-64b", (), id="b_series"),
+        pytest.param(PUB_SERIES, 512, "pub-512", (), id="pub_series"),
     ],
 )
 def test_the_built_in_series_name_their_suites(series, size, name_expected, aliases_expected):
-    """A suite of the a-series or the b-series carries the name and the aliases of its size."""
+    """A suite of a built-in series carries the name and the aliases of its size."""
     # --- arrange ----------------------
     problem_ids = [ProblemId.from_string(f"f99.1[p={idx + 1}]") for idx in range(size)]
 
