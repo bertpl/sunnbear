@@ -1,12 +1,13 @@
 """`CandidateGroup` is a group of candidates; a quota counts how many of its members a selection holds.
 
-`DifficultyTierCandidateGroup` groups the candidates by difficulty tier.
+`DifficultyTierCandidateGroup` groups the candidates by difficulty tier, and `FormulaCategoryCandidateGroup` by an
+ancestor category of their formulas.
 """
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from sunnbear._core.problems.core import ProblemId
+from sunnbear._core.problems.core import FormulaCategory, ProblemId
 
 from .candidate_pool import CandidatePool
 from .difficulty_tier import DifficultyTier
@@ -64,3 +65,35 @@ class DifficultyTierCandidateGroup(CandidateGroup):
     def member_ids(self, candidate_pool: CandidatePool) -> list[ProblemId]:
         """Return the ids of the candidates of `candidate_pool` whose difficulty tier is 1 of `tiers`."""
         return [problem_id for problem_id, tier in candidate_pool.difficulty_tiers.items() if tier in self.tiers]
+
+
+# ==================================================================================================
+#  FormulaCategoryCandidateGroup
+# ==================================================================================================
+@dataclass(frozen=True)
+class FormulaCategoryCandidateGroup(CandidateGroup):
+    """A `FormulaCategoryCandidateGroup` holds the candidates whose formulas lie below 1 formula category.
+
+    A candidate belongs to the group when its formula lies at any depth below `category`, as
+    `FormulaCategory.is_ancestor_of` decides from the candidate's formula number. So the group of category 1 also
+    holds the candidates of its subcategories 1.1 and 1.99, whereas `FormulaRegistry.category_of` gives only a
+    formula's own category.
+
+    Attributes:
+        category: The group holds the candidates whose formulas lie at any depth below this category.
+    """
+
+    category: type[FormulaCategory]
+
+    @property
+    def label(self) -> str:
+        """Return the name of `category`."""
+        return self.category.name
+
+    def member_ids(self, candidate_pool: CandidatePool) -> list[ProblemId]:
+        """Return the ids of the candidates of `candidate_pool` whose formulas lie below `category`."""
+        return [
+            problem_id
+            for problem_id in candidate_pool.feature_matrix.problem_ids
+            if self.category.is_ancestor_of(problem_id.formula_number)
+        ]

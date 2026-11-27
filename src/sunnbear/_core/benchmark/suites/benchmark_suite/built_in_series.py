@@ -35,5 +35,16 @@ SB_B_SERIES = BenchmarkSuiteSeries(
     sizes=(1024, 512, 256, 128, 64),
 )
 
-BUILT_IN_SERIES = (SB_A_SERIES, SB_B_SERIES)
+PUB_SERIES = BenchmarkSuiteSeries(
+    series_id="pub",
+    readable_name="pub-series",
+    summary=(
+        "The pub-series holds only published test problems, some modified so that they meet the benchmark suite "
+        "inclusion conditions, for benchmarking solvers on published test problems alone."
+    ),
+    name_format="pub-{size}",
+    sizes=(512, 256, 128, 64),
+)
+
+BUILT_IN_SERIES = (SB_A_SERIES, SB_B_SERIES, PUB_SERIES)
 BUILT_IN_SERIES_BY_ID = {series.series_id: series for series in BUILT_IN_SERIES}

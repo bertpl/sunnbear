@@ -155,3 +155,27 @@ def test_category_description_defaults_to_none():
 
     # --- assert -----------------------
     assert (described.description, undescribed.description) == ("Example functions.", None)
+
+
+# ==================================================================================================
+#  ancestry
+# ==================================================================================================
+@pytest.mark.usefixtures("isolated_formula_registry")
+@pytest.mark.parametrize(
+    "number, is_ancestor_expected",
+    [
+        pytest.param((99, 1, 1), True, id="formula_of_the_category"),
+        pytest.param((99, 1, 2, 3), True, id="formula_2_levels_below"),
+        pytest.param((99, 1), False, id="the_category_itself"),
+        pytest.param((99,), False, id="the_parent_category"),
+        pytest.param((99, 10, 1), False, id="number_whose_text_starts_alike"),
+    ],
+)
+def test_a_category_is_the_ancestor_of_every_node_below_it(number, is_ancestor_expected):
+    """Category 99.1 is the ancestor of every node whose number starts with 99.1 and is longer, at any depth, and not
+    of itself, of its parent, or of a node below 99.10."""
+    # --- arrange ----------------------
+    category = define_category_cls((99, 1))
+
+    # --- act / assert -----------------
+    assert category.is_ancestor_of(number) is is_ancestor_expected

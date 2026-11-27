@@ -1,5 +1,10 @@
-"""`DifficultyTierCandidateGroup` holds the candidates of its difficulty tiers, labels itself by them, and refuses an
-empty or repeated list of tiers."""
+"""The kinds of `CandidateGroup` meet these checks:
+
+- `DifficultyTierCandidateGroup` holds the candidates of its difficulty tiers, labels itself by them, and refuses an
+  empty or repeated list of tiers;
+- `FormulaCategoryCandidateGroup` holds the candidates whose formulas lie at any depth below its category, and labels
+  itself by the category's name.
+"""
 
 import numpy as np
 import pytest
@@ -9,8 +14,11 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
     CandidatePool,
     DifficultyTier,
     DifficultyTierCandidateGroup,
+    FormulaCategoryCandidateGroup,
 )
+from sunnbear._core.problems.core import ProblemId
 from tests.benchmark.suites.pipeline.example_states import example_problem_ids
+from tests.problems.helpers.example_taxonomy_nodes import define_category_cls
 
 A, B, C, D = DifficultyTier
 
@@ -52,3 +60,26 @@ def test_a_group_refuses_an_empty_or_repeated_list_of_tiers(tiers):
     # --- act / assert -----------------
     with pytest.raises(ValueError, match="A group needs 1 or more tiers, each listed once"):
         DifficultyTierCandidateGroup(tiers=tiers)
+
+
+@pytest.mark.usefixtures("isolated_formula_registry")
+def test_a_formula_category_group_holds_the_candidates_below_its_category_at_any_depth():
+    """The group of category 99.5 holds the candidates of formulas 99.5.1 and 99.5.2.1, and not those of formulas
+    99.50.1 and 1.2.3; its label is the category's name."""
+    # --- arrange ----------------------
+    category = define_category_cls((99, 5))
+    problem_ids = [
+        ProblemId.from_string(text) for text in ("f99.5.1[p=1]", "f99.50.1[p=1]", "f99.5.2.1[p=1]", "f1.2.3[p=1]")
+    ]
+    pool = CandidatePool(
+        feature_matrix=FeatureMatrix(problem_ids=tuple(problem_ids), values=np.zeros((4, 2))),
+        edis=np.full(4, 10.0),
+        n_bisection_fevals=40,
+    )
+    group = FormulaCategoryCandidateGroup(category=category)
+
+    # --- act --------------------------
+    member_ids = group.member_ids(pool)
+
+    # --- assert -----------------------
+    assert (member_ids, group.label) == ([problem_ids[0], problem_ids[2]], "Example 99.5")

@@ -7,4 +7,4 @@
 
 from .benchmark_suite import BenchmarkSuite
 from .benchmark_suite_series import BenchmarkSuiteSeries
-from .built_in_series import BUILT_IN_SERIES, BUILT_IN_SERIES_BY_ID, SB_A_SERIES, SB_B_SERIES
+from .built_in_series import BUILT_IN_SERIES, BUILT_IN_SERIES_BY_ID, PUB_SERIES, SB_A_SERIES, SB_B_SERIES

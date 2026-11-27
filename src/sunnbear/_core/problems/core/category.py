@@ -78,6 +78,15 @@ class FormulaCategory(FormulaTaxonomyNode):
             )
         FormulaRegistry.register_category(cls)
 
+    @classmethod
+    def is_ancestor_of(cls, number: tuple[int, ...]) -> bool:
+        """Return whether the node numbered `number` lies below this category, at any depth.
+
+        The category is the ancestor of every node whose number starts with the category's number and is longer, so
+        category 1 is the ancestor of formula 1.99.1.6.3 and of category 1.99, and not of itself or of category 19.
+        """
+        return len(number) > len(cls.number) and number[: len(cls.number)] == cls.number
+
     def original_formula_number(self, formula_number: tuple[int, ...]) -> tuple[int, ...] | None:
         """Return the number of the formula that the formula numbered `formula_number`, below this category, modifies.
 
