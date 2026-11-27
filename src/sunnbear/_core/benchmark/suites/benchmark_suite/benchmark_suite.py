@@ -13,20 +13,18 @@ from sunnbear._core.problems.core import ProblemId
 class BenchmarkSuite:
     """A `BenchmarkSuite` is a named selection of test problems to benchmark solvers on.
 
-    A suite is known by its name and by each of its aliases. The suites that sunnbear builds are:
-
-    - the a-series, `sb-<size>a`: the highest-quality selection of benchmark suites;
-    - the b-series, `sb-<size>b`: the b-series shares no test problem with the a-series, so it is an independent series
-      of benchmark suites, which may be of lower quality.
-
-    Within each series, every suite holds every smaller suite of the series.
+    A suite belongs to 1 `BenchmarkSuiteSeries`, which creates it and gives it its name and aliases. A suite is known by
+    its name and by each of its aliases. The suite stores its name and aliases, so that a suite read back from a file
+    needs no lookup of its series.
 
     Attributes:
+        series_id: The `series_id` of the suite's series, such as ``sb-a``.
         name: The suite's name, such as ``sb-256a``.
         aliases: The suite's other names, such as ``sb-small``; most suites have none.
         problem_ids: The ids of the suite's test problems.
     """
 
+    series_id: str
     name: str
     aliases: tuple[str, ...]
     problem_ids: tuple[ProblemId, ...]
@@ -35,8 +33,13 @@ class BenchmarkSuite:
     #  Files
     # --------------------------------------------------------------------------
     def to_json_values(self) -> dict[str, Any]:
-        """Return the suite as JSON values: its ``name``, its ``aliases`` and its ``problem_ids`` as strings."""
-        return {"name": self.name, "aliases": list(self.aliases), "problem_ids": list(map(str, self.problem_ids))}
+        """Return the suite as JSON values, with its problem ids as strings."""
+        return {
+            "series_id": self.series_id,
+            "name": self.name,
+            "aliases": list(self.aliases),
+            "problem_ids": list(map(str, self.problem_ids)),
+        }
 
     # --------------------------------------------------------------------------
     #  Factory methods
@@ -45,6 +48,7 @@ class BenchmarkSuite:
     def from_json_values(cls, json_values: dict[str, Any]) -> Self:
         """Return the suite that the output of `to_json_values` holds."""
         return cls(
+            series_id=json_values["series_id"],
             name=json_values["name"],
             aliases=tuple(json_values["aliases"]),
             problem_ids=tuple(map(ProblemId.from_string, json_values["problem_ids"])),

@@ -6,9 +6,9 @@
 - where a tier has too few candidates for both largest suites, the largest suite of the b-series fills the rest of that
   tier's quota with candidates of a neighboring tier;
 - each series' smaller suites lie inside its larger ones, and every suite meets the quotas that the stage stores for it;
+- every suite carries the id of its series, and the name and aliases that its series gives it;
 - every suite's diversity score is the score of its own test problems;
-- the stage records max-div's time per candidate and seed in its parameters;
-- the a-series' aliases cover each of its sizes up to `MAX_SUITE_SIZE`.
+- the stage records max-div's time per candidate and seed in its parameters.
 """
 
 from collections import Counter
@@ -25,8 +25,7 @@ from sunnbear._core.benchmark.suites.pipeline.selection import (
     DifficultyTierQuotas,
     compute_diversity_score,
 )
-from sunnbear._core.benchmark.suites.pipeline.stages import MAX_SUITE_SIZE, SMALLEST_SUITE_SIZE, SuiteSelectionStage
-from sunnbear._core.benchmark.suites.pipeline.stages.s6_suite_selection.stage import _PRIMARY_SERIES_ALIASES
+from sunnbear._core.benchmark.suites.pipeline.stages import SuiteSelectionStage
 from sunnbear._core.benchmark.suites.pipeline.state import BenchmarkSuitesBuildDetails
 from sunnbear._core.utils.worker_pool import WorkerPool
 from tests.benchmark.suites.pipeline.example_states import build_state_before, example_problem_ids
@@ -68,19 +67,19 @@ def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails) -> None
     """
     edis = build_details.edis(PipelineStageId.FINE_CHARACTERIZATION)
     all_selection_details = list(build_details.suite_selection_details().values())
-    problem_ids_by_series = {"a": set(), "b": set()}
+    problem_ids_by_series_id = {"sb-a": set(), "sb-b": set()}
     for selection_details in all_selection_details:
         suite = selection_details.benchmark_suite
-        problem_ids_by_series[suite.name[-1]] |= set(suite.problem_ids)
+        problem_ids_by_series_id[suite.series_id] |= set(suite.problem_ids)
         tier_counts = {
             tier: sum(lower <= edis[p] <= upper for p in suite.problem_ids)
             for tier, (lower, upper) in selection_details.edi_range_by_tier.items()
         }
         assert tier_counts == DifficultyTierQuotas(len(suite.problem_ids)).quota_by_tier
-    assert not problem_ids_by_series["a"] & problem_ids_by_series["b"]
+    assert not problem_ids_by_series_id["sb-a"] & problem_ids_by_series_id["sb-b"]
     for selection_details, next_selection_details in pairwise(all_selection_details):
         suite, next_suite = selection_details.benchmark_suite, next_selection_details.benchmark_suite
-        if suite.name[-1] == next_suite.name[-1]:
+        if suite.series_id == next_suite.series_id:
             assert set(next_suite.problem_ids) < set(suite.problem_ids)
 
 
@@ -96,8 +95,8 @@ def _check_series_and_quotas(build_details: BenchmarkSuitesBuildDetails) -> None
 def test_the_largest_suite_size_is_the_largest_that_the_candidates_fill_twice(
     n_candidates, largest_suite_size_expected
 ):
-    """The size of the largest suites is the largest power of 2 up to `MAX_SUITE_SIZE` of which the candidates fill 2
-    suites."""
+    """The size of the largest suites is the largest size that both series declare and that is at most half the number
+    of candidates."""
     # --- act / assert -----------------
     assert SuiteSelectionStage._choose_largest_suite_size(n_candidates) == largest_suite_size_expected
 
@@ -119,18 +118,18 @@ def test_the_stage_stops_the_pipeline_below_2_suites_of_the_smallest_size():
 
 @pytest.mark.only_with_numba_jit
 def test_the_stage_selects_2_disjoint_largest_suites_and_drops_the_other_candidates():
-    """Of 160 candidates, 40 of each tier, the stage selects `sb-64a`, alias `sb-tiny`, and `sb-64b`, each with 16 of
-    each tier, and drops the other 32 with the reason `not_in_any_suite`; each suite's diversity score is that of
-    its own 64 test problems."""
+    """Of 160 candidates, 40 of each tier, the stage selects `sb-64a` of the a-series, alias `sb-tiny`, and `sb-64b` of
+    the b-series, each with 16 of each tier, and drops the other 32 with the reason `not_in_any_suite`; each suite's
+    diversity score is that of its own 64 test problems."""
     # --- act --------------------------
     build_details = _select_suites({A: 40, B: 40, C: 40, D: 40}, SuiteSelectionStage(_SEC_PER_CANDIDATE))
 
     # --- assert -----------------------
     all_selection_details = build_details.suite_selection_details()
-    assert [(name, details.benchmark_suite.aliases) for name, details in all_selection_details.items()] == [
-        ("sb-64a", ("sb-tiny",)),
-        ("sb-64b", ()),
-    ]
+    assert [
+        (name, details.benchmark_suite.series_id, details.benchmark_suite.aliases)
+        for name, details in all_selection_details.items()
+    ] == [("sb-64a", "sb-a", ("sb-tiny",)), ("sb-64b", "sb-b", ())]
     assert len(build_details.difficulty_tiers()) == 160
     drops = [build_details.drop_of(problem_id) for problem_id in build_details.problem_ids]
     assert Counter(drop.reason for drop in drops if drop is not None) == {"not_in_any_suite": 32}
@@ -183,17 +182,3 @@ def test_each_series_nests_its_suites():
         ("sb-64b", ()),
     ]
     _check_series_and_quotas(build_details)
-
-
-def test_the_aliases_cover_each_a_series_size_up_to_the_max_suite_size():
-    """The a-series of a run whose largest suites have `MAX_SUITE_SIZE` holds 1 suite per power of 2 from
-    `SMALLEST_SUITE_SIZE` up to `MAX_SUITE_SIZE`, and each such size has its aliases."""
-    # --- arrange ----------------------
-    a_series_sizes = set()
-    size = SMALLEST_SUITE_SIZE
-    while size <= MAX_SUITE_SIZE:
-        a_series_sizes.add(size)
-        size *= 2
-
-    # --- act / assert -----------------
-    assert set(_PRIMARY_SERIES_ALIASES) == a_series_sizes
