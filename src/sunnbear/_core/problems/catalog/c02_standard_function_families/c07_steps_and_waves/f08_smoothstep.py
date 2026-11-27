@@ -20,14 +20,14 @@ class Smoothstep(Formula):
     """`Smoothstep` is ``S_n(x - b*c + 1/2) - d`` on ``[-b, b]``, with the generalized smoothstep ``S_n``.
 
     ``S_n(t)`` is 0 for ``t <= 0``, 1 for ``t >= 1``, and in between the polynomial of degree ``2*n + 1`` whose first
-    ``n`` derivatives vanish at both ends: ``S_0`` is the clamped line, ``S_1(t) = 3*t^2 - 2*t^3`` the classic
-    smoothstep of computer graphics, ``S_2(t) = 6*t^5 - 15*t^4 + 10*t^3`` the "smootherstep". The function is exactly
-    ``-d`` and ``1 - d`` on either side of the step, at any steepness.
+    ``n`` derivatives vanish at both ends:
 
-    Between 0 and 1, the function sums the Bernstein form of ``S_n``,
-    ``sum(j = n+1 … 2*n+1) C(2*n + 1, j) * t^j * (1 - t)^(2*n + 1 - j)``: its terms are positive, so none cancels
-    another, and each comes from log-gamma, so no binomial coefficient overflows. Each evaluation sums ``n + 1`` terms,
-    so its cost grows with ``n``.
+    - ``S_0`` is the clamped line;
+    - ``S_1(t) = 3*t^2 - 2*t^3`` is the classic smoothstep of computer graphics;
+    - ``S_2(t) = 6*t^5 - 15*t^4 + 10*t^3`` is the "smootherstep".
+
+    The function is exactly ``-d`` and ``1 - d`` on either side of the step, at any steepness. Each evaluation of
+    ``S_n`` between 0 and 1 sums ``n + 1`` terms, so its cost grows with ``n``.
 
     - ``n`` is an integer of at least 0, the order.
     - ``b`` is the upper bound of the interval, at least 1/2. At ``c = 0`` the step lies on ``[-1/2, 1/2]``, so ``b``
@@ -81,7 +81,12 @@ class Smoothstep(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, b: float, d: float) -> float:
-        """Evaluate ``S_n(x - b*c + 1/2) - d``, with ``S_n`` in its Bernstein form between 0 and 1."""
+        """Evaluate ``S_n(x - b*c + 1/2) - d``, with ``S_n`` in its Bernstein form between 0 and 1.
+
+        The Bernstein form is ``sum(j = n+1 … 2*n+1) C(2*n + 1, j) * t^j * (1 - t)^(2*n + 1 - j)``: its terms are
+        positive, so none cancels another, and the function computes each binomial coefficient from log-gamma, so none
+        overflows.
+        """
         t = x - b * c + 0.5
         if t <= 0.0:
             return -d
@@ -103,13 +108,16 @@ class Smoothstep(Formula):
         return (-b, b)
 
     def recipes(self) -> tuple[ParamRecipe, ...]:
-        """Return the sweeps of ``b``, ``n`` and ``d``, each at the other 2 of ``n = 1``, ``b = 2^10`` and ``d = 1/2``.
+        """Return the sweeps of ``b``, ``n`` and ``d``, each with the other 2 parameters fixed.
+
+        The fixed values are ``n = 1``, ``b = 2^10`` and ``d = 1/2``.
 
         - The sweep of ``b``: from 1/2 to 2^40. From about 2^40 on, the step is narrower than the benchmark's ``xtol``,
-          so every solver sees the Heaviside step at ``d = 1/2``. Its steps are coarser than the other sweeps', because
-          the core solver configs spend their evaluations about as on the Butterworth filter's gain over its order.
+          so every solver sees the Heaviside step at ``d = 1/2``. Its grid is coarser than the other sweeps' grids,
+          because over ``b`` the core solver configs spend their evaluations in about the same pattern as on
+          `ButterworthFilterGain` over its order, so a finer grid would repeat that formula's candidates.
         - The sweep of ``n``, in 2 grids: ``n = 0``, the clamped line, and the integers from 1 to 2^10. Each
-          evaluation sums ``n + 1`` terms.
+          evaluation sums ``n + 1`` terms, so the sweep ends where an evaluation sums 1025 terms.
         - The sweep of ``d``: from 2^-40 to 1/2. Below 2^-40, the core solver configs spend their evaluations in about
           the same pattern as on the Heaviside step.
         """

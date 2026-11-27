@@ -24,8 +24,8 @@ class PulseWave(Formula):
     function has no root. At ``d = 1/2`` it is half the square wave.
 
     - ``n`` is an integer of at least 1. The interval holds the ``2*n + 1`` jumps from the up-jump at 0 to the up-jump
-      at ``n``; its bounds lie halfway along a low and a high part. At ``n = 0`` the interval would hold 1 jump, and the
-      function would be the Heaviside step at the same ``d``.
+      at ``n``; its lower bound lies halfway along a low part, and its upper bound halfway along a high part. At
+      ``n = 0`` the interval would hold 1 jump, and the function would be the Heaviside step at the same ``d``.
     - ``d`` lies between 0 and 1/2: it is the duty cycle, and the levels are ``-d`` and ``1 - d``, as the Heaviside
       step's are. ``d`` and ``1 - d`` give mirror images of each other, so ``d`` stays at or below 1/2.
 
@@ -80,9 +80,9 @@ class PulseWave(Formula):
         """Return 2 recipes: one that sweeps ``d`` at ``n = 2^20``, and one that sweeps ``n`` at ``d = 2^-8``.
 
         - The sweep of ``d``: from 2^-9 to 1/2. At ``d = 2^-10`` the c-range would be narrower than validation allows.
-          At many periods, the core solver configs spend their evaluations in another pattern than on the Heaviside
-          step at the same ``d``.
-        - The sweep of ``n``: from 1 to 2^20.
+          At ``n = 2^20``, the core solver configs spend their evaluations in the pattern that differs most from the
+          one on the Heaviside step at the same ``d``.
+        - The sweep of ``n``: from 1 to 2^20, the ``n`` of the sweep of ``d``, so that the 2 sweeps meet there.
         """
         return (
             ParamGrid(

@@ -1,7 +1,7 @@
 """These tests cover what the formulas of steps and waves (category 2.7) add to the plain functions:
 
 - the jumps of `HeavisideStep`, `FloorFunction` and `PulseWave`, where ``c`` moves them and where the functions take
-  no value 0; the check of how a formula applies ``c`` cannot judge these 3, because they are constant between jumps;
+  no value 0; `follows_effect_of_c` cannot judge these 3, because they are constant between jumps;
 - the sign changes of `SawtoothWave` and `PulseWave`;
 - the sum of `SquareWaveFourierPartialSum`, and its 1 root at ``d = 0``;
 - the forms of `ButterworthFilterGain` and `ChebyshevFilterGain` beyond the cutoff, which never overflow;
@@ -23,20 +23,22 @@ MPMATH_DIGITS = 50
 # ==================================================================================================
 #  Jumps
 # ==================================================================================================
-# Each entry holds a formula's number and the position of the jump that ``c`` moves, as a function of the candidate's
-# parameter values and ``c``: the step of `HeavisideStep`, the step of `FloorFunction` at which the sign changes, and
-# the up-jump of `PulseWave` at 0.
+# Each entry holds a formula's number and 2 functions of the candidate's parameter values: the position of the jump that
+# ``c`` moves, also a function of ``c``, and the largest ``abs(c)`` that the test uses, within every candidate's
+# c-range. The jump is the step of `HeavisideStep`, the step of `FloorFunction` at which the sign changes, and the
+# up-jump of `PulseWave` at 0; the pulse wave's c-range is about ``d/2`` wide on each side, the others' are wider than
+# 0.3.
 JUMP_POSITIONS = [
-    pytest.param((2, 7, 1), lambda param_values, c: c, id="heaviside_step"),
-    pytest.param((2, 7, 2), lambda param_values, c: param_values[0] * c, id="floor_function"),
-    pytest.param((2, 7, 4), lambda param_values, c: c, id="pulse_wave"),
+    pytest.param((2, 7, 1), lambda param_values, c: c, lambda param_values: 0.3, id="heaviside_step"),
+    pytest.param((2, 7, 2), lambda param_values, c: param_values[0] * c, lambda param_values: 0.3, id="floor_function"),
+    pytest.param((2, 7, 4), lambda param_values, c: c, lambda param_values: 0.25 * param_values[1], id="pulse_wave"),
 ]
 
 
-@pytest.mark.parametrize("formula_number, jump_position", JUMP_POSITIONS)
-def test_c_moves_the_jump_and_the_function_takes_no_value_0_beside_it(formula_number, jump_position):
-    """At several ``c`` within every candidate's c-range, the function jumps from negative to positive at the position
-    that ``c`` gives the jump: it is negative at the float below that position and positive at the float above it, and
+@pytest.mark.parametrize("formula_number, jump_position, max_abs_c_of", JUMP_POSITIONS)
+def test_c_moves_the_jump_and_the_function_takes_no_value_0_beside_it(formula_number, jump_position, max_abs_c_of):
+    """At several ``c`` within every candidate's c-range, the function jumps from negative to positive at the jump's
+    position for that ``c``: it is negative at the float below that position and positive at the float above it, and
     not 0 at the position itself."""
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number(formula_number)
@@ -44,8 +46,7 @@ def test_c_moves_the_jump_and_the_function_takes_no_value_0_beside_it(formula_nu
     # --- act / assert -----------------
     for candidate in formula.build_all_candidates():
         param_values = candidate.id.param_values
-        # The pulse wave's c-range is about d/2 wide on each side; the others' are wider than 0.3.
-        max_abs_c = 0.25 * param_values[1] if formula_number == (2, 7, 4) else 0.3
+        max_abs_c = max_abs_c_of(param_values)
         for c in (-max_abs_c, 0.0, max_abs_c):
             x_jump = jump_position(param_values, c)
             assert candidate.xc_fun(math.nextafter(x_jump, -math.inf), c) < 0.0, (candidate.id, c)
@@ -53,15 +54,34 @@ def test_c_moves_the_jump_and_the_function_takes_no_value_0_beside_it(formula_nu
             assert candidate.xc_fun(x_jump, c) != 0.0, (candidate.id, c)
 
 
-@pytest.mark.parametrize(
-    "formula_number, n_sign_changes", [((2, 7, 3), lambda n: 4 * n + 1), ((2, 7, 4), lambda n: 2 * n + 1)]
-)
-def test_waves_change_sign_as_often_as_their_docstrings_say(formula_number, n_sign_changes):
+def _x_values_between_sign_changes_of_the_pulse_wave(candidate, n):
+    """Return the pulse wave's x-values in the middle of each low and high part of its interval, at ``c = 0``."""
+    d = candidate.id.param_values[1]
+    return [candidate.a, *(k + offset for k in range(n) for offset in (0.5 * d, 0.5 * (1.0 + d))), candidate.b]
+
+
+# Each entry holds a formula's number, its number of sign changes at ``c = 0`` as a function of ``n``, and x-values
+# between each sign change and the next, as a function of the candidate and ``n``: the sawtooth's at each root plus and
+# minus 1/4, the pulse wave's in the middle of each high and low part.
+SIGN_CHANGES = [
+    pytest.param(
+        (2, 7, 3),
+        lambda n: 4 * n + 1,
+        lambda candidate, n: [k + offset for k in range(-n, n + 1) for offset in (-0.25, 0.25)],
+        id="sawtooth_wave",
+    ),
+    pytest.param((2, 7, 4), lambda n: 2 * n + 1, _x_values_between_sign_changes_of_the_pulse_wave, id="pulse_wave"),
+]
+
+
+@pytest.mark.parametrize("formula_number, n_sign_changes, x_values_between_sign_changes", SIGN_CHANGES)
+def test_waves_change_sign_as_often_as_their_docstrings_say(
+    formula_number, n_sign_changes, x_values_between_sign_changes
+):
     """At ``c = 0``, `SawtoothWave` changes sign ``4*n + 1`` times, at its roots and its jumps, and `PulseWave` changes
     sign ``2*n + 1`` times, at its jumps.
 
-    The x-values lie between each sign change and the next: the sawtooth's at each root plus and minus 1/4, the pulse
-    wave's in the middle of each high and low part. The test covers the candidates with ``n`` up to 64.
+    The test covers the candidates with ``n`` up to 64, which keeps it fast.
     """
     # --- arrange ----------------------
     formula = FormulaRegistry.formula_from_number(formula_number)
@@ -70,18 +90,9 @@ def test_waves_change_sign_as_often_as_their_docstrings_say(formula_number, n_si
     # --- act / assert -----------------
     for candidate in candidates:
         n = int(candidate.id.param_values[0])
-        if formula_number == (2, 7, 3):
-            x_values = [k + offset for k in range(-n, n + 1) for offset in (-0.25, 0.25)]
-        else:
-            d = candidate.id.param_values[1]
-            x_values = [
-                candidate.a,
-                *(k + offset for k in range(n) for offset in (0.5 * d, 0.5 * (1.0 + d))),
-                candidate.b,
-            ]
-        signs = [math.copysign(1.0, candidate.xc_fun(x, 0.0)) for x in x_values]
-        changes = sum(1 for sign_before, sign_after in itertools.pairwise(signs) if sign_before != sign_after)
-        assert changes == n_sign_changes(n), candidate.id
+        signs = [math.copysign(1.0, candidate.xc_fun(x, 0.0)) for x in x_values_between_sign_changes(candidate, n)]
+        n_changes = sum(1 for sign_before, sign_after in itertools.pairwise(signs) if sign_before != sign_after)
+        assert n_changes == n_sign_changes(n), candidate.id
 
 
 # ==================================================================================================
@@ -132,8 +143,8 @@ PLAIN_GAINS = [
 @pytest.mark.parametrize("formula_number, plain_gain", PLAIN_GAINS)
 @pytest.mark.parametrize("n", [1, 2, 5, 16, 64])
 def test_filter_gain_beyond_the_cutoff_agrees_with_its_plain_form(formula_number, plain_gain, n):
-    """Beyond the cutoff, where the plain form does not overflow, the filter gain, at the level 0, agrees with it to
-    within a relative 1e-12."""
+    """Beyond the cutoff, at values of ``u`` where the plain form does not overflow, the filter gain at the level 0
+    agrees with the plain form to within a relative 1e-12."""
     # --- arrange ----------------------
     gain = FormulaRegistry.formula_from_number(formula_number).bind_xc_fun((float(n), 0.0))
 
@@ -161,15 +172,15 @@ def test_filter_gain_is_minus_d_far_beyond_the_cutoff_at_its_highest_order(formu
 #  Smoothstep
 # ==================================================================================================
 # Each entry holds an order and the smoothstep of that order in its usual form.
-SMOOTHSTEPS = [
+USUAL_SMOOTHSTEPS = [
     pytest.param(0, lambda t: t, id="clamped_line"),
     pytest.param(1, lambda t: 3 * t**2 - 2 * t**3, id="smoothstep"),
     pytest.param(2, lambda t: 6 * t**5 - 15 * t**4 + 10 * t**3, id="smootherstep"),
 ]
 
 
-@pytest.mark.parametrize("n, smoothstep", SMOOTHSTEPS)
-def test_smoothstep_agrees_with_its_usual_form(n, smoothstep):
+@pytest.mark.parametrize("n, usual_smoothstep", USUAL_SMOOTHSTEPS)
+def test_smoothstep_agrees_with_its_usual_form(n, usual_smoothstep):
     """The Bernstein form of `Smoothstep`, at the level 0, agrees with the usual form of orders 0, 1 and 2 to within a
     relative 1e-12."""
     # --- arrange ----------------------
@@ -179,7 +190,7 @@ def test_smoothstep_agrees_with_its_usual_form(n, smoothstep):
     for x in (1e-6 - 0.5, -0.4, -0.25, 0.0, 0.2, 0.499):
         # The formula's argument, as it computes it from x at c = 0.
         t = x + 0.5
-        assert smoothstep_n(x, 0.0) == pytest.approx(smoothstep(t), rel=1e-12, abs=0.0), x
+        assert smoothstep_n(x, 0.0) == pytest.approx(usual_smoothstep(t), rel=1e-12, abs=0.0), x
 
 
 @pytest.mark.parametrize("n", [1, 16, 1024])

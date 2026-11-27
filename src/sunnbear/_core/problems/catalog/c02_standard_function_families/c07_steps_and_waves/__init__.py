@@ -7,8 +7,8 @@ The steps and waves give behaviors absent from the other families:
 - a smooth step whose steepness a parameter sets, up to a step in float64, with ripples, an overshoot or exactly
   constant plateaus beside it.
 
-A formula with a level subtracts it as ``d``, which sets where the root lies between the 2 plateaus, or, at a jump,
-the ratio of the 2 levels.
+A formula with a level ``d`` subtracts ``d`` from its function: ``d`` sets where the root lies between the 2 plateaus
+or, at a jump, the ratio of the 2 levels beside the jump.
 
 Every formula shifts ``x`` by a multiple of ``c``:
 

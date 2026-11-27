@@ -20,10 +20,15 @@ class ButterworthFilterGain(Formula):
     """`ButterworthFilterGain` is ``G_n(x - c) - d`` on ``[0, 2]``, with the gain ``G_n(u) = 1/sqrt(1 + abs(u)^(2*n))``.
 
     ``G_n`` is the gain of the Butterworth low-pass filter of order ``n``, at the frequency ``u`` relative to its
-    cutoff. It is 1 at 0, where its first ``2*n - 1`` derivatives vanish, falls through ``1/sqrt(2)`` at ``u = 1`` for
-    every ``n``, and decays as ``u^(-n)`` beyond 1; for a large ``n`` it is close to a step at 1, and in float64 it is
-    exactly 1 on most of ``[0, 1)`` and exactly 0 on most of ``(1, 2]``. ``G_n`` is even, so the interval starts at its
-    maximum and leaves out the mirror image of the root.
+    cutoff:
+
+    - it is 1 at 0, where its first ``2*n - 1`` derivatives vanish;
+    - it falls through ``1/sqrt(2)`` at ``u = 1`` for every ``n``;
+    - it decays as ``u^(-n)`` beyond 1.
+
+    For a large ``n`` it is close to a step at 1, and in float64 it is exactly 1 on most of ``[0, 1)`` and exactly 0 on
+    most of ``(1, 2]``. ``G_n`` is even, so the interval starts at its maximum and leaves out the mirror image of the
+    root.
 
     - ``n`` is an integer of at least 1, the order.
     - ``d`` is the level, between 0 and 1/2, so the root lies on the falling side at or beyond the cutoff: at
@@ -32,10 +37,6 @@ class ButterworthFilterGain(Formula):
 
     A pair of ``n`` and ``d`` is valid only when the root at ``c = 0``, ``u = (1/d^2 - 1)^(1/(2*n))``, lies inside the
     interval.
-
-    Beyond ``abs(u) = 1``, the function computes ``G_n`` as ``s/sqrt(1 + s^2)`` with ``s = abs(u)^(-n)``, which
-    underflows to 0 for a large ``n`` where ``abs(u)^(2*n)`` would overflow: without numba's compilation, Python raises
-    on that overflow.
 
     ``c`` shifts x, so the root at ``c = 0`` moves by ``c``.
     """
@@ -76,7 +77,12 @@ class ButterworthFilterGain(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, d: float) -> float:
-        """Evaluate ``G_n(x - c) - d``, in the form that never overflows."""
+        """Evaluate ``G_n(x - c) - d``, in the form that never overflows.
+
+        Beyond ``abs(u) = 1``, it computes ``G_n`` as ``s/sqrt(1 + s^2)`` with ``s = abs(u)^(-n)``. For a large ``n``,
+        ``s`` underflows to 0 where ``abs(u)^(2*n)`` would overflow, and plain Python, unlike numba-compiled code,
+        raises on that overflow.
+        """
         u = abs(x - c)
         if u <= 1.0:
             return 1.0 / math.sqrt(1.0 + u ** (2.0 * n)) - d

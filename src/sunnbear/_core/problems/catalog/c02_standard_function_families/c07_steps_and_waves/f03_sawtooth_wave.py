@@ -21,8 +21,8 @@ class SawtoothWave(Formula):
 
     ``s(u) = u - floor(u + 1/2)`` rises with slope 1 from -1/2 to 1/2 on each tooth, and jumps back down to -1/2 at
     each half-integer. The interval holds the ``2*n + 1`` roots at the integers from ``-n`` to ``n``, and the ``2*n``
-    jumps between them, where the function changes sign too, without a root. Its bounds lie halfway between a root and
-    the next jump, where the function is -1/4 and 1/4.
+    jumps between them, where the function changes sign too, without a root. The interval's bounds lie halfway between
+    a root and the next jump, where the function is -1/4 and 1/4.
 
     ``n`` is an integer of at least 1. A solver halves the interval until it holds 1 tooth, then finds the root on the
     tooth's ramp, which is a line, in a few evaluations; the jumps seldom end a solve. At ``n = 0`` the function is a

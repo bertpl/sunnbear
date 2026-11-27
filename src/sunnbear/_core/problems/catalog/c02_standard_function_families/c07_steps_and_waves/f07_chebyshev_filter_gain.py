@@ -21,6 +21,7 @@ class ChebyshevFilterGain(Formula):
 
     ``G_n`` is the gain of the Chebyshev low-pass filter of type I, of order ``n`` and with the ripple factor 1, at the
     frequency ``u`` relative to its cutoff; the filter of type II is usually called the inverse Chebyshev filter.
+
     ``T_n`` is the Chebyshev polynomial of the 1st kind, which is ``cos(n*acos(u))`` on ``[0, 1]`` and
     ``cosh(n*acosh(u))`` beyond 1. On ``[0, 1]``, ``G_n`` ripples ``n`` times between ``1/sqrt(2)`` and 1; beyond 1 it
     falls faster than the Butterworth filter's gain of the same order, over a width of about ``1/n^2``. ``G_n`` is even,
@@ -33,10 +34,6 @@ class ChebyshevFilterGain(Formula):
 
     A pair of ``n`` and ``d`` is valid only when the function changes sign on the interval at ``c = 0``: ``d`` lies
     below ``G_n(0)``, which is 1 for an odd ``n`` and ``1/sqrt(2)`` for an even one, and above ``G_n(2)``.
-
-    Beyond the cutoff, the function computes ``G_n`` as ``2*v/sqrt(1 + 6*v^2 + v^4)`` with ``v = exp(-n*acosh(u))``,
-    which underflows to 0 for a large ``n`` where ``cosh(n*acosh(u))`` would overflow: without numba's compilation,
-    Python raises on that overflow.
 
     ``c`` shifts x, so the roots at ``c = 0`` move by ``c``.
 
@@ -87,7 +84,12 @@ class ChebyshevFilterGain(Formula):
 
     @staticmethod
     def parametrized_fun(x: float, c: float, n: float, d: float) -> float:
-        """Evaluate ``G_n(x - c) - d``, in the form that never overflows."""
+        """Evaluate ``G_n(x - c) - d``, in the form that never overflows.
+
+        Beyond the cutoff, it computes ``G_n`` as ``2*v/sqrt(1 + 6*v^2 + v^4)`` with ``v = exp(-n*acosh(u))``. For a
+        large ``n``, ``v`` underflows to 0 where ``cosh(n*acosh(u))`` would overflow, and plain Python, unlike
+        numba-compiled code, raises on that overflow.
+        """
         u = abs(x - c)
         if u <= 1.0:
             t = math.cos(n * math.acos(u))

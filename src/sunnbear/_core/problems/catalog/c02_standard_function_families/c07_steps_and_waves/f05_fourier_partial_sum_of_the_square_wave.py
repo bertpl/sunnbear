@@ -20,9 +20,9 @@ class SquareWaveFourierPartialSum(Formula):
     """`SquareWaveFourierPartialSum` is ``S_n(x - c) - d`` on ``[-1/2, 1/2]``.
 
     ``S_n(u) = (4/pi)*sum(k = 0 … n-1) sin((2*k + 1)*pi*u)/(2*k + 1)`` is the Fourier series of the square wave
-    ``sign(sin(pi*u))`` cut off after ``n`` terms. Its slope at the root at 0 is ``4*n``; next to the jump it overshoots
-    1 by about 9 % of the jump, to about 1.18, and then ripples about 1 (the Gibbs phenomenon). On ``(0, 1)`` every
-    partial sum is positive.
+    ``sign(sin(pi*u))`` cut off after ``n`` terms. The slope of ``S_n`` at the root at 0 is ``4*n``; next to the square
+    wave's jump at 0 it overshoots 1 by about 9 % of that jump, to about 1.18, and then ripples about 1 (the Gibbs
+    phenomenon). On ``(0, 1)`` every partial sum is positive.
 
     - ``n`` is an integer of at least 1, the number of terms. Each evaluation sums them, so its cost grows with ``n``.
     - ``d`` is the level, at least 0. At ``d = 0`` the root lies at 0, an inflection point. A larger ``d`` moves the
@@ -78,7 +78,8 @@ class SquareWaveFourierPartialSum(Formula):
 
         - The sweep of ``n``: from 1 to 2^12. Each evaluation sums ``n`` terms, so the sweep ends where an evaluation
           costs 2^12 sines.
-        - The sweep of ``d``: from 0.01 to 0.99, at a quarter of that cost.
+        - The sweep of ``d``: from 0.01 to 0.99, at ``n = 2^10``, where an evaluation costs a quarter of the sines at
+          the end of the sweep of ``n``; ``d = 0`` lies in the sweep of ``n``, and 0.99 stays below ``S_n(1/2)``.
         """
         return (
             ParamGrid(

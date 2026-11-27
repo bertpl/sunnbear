@@ -20,7 +20,7 @@ class HeavisideStep(Formula):
     step, where it has no root, and bisection converges to the step.
 
     ``d`` lies between 0 and 1/2. A secant through the 2 bounds crosses 0 at the fraction ``d`` of the interval, so
-    ``d`` sets how far from the step an interpolating solver's first step lands. ``d`` and ``1 - d`` give mirror
+    ``d`` sets how far from the step an interpolating solver's first estimate lands. ``d`` and ``1 - d`` give mirror
     images of each other, with x, f and ``c`` negated, so ``d`` stays at or below 1/2. At ``d = 1/2`` the function is
     half the sign function, apart from its value at the step.
 
