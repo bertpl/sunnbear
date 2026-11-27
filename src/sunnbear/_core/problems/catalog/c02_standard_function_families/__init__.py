@@ -9,6 +9,7 @@ from . import (
     c04_hyperbolic_functions,
     c05_exponential_and_logarithm,
     c06_trigonometric_functions,
+    c07_steps_and_waves,
 )
 
 
@@ -19,7 +20,7 @@ class StandardFunctionFamilies(FormulaCategory):
     name = "Standard function families"
     description = (
         "Families of standard functions, such as polynomials, powers and the hyperbolic functions. Their parameters "
-        "set what a solver has to deal with, such as roots close together, an infinite slope, a pole or exponential "
-        "growth."
+        "set what a solver has to deal with, such as roots close together, an infinite slope, a pole, a jump or "
+        "exponential growth."
     )
     is_builtin_only = True

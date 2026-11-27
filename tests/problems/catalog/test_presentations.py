@@ -7,11 +7,13 @@ The tests of how category 1's formulas apply ``c`` live with the survey of publi
 the rule of category 1 for the size of the shift.
 """
 
+import numpy as np
 import pytest
 
 import sunnbear._core.problems.catalog as catalog
 from sunnbear._core.problems.core import Formula, FormulaRegistry
 from tests.problems.helpers.effect_of_c_check import follows_effect_of_c
+from tests.problems.helpers.piecewise_constant_formulas import PIECEWISE_CONSTANT_FORMULA_NUMBERS
 
 _CATALOG_PREFIX = f"{catalog.__name__}."
 _SHIPPED_FORMULAS = [
@@ -20,7 +22,15 @@ _SHIPPED_FORMULAS = [
 _SHIPPED_CATEGORIES = [
     category for category in FormulaRegistry.categories() if type(category).__module__.startswith(_CATALOG_PREFIX)
 ]
-_FORMULAS_TO_CHECK_FOR_C = [formula for formula in _SHIPPED_FORMULAS if formula.number[0] != 1]
+# A formula counts as piecewise constant when its first candidate takes at most this many values at
+# _N_X_VALUES_TO_DETECT_PIECEWISE_CONSTANT_FORMULA x-values across its interval, at c = 0.
+_MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT_FORMULA = 8
+_N_X_VALUES_TO_DETECT_PIECEWISE_CONSTANT_FORMULA = 1001
+_FORMULAS_TO_CHECK_FOR_C = [
+    formula
+    for formula in _SHIPPED_FORMULAS
+    if formula.number[0] != 1 and formula.number not in PIECEWISE_CONSTANT_FORMULA_NUMBERS
+]
 
 
 # ==================================================================================================
@@ -173,3 +183,21 @@ def test_formula_applies_c_as_declared(formula):
     judged = [result for result in results if result is not None]
     assert judged
     assert all(judged)
+
+
+def test_the_piecewise_constant_formulas_are_those_whose_first_candidate_takes_few_values():
+    """`PIECEWISE_CONSTANT_FORMULA_NUMBERS` holds exactly the formulas outside category 1 whose first candidate takes at
+    most `_MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT_FORMULA` values at c = 0, so that
+    `test_formula_applies_c_as_declared` skips no other formula."""
+    # --- act --------------------------
+    piecewise_constant_formula_numbers = set()
+    for formula in _SHIPPED_FORMULAS:
+        if formula.number[0] != 1:
+            candidate = formula.build_all_candidates()[0]
+            x_values = np.linspace(candidate.a, candidate.b, _N_X_VALUES_TO_DETECT_PIECEWISE_CONSTANT_FORMULA)
+            n_distinct_values = len({candidate.xc_fun(float(x), 0.0) for x in x_values})
+            if n_distinct_values <= _MAX_DISTINCT_VALUES_OF_PIECEWISE_CONSTANT_FORMULA:
+                piecewise_constant_formula_numbers.add(formula.number)
+
+    # --- assert -----------------------
+    assert piecewise_constant_formula_numbers == PIECEWISE_CONSTANT_FORMULA_NUMBERS

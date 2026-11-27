@@ -17,6 +17,15 @@ from sunnbear._core.problems.core import FormulaRegistry
 #   recipes hold ``b = 1``, which counts once. `InverseSine` (2.6.5) has 1 at ``d = 0`` and 300 from the sweep of ``d``.
 # - `InverseTangent` (2.6.6) has 241 candidates from the sweep of ``b`` and 121 from the sweep of ``d``; both sweeps
 #   hold ``b = 2^30``, ``d = 1``, which counts once.
+# - In a formula of 2.7 that sweeps 2 or more parameters, the point at which its sweeps meet counts once:
+#   - `PulseWave` (2.7.4): 81 from the sweep of ``d`` and 76 from the sweep of ``n``;
+#   - `ButterworthFilterGain` (2.7.6): 156 from the sweep of ``n`` and 101 from the sweep of ``d``;
+#   - `ChebyshevFilterGain` (2.7.7): 176 from the sweep of ``n`` and 91 from the sweep of ``d`` below the ripples,
+#     which meet, and 29 within the ripples;
+#   - `Smoothstep` (2.7.8): 83 from the sweep of ``b``, 1 + 36 from the sweep of ``n`` and 157 from the sweep of ``d``,
+#     which all meet at ``n = 1``, ``b = 2^10``, ``d = 1/2``.
+#   `SquareWaveFourierPartialSum` (2.7.5) has 96 candidates from the sweep of ``n`` and 99 from the sweep of ``d``,
+#   which do not meet.
 CANDIDATE_COUNTS = [
     pytest.param((2, 1, 1), 1, id="linear"),
     pytest.param((2, 1, 2), 5 * 31, id="linear_plus_even_power"),
@@ -53,6 +62,14 @@ CANDIDATE_COUNTS = [
     pytest.param((2, 6, 4), 264, id="tangent_across_poles"),
     pytest.param((2, 6, 5), 1 + 300, id="inverse_sine"),
     pytest.param((2, 6, 6), 241 + 121 - 1, id="inverse_tangent"),
+    pytest.param((2, 7, 1), 151, id="heaviside_step"),
+    pytest.param((2, 7, 2), 186, id="floor_function"),
+    pytest.param((2, 7, 3), 176, id="sawtooth_wave"),
+    pytest.param((2, 7, 4), 81 + 76 - 1, id="pulse_wave"),
+    pytest.param((2, 7, 5), 96 + 99, id="fourier_partial_sum_of_the_square_wave"),
+    pytest.param((2, 7, 6), 156 + 101 - 1, id="butterworth_filter_gain"),
+    pytest.param((2, 7, 7), 176 + 91 - 1 + 29, id="chebyshev_filter_gain"),
+    pytest.param((2, 7, 8), 83 + 1 + 36 + 157 - 2, id="smoothstep"),
 ]
 
 
