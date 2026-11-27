@@ -35,7 +35,7 @@ _DEFAULT_C_RANGE = CRange(c_min=-1.0, c_max=1.0)
 def example_problem_ids(n_candidates: int, *, category_number: int = 99, formula_number: int = 1) -> list[ProblemId]:
     """Return the ids of `n_candidates` candidates of the formula numbered ``(category_number, formula_number)``.
 
-    No registered formula needs that number, because a state of `build_state_before` reads no formula.
+    The number need not belong to a registered formula, because a state of `build_state_before` reads no formula.
     """
     return [ProblemId.from_string(f"f{category_number}.{formula_number}[p={idx + 1}]") for idx in range(n_candidates)]
 

@@ -1,7 +1,7 @@
 """`CandidateGroup` is a group of candidates; a quota counts how many of its members a selection holds.
 
-`DifficultyTierCandidateGroup` groups the candidates by difficulty tier, and `FormulaCategoryCandidateGroup` by the
-formula category that their formulas lie below.
+`DifficultyTierCandidateGroup` groups the candidates by difficulty tier, and `FormulaCategoryCandidateGroup` by an
+ancestor category of their formulas.
 """
 
 from abc import ABC, abstractmethod
@@ -75,9 +75,9 @@ class FormulaCategoryCandidateGroup(CandidateGroup):
     """A `FormulaCategoryCandidateGroup` holds the candidates whose formulas lie below 1 formula category.
 
     A candidate belongs to the group when its formula lies at any depth below `category`, as
-    `FormulaCategory.is_ancestor_of` decides from the candidate's formula number. So the group of category 1 holds the
-    formulas of its subcategories 1.1 and 1.99 too, where `FormulaRegistry.category_of` gives a formula's own category
-    only.
+    `FormulaCategory.is_ancestor_of` decides from the candidate's formula number. So the group of category 1 also
+    holds the candidates of its subcategories 1.1 and 1.99, whereas `FormulaRegistry.category_of` gives only a
+    formula's own category.
 
     Attributes:
         category: The formula category whose formulas, at any depth, the group holds.
@@ -87,7 +87,7 @@ class FormulaCategoryCandidateGroup(CandidateGroup):
 
     @property
     def label(self) -> str:
-        """Return the category's name, such as "Published test problems"."""
+        """Return the name of `category`."""
         return self.category.name
 
     def member_ids(self, candidate_pool: CandidatePool) -> list[ProblemId]:

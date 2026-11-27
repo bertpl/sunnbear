@@ -5,7 +5,8 @@
   the b-series;
 - it stores each candidate's tier, selects 2 disjoint largest suites of the a-series and the b-series, and drops the
   other candidates;
-- the pub-series selects its suites from the candidates of category 1 alone, and the drops keep its candidates;
+- the pub-series selects its suites from the candidates of category 1 alone, and the stage does not drop the
+  candidates of its largest suite;
 - where a tier has too few candidates for both largest suites, the largest suite of the b-series misses that tier's
   quota, and its selection details record that the suite misses the quota;
 - each series' smaller suites lie inside its larger ones, and every suite meets its quotas when the candidates allow;
@@ -137,7 +138,7 @@ def test_the_largest_suite_size_is_the_largest_at_which_the_disjoint_suites_fit(
     disjoint_series, n_candidates, largest_suite_size_expected
 ):
     """The size of the largest suites of disjoint series is the largest size that each of them declares and at which
-    that many suites fit into the candidates, or None when not even the smallest size fits."""
+    1 suite per series fits into the candidates, or None when not even the smallest size fits."""
     # --- act / assert -----------------
     assert (
         SuiteSelectionStage._choose_largest_suite_size(n_candidates, disjoint_series=disjoint_series)

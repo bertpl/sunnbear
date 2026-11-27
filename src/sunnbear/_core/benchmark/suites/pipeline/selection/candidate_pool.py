@@ -31,10 +31,6 @@ class CandidatePool:
     edis: np.ndarray
     n_bisection_fevals: int
 
-    def __len__(self) -> int:
-        """Return the number of candidates in the pool."""
-        return len(self.feature_matrix.problem_ids)
-
     @cached_property
     def difficulty_tiers(self) -> dict[ProblemId, DifficultyTier]:
         """Return each candidate's difficulty tier, from its EDI, keyed by id in the order of the pool."""
