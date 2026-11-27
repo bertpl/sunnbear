@@ -8,7 +8,7 @@
   "built_with": {
     "max-div": "0.21.8",
     "snuffled": "0.1.11",
-    "sunnbear": "0.4.17+dev"
+    "sunnbear": "0.4.18"
   },
   "content_hash": "64c894f8813a5d15e183fc47914a8b40c8a6b2af5ce196dee8ba312b216ceb43",
   "files": [
